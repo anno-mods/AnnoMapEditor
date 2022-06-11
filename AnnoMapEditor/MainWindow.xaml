@@ -1,0 +1,70 @@
+﻿<Window x:Class="AnnoMapEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:AnnoMapEditor.Controls"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800"
+        Background="#182B3F">
+    <Window.Resources>
+        <Style x:Key="DefaultButtonStyle" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="FontFamily" Value="Verdana" />
+            <Setter Property="FontSize" Value="11px" />
+            <Setter Property="Foreground" Value="#f0f0f0" />
+            <Setter Property="Background" Value="#8024415F" />
+            <Setter Property="Width" Value="auto" />
+            <Setter Property="Padding" Value="8,6,8,6" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border BorderThickness="0"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                                x:Name="border"
+                                CornerRadius="3"
+                                SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                            VerticalAlignment="Center" Name="content"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#24415F" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#182B3F" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="DefaultLabelStyle" TargetType="TextBlock">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="FontFamily" Value="Verdana" />
+            <Setter Property="FontSize" Value="11px" />
+            <Setter Property="Foreground" Value="#e0e0e0" />
+            <Setter Property="Width" Value="auto" />
+            <Setter Property="Padding" Value="2,6,2,6" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <controls:MapView Grid.Column="0" DataContext="{Binding ViewModel.Session, Mode=OneWay}" />
+        <StackPanel Grid.Column="0" Margin="16">
+            <Button Click="OpenFile_Click" Style="{StaticResource DefaultButtonStyle}" Width="200" HorizontalAlignment="Left">Open map template...</Button>
+            <TextBlock Style="{StaticResource DefaultLabelStyle}" HorizontalAlignment="Left" Text="{Binding ViewModel.SessionFilePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Click="Configure_Click" Style="{StaticResource DefaultButtonStyle}" Width="200" HorizontalAlignment="Left">Set RDA path...</Button>
+            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource DefaultLabelStyle}" Text="{Binding Settings.DataPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Style="{StaticResource DefaultLabelStyle}" Text="✔" Visibility="{Binding Settings.IsValidDataPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
