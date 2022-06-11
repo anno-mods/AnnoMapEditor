@@ -24,7 +24,7 @@ namespace AnnoMapEditor.Utils
                 }
             }
         }
-        private string? _dataPath = UserSettings.Default.DataPath;
+        private string? _dataPath;
 
         public bool IsValidDataPath
         {
@@ -32,6 +32,11 @@ namespace AnnoMapEditor.Utils
             private set => SetProperty(ref _isValidDataPath, value);
         }
         private bool _isValidDataPath = false;
+
+        public Settings()
+        {
+            DataPath = UserSettings.Default.DataPath;
+        }
 
         private static string? CorrectDataPath(string? path)
         {

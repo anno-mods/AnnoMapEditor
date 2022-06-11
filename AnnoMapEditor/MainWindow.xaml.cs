@@ -44,7 +44,7 @@ namespace AnnoMapEditor
 
             if (true == picker.ShowDialog())
             {
-                if (string.IsNullOrEmpty(Settings.Instance.DataPath))
+                if (!Settings.Instance.IsValidDataPath)
                 {
                     int end = picker.FileName.IndexOf(@"\data\session");
                     if (end == -1)
