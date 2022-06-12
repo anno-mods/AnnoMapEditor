@@ -6,47 +6,41 @@ namespace AnnoMapEditor.Utils
 {
     public class Settings : INotifyPropertyChanged
     {
-        public static Settings Instance = new();
+        public static Settings Instance { get; } = new();
+
+        public IDataArchive DataArchive
+        {
+            get => _dataArchive;
+            private set
+            {
+                if (_dataArchive is System.IDisposable disposable)
+                    disposable.Dispose();
+                SetProperty(ref _dataArchive, value);
+            }
+        }
+        private IDataArchive _dataArchive = Utils.DataArchive.Open(null);
 
         public string? DataPath 
         {
-            get => _dataPath;
+            get => _dataArchive.Path;
             set
             {
                 if (value != DataPath)
                 {
-                    string? validPath = CorrectDataPath(value);
-                    _dataPath = validPath ?? value;
-                    UserSettings.Default.DataPath = value;
+                    DataArchive = Utils.DataArchive.Open(value);
+                    UserSettings.Default.DataPath = DataArchive.Path;
                     UserSettings.Default.Save();
-                    IsValidDataPath = validPath is not null;
-                    SetProperty(ref _dataPath, value);
+                    OnPropertyChanged(nameof(DataPath));
+                    OnPropertyChanged(nameof(IsValidDataPath));
                 }
             }
         }
-        private string? _dataPath;
 
-        public bool IsValidDataPath
-        {
-            get => _isValidDataPath;
-            private set => SetProperty(ref _isValidDataPath, value);
-        }
-        private bool _isValidDataPath = false;
+        public bool IsValidDataPath => _dataArchive?.IsValid ?? false;
 
         public Settings()
         {
             DataPath = UserSettings.Default.DataPath;
-        }
-
-        private static string? CorrectDataPath(string? path)
-        {
-            if (path is null)
-                return null;
-            if (Directory.Exists(Path.Combine(path, "data/dlc01")))
-                return path;
-            if (Directory.Exists(Path.Combine(path, "dlc01")))
-                return Path.GetDirectoryName(path);
-            return null;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };

@@ -36,9 +36,16 @@ namespace AnnoMapEditor.Models
 
         public static async Task<Session?> FromA7tinfoAsync(string filePath)
         {
-            var doc = await FileDBReader.ReadFileDBAsync(filePath);
-            if (doc is null)
-                return null;
+            IFileDBDocument? doc = null;
+            using (Stream? fs = File.OpenRead(filePath))
+            {
+                if (fs is null)
+                    return null;
+
+                doc = await FileDBReader.ReadFileDBAsync(fs);
+                if (doc is null)
+                    return null;
+            }
 
             Region region = DetectRegionFromPath(filePath);
 

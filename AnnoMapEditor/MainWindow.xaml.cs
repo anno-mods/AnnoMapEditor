@@ -13,13 +13,12 @@ namespace AnnoMapEditor
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Models.App ViewModel { get; } = new Models.App();
-        public Settings Settings { get; } = Settings.Instance;
+        public Models.App ViewModel { get; } = new Models.App(Settings.Instance);
 
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = this;
+            DataContext = ViewModel;
 
             var exePath = Path.Join(AppContext.BaseDirectory, "AnnoMapEditor.exe");
             var productVersion = "";

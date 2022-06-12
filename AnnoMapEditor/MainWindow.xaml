@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:AnnoMapEditor.Controls"
         xmlns:utils="clr-namespace:AnnoMapEditor.Utils"
+        xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         Background="#182B3F">
@@ -52,21 +53,21 @@
             <Setter Property="Width" Value="auto" />
             <Setter Property="Padding" Value="2,6,2,6" />
         </Style>
-        <utils:BooleanToVisibilityConverter x:Key="VisibleOnTrue" />
     </Window.Resources>
-    <Grid>
+    <Grid VerticalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <controls:MapView Grid.Column="0" DataContext="{Binding ViewModel.Session, Mode=OneWay}" />
-        <StackPanel Grid.Column="0" Margin="16">
+        <controls:MapView Grid.Column="0" DataContext="{Binding Session, Mode=OneWay}" />
+        <StackPanel Grid.Column="0" Margin="16" VerticalAlignment="Stretch">
             <Button Click="OpenFile_Click" Style="{StaticResource DefaultButtonStyle}" Width="200" HorizontalAlignment="Left">Open map template...</Button>
-            <TextBlock Style="{StaticResource DefaultLabelStyle}" HorizontalAlignment="Left" Text="{Binding ViewModel.SessionFilePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Click="Configure_Click" Style="{StaticResource DefaultButtonStyle}" Width="200" HorizontalAlignment="Left">Set RDA path...</Button>
+            <TextBlock Style="{StaticResource DefaultLabelStyle}" HorizontalAlignment="Left" Text="{Binding SessionFilePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Click="Configure_Click" Style="{StaticResource DefaultButtonStyle}" Width="200" HorizontalAlignment="Left">Set extracted RDA path...</Button>
             <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
                 <TextBlock Style="{StaticResource DefaultLabelStyle}" Text="{Binding Settings.DataPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBlock Style="{StaticResource DefaultLabelStyle}" Text="✔" Visibility="{Binding Settings.IsValidDataPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibleOnTrue}}" />
+                <emoji:TextBlock Style="{StaticResource DefaultLabelStyle}" Text="{Binding DataPathHintIcon, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{Binding DataPathHint, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
         </StackPanel>
+        <TextBlock Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,8,0" VerticalAlignment="Bottom" Style="{StaticResource DefaultLabelStyle}" Text="Viewing only. Editing is not implemented yet." />
     </Grid>
 </Window>
