@@ -15,6 +15,7 @@ namespace AnnoMapEditor.Models
         public string Status { get; set; } = string.Empty;
         public string? ToolTip { get; set; }
         public Visibility AutoDetect { get; set; } = Visibility.Collapsed;
+        public Visibility Configure { get; set; } = Visibility.Visible;
         public string ConfigureText { get; set; } = string.Empty;
     }
 
@@ -89,6 +90,9 @@ namespace AnnoMapEditor.Models
                 case "IsValidDataPath":
                     UpdateStatusAndMenus();
                     break;
+                case "DataArchive":
+                    UpdateStatusAndMenus();
+                    break;
             }
         }
 
@@ -113,7 +117,18 @@ namespace AnnoMapEditor.Models
 
         private void UpdateStatusAndMenus()
         {
-            if (Settings.IsValidDataPath)
+            if (Settings.IsLoading)
+            {
+                // still loading
+                DataPathStatus = new DataPathStatus()
+                {
+                    Status = "loading RDA...",
+                    ToolTip = "",
+                    Configure = Visibility.Collapsed,
+                    AutoDetect = Visibility.Collapsed
+                };
+            }
+            else if (Settings.IsValidDataPath)
             {
                 DataPathStatus = new DataPathStatus()
                 {

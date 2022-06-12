@@ -109,7 +109,8 @@
             <emoji:TextBlock Style="{StaticResource DefaultLabelStyle}"
                              Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"
                              ToolTip="{Binding DataPathStatus.ToolTip, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Click="Configure_Click" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Left">
+            <Button Click="Configure_Click" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Left"
+                    Visibility="{Binding DataPathStatus.Configure, UpdateSourceTrigger=PropertyChanged}">
                 <TextBlock Text="{Binding DataPathStatus.ConfigureText, UpdateSourceTrigger=PropertyChanged}"/>
             </Button>
             <Button Click="AutoDetect_Click" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Left"

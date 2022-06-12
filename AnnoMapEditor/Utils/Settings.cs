@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Microsoft.Win32;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace AnnoMapEditor.Utils
 {
@@ -28,7 +30,7 @@ namespace AnnoMapEditor.Utils
             {
                 if (value != DataPath)
                 {
-                    DataArchive = Utils.DataArchive.Open(value);
+                    LoadDataPath(value);
                     UserSettings.Default.DataPath = DataArchive.Path;
                     UserSettings.Default.Save();
                     OnPropertyChanged(nameof(DataPath));
@@ -38,6 +40,7 @@ namespace AnnoMapEditor.Utils
         }
 
         public bool IsValidDataPath => _dataArchive?.IsValid ?? false;
+        public bool IsLoading { get; private set; }
 
         public Settings()
         {
@@ -47,6 +50,17 @@ namespace AnnoMapEditor.Utils
                 // auto detect on start-up if not valid
                 DataPath = GetInstallDirFromRegistry();
             }
+        }
+
+        public void LoadDataPath(string? path)
+        {
+            IsLoading = true;
+
+            Task.Run(() => {
+                var archive = Utils.DataArchive.Open(path);
+                IsLoading = false;
+                Application.Current.Dispatcher.Invoke(() => DataArchive = archive);
+            });
         }
 
         public static string? GetInstallDirFromRegistry()
