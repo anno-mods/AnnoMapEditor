@@ -37,14 +37,14 @@ jobs:
     - name: Publish
       run: dotnet publish -c Release -o Build -r win-x64 -p:PublishTrimmed=false -p:PublishSingleFile=true --self-contained false
 
-    - name: Package
-      run: tar --exclude='*.pdb' -caf AnnoMapEditor.zip Build/*
+    #- name: Package
+    #  run: tar --exclude='*.pdb' -caf AnnoMapEditor.zip -C ./Build/ *
     
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
         name: AnnoMapEditor
-        path: AnnoMapEditor.zip
+        path: Build/AnnoMapEditor.exe
         if-no-files-found: error
 
     - name: Release
@@ -55,4 +55,4 @@ jobs:
         body: |
           Introduction in [readme](https://github.com/anno-mods/AnnoMapEditor/blob/${{ github.sha }}/README.md).
         files: |
-          AnnoMapEditor.zip
+          Build/AnnoMapEditor.exe

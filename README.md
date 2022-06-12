@@ -1,4 +1,4 @@
-﻿# Community Editor for Anno 1800 Maps
+﻿# Community Map Editor for Anno 1800
 
 This project is not affiliated in any way with Ubisoft.
 
