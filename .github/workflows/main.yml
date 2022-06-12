@@ -1,0 +1,58 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - "*"
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
+      
+    #- name: Test
+    #  run: dotnet test --no-build --verbosity normal
+    
+    - name: Publish
+      run: dotnet publish -c Release -o Build -r win-x64 -p:PublishTrimmed=false -p:PublishSingleFile=true --self-contained false
+
+    - name: Package
+      run: tar --exclude='*.pdb' -caf AnnoMapEditor.zip Build
+    
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: AnnoMapEditor
+        path: AnnoMapEditor.zip
+        if-no-files-found: error
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        draft: true
+        body: |
+          Introduction in [readme](https://github.com/anno-mods/AnnoMapEditor/blob/${{ github.sha }}/README.md).
+        files: |
+          AnnoMapEditor.zip

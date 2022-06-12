@@ -34,7 +34,7 @@ namespace AnnoMapEditor
                 }
                 catch { }
             }
-            title = $"Anno Map Editor {productVersion}";
+            title = $"Community Map Editor for Anno 1800 {productVersion}";
             Title = title;
 
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -88,7 +88,7 @@ namespace AnnoMapEditor
             var picker = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog
             {
                 UseDescriptionForTitle = true,
-                Description = "Select your game (i.e. Anno 1800) folder or a folder where all .rda files are extracted into"
+                Description = "Select your game (i.e. \"Anno 1800/\") folder or a folder where all .rda files are extracted into"
             };
             if (true == picker.ShowDialog())
             {
