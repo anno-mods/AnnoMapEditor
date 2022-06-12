@@ -81,30 +81,36 @@ namespace AnnoMapEditor.Controls
                 {
                     image = new();
                     BitmapImage? png = null;
-                    await System.Threading.Tasks.Task.Run(() =>
-                    {
+                    //await System.Threading.Tasks.Task.Run(() =>
+                    //{
                         png = new();
                         try
                         {
-                            using var stream = File.OpenRead(island.ImageFile);
-                            png.BeginInit();
-                            png.StreamSource = stream;
-                            png.CacheOption = BitmapCacheOption.OnLoad;
-                            png.EndInit();
-                            png.Freeze();
+                            using Stream? stream = Utils.Settings.Instance.DataArchive?.OpenRead(island.ImageFile);
+                            if (stream is not null)
+                            {
+                                png.BeginInit();
+                                png.StreamSource = stream;
+                                png.CacheOption = BitmapCacheOption.OnLoad;
+                                png.EndInit();
+                                png.Freeze();
+                            }
                         }
                         catch
                         {
                             png = null;
                         }
-                    });
+                    //});
 
-                    image.Width = island.SizeInTiles;
-                    image.Height = island.SizeInTiles;
-                    image.RenderTransform = new RotateTransform(island.Rotation * -90);
-                    image.RenderTransformOrigin = new Point(0.5, 0.5);
-                    image.Source = png;
-                    canvas.Children.Add(image);
+                    if (png is not null)
+                    {
+                        image.Width = island.SizeInTiles;
+                        image.Height = island.SizeInTiles;
+                        image.RenderTransform = new RotateTransform(island.Rotation * -90);
+                        image.RenderTransformOrigin = new Point(0.5, 0.5);
+                        image.Source = png;
+                        canvas.Children.Add(image);
+                    }
                 }
 
 

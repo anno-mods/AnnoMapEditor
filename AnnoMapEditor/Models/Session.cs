@@ -36,7 +36,16 @@ namespace AnnoMapEditor.Models
 
         public static async Task<Session?> FromA7tinfoAsync(string filePath)
         {
-            var doc = await FileDBReader.ReadFileDBAsync(filePath);
+            return await FromA7tinfoAsync(File.OpenRead(filePath), filePath);
+        }
+
+        public static async Task<Session?> FromA7tinfoAsync(Stream? stream, string filePath)
+        {
+            IFileDBDocument? doc = null;
+            if (stream is null)
+                return null;
+
+            doc = await FileDBReader.ReadFileDBAsync(stream);
             if (doc is null)
                 return null;
 

@@ -46,8 +46,11 @@ namespace AnnoMapEditor.Models
                 value = "PirateIsland";
                 return;
             }
-            if (type == "unused?")
-                throw new Exception();
+            if (type == "Cliff")
+            {
+                value = "Cliff";
+                return;
+            }
 
             value = "Normal";
         }

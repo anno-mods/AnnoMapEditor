@@ -77,11 +77,14 @@ namespace AnnoMapEditor.External
     {
         public static async Task<int> ReadTileInSizeFromFileAsync(string mapPath)
         {
-            if (Utils.Settings.Instance.DataPath is null)
+            if (Utils.Settings.Instance.DataArchive?.IsValid != true)
                 return 0;
 
-            string fullFilePath = Path.Combine(Utils.Settings.Instance.DataPath, mapPath) + @"info";
-            var doc = await ReadFileDBAsync(fullFilePath);
+            using Stream? fs = Utils.Settings.Instance.DataArchive.OpenRead(mapPath + @"info");
+            if (fs is null)
+                return 0;
+
+            var doc = await ReadFileDBAsync(fs);
 
             if (doc?.Roots.FirstOrDefault(x => x.Name == "MapSize" && x.NodeType == FileDBNodeType.Attrib) is not Attrib mapSize)
                 return 0;
@@ -90,25 +93,24 @@ namespace AnnoMapEditor.External
             return sizeInTiles;
         }
 
-        public static async Task<IFileDBDocument?> ReadFileDBAsync(string filePath)
+        public static async Task<IFileDBDocument?> ReadFileDBAsync(Stream fileStream)
         {
             return await Task.Run(() =>
             {
                 try
                 {
-                    using FileStream fs = File.OpenRead(filePath);
-                    var Version = VersionDetector.GetCompressionVersion(fs);
+                    var Version = VersionDetector.GetCompressionVersion(fileStream);
 
                     IFileDBDocument? doc = null;
                     if (Version == FileDBDocumentVersion.Version1)
                     {
                         var parser = new DocumentParser<FileDBDocument_V1>();
-                        doc = parser.LoadFileDBDocument(fs);
+                        doc = parser.LoadFileDBDocument(fileStream);
                     }
                     else if (Version == FileDBDocumentVersion.Version2)
                     {
                         var parser = new DocumentParser<FileDBDocument_V2>();
-                        doc = parser.LoadFileDBDocument(fs);
+                        doc = parser.LoadFileDBDocument(fileStream);
                     }
 
                     return doc;

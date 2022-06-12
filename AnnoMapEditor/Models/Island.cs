@@ -88,7 +88,7 @@ namespace AnnoMapEditor.Models
 
             if (Settings.Instance.DataPath is not null)
             {
-                string activeMapImagePath = Path.Combine(Settings.Instance.DataPath, Path.GetDirectoryName(AssumedMapPath) ?? "", "_gamedata", Path.GetFileNameWithoutExtension(AssumedMapPath), "mapimage.png");
+                string activeMapImagePath = Path.Combine(Path.GetDirectoryName(AssumedMapPath) ?? "", "_gamedata", Path.GetFileNameWithoutExtension(AssumedMapPath), "mapimage.png");
                 ImageFile = activeMapImagePath;
             }
         }
