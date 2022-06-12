@@ -49,7 +49,7 @@ namespace AnnoMapEditor.Utils
             }
         }
 
-        private static string? GetInstallDirFromRegistry()
+        public static string? GetInstallDirFromRegistry()
         {
             string installDirKey = @"SOFTWARE\WOW6432Node\Ubisoft\Anno 1800";
             using RegistryKey? key = Registry.LocalMachine.OpenSubKey(installDirKey);

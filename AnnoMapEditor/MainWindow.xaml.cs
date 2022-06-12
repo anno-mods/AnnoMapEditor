@@ -14,6 +14,7 @@ namespace AnnoMapEditor
     public partial class MainWindow : Window
     {
         public Models.App ViewModel { get; } = new Models.App(Settings.Instance);
+        private string title;
 
         public MainWindow()
         {
@@ -30,7 +31,25 @@ namespace AnnoMapEditor
                 }
                 catch { }
             }
-            Title = $"Anno Map Editor {productVersion}";
+            title = $"Anno Map Editor {productVersion}";
+            Title = title;
+
+            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+        }
+
+        private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "Session":
+                    if (ViewModel?.Session is not null)
+                    {
+                        Title = $"{title} - {Path.GetFileName(ViewModel.SessionFilePath)}";
+                    }
+                    else
+                        Title = title;
+                    break;
+            }
         }
 
         private async void OpenFile_Click(object sender, RoutedEventArgs e)
@@ -58,11 +77,20 @@ namespace AnnoMapEditor
 
         private void Configure_Click(object _, RoutedEventArgs _1)
         {
-            var picker = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
+            var picker = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog
+            {
+                UseDescriptionForTitle = true,
+                Description = "Select your game (i.e. Anno 1800) folder or a folder where all .rda files are extracted into"
+            };
             if (true == picker.ShowDialog())
             {
                 Settings.Instance.DataPath = picker.SelectedPath;
             }
+        }
+
+        private void AutoDetect_Click(object _, RoutedEventArgs _1)
+        {
+            Settings.Instance.DataPath = Settings.GetInstallDirFromRegistry();
         }
     }
 }

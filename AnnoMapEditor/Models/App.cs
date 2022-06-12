@@ -2,9 +2,18 @@
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace AnnoMapEditor.Models
 {
+    public class DataPathStatus
+    {
+        public string Status { get; set; } = string.Empty;
+        public string? ToolTip { get; set; }
+        public Visibility AutoDetect { get; set; } = Visibility.Collapsed;
+        public string ConfigureText { get; set; } = string.Empty;
+    }
+
     public class App : INotifyPropertyChanged
     {
         public Session? Session
@@ -21,19 +30,12 @@ namespace AnnoMapEditor.Models
         }
         private string? _sessionFilePath;
 
-        public string DataPathHint
+        public DataPathStatus DataPathStatus
         {
-            get => _dataPathHint;
-            private set => SetProperty(ref _dataPathHint, value);
+            get => _dataPathStatus;
+            private set => SetProperty(ref _dataPathStatus, value);
         }
-        private string _dataPathHint = string.Empty;
-
-        public string DataPathHintIcon
-        {
-            get => _dataPathHintIcon;
-            private set => SetProperty(ref _dataPathHintIcon, value);
-        }
-        private string _dataPathHintIcon = "❌";
+        private DataPathStatus _dataPathStatus = new DataPathStatus();
 
         public Utils.Settings Settings { get; private set; }
 
@@ -51,8 +53,27 @@ namespace AnnoMapEditor.Models
             switch (e.PropertyName)
             {
                 case "IsValidDataPath":
-                    DataPathHintIcon = Settings.IsValidDataPath ? "✔" : "⚠";
-                    DataPathHint = Settings.IsValidDataPath ? "Path looks right." : "Needs contain the folder `data/` with the extracted .rda contents.";
+                    if (Settings.IsValidDataPath)
+                    {
+                        DataPathStatus = new DataPathStatus()
+                        {
+                            Status = Settings.DataArchive is Utils.RdaDataArchive ? "Game path set ✔" : "Extracted RDA path set ✔",
+                            ToolTip = Settings.DataArchive.Path,
+                            ConfigureText = "Change...",
+                            AutoDetect = Visibility.Collapsed,
+                        };
+                    }
+                    else
+                    {
+                        DataPathStatus = new DataPathStatus()
+                        {
+                            Status = "⚠ Game or RDA path not valid.",
+                            ToolTip = null,
+                            ConfigureText = "Select...",
+                            AutoDetect = Visibility.Visible
+                        };
+                    }
+
                     break;
             }
         }

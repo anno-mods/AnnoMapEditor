@@ -60,14 +60,22 @@
         </Grid.ColumnDefinitions>
         <controls:MapView Grid.Column="0" DataContext="{Binding Session, Mode=OneWay}" />
         <StackPanel Grid.Column="0" Margin="16" VerticalAlignment="Stretch">
-            <Button Click="OpenFile_Click" Style="{StaticResource DefaultButtonStyle}" Width="200" HorizontalAlignment="Left">Open map template...</Button>
-            <TextBlock Style="{StaticResource DefaultLabelStyle}" HorizontalAlignment="Left" Text="{Binding SessionFilePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Click="Configure_Click" Style="{StaticResource DefaultButtonStyle}" Width="200" HorizontalAlignment="Left">Set extracted RDA path...</Button>
-            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                <TextBlock Style="{StaticResource DefaultLabelStyle}" Text="{Binding Settings.DataPath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                <emoji:TextBlock Style="{StaticResource DefaultLabelStyle}" Text="{Binding DataPathHintIcon, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{Binding DataPathHint, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-            </StackPanel>
+            <Button Click="OpenFile_Click" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Left">Open map template...</Button>
         </StackPanel>
-        <TextBlock Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,8,0" VerticalAlignment="Bottom" Style="{StaticResource DefaultLabelStyle}" Text="Viewing only. Editing is not implemented yet." />
+        <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="8,0,0,0">
+            <emoji:TextBlock Style="{StaticResource DefaultLabelStyle}"
+                             Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="{Binding DataPathStatus.ToolTip, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Click="Configure_Click" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Left">
+                <TextBlock Text="{Binding DataPathStatus.ConfigureText, UpdateSourceTrigger=PropertyChanged}"/>
+            </Button>
+            <Button Click="AutoDetect_Click" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Left"
+                    Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}">Auto detect</Button>
+        </StackPanel>
+        <TextBlock Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,0" Style="{StaticResource DefaultLabelStyle}" TextAlignment="Right">
+            <Run>Viewing only.</Run>
+            <LineBreak />
+            <Run>There's no clicking or editing yet.</Run>
+        </TextBlock>
     </Grid>
 </Window>
