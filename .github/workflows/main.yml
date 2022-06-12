@@ -38,7 +38,7 @@ jobs:
       run: dotnet publish -c Release -o Build -r win-x64 -p:PublishTrimmed=false -p:PublishSingleFile=true --self-contained false
 
     - name: Package
-      run: tar --exclude='*.pdb' -caf AnnoMapEditor.zip Build
+      run: tar --exclude='*.pdb' -caf AnnoMapEditor.zip Build/*
     
     - name: Upload
       uses: actions/upload-artifact@v2
