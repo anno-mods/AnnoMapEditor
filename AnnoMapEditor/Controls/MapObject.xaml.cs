@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows;
+using System.Windows.Input;
 using System.Windows.Shapes;
 using System.Windows.Media.Imaging;
 using AnnoMapEditor.MapTemplates;
@@ -34,12 +35,24 @@ namespace AnnoMapEditor.Controls
         static readonly SolidColorBrush Yellow = new(Color.FromArgb(255, 234, 224, 83));
         readonly Session session;
 
+        public Point MouseOffset;
+
         public MapObject(Session session)
         {
             InitializeComponent();
 
             this.session = session;
             DataContextChanged += MapObject_DataContextChanged;
+            MouseMove += OnMouseMove;
+        }
+
+        private void OnMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                MouseOffset = Mouse.GetPosition(this);
+                DragDrop.DoDragDrop(this, this, DragDropEffects.Move);                
+            }
         }
 
         private void MapObject_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

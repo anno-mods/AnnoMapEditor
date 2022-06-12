@@ -19,6 +19,7 @@ namespace AnnoMapEditor.MapTemplates
 
         public Session()
         {
+            Size = new Vector2(0, 0);
             Islands = new List<Island>();
             template = new Serializing.A7tinfo.MapTemplateDocument();
         }

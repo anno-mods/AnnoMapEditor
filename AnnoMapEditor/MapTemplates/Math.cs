@@ -6,10 +6,23 @@ using System.Threading.Tasks;
 
 namespace AnnoMapEditor.MapTemplates
 {
-    public struct Vector2
+    public record Vector2
     {
-        public int X;
-        public int Y;
+        private int Normalize(int x) => (x + 4) / 8 * 8; 
+
+        public int X 
+        {
+            get => _x;
+            set => _x = Normalize(value);
+        }
+        private int _x = 0;
+
+        public int Y
+        {
+            get => _y;
+            set => _y = Normalize(value);
+        }
+        private int _y = 0;
 
         public Vector2(int x, int y)
         {
@@ -26,12 +39,8 @@ namespace AnnoMapEditor.MapTemplates
                 {
                     X = int.Parse(parts[0]);
                     Y = int.Parse(parts[1]);
-                    return;
                 }
             }
-
-            X = 0;
-            Y = 0;
         }
 
         public Vector2(int[]? numbers)
@@ -40,11 +49,7 @@ namespace AnnoMapEditor.MapTemplates
             {
                 X = numbers[0];
                 Y = numbers[1];
-                return;
             }
-            
-            X = 0;
-            Y = 0;
         }
     }
 

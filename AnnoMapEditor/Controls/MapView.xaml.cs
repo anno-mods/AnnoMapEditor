@@ -102,5 +102,37 @@ namespace AnnoMapEditor.Controls
             rotationCanvas.Width = scale * session.Size.X;
             rotationCanvas.Height = scale * session.Size.Y;
         }
+
+        private void sessionCanvas_Drop(object sender, DragEventArgs e)
+        {
+            MapObject? _island = e.Data?.GetData(typeof(MapObject)) as MapObject;
+            if (_island is null) return;
+
+            Point position = e.GetPosition(sessionCanvas);
+            MoveMapObject(_island, position.X - _island.MouseOffset.X, position.Y - _island.MouseOffset.Y);
+
+        }
+
+        private void MoveMapObject(MapObject _island, double x, double y)
+        {
+            if (session is null) return;
+
+            //Rect2 area = session.PlayableArea;
+            var minX = 0;
+            var maxX = session.Size.X - _island.Height;
+            var minY = 0;
+            var maxY = session.Size.Y - _island.Width;
+
+            var ensuredX = (int)Math.Clamp(x, minX, maxX);
+            var ensuredY = (int)Math.Clamp(y, minY, maxY);
+
+            if (_island.DataContext is Island island)
+            {
+                island.Position = new MapTemplates.Vector2(ensuredX, session.Size.Y - ensuredY - island.SizeInTiles);
+
+                Canvas.SetLeft(_island, ensuredX);
+                Canvas.SetTop(_island, ensuredY);
+            }
+        }
     }
 }
