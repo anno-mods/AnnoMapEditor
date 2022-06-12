@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:AnnoMapEditor.Controls"
-        xmlns:utils="clr-namespace:AnnoMapEditor.Utils"
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
@@ -44,6 +43,45 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="DropDownButtonStyle" TargetType="ToggleButton">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="FontFamily" Value="Verdana" />
+            <Setter Property="FontSize" Value="11px" />
+            <Setter Property="Foreground" Value="#f0f0f0" />
+            <Setter Property="Background" Value="#8024415F" />
+            <Setter Property="Width" Value="auto" />
+            <Setter Property="Padding" Value="8,6,8,6" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border BorderThickness="0"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                                x:Name="border"
+                                CornerRadius="3"
+                                SnapsToDevicePixels="true">
+                            <StackPanel Orientation="Horizontal">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center" Name="content" />
+                                <Path x:Name="BtnArrow" Margin="8,0,0,0" VerticalAlignment="Center" Width="6" Fill="#f0f0f0"
+                                      Stretch="Uniform" HorizontalAlignment="Right"
+                                      Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z "/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#24415F" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#182B3F" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="DefaultLabelStyle" TargetType="TextBlock">
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="Margin" Value="2" />
@@ -60,7 +98,12 @@
         </Grid.ColumnDefinitions>
         <controls:MapView Grid.Column="0" DataContext="{Binding Session, Mode=OneWay}" />
         <StackPanel Grid.Column="0" Margin="16" VerticalAlignment="Stretch">
-            <Button Click="OpenFile_Click" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Left">Open map template...</Button>
+            <controls:DropDownButton HorizontalAlignment="Left" Style="{StaticResource DropDownButtonStyle}">
+                <ContentControl Content="Open map" />
+                <controls:DropDownButton.Menu>
+                    <ContextMenu Name="openMapMenu" />
+                </controls:DropDownButton.Menu>
+            </controls:DropDownButton>
         </StackPanel>
         <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="8,0,0,0">
             <emoji:TextBlock Style="{StaticResource DefaultLabelStyle}"

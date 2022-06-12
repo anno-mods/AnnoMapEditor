@@ -1,4 +1,5 @@
-﻿using AnnoMapEditor.Models;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace AnnoMapEditor.Utils
@@ -43,6 +44,7 @@ namespace AnnoMapEditor.Utils
         string Path { get; }
 
         Stream? OpenRead(string filePath);
+        IEnumerable<string> Find(string pattern);
     }
 
     public class InvalidDataPath : IDataArchive
@@ -54,6 +56,11 @@ namespace AnnoMapEditor.Utils
         public InvalidDataPath(string path)
         {
             Path = path;
+        }
+
+        public IEnumerable<string> Find(string pattern)
+        {
+            return Array.Empty<string>();
         }
     }
 }

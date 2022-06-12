@@ -1,6 +1,10 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -12,6 +16,29 @@ namespace AnnoMapEditor.Models
         public string? ToolTip { get; set; }
         public Visibility AutoDetect { get; set; } = Visibility.Collapsed;
         public string ConfigureText { get; set; } = string.Empty;
+    }
+
+    public class MapGroup
+    {
+        public string Name;
+        public List<MapInfo> Maps;
+
+        public MapGroup(string name, IEnumerable<string> mapFiles, Regex regex)
+        {
+            Name = name;
+            Maps = mapFiles.Select(x => new MapInfo()
+            {
+                Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(
+                    string.Join(' ', regex.Match(x).Groups.Values.Skip(1).Select(y => y.Value)).Replace("_", " ")),
+                FileName = x
+            }).ToList();
+        }
+    }
+
+    public class MapInfo
+    {
+        public string? Name;
+        public string? FileName;
     }
 
     public class App : INotifyPropertyChanged
@@ -37,6 +64,13 @@ namespace AnnoMapEditor.Models
         }
         private DataPathStatus _dataPathStatus = new DataPathStatus();
 
+        public List<MapGroup>? Maps
+        {
+            get => _maps;
+            private set => SetProperty(ref _maps, value);
+        }
+        private List<MapGroup>? _maps;
+
         public Utils.Settings Settings { get; private set; }
 
         public App(Utils.Settings settings)
@@ -53,41 +87,81 @@ namespace AnnoMapEditor.Models
             switch (e.PropertyName)
             {
                 case "IsValidDataPath":
-                    if (Settings.IsValidDataPath)
-                    {
-                        DataPathStatus = new DataPathStatus()
-                        {
-                            Status = Settings.DataArchive is Utils.RdaDataArchive ? "Game path set ✔" : "Extracted RDA path set ✔",
-                            ToolTip = Settings.DataArchive.Path,
-                            ConfigureText = "Change...",
-                            AutoDetect = Visibility.Collapsed,
-                        };
-                    }
-                    else
-                    {
-                        DataPathStatus = new DataPathStatus()
-                        {
-                            Status = "⚠ Game or RDA path not valid.",
-                            ToolTip = null,
-                            ConfigureText = "Select...",
-                            AutoDetect = Visibility.Visible
-                        };
-                    }
-
+                    UpdateStatusAndMenus();
                     break;
             }
         }
 
-        public async Task OpenMap(string filePath)
+        public async Task OpenMap(string filePath, bool fromArchive = false)
         {
             SessionFilePath = Path.GetFileName(filePath);
-            if (Path.GetExtension(filePath) == ".a7tinfo")
-                Session = await Session.FromA7tinfoAsync(filePath);
+
+            if (fromArchive)
+            {
+                Stream? fs = Settings?.DataArchive.OpenRead(filePath);
+                if (fs is not null)
+                    Session = await Session.FromA7tinfoAsync(fs, filePath);
+            }
             else
-                Session = await Session.FromXmlAsync(filePath);
+            {
+                if (Path.GetExtension(filePath) == ".a7tinfo")
+                    Session = await Session.FromA7tinfoAsync(filePath);
+                else
+                    Session = await Session.FromXmlAsync(filePath);
+            }
         }
 
-        #region IPropertyChanged
+        private void UpdateStatusAndMenus()
+        {
+            if (Settings.IsValidDataPath)
+            {
+                DataPathStatus = new DataPathStatus()
+                {
+                    Status = Settings.DataArchive is Utils.RdaDataArchive ? "Game path set ✔" : "Extracted RDA path set ✔",
+                    ToolTip = Settings.DataArchive.Path,
+                    ConfigureText = "Change...",
+                    AutoDetect = Settings.DataArchive is Utils.RdaDataArchive ? Visibility.Collapsed : Visibility.Visible,
+                };
+
+                Dictionary<string, Regex> templateGroups = new()
+                {
+                    ["DLCs"] = new(@"data\/(?!=sessions\/)([^\/]+)"),
+                    ["Moderate"] = new(@"data\/sessions\/.+moderate"),
+                    ["New World"] = new(@"data\/sessions\/.+colony01")
+                }; 
+
+                var mapTemplates = Settings.DataArchive.Find("**/*.a7tinfo");
+
+                Maps = new()
+                {
+                    new MapGroup("Campaign", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/campaign")), new(@"\/campaign_([^\/]+)\.")),
+                    new MapGroup("Moderate, Archipelago", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_archipel")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("Moderate, Atoll", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_atoll")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("Moderate, Corners", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_corners")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("Moderate, Island Arc", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_islandarc")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("Moderate, Snowflake", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_snowflake")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("New World, Large", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_l")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("New World, Medium", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_m")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("New World, Small", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_s")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("DLCs", mapTemplates.Where(x => !x.StartsWith(@"data/sessions/")), new(@"data\/([^\/]+)\/.+\/maps\/([^\/]+)"))
+                    //new MapGroup("Moderate", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate")), new(@"\/([^\/]+)\."))
+                };
+            }
+            else
+            {
+                DataPathStatus = new DataPathStatus()
+                {
+                    Status = "⚠ Game or RDA path not valid.",
+                    ToolTip = null,
+                    ConfigureText = "Select...",
+                    AutoDetect = Visibility.Visible
+                };
+
+                Maps = new();
+            }
+        }
+
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         protected void SetProperty<T>(ref T property, T value, [CallerMemberName] string propertyName = "")

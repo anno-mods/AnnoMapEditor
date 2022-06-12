@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using RDAExplorer;
 
 namespace AnnoMapEditor.Utils
@@ -38,6 +40,8 @@ namespace AnnoMapEditor.Utils
 
         readonly RDAReader[]? readers;
 
+        readonly Dictionary<string, RDAFile> allFiles = new();
+
         public RdaDataArchive(string folderPath)
         {
             Path = folderPath;
@@ -59,6 +63,9 @@ namespace AnnoMapEditor.Utils
                         FileName = x
                     };
                     reader.ReadRDAFile();
+                    foreach (var file in reader.rdaFolder.GetAllFiles())
+                        if (file.FileName.EndsWith(".a7tinfo") || file.FileName.EndsWith(".png") || file.FileName.EndsWith(".a7minfo"))
+                            allFiles[file.FileName] = file;
                     return reader;
                 }
                 catch
@@ -76,14 +83,27 @@ namespace AnnoMapEditor.Utils
 
             try
             {
-                RDAFile? file = readers.Select(x => x.GetFileByPath(filePath)).Where(x => x is not null)!.FirstOrDefault();
-                if (file is null)
+                // RDAFile? file = readers.Select(x => x.GetFileByPath(filePath)).Where(x => x is not null)!.FirstOrDefault();
+                if (!allFiles.TryGetValue(filePath.Replace('\\', '/'), out RDAFile? file) || file is null)
                     return null;
 
                 stream = new MemoryStream(file.GetData());
             }
             catch { }
             return stream;
+        }
+
+        public IEnumerable<string> Find(string pattern)
+        {
+            if (!IsValid || readers is null)
+                return Array.Empty<string>();
+
+            Matcher matcher = new();
+            matcher.AddIncludePatterns(new string[] { pattern });
+
+            PatternMatchingResult result = matcher.Match(allFiles.Keys);
+
+            return result.Files.Select(x => x.Path);
         }
 
         public void Dispose()

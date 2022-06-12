@@ -5,6 +5,9 @@ using System.Windows;
 
 using AnnoMapEditor.Utils;
 using System.Diagnostics;
+using System.Windows.Controls;
+using System.Collections.Generic;
+using AnnoMapEditor.Models;
 
 namespace AnnoMapEditor
 {
@@ -14,7 +17,7 @@ namespace AnnoMapEditor
     public partial class MainWindow : Window
     {
         public Models.App ViewModel { get; } = new Models.App(Settings.Instance);
-        private string title;
+        private readonly string title;
 
         public MainWindow()
         {
@@ -35,6 +38,8 @@ namespace AnnoMapEditor
             Title = title;
 
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+
+            CreateImportMenu(openMapMenu, ViewModel?.Maps);
         }
 
         private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -48,6 +53,9 @@ namespace AnnoMapEditor
                     }
                     else
                         Title = title;
+                    break;
+                case "Maps":
+                    CreateImportMenu(openMapMenu, ViewModel?.Maps);
                     break;
             }
         }
@@ -91,6 +99,45 @@ namespace AnnoMapEditor
         private void AutoDetect_Click(object _, RoutedEventArgs _1)
         {
             Settings.Instance.DataPath = Settings.GetInstallDirFromRegistry();
+        }
+
+        private void CreateImportMenu(ContextMenu parentMenu, List<MapGroup>? mapGroups)
+        {
+            parentMenu.Items.Clear();
+
+            MenuItem openFile = new() { Header = "Open file..." };
+            openFile.Click += OpenFile_Click;
+            parentMenu.Items.Add(openFile);
+            parentMenu.Items.Add(new Separator());
+
+            if (mapGroups is null || mapGroups.Count == 0)
+            {
+                parentMenu.Items.Add(new MenuItem() { Header = "Set game/RDA path to import.", IsEnabled = false });
+                return;
+            }
+
+            foreach (var group in mapGroups)
+            {
+                MenuItem groupMenu = new() { Header = group.Name };
+
+                foreach (var map in group.Maps)
+                {
+                    MenuItem mapMenu = new() { Header = map.Name, DataContext = map };
+                    mapMenu.Click += MapMenu_Click;
+                    groupMenu.Items.Add(mapMenu);
+                }
+
+                parentMenu.Items.Add(groupMenu);
+            }
+        }
+
+        private async void MapMenu_Click(object sender, RoutedEventArgs e)
+        {
+            MapInfo? mapInfo = (sender as MenuItem)?.DataContext as MapInfo;
+            if (mapInfo?.FileName is not null)
+            {
+                await ViewModel.OpenMap(mapInfo.FileName, true);
+            }
         }
     }
 }
