@@ -8,7 +8,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace AnnoMapEditor.Models
+using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.MapTemplates;
+
+namespace AnnoMapEditor
 {
     public class DataPathStatus
     {
@@ -42,7 +45,7 @@ namespace AnnoMapEditor.Models
         public string? FileName;
     }
 
-    public class App : INotifyPropertyChanged
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
         public Session? Session
         {
@@ -74,7 +77,7 @@ namespace AnnoMapEditor.Models
 
         public Utils.Settings Settings { get; private set; }
 
-        public App(Utils.Settings settings)
+        public MainWindowViewModel(Utils.Settings settings)
         {
             Settings = settings;
             Settings.PropertyChanged += Settings_PropertyChanged;
@@ -132,10 +135,10 @@ namespace AnnoMapEditor.Models
             {
                 DataPathStatus = new DataPathStatus()
                 {
-                    Status = Settings.DataArchive is Utils.RdaDataArchive ? "Game path set ✔" : "Extracted RDA path set ✔",
+                    Status = Settings.DataArchive is RdaDataArchive ? "Game path set ✔" : "Extracted RDA path set ✔",
                     ToolTip = Settings.DataArchive.Path,
                     ConfigureText = "Change...",
-                    AutoDetect = Settings.DataArchive is Utils.RdaDataArchive ? Visibility.Collapsed : Visibility.Visible,
+                    AutoDetect = Settings.DataArchive is RdaDataArchive ? Visibility.Collapsed : Visibility.Visible,
                 };
 
                 Dictionary<string, Regex> templateGroups = new()
@@ -143,7 +146,7 @@ namespace AnnoMapEditor.Models
                     ["DLCs"] = new(@"data\/(?!=sessions\/)([^\/]+)"),
                     ["Moderate"] = new(@"data\/sessions\/.+moderate"),
                     ["New World"] = new(@"data\/sessions\/.+colony01")
-                }; 
+                };
 
                 var mapTemplates = Settings.DataArchive.Find("**/*.a7tinfo");
 

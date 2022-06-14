@@ -8,7 +8,7 @@ using FileDBSerializing;
 using AnnoMapEditor.External;
 using AnnoMapEditor.Utils;
 
-namespace AnnoMapEditor.Models
+namespace AnnoMapEditor.MapTemplates
 {
     static class SpecialIslands
     {

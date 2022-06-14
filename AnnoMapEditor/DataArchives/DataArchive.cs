@@ -1,8 +1,9 @@
-﻿using System;
+﻿using AnnoMapEditor.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace AnnoMapEditor.Utils
+namespace AnnoMapEditor.DataArchives
 {
     public static class DataArchive
     {

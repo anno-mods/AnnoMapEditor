@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.Windows;
+using AnnoMapEditor.DataArchives;
 
 namespace AnnoMapEditor.Utils
 {
@@ -21,7 +22,7 @@ namespace AnnoMapEditor.Utils
                 SetProperty(ref _dataArchive, value);
             }
         }
-        private IDataArchive _dataArchive = Utils.DataArchive.Open(null);
+        private IDataArchive _dataArchive = DataArchives.DataArchive.Open(null);
 
         public string? DataPath 
         {
@@ -57,7 +58,7 @@ namespace AnnoMapEditor.Utils
             IsLoading = true;
 
             Task.Run(() => {
-                var archive = Utils.DataArchive.Open(path);
+                var archive = DataArchives.DataArchive.Open(path);
                 IsLoading = false;
                 Application.Current.Dispatcher.Invoke(() => DataArchive = archive);
             });

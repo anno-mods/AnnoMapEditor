@@ -9,7 +9,7 @@ using FileDBSerializing;
 using AnnoMapEditor.External;
 using AnnoMapEditor.Utils;
 
-namespace AnnoMapEditor.Models
+namespace AnnoMapEditor.MapTemplates
 {
     public class Session
     {

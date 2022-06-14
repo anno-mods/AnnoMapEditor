@@ -6,13 +6,13 @@ using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using RDAExplorer;
 
-namespace AnnoMapEditor.Utils
+namespace AnnoMapEditor.DataArchives
 {
     public static class RDAExtensions
     {
         public static RDAFile? GetFileByPath(this RDAReader that, string path)
         {
-            Queue<string>? parts = new(Path.GetDirectoryName(path)?.Split('\\') ?? System.Array.Empty<string>());
+            Queue<string>? parts = new(Path.GetDirectoryName(path)?.Split('\\') ?? Array.Empty<string>());
             if (!parts.Any())
                 return null;
 
@@ -33,7 +33,7 @@ namespace AnnoMapEditor.Utils
         }
     }
 
-    public class RdaDataArchive : IDataArchive, System.IDisposable
+    public class RdaDataArchive : IDataArchive, IDisposable
     {
         public string Path { get; }
         public bool IsValid { get; } = true;
@@ -113,7 +113,7 @@ namespace AnnoMapEditor.Utils
                 foreach (var reader in readers)
                     reader.Dispose();
             }
-            System.GC.SuppressFinalize(this);
+            GC.SuppressFinalize(this);
         }
     }
 }

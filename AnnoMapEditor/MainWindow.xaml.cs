@@ -7,7 +7,6 @@ using AnnoMapEditor.Utils;
 using System.Diagnostics;
 using System.Windows.Controls;
 using System.Collections.Generic;
-using AnnoMapEditor.Models;
 
 namespace AnnoMapEditor
 {
@@ -16,7 +15,7 @@ namespace AnnoMapEditor
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Models.App ViewModel { get; } = new Models.App(Settings.Instance);
+        public MainWindowViewModel ViewModel { get; } = new MainWindowViewModel(Settings.Instance);
         private readonly string title;
 
         public MainWindow()

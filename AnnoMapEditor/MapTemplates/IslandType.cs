@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AnnoMapEditor.Models
+namespace AnnoMapEditor.MapTemplates
 {
     public struct IslandType
     {
