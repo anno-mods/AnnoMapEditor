@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using FileDBSerializing;
+using FileDBSerializing.LookUps;
 
 namespace AnnoMapEditor.External
 {
@@ -13,18 +14,7 @@ namespace AnnoMapEditor.External
     {
         public static byte[]? GetBytesFromPath(this IFileDBDocument that, string path)
         {
-            Queue<string> parts = new(path.Split('/'));
-            if (!parts.Any())
-                return null;
-
-            FileDBNode? currentNode = that.Roots.FirstOrDefault(x => x.Name == parts.Dequeue());
-
-            while (parts.Any() && currentNode is Tag tagNode)
-            {
-                string current = parts.Dequeue();
-                currentNode = tagNode.Children.FirstOrDefault(x => x.Name == current);
-            }
-
+            var currentNode = that.SelectNodes(path).FirstOrDefault();
             if (currentNode is not Attrib attribNode)
                 return null;
 
