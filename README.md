@@ -1,4 +1,4 @@
-﻿# Community Editor for Anno 1800 Maps
+﻿# Community Map Editor for Anno 1800
 
 This project is not affiliated in any way with Ubisoft.
 
@@ -19,17 +19,26 @@ If it didn't find it, you'll need to set the path manually to your game or a fol
 
 ## Features
 
-Currently supported features:
-- viewing only currently, no editing
-- `.a7tinfo` and [FileDBReader](https://github.com/anno-mods/FileDBReader) `.xml`
-- open map templates directly from the game
+- open, view and save `.a7tinfo` and [FileDBReader](https://github.com/anno-mods/FileDBReader) `.xml`
+- open map templates directly from the `.rda` game archives
 
 ## Roadmap
 
-- editing (add, remove, change islands, resize session, ...)
-
-- save as `.a7tinfo`, FileDBReader `.xml`
+- move, change islands
+- add, remove islands
+- resize session
 - export as ready-to-play mod
+
+## Changelog
+
+### 0.3
+
+- Save/export to `.a7tinfo` and `.xml` files
+
+### 0.2
+
+- Open maps from game archives
+- Auto-detect game data path
 
 ## Notes
 

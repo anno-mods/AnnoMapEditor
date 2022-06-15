@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AnnoMapEditor.Models
+namespace AnnoMapEditor.MapTemplates
 {
     public struct Region
     {
@@ -23,13 +23,13 @@ namespace AnnoMapEditor.Models
             {
                 this.filePath = filePath;
                 this.size = size;
-                this.ids = null;
+                ids = null;
             }
 
             public Pool(string filePath, int[] ids)
-            { 
+            {
                 this.filePath = filePath;
-                this.size = ids.Length;
+                size = ids.Length;
                 this.ids = ids;
             }
         }
@@ -81,7 +81,7 @@ namespace AnnoMapEditor.Models
             var ids = PoolIslands[size].ids;
             if (ids is not null)
                 index = ids[index];
-            
+
             return string.Format(PoolIslands[size].filePath, string.Format("{0:00}", index));
         }
 

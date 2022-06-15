@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AnnoMapEditor.Utils
+namespace AnnoMapEditor.MapTemplates
 {
     public struct Vector2
     {
@@ -34,15 +34,15 @@ namespace AnnoMapEditor.Utils
             Y = 0;
         }
 
-        public Vector2(byte[]? data)
+        public Vector2(int[]? numbers)
         {
-            if (data is not null && data.Length == 8)
+            if (numbers?.Length >= 2)
             {
-                X = BitConverter.ToInt32(new ReadOnlySpan<byte>(data, 0, 4));
-                Y = BitConverter.ToInt32(new ReadOnlySpan<byte>(data, 4, 4));
+                X = numbers[0];
+                Y = numbers[1];
                 return;
             }
-
+            
             X = 0;
             Y = 0;
         }
@@ -76,14 +76,14 @@ namespace AnnoMapEditor.Utils
             Height = 0;
         }
 
-        public Rect2(byte[]? data)
+        public Rect2(int[]? numbers)
         {
-            if (data is not null && data.Length == 16)
+            if (numbers?.Length == 4)
             {
-                X = BitConverter.ToInt32(new ReadOnlySpan<byte>(data, 0, 4));
-                Y = BitConverter.ToInt32(new ReadOnlySpan<byte>(data, 4, 4));
-                Width = BitConverter.ToInt32(new ReadOnlySpan<byte>(data, 8, 4)) - X;
-                Height = BitConverter.ToInt32(new ReadOnlySpan<byte>(data, 12, 4)) - Y;
+                X = numbers[0];
+                Y = numbers[1];
+                Width = numbers[2] - X;
+                Height = numbers[3] - Y;
                 return;
             }
 

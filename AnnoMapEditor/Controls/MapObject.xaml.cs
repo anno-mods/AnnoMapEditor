@@ -6,7 +6,7 @@ using System.Windows.Media;
 using System.Windows;
 using System.Windows.Shapes;
 using System.Windows.Media.Imaging;
-using AnnoMapEditor.Models;
+using AnnoMapEditor.MapTemplates;
 
 namespace AnnoMapEditor.Controls
 {
@@ -42,7 +42,7 @@ namespace AnnoMapEditor.Controls
             DataContextChanged += MapObject_DataContextChanged;
         }
 
-        private async void MapObject_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void MapObject_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (DataContext is not Island island)
                 return;

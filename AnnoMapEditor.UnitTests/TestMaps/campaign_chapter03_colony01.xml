@@ -1,0 +1,405 @@
+<Content>
+  <MapTemplate>
+    <Size>1600 1600</Size>
+    <PlayableArea>80 80 1520 1520</PlayableArea>
+    <RandomlyPlacedThirdParties />
+    <ElementCount>18</ElementCount>
+    <TemplateElement>
+      <Element>
+        <Position>112 112</Position>
+        <MapFilePath>data/sessions/islands/pool/colony01/colony01_3rdparty04_01/colony01_3rdparty04_01.a7m</MapFilePath>
+        <Rotation90>2</Rotation90>
+        <IslandLabel>LaFortuneIsland</IslandLabel>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>ThirdParty</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>832 752</Position>
+        <MapFilePath>data/sessions/islands/pool/colony01/colony01_3rdparty05_01/colony01_3rdparty05_01.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <IslandLabel>Campaign_SA_IzabelIsland</IslandLabel>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>ThirdParty</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>136 1152</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1160 800</Position>
+        <MapFilePath>data/sessions/islands/campaign/colony01/chapter03/campaign_colony01_la_isla_01/campaign_colony01_la_isla_01.a7m</MapFilePath>
+        <Rotation90>1</Rotation90>
+        <IslandLabel>Campaign_SA_PlayerStartIsland</IslandLabel>
+        <FertilityGuids>120038 120039 120040 1010573</FertilityGuids>
+        <RandomizeFertilities>0</RandomizeFertilities>
+        <MineSlotMapping>
+          <None>-9204196828944269293</None>
+          <None>0</None>
+          <None>-9204196828944269298</None>
+          <None>0</None>
+          <None>-9204196828944269296</None>
+          <None>0</None>
+          <None>-9204196828944269294</None>
+          <None>0</None>
+          <None>-9204196828944269295</None>
+          <None>0</None>
+          <None>-9208700428571639778</None>
+          <None>0</None>
+          <None>-9204231734143483903</None>
+          <None>0</None>
+          <None>-9204196828944269299</None>
+          <None>0</None>
+          <None>-9204196828944269301</None>
+          <None>0</None>
+          <None>-9204196828944269297</None>
+          <None>0</None>
+          <None>-9204196828944269300</None>
+          <None>0</None>
+          <None>-9205357634050326526</None>
+          <None>0</None>
+          <None>-9208700428571639781</None>
+          <None>0</None>
+          <None>-9208700428571639779</None>
+          <None>0</None>
+          <None>-9208700428571639784</None>
+          <None>0</None>
+          <None>-9208700428571639783</None>
+          <None>0</None>
+          <None>-9208700428571639777</None>
+          <None>0</None>
+          <None>-9208700428571639782</None>
+          <None>0</None>
+          <None>-9208700428571639776</None>
+          <None>0</None>
+          <None>-9208700428571639780</None>
+          <None>0</None>
+        </MineSlotMapping>
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Starter</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>104 720</Position>
+        <Size>Large</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>408 112</Position>
+        <Size>Large</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1112 104</Position>
+        <Size>Large</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>608 872</Position>
+        <MapFilePath>data/sessions/islands/campaign/colony01/chapter03/campaign_colony01_burnt_island_01/campaign_colony01_burnt_island_01.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <IslandLabel>Campaign_SA_IzabelBurntIsland</IslandLabel>
+        <FertilityGuids>
+        </FertilityGuids>
+        <RandomizeFertilities>0</RandomizeFertilities>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>856 152</Position>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Pirate</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>896 1312</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>120 424</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>816 392</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1176 1184</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>528 536</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>2</ElementType>
+      <Element>
+        <Position>1272 1016</Position>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1184 504</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>792 968</Position>
+        <MapFilePath>data/sessions/islands/campaign/colony01/chapter03/campaign_colony01_prosperity_01/campaign_colony01_prosperity_01.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <IslandLabel>Campaign_SA_ColonialistIsland</IslandLabel>
+        <FertilityGuids>120038 120040 1010574 1010576</FertilityGuids>
+        <RandomizeFertilities>0</RandomizeFertilities>
+        <MineSlotMapping>
+          <None>-9210987086339899082</None>
+          <None>0</None>
+          <None>-9210987129289571985</None>
+          <None>101062</None>
+          <None>-9210987129289571984</None>
+          <None>101062</None>
+          <None>-9215490737506877438</None>
+          <None>0</None>
+          <None>-9210987129289572003</None>
+          <None>101062</None>
+          <None>-9215455785063022549</None>
+          <None>0</None>
+          <None>-9216616628823785137</None>
+          <None>101062</None>
+          <None>-9216616628823785145</None>
+          <None>101062</None>
+          <None>-9216581684969865066</None>
+          <None>0</None>
+          <None>-9210952185435652035</None>
+          <None>0</None>
+          <None>-9216581684969865046</None>
+          <None>0</None>
+          <None>-9210987129289571982</None>
+          <None>101062</None>
+          <None>-9216616628823785144</None>
+          <None>101062</None>
+          <None>-9215455785063022544</None>
+          <None>0</None>
+          <None>-9197476330407460863</None>
+          <None>0</None>
+          <None>-9204231729848516520</None>
+          <None>101062</None>
+          <None>-9210952185435652033</None>
+          <None>0</None>
+          <None>-9210952168255782866</None>
+          <None>0</None>
+          <None>-9215455767883153365</None>
+          <None>101061</None>
+          <None>-9204231729848516517</None>
+          <None>101062</None>
+          <None>-9210952168255782865</None>
+          <None>0</None>
+          <None>-9204196820354334618</None>
+          <None>101062</None>
+          <None>-9216581667789995927</None>
+          <None>0</None>
+          <None>-9216581667789995931</None>
+          <None>0</None>
+          <None>-9216616633118752710</None>
+          <None>0</None>
+          <None>-9204231729848516519</None>
+          <None>101062</None>
+          <None>-9210987133584539635</None>
+          <None>0</None>
+          <None>-9216581667789995937</None>
+          <None>0</None>
+          <None>-9210987129289572001</None>
+          <None>101062</None>
+          <None>-9204196768814727166</None>
+          <None>101061</None>
+          <None>-9204231729848516518</None>
+          <None>101062</None>
+          <None>-9210987129289571986</None>
+          <None>101062</None>
+          <None>-9210987129289572005</None>
+          <None>101062</None>
+          <None>-9210987129289571981</None>
+          <None>101062</None>
+          <None>-9210987129289572004</None>
+          <None>101062</None>
+          <None>-9216616628823785146</None>
+          <None>101062</None>
+          <None>-9210952219795390095</None>
+          <None>101062</None>
+          <None>-9216581719329603247</None>
+          <None>101062</None>
+          <None>-9216616628823785136</None>
+          <None>101062</None>
+          <None>-9210987129289572000</None>
+          <None>101062</None>
+          <None>-9204231729848516508</None>
+          <None>101062</None>
+          <None>-9210987129289572002</None>
+          <None>101062</None>
+          <None>-9204231729848516507</None>
+          <None>101062</None>
+          <None>-9204231729848516505</None>
+          <None>101062</None>
+        </MineSlotMapping>
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>376 1128</Position>
+        <MapFilePath>data/sessions/islands/campaign/colony01/chapter03/campaign_colony01_atoll_01/campaign_colony01_atoll_01.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <RandomizeFertilities>0</RandomizeFertilities>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+  </MapTemplate>
+</Content>

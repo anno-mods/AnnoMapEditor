@@ -8,7 +8,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace AnnoMapEditor.Models
+using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.MapTemplates;
+
+namespace AnnoMapEditor
 {
     public class DataPathStatus
     {
@@ -42,14 +45,16 @@ namespace AnnoMapEditor.Models
         public string? FileName;
     }
 
-    public class App : INotifyPropertyChanged
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
         public Session? Session
         {
             get => _session;
-            private set => SetProperty(ref _session, value);
+            private set => SetProperty(ref _session, value, new string[] { "CanExport" });
         }
         private Session? _session;
+
+        public bool CanExport => _session is not null;
 
         public string? SessionFilePath
         {
@@ -74,7 +79,7 @@ namespace AnnoMapEditor.Models
 
         public Utils.Settings Settings { get; private set; }
 
-        public App(Utils.Settings settings)
+        public MainWindowViewModel(Utils.Settings settings)
         {
             Settings = settings;
             Settings.PropertyChanged += Settings_PropertyChanged;
@@ -108,11 +113,24 @@ namespace AnnoMapEditor.Models
             }
             else
             {
-                if (Path.GetExtension(filePath) == ".a7tinfo")
+                if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
                     Session = await Session.FromA7tinfoAsync(filePath);
                 else
                     Session = await Session.FromXmlAsync(filePath);
             }
+        }
+
+        public async Task SaveMap(string filePath)
+        {
+            if (Session is null)
+                return;
+
+            SessionFilePath = Path.GetFileName(filePath);
+
+            if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
+                await Session.SaveAsync(filePath);
+            else
+                await Session.SaveToXmlAsync(filePath);
         }
 
         private void UpdateStatusAndMenus()
@@ -132,10 +150,10 @@ namespace AnnoMapEditor.Models
             {
                 DataPathStatus = new DataPathStatus()
                 {
-                    Status = Settings.DataArchive is Utils.RdaDataArchive ? "Game path set ✔" : "Extracted RDA path set ✔",
+                    Status = Settings.DataArchive is RdaDataArchive ? "Game path set ✔" : "Extracted RDA path set ✔",
                     ToolTip = Settings.DataArchive.Path,
                     ConfigureText = "Change...",
-                    AutoDetect = Settings.DataArchive is Utils.RdaDataArchive ? Visibility.Collapsed : Visibility.Visible,
+                    AutoDetect = Settings.DataArchive is RdaDataArchive ? Visibility.Collapsed : Visibility.Visible,
                 };
 
                 Dictionary<string, Regex> templateGroups = new()
@@ -143,7 +161,7 @@ namespace AnnoMapEditor.Models
                     ["DLCs"] = new(@"data\/(?!=sessions\/)([^\/]+)"),
                     ["Moderate"] = new(@"data\/sessions\/.+moderate"),
                     ["New World"] = new(@"data\/sessions\/.+colony01")
-                }; 
+                };
 
                 var mapTemplates = Settings.DataArchive.Find("**/*.a7tinfo");
 
@@ -179,7 +197,7 @@ namespace AnnoMapEditor.Models
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        protected void SetProperty<T>(ref T property, T value, [CallerMemberName] string propertyName = "")
+        protected void SetProperty<T>(ref T property, T value, string[]? dependingPropertyNames = null, [CallerMemberName] string propertyName = "")
         {
             if (property is null && value is null)
                 return;
@@ -188,6 +206,9 @@ namespace AnnoMapEditor.Models
             {
                 property = value;
                 OnPropertyChanged(propertyName);
+                if (dependingPropertyNames is not null)
+                    foreach (var name in dependingPropertyNames)
+                        OnPropertyChanged(name);
             }
         }
         #endregion

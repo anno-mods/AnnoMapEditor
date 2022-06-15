@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AnnoMapEditor.Models
+namespace AnnoMapEditor.MapTemplates
 {
     public struct IslandSize
     {
@@ -28,37 +28,31 @@ namespace AnnoMapEditor.Models
             IsDefault = size != "Small";
         }
 
-        public IslandSize(byte[]? data)
+        public IslandSize(short? size)
         {
-            if (data is not null && data.Length == 2)
+            switch (size)
             {
-                int val = BitConverter.ToInt16(data);
-                if (val >= 0 && val < 3)
-                {
-                    if (val == 0)
-                    {
-                        value = "Small";
-                        InTiles = 128;
-                    }
-                    else if (val == 1)
-                    {
-                        value = "Medium";
-                        InTiles = 320;
-                    }
-                    else
-                    {
-                        value = "Large";
-                        InTiles = 384;
-                    }
-
+                default:
+                    IsDefault = true;
+                    value = "Small";
+                    InTiles = 128;
+                    break;
+                case 0:
                     IsDefault = false;
-                    return;
-                }
+                    value = "Small";
+                    InTiles = 128;
+                    break;
+                case 1:
+                    IsDefault = false;
+                    value = "Medium";
+                    InTiles = 320;
+                    break;
+                case 2:
+                    IsDefault = false;
+                    value = "Large";
+                    InTiles = 384;
+                    break;
             }
-
-            value = "Small";
-            InTiles = 128;
-            IsDefault = true;
         }
 
         public override string ToString() => value;

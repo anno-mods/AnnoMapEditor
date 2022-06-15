@@ -7,7 +7,6 @@ using AnnoMapEditor.Utils;
 using System.Diagnostics;
 using System.Windows.Controls;
 using System.Collections.Generic;
-using AnnoMapEditor.Models;
 
 namespace AnnoMapEditor
 {
@@ -16,7 +15,7 @@ namespace AnnoMapEditor
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Models.App ViewModel { get; } = new Models.App(Settings.Instance);
+        public MainWindowViewModel ViewModel { get; } = new MainWindowViewModel(Settings.Instance);
         private readonly string title;
 
         public MainWindow()
@@ -55,6 +54,7 @@ namespace AnnoMapEditor
                         Title = title;
                     break;
                 case "Maps":
+                case "IsValidDataPath":
                     CreateImportMenu(openMapMenu, ViewModel?.Maps);
                     break;
             }
@@ -64,7 +64,6 @@ namespace AnnoMapEditor
         {
             var picker = new OpenFileDialog
             {
-                DefaultExt = ".a7tinfo",
                 Filter = "Map templates (*.a7tinfo, *.xml)|*.a7tinfo;*.xml"
             };
 
@@ -112,7 +111,10 @@ namespace AnnoMapEditor
 
             if (mapGroups is null || mapGroups.Count == 0)
             {
-                parentMenu.Items.Add(new MenuItem() { Header = "Set game/RDA path to import.", IsEnabled = false });
+                parentMenu.Items.Add(new MenuItem() {
+                    Header = Settings.Instance.IsLoading ? "(loading RDA...)" : "Set game/RDA path to import.",
+                    IsEnabled = false
+                });
                 return;
             }
 
@@ -137,6 +139,23 @@ namespace AnnoMapEditor
             if (mapInfo?.FileName is not null)
             {
                 await ViewModel.OpenMap(mapInfo.FileName, true);
+            }
+        }
+
+        private async void Export_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new SaveFileDialog
+            {
+                DefaultExt = ".a7tinfo",
+                Filter = "Map template (*.a7tinfo)|*.a7tinfo|XML map template (*.xml)|*.xml",
+                FilterIndex = Path.GetExtension(ViewModel.SessionFilePath)?.ToLower() == ".xml" ? 2 : 1,
+                FileName = Path.GetFileName(ViewModel.SessionFilePath),
+                OverwritePrompt = true
+            };
+
+            if (true == picker.ShowDialog() && picker.FileName is not null)
+            {
+                await ViewModel.SaveMap(picker.FileName);
             }
         }
     }

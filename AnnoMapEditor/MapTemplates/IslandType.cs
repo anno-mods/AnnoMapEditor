@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AnnoMapEditor.Models
+namespace AnnoMapEditor.MapTemplates
 {
     public struct IslandType
     {
@@ -21,16 +21,6 @@ namespace AnnoMapEditor.Models
             "Cliff",
             "Normal" // clamp
         };
-
-        //private static readonly string[] TypeIDs = new[]
-        //{
-        //    "Normal",
-        //    "Starter",
-        //    "unused?",
-        //    "ThirdParty", // FileFormat says Decoration??
-        //    "PirateIsland",
-        //    "Normal" // clamp
-        //};
 
         private readonly string value;
 
@@ -55,15 +45,15 @@ namespace AnnoMapEditor.Models
             value = "Normal";
         }
 
-        public IslandType(byte[]? data, bool randomType)
+        public IslandType(short? type)
         {
-            if (data is not null && data.Length == 2)
+            if (type is null)
             {
-                value = RandomIDs[Math.Clamp(BitConverter.ToInt16(data), 0, RandomIDs.Length - 1)];
+                value = "Normal";
                 return;
             }
 
-            value = RandomIDs[0];
+            value = RandomIDs[Math.Clamp((int)type, 0, RandomIDs.Length - 1)];
         }
 
         public override string ToString() => value;

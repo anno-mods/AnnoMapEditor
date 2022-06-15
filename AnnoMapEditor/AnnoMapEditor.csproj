@@ -28,7 +28,15 @@
     </PropertyGroup>
   </Target>
   <ItemGroup>
+    <None Remove="MapTemplates\Serializing\A7tinfo\a7tinfo.xml" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Assets\app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MapTemplates\Serializing\A7tinfo\a7tinfo.xml">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -39,6 +47,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="FileDBReader">
+      <HintPath>MapTemplates\Serializing\FileDBReader.dll</HintPath>
+    </Reference>
     <Reference Include="FileDBSerializer">
       <HintPath>External\FileDBSerializer.dll</HintPath>
     </Reference>
@@ -48,7 +59,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Utils\UserSettings.Designer.cs">
+    <Compile Update="UserSettings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
       <DependentUpon>UserSettings.settings</DependentUpon>
@@ -56,10 +67,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Utils\UserSettings.settings">
+    <None Update="UserSettings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>UserSettings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\MapObject.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\MapView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(MSBuildProjectName).UnitTests</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>

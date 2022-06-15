@@ -1,0 +1,256 @@
+<Content>
+  <MapTemplate>
+    <Size>2048 2048</Size>
+    <PlayableArea>313 313 1743 1743</PlayableArea>
+    <RandomlyPlacedThirdParties />
+    <ElementCount>17</ElementCount>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>352 512</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1488 1032</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1032 1440</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>328 840</Position>
+        <MapFilePath>data/dlc06/sessions/islands/pool/colony02_storyisland_02/colony02_storyisland_02.a7m</MapFilePath>
+        <Rotation90>1</Rotation90>
+        <IslandLabel>storyisland_02</IslandLabel>
+        <FertilityGuids>
+        </FertilityGuids>
+        <RandomizeFertilities>0</RandomizeFertilities>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>ThirdParty</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1000 496</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1352 360</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>544 800</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1344 1272</Position>
+        <Size>Large</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1240 1064</Position>
+        <MapFilePath>data/dlc06/sessions/islands/pool/colony02_storyisland_03/colony02_storyisland_03.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <IslandLabel>storyisland_03</IslandLabel>
+        <FertilityGuids>114345 114348 114352</FertilityGuids>
+        <RandomizeFertilities>0</RandomizeFertilities>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>ThirdParty</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>2</ElementType>
+      <Element>
+        <Position>904 968</Position>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>320 1096</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1112 1216</Position>
+        <MapFilePath>data/dlc06/sessions/islands/pool/colony02_storyisland_01/colony02_storyisland_01.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <IslandLabel>storyisland_01</IslandLabel>
+        <FertilityGuids>
+        </FertilityGuids>
+        <RandomizeFertilities>0</RandomizeFertilities>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>ThirdParty</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>624 1256</Position>
+        <Size>Large</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>400 1424</Position>
+        <MapFilePath>data/dlc06/sessions/islands/pool/colony02_settlement_01/colony02_settlement_01.a7m</MapFilePath>
+        <Rotation90>2</Rotation90>
+        <IslandLabel>blakeisland</IslandLabel>
+        <FertilityGuids>114343 114347 114352</FertilityGuids>
+        <RandomizeFertilities>0</RandomizeFertilities>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1320 592</Position>
+        <Size>Large</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>576 376</Position>
+        <Size>Large</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>872 856</Position>
+        <MapFilePath>data/dlc06/sessions/islands/pool/colony02_3rdparty10_01/colony02_3rdparty10_01.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <IslandLabel>ketemaisland</IslandLabel>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Starter</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+  </MapTemplate>
+</Content>
