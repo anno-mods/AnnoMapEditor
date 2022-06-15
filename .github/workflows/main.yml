@@ -31,8 +31,8 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
       
-    #- name: Test
-    #  run: dotnet test --no-build --verbosity normal
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
     
     - name: Publish
       run: dotnet publish -c Release -o Build -r win-x64 -p:PublishTrimmed=false -p:PublishSingleFile=true --self-contained false
