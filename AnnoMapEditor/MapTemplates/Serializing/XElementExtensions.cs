@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace AnnoMapEditor.External
+namespace AnnoMapEditor.MapTemplates.Serializing
 {
     public static class XElementExtensions
     {

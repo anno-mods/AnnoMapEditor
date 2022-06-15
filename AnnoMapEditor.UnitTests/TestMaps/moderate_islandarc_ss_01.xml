@@ -1,0 +1,209 @@
+<Content>
+  <MapTemplate>
+    <Size>1536 1536</Size>
+    <PlayableArea>100 100 1436 1436</PlayableArea>
+    <RandomlyPlacedThirdParties />
+    <ElementCount>18</ElementCount>
+    <TemplateElement>
+      <ElementType>2</ElementType>
+      <Element>
+        <Position>936 1152</Position>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>304 112</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1200 1232</Position>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Decoration</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>576 152</Position>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Decoration</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1184 768</Position>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Decoration</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>384 384</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>960 960</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>112 152</Position>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Decoration</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>872 464</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>384 960</Position>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Pirate</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1152 960</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>576 344</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>912 688</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>720 616</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>112 1152</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>2</ElementType>
+      <Element>
+        <Position>968 1184</Position>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>2</ElementType>
+      <Element>
+        <Position>360 576</Position>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>2</ElementType>
+      <Element>
+        <Position>392 608</Position>
+      </Element>
+    </TemplateElement>
+  </MapTemplate>
+</Content>

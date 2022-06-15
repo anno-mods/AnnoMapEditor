@@ -63,7 +63,6 @@ namespace AnnoMapEditor
         {
             var picker = new OpenFileDialog
             {
-                DefaultExt = ".a7tinfo",
                 Filter = "Map templates (*.a7tinfo, *.xml)|*.a7tinfo;*.xml"
             };
 
@@ -136,6 +135,23 @@ namespace AnnoMapEditor
             if (mapInfo?.FileName is not null)
             {
                 await ViewModel.OpenMap(mapInfo.FileName, true);
+            }
+        }
+
+        private async void Export_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new SaveFileDialog
+            {
+                DefaultExt = ".a7tinfo",
+                Filter = "Map template (*.a7tinfo)|*.a7tinfo|XML map template (*.xml)|*.xml",
+                FilterIndex = Path.GetExtension(ViewModel.SessionFilePath)?.ToLower() == ".xml" ? 2 : 1,
+                FileName = Path.GetFileName(ViewModel.SessionFilePath),
+                OverwritePrompt = true
+            };
+
+            if (true == picker.ShowDialog() && picker.FileName is not null)
+            {
+                await ViewModel.SaveMap(picker.FileName);
             }
         }
     }

@@ -1,0 +1,244 @@
+<Content>
+  <MapTemplate>
+    <Size>1536 1536</Size>
+    <PlayableArea>256 256 1280 1280</PlayableArea>
+    <RandomlyPlacedThirdParties />
+    <ElementCount>10</ElementCount>
+    <TemplateElement>
+      <Element>
+        <Position>672 792</Position>
+        <MapFilePath>data/dlc10/scenario02/sessions/islands/pool/scenario02_l_01/scenario02_l_01.a7m</MapFilePath>
+        <Rotation90>2</Rotation90>
+        <IslandLabel>Scenario02_Prata</IslandLabel>
+        <FertilityGuids>114348 120017 120038 1010573</FertilityGuids>
+        <RandomizeFertilities>0</RandomizeFertilities>
+        <MineSlotMapping>
+          <None>-9203105834236641273</None>
+          <None>1010507</None>
+          <None>-9209861233677696865</None>
+          <None>1010507</None>
+          <None>-9209861233677696609</None>
+          <None>1010507</None>
+          <None>-9203105834236641272</None>
+          <None>101061</None>
+          <None>-9209861233677696864</None>
+          <None>1010507</None>
+          <None>-9214364833305067475</None>
+          <None>1010507</None>
+          <None>-9209861233677696863</None>
+          <None>1010507</None>
+          <None>-9203105834236641271</None>
+          <None>101061</None>
+          <None>-9216616633118752764</None>
+          <None>101062</None>
+          <None>-9215490733211910134</None>
+          <None>101062</None>
+          <None>-9215490733211910136</None>
+          <None>101062</None>
+          <None>-9208735333770854266</None>
+          <None>1010507</None>
+          <None>-9203105834236641219</None>
+          <None>101061</None>
+        </MineSlotMapping>
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>2</ElementType>
+      <Element>
+        <Position>832 856</Position>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>888 416</Position>
+        <MapFilePath>data/dlc10/scenario02/sessions/islands/pool/scenario02_s_02/scenario02_s_02.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <IslandLabel>Scenario02_Small_02</IslandLabel>
+        <FertilityGuids>120017</FertilityGuids>
+        <RandomizeFertilities>0</RandomizeFertilities>
+        <MineSlotMapping>
+          <None>-9214364833305067490</None>
+          <None>101062</None>
+          <None>-9217742533025595382</None>
+          <None>102498</None>
+          <None>-9215490733211910108</None>
+          <None>102498</None>
+          <None>-9218868432932437730</None>
+          <None>101061</None>
+          <None>-9218868432932437771</None>
+          <None>1010507</None>
+          <None>-9218868432932437777</None>
+          <None>1010507</None>
+          <None>-9218868432932437759</None>
+          <None>1010507</None>
+          <None>-9221120232746123230</None>
+          <None>101061</None>
+          <None>-9219994332839280638</None>
+          <None>101061</None>
+        </MineSlotMapping>
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>424 528</Position>
+        <MapFilePath>data/dlc10/scenario02/sessions/islands/pool/scenario02_s_01/scenario02_s_01.a7m</MapFilePath>
+        <Rotation90>2</Rotation90>
+        <IslandLabel>Scenario02_Small_01</IslandLabel>
+        <FertilityGuids>114343 120039 1010573 1010574 1010577</FertilityGuids>
+        <RandomizeFertilities>0</RandomizeFertilities>
+        <MineSlotMapping>
+          <None>-9218868432932436893</None>
+          <None>1010507</None>
+          <None>-9218868432932436877</None>
+          <None>1010507</None>
+          <None>-9218868432932436862</None>
+          <None>1010507</None>
+        </MineSlotMapping>
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>672 240</Position>
+        <MapFilePath>data/dlc10/scenario02/sessions/islands/pool/scenario02_d_11/scenario02_d_11.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>608 576</Position>
+        <MapFilePath>data/dlc10/scenario02/sessions/islands/pool/scenario02_d_05/scenario02_d_05.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>792 376</Position>
+        <MapFilePath>data/dlc10/scenario02/sessions/islands/pool/scenario02_d_02/scenario02_d_02.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>624 344</Position>
+        <MapFilePath>data/dlc10/scenario02/sessions/islands/pool/scenario02_blocker_01/scenario02_blocker_01.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>712 600</Position>
+        <MapFilePath>data/dlc10/scenario02/sessions/islands/pool/scenario02_blocker_01/scenario02_blocker_01.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>952 704</Position>
+        <MapFilePath>data/dlc10/scenario02/sessions/islands/pool/scenario02_d_03/scenario02_d_03.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+  </MapTemplate>
+</Content>

@@ -38,6 +38,10 @@
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter Property="Background" Value="#182B3F" />
                             </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#708090" />
+                                <Setter Property="Background" Value="#4024415F" />
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -97,13 +101,15 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <controls:MapView Grid.Column="0" DataContext="{Binding Session, Mode=OneWay}" />
-        <StackPanel Grid.Column="0" Margin="16" VerticalAlignment="Stretch">
+        <StackPanel Grid.Column="0" Margin="16" VerticalAlignment="Stretch" HorizontalAlignment="Left">
             <controls:DropDownButton HorizontalAlignment="Left" Style="{StaticResource DropDownButtonStyle}">
                 <ContentControl Content="Open map" />
                 <controls:DropDownButton.Menu>
                     <ContextMenu Name="openMapMenu" />
                 </controls:DropDownButton.Menu>
             </controls:DropDownButton>
+            <Button Style="{StaticResource DefaultButtonStyle}" Click="Export_Click"
+                    IsEnabled="{Binding CanExport, UpdateSourceTrigger=PropertyChanged}">Export...</Button>
         </StackPanel>
         <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="8,0,0,0">
             <emoji:TextBlock Style="{StaticResource DefaultLabelStyle}"

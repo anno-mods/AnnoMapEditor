@@ -1,0 +1,907 @@
+<Content>
+  <MapTemplate>
+    <Size>1920 1920</Size>
+    <PlayableArea>190 190 1720 1720</PlayableArea>
+    <RandomlyPlacedThirdParties />
+    <ElementCount>48</ElementCount>
+    <TemplateElement>
+      <Element>
+        <Position>1152 1152</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_c_01/moderate_c_01.a7m</MapFilePath>
+        <Rotation90>1</Rotation90>
+        <IslandLabel>continental_island</IslandLabel>
+        <FertilityGuids>120013 1010569 1010571 1010572</FertilityGuids>
+        <RandomizeFertilities>0</RandomizeFertilities>
+        <MineSlotMapping>
+          <None>-9108530242061860854</None>
+          <None>1010503</None>
+          <None>-9095019443179749375</None>
+          <None>1010504</None>
+          <None>-9151314438521880571</None>
+          <None>1010503</None>
+          <None>-9153566238335565805</None>
+          <None>0</None>
+          <None>-9154657228748226554</None>
+          <None>0</None>
+          <None>-9081508644297637887</None>
+          <None>1010500</None>
+          <None>-9108530242061860856</None>
+          <None>1010500</None>
+          <None>-9135551839826083835</None>
+          <None>101061</None>
+          <None>-9163699337497149435</None>
+          <None>0</None>
+          <None>-9153566238335565813</None>
+          <None>1010501</None>
+          <None>-9122041040943972348</None>
+          <None>1010501</None>
+          <None>-9154657228748226557</None>
+          <None>0</None>
+          <None>-9122041040943972351</None>
+          <None>1010504</None>
+          <None>-9163699337497149438</None>
+          <None>1010501</None>
+          <None>-9154657228748226550</None>
+          <None>0</None>
+          <None>-9109656141968703487</None>
+          <None>0</None>
+          <None>-9135551839826083839</None>
+          <None>1010500</None>
+          <None>-9164825237403992063</None>
+          <None>1010505</None>
+          <None>-9153566238335565816</None>
+          <None>1010501</None>
+          <None>-9162573437590306815</None>
+          <None>1010501</None>
+          <None>-9163699337497149387</None>
+          <None>1010505</None>
+          <None>-9109656141968703485</None>
+          <None>101061</None>
+          <None>-9152440338428723199</None>
+          <None>0</None>
+          <None>-9153566238335565821</None>
+          <None>1010500</None>
+          <None>-9154657228748226552</None>
+          <None>0</None>
+          <None>-9153566238335565810</None>
+          <None>1010500</None>
+          <None>-9140055439453454329</None>
+          <None>1010504</None>
+          <None>-9153566238335565807</None>
+          <None>101061</None>
+          <None>-9135551839826083834</None>
+          <None>0</None>
+          <None>-9109656141968703486</None>
+          <None>0</None>
+          <None>-9151314438521880564</None>
+          <None>0</None>
+          <None>-9141181339360296948</None>
+          <None>1010503</None>
+          <None>-9108530242061860851</None>
+          <None>0</None>
+          <None>-9154657228748226555</None>
+          <None>0</None>
+          <None>-9140055439453454335</None>
+          <None>0</None>
+          <None>-9154657228748226551</None>
+          <None>0</None>
+          <None>-9135551839826083836</None>
+          <None>101061</None>
+          <None>-9151314438521880566</None>
+          <None>0</None>
+          <None>-9154657228748226553</None>
+          <None>0</None>
+          <None>-9154657228748226558</None>
+          <None>0</None>
+          <None>-9151314438521880574</None>
+          <None>1010500</None>
+          <None>-9154657228748226556</None>
+          <None>0</None>
+        </MineSlotMapping>
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Starter</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>216 1320</Position>
+        <Size>Large</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>624 496</Position>
+        <Size>Large</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>208 680</Position>
+        <Size>Large</Size>
+        <Difficulty />
+        <Config>
+          <Type>
+            <id>Starter</id>
+          </Type>
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1160 856</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_3rdparty06_01/moderate_3rdparty06_01.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <IslandLabel>old_nate_island</IslandLabel>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>ThirdParty</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>880 1176</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>608 904</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1152 216</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>264 200</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>632 1440</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>904 920</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1232 424</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_battlesite_01/moderate_battlesite_01.a7m</MapFilePath>
+        <Rotation90>1</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>608 1176</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_battlesite_02/moderate_battlesite_02.a7m</MapFilePath>
+        <Rotation90>2</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>880 168</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_battlesite_03/moderate_battlesite_03.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>928 288</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_01/moderate_dst_01.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>832 216</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_02/moderate_dst_02.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1576 984</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_02/moderate_dst_02.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1312 368</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_03/moderate_dst_03.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1352 200</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_04/moderate_dst_04.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1424 536</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_05/moderate_dst_05.a7m</MapFilePath>
+        <Rotation90>1</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1072 592</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_06/moderate_dst_06.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1424 736</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_07/moderate_dst_07.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1256 592</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_08/moderate_dst_08.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1368 864</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_09/moderate_dst_09.a7m</MapFilePath>
+        <Rotation90>2</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1064 440</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_10/moderate_dst_10.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1568 256</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_11/moderate_dst_11.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1432 680</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_11/moderate_dst_11.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>2</ElementType>
+      <Element>
+        <Position>1184 1120</Position>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1440 800</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_strandedsailor_01/moderate_strandedsailor_01.a7m</MapFilePath>
+        <Rotation90>2</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1040 488</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_04/moderate_dst_04.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>224 400</Position>
+        <Size>Medium</Size>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1048 744</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_02/moderate_dst_02.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1048 240</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_11/moderate_dst_11.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1248 664</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>296 1064</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_encounter_01/moderate_encounter_01.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type>
+              <id>Decoration</id>
+            </Type>
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>536 288</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>896 1472</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1200 896</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_04/moderate_dst_04.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1128 408</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_07/moderate_dst_07.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>592 1144</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_02/moderate_dst_02.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>760 1336</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_03/moderate_dst_03.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>736 1208</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_04/moderate_dst_04.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>744 288</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_06/moderate_dst_06.a7m</MapFilePath>
+        <Rotation90>1</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>616 1312</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_11/moderate_dst_11.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1344 904</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_06/moderate_dst_06.a7m</MapFilePath>
+        <Rotation90>0</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <ElementType>1</ElementType>
+      <Element>
+        <Position>1424 360</Position>
+        <Difficulty />
+        <Config>
+          <Type />
+          <Difficulty />
+        </Config>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1600 448</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_02/moderate_dst_02.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+    <TemplateElement>
+      <Element>
+        <Position>1008 680</Position>
+        <MapFilePath>data/dlc01/sessions/islands/pool/moderate_dst_10/moderate_dst_10.a7m</MapFilePath>
+        <Rotation90>3</Rotation90>
+        <FertilityGuids>
+        </FertilityGuids>
+        <MineSlotMapping />
+        <RandomIslandConfig>
+          <value>
+            <Type />
+            <Difficulty>
+              <id>Normal</id>
+            </Difficulty>
+          </value>
+        </RandomIslandConfig>
+      </Element>
+    </TemplateElement>
+  </MapTemplate>
+</Content>

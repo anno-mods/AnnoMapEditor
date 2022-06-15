@@ -50,9 +50,11 @@ namespace AnnoMapEditor
         public Session? Session
         {
             get => _session;
-            private set => SetProperty(ref _session, value);
+            private set => SetProperty(ref _session, value, new string[] { "CanExport" });
         }
         private Session? _session;
+
+        public bool CanExport => _session is not null;
 
         public string? SessionFilePath
         {
@@ -111,11 +113,24 @@ namespace AnnoMapEditor
             }
             else
             {
-                if (Path.GetExtension(filePath) == ".a7tinfo")
+                if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
                     Session = await Session.FromA7tinfoAsync(filePath);
                 else
                     Session = await Session.FromXmlAsync(filePath);
             }
+        }
+
+        public async Task SaveMap(string filePath)
+        {
+            if (Session is null)
+                return;
+
+            SessionFilePath = Path.GetFileName(filePath);
+
+            if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
+                await Session.SaveAsync(filePath);
+            else
+                await Session.SaveToXmlAsync(filePath);
         }
 
         private void UpdateStatusAndMenus()
@@ -182,7 +197,7 @@ namespace AnnoMapEditor
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        protected void SetProperty<T>(ref T property, T value, [CallerMemberName] string propertyName = "")
+        protected void SetProperty<T>(ref T property, T value, string[]? dependingPropertyNames = null, [CallerMemberName] string propertyName = "")
         {
             if (property is null && value is null)
                 return;
@@ -191,6 +206,9 @@ namespace AnnoMapEditor
             {
                 property = value;
                 OnPropertyChanged(propertyName);
+                if (dependingPropertyNames is not null)
+                    foreach (var name in dependingPropertyNames)
+                        OnPropertyChanged(name);
             }
         }
         #endregion

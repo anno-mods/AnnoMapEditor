@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-using FileDBSerializing;
-using AnnoMapEditor.External;
-using AnnoMapEditor.Utils;
+using AnnoMapEditor.MapTemplates.Serializing;
 
 namespace AnnoMapEditor.MapTemplates
 {
@@ -18,9 +15,12 @@ namespace AnnoMapEditor.MapTemplates
         public Rect2 PlayableArea { get; private set; }
         public Region Region { get; set; }
 
+        private Serializing.A7tinfo.MapTemplateDocument template;
+
         public Session()
         {
             Islands = new List<Island>();
+            template = new Serializing.A7tinfo.MapTemplateDocument();
         }
 
         private static Region DetectRegionFromPath(string filePath)
@@ -39,66 +39,50 @@ namespace AnnoMapEditor.MapTemplates
             return await FromA7tinfoAsync(File.OpenRead(filePath), filePath);
         }
 
-        public static async Task<Session?> FromA7tinfoAsync(Stream? stream, string filePath)
+        public static async Task<Session?> FromA7tinfoAsync(Stream? stream, string internalPath)
         {
-            IFileDBDocument? doc = null;
-            if (stream is null)
-                return null;
-
-            doc = await FileDBReader.ReadFileDBAsync(stream);
+            var doc = await Serializer.ReadAsync<Serializing.A7tinfo.MapTemplateDocument>(stream);
             if (doc is null)
                 return null;
 
-            Region region = DetectRegionFromPath(filePath);
-
-            var mapTemplate = doc.Roots.FirstOrDefault(x => x.Name == "MapTemplate") as Tag;
-            var elements = from element in mapTemplate?.Children
-                           where element.Name == "TemplateElement"
-                           select (element as Tag)?.Children.FirstOrDefault(x => x.Name == "Element");
-            var islands = from node in elements
-                          where node is not null
-                          select Island.FromFileDBNode(node, region);
-            Session session = new()
-            {
-                Region = region,
-                Islands = new List<Island>(await Task.WhenAll(islands)),
-                Size = new Vector2(doc.GetBytesFromPath("MapTemplate/Size")),
-                PlayableArea = new Rect2(doc.GetBytesFromPath("MapTemplate/PlayableArea"))
-            };
-
-            if (session.Size.X == 0)
-                return null;
-
-            return session;
+            return await FromTemplateDocument(doc, DetectRegionFromPath(internalPath));
         }
 
         public static async Task<Session?> FromXmlAsync(string filePath)
         {
-            XDocument sessionDocument;
-            try
-            {
-                sessionDocument = XDocument.Load(File.OpenRead(filePath));
-            }
-            catch
-            {
-                return null;
-            }
-
-            if (sessionDocument.Root is null)
+            var doc = await Serializer.ReadFromXmlAsync<Serializing.A7tinfo.MapTemplateDocument>(File.OpenRead(filePath));
+            if (doc is null)
                 return null;
 
-            Region region = DetectRegionFromPath(filePath);
+            return await FromTemplateDocument(doc, DetectRegionFromPath(filePath));
+        }
 
-            var islands = from node in sessionDocument.Descendants("TemplateElement")
-                          select Island.FromXElement(node, region);
+        public static async Task<Session?> FromXmlAsync(Stream? stream, string internalPath)
+        {
+            var doc = await Serializer.ReadFromXmlAsync<Serializing.A7tinfo.MapTemplateDocument>(stream);
+            if (doc is null)
+                return null;
 
+            return await FromTemplateDocument(doc, DetectRegionFromPath(internalPath));
+        }
+
+        public static async Task<Session?> FromTemplateDocument(Serializing.A7tinfo.MapTemplateDocument document, Region region)
+        {
+            var islands = from element in document.MapTemplate?.TemplateElement
+                          where element?.Element is not null
+                          select Island.FromSerialized(element, region);
             Session session = new()
             {
                 Region = region,
                 Islands = new List<Island>(await Task.WhenAll(islands)),
-                Size = new Vector2(sessionDocument.Root.GetValueFromPath("MapTemplate/Size")),
-                PlayableArea = new Rect2(sessionDocument.Root.GetValueFromPath("MapTemplate/PlayableArea"))
+                Size = new Vector2(document.MapTemplate?.Size),
+                PlayableArea = new Rect2(document.MapTemplate?.PlayableArea),
+                template = document
             };
+
+            // clear links in the original
+            if (session.template.MapTemplate is not null)
+                session.template.MapTemplate.TemplateElement = null;
 
             if (session.Size.X == 0)
                 return null;
@@ -110,6 +94,38 @@ namespace AnnoMapEditor.MapTemplates
         {
             foreach (var island in Islands)
                 await island.UpdateExternalDataAsync();
+        }
+        public Serializing.A7tinfo.MapTemplateDocumentExport? ToTemplate()
+        {
+            if (template.MapTemplate is null)
+                return null;
+
+            return new Serializing.A7tinfo.MapTemplateDocumentExport()
+            {
+                MapTemplate = new Serializing.A7tinfo.MapTemplateExport(template.MapTemplate, Islands.Select(x => x.ToTemplate()))
+            };
+        }
+
+        public async Task SaveToXmlAsync(string filePath)
+        {
+            var export = ToTemplate();
+            if (export is null)
+                return;
+
+            using Stream file = File.OpenWrite(filePath);
+            file.SetLength(0); // clear
+            await Serializer.WriteToXmlAsync(export, file);
+        }
+
+        public async Task SaveAsync(string filePath)
+        {
+            var export = ToTemplate();
+            if (export is null)
+                return;
+
+            using Stream file = File.OpenWrite(filePath);
+            file.SetLength(0); // clear
+            await Serializer.WriteAsync(export, file);
         }
     }
 }
