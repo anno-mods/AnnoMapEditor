@@ -54,6 +54,7 @@ namespace AnnoMapEditor
                         Title = title;
                     break;
                 case "Maps":
+                case "IsValidDataPath":
                     CreateImportMenu(openMapMenu, ViewModel?.Maps);
                     break;
             }
@@ -110,7 +111,10 @@ namespace AnnoMapEditor
 
             if (mapGroups is null || mapGroups.Count == 0)
             {
-                parentMenu.Items.Add(new MenuItem() { Header = "Set game/RDA path to import.", IsEnabled = false });
+                parentMenu.Items.Add(new MenuItem() {
+                    Header = Settings.Instance.IsLoading ? "(loading RDA...)" : "Set game/RDA path to import.",
+                    IsEnabled = false
+                });
                 return;
             }
 
