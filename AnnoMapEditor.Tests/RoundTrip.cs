@@ -1,8 +1,8 @@
 using AnnoMapEditor.MapTemplates;
 using AnnoMapEditor.MapTemplates.Serializing;
-using AnnoMapEditor.UnitTests.Utils;
+using AnnoMapEditor.Tests.Utils;
 
-namespace AnnoMapEditor.UnitTests
+namespace AnnoMapEditor.Tests
 {
     public class RoundTrip
     {
