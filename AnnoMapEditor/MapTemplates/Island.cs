@@ -65,6 +65,10 @@ namespace AnnoMapEditor.MapTemplates
 
         public Serializing.A7tinfo.TemplateElement ToTemplate()
         {
+            if (template.Element is null)
+                return template;
+
+            template.Element.Position = new int[] { Position.X, Position.Y };
             return template;
         }
 
