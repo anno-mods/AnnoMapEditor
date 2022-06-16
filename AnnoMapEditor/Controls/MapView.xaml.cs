@@ -130,8 +130,8 @@ namespace AnnoMapEditor.Controls
             {
                 island.Position = new MapTemplates.Vector2(ensuredX, session.Size.Y - ensuredY - island.SizeInTiles);
 
-                Canvas.SetLeft(_island, ensuredX);
-                Canvas.SetTop(_island, ensuredY);
+                Canvas.SetLeft(_island, island.Position.X);
+                Canvas.SetTop(_island, session.Size.Y - island.Position.Y - island.SizeInTiles);
             }
         }
     }
