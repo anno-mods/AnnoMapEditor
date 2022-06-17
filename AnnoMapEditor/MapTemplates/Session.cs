@@ -17,6 +17,8 @@ namespace AnnoMapEditor.MapTemplates
 
         private Serializing.A7tinfo.MapTemplateDocument template;
 
+        public string MapSizeText => $"Size: {Size.X}, Playable: {PlayableArea.Width}";
+
         public Session()
         {
             Size = new Vector2(0, 0);
@@ -124,6 +126,9 @@ namespace AnnoMapEditor.MapTemplates
             if (export is null)
                 return;
 
+            var parentPath = Path.GetDirectoryName(filePath);
+            if (parentPath is not null)
+                Directory.CreateDirectory(parentPath);
             using Stream file = File.OpenWrite(filePath);
             file.SetLength(0); // clear
             await Serializer.WriteAsync(export, file);

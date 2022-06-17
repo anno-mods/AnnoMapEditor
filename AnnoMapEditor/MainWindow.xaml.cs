@@ -7,6 +7,7 @@ using AnnoMapEditor.Utils;
 using System.Diagnostics;
 using System.Windows.Controls;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AnnoMapEditor
 {
@@ -33,7 +34,7 @@ namespace AnnoMapEditor
                 }
                 catch { }
             }
-            title = $"Community Map Editor for Anno 1800 {productVersion}";
+            title = $"{App.Title} {productVersion}";
             Title = title;
 
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -142,7 +143,7 @@ namespace AnnoMapEditor
             }
         }
 
-        private async void Export_Click(object sender, RoutedEventArgs e)
+        private async void ExportMap_Click(object sender, RoutedEventArgs e)
         {
             var picker = new SaveFileDialog
             {
@@ -157,6 +158,23 @@ namespace AnnoMapEditor
             {
                 await ViewModel.SaveMap(picker.FileName);
             }
+        }
+
+        private void ExportMod_Click(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.Session is null)
+                return;
+
+            exportDialog.Show(ViewModel.Session);
+        }
+
+        private void Hyperlink_OpenBrowser(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            var info = new ProcessStartInfo(e.Uri.AbsoluteUri)
+            {
+                UseShellExecute = true,
+            };
+            Process.Start(info);
         }
     }
 }

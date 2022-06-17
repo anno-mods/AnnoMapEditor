@@ -3,129 +3,59 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AnnoMapEditor"
         xmlns:controls="clr-namespace:AnnoMapEditor.Controls"
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+        d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
-        Background="#182B3F">
+        Background="{StaticResource BackgroundBrush}">
     <Window.Resources>
-        <Style x:Key="DefaultButtonStyle" TargetType="Button">
-            <Setter Property="OverridesDefaultStyle" Value="True" />
-            <Setter Property="Margin" Value="2" />
-            <Setter Property="FontFamily" Value="Verdana" />
-            <Setter Property="FontSize" Value="11px" />
-            <Setter Property="Foreground" Value="#f0f0f0" />
-            <Setter Property="Background" Value="#8024415F" />
-            <Setter Property="Width" Value="auto" />
-            <Setter Property="Padding" Value="8,6,8,6" />
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="0"
-                                Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}"
-                                x:Name="border"
-                                CornerRadius="3"
-                                SnapsToDevicePixels="true">
-                            <ContentPresenter HorizontalAlignment="Center" 
-                            VerticalAlignment="Center" Name="content"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#24415F" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#182B3F" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Foreground" Value="#708090" />
-                                <Setter Property="Background" Value="#4024415F" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="DropDownButtonStyle" TargetType="ToggleButton">
-            <Setter Property="OverridesDefaultStyle" Value="True" />
-            <Setter Property="Margin" Value="2" />
-            <Setter Property="FontFamily" Value="Verdana" />
-            <Setter Property="FontSize" Value="11px" />
-            <Setter Property="Foreground" Value="#f0f0f0" />
-            <Setter Property="Background" Value="#8024415F" />
-            <Setter Property="Width" Value="auto" />
-            <Setter Property="Padding" Value="8,6,8,6" />
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Border BorderThickness="0"
-                                Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}"
-                                x:Name="border"
-                                CornerRadius="3"
-                                SnapsToDevicePixels="true">
-                            <StackPanel Orientation="Horizontal">
-                                <ContentPresenter HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center" Name="content" />
-                                <Path x:Name="BtnArrow" Margin="8,0,0,0" VerticalAlignment="Center" Width="6" Fill="#f0f0f0"
-                                      Stretch="Uniform" HorizontalAlignment="Right"
-                                      Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z "/>
-                            </StackPanel>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#24415F" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#182B3F" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="DefaultLabelStyle" TargetType="TextBlock">
-            <Setter Property="OverridesDefaultStyle" Value="True" />
-            <Setter Property="Margin" Value="2" />
-            <Setter Property="FontFamily" Value="Verdana" />
-            <Setter Property="FontSize" Value="11px" />
-            <Setter Property="Foreground" Value="#e0e0e0" />
-            <Setter Property="Width" Value="auto" />
-            <Setter Property="Padding" Value="2,6,2,6" />
-        </Style>
+        <ResourceDictionary Source="Styles.xaml" />
     </Window.Resources>
     <Grid VerticalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <controls:MapView Grid.Column="0" DataContext="{Binding Session, Mode=OneWay}" />
-        <StackPanel Grid.Column="0" Margin="16" VerticalAlignment="Stretch" HorizontalAlignment="Left">
-            <controls:DropDownButton HorizontalAlignment="Left" Style="{StaticResource DropDownButtonStyle}">
+        <StackPanel Grid.Column="0" Margin="16" VerticalAlignment="Top" Orientation="Horizontal">
+            <controls:DropDownButton HorizontalAlignment="Left">
                 <ContentControl Content="Open map" />
                 <controls:DropDownButton.Menu>
                     <ContextMenu Name="openMapMenu" />
                 </controls:DropDownButton.Menu>
             </controls:DropDownButton>
-            <Button Style="{StaticResource DefaultButtonStyle}" Click="Export_Click"
-                    IsEnabled="{Binding CanExport, UpdateSourceTrigger=PropertyChanged}">Export...</Button>
+            <controls:DropDownButton HorizontalAlignment="Left"
+                                     IsEnabled="{Binding CanExport, UpdateSourceTrigger=PropertyChanged}">
+                <ContentControl Content="Export" />
+                <controls:DropDownButton.Menu>
+                    <ContextMenu>
+                        <MenuItem Header="Save to file..." Click="ExportMap_Click"/>
+                        <MenuItem Header="Export as mod..." Click="ExportMod_Click"/>
+                    </ContextMenu>
+                </controls:DropDownButton.Menu>
+            </controls:DropDownButton>
         </StackPanel>
         <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="8,0,0,0">
-            <emoji:TextBlock Style="{StaticResource DefaultLabelStyle}"
-                             Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"
+            <emoji:TextBlock Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"
                              ToolTip="{Binding DataPathStatus.ToolTip, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Click="Configure_Click" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Left"
+            <Button Click="Configure_Click" HorizontalAlignment="Left"
                     Visibility="{Binding DataPathStatus.Configure, UpdateSourceTrigger=PropertyChanged}">
                 <TextBlock Text="{Binding DataPathStatus.ConfigureText, UpdateSourceTrigger=PropertyChanged}"/>
             </Button>
-            <Button Click="AutoDetect_Click" Style="{StaticResource DefaultButtonStyle}" HorizontalAlignment="Left"
+            <Button Click="AutoDetect_Click" HorizontalAlignment="Left"
                     Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}">Auto detect</Button>
         </StackPanel>
-        <TextBlock Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,0" Style="{StaticResource DefaultLabelStyle}" TextAlignment="Right">
-            <Run>Viewing only.</Run>
+        <TextBlock Style="{StaticResource DefaultLabelStyle}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8,0,8,0" TextAlignment="Right" 
+                   Text="{Binding Session.MapSizeText}"/>
+        <TextBlock Style="{StaticResource DefaultLabelStyle}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,0" TextAlignment="Right">
+            <Run>Edit functions are work in progress.</Run>
             <LineBreak />
-            <Run>There's no clicking or editing yet.</Run>
+            <Run>Visit GitHub for </Run>
+            <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor#roadmap" RequestNavigate="Hyperlink_OpenBrowser">roadmap</Hyperlink>
+            <Run> and </Run>
+            <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink>
         </TextBlock>
+        <local:ExportAsMod x:Name="exportDialog" Grid.Column="0" />
     </Grid>
 </Window>

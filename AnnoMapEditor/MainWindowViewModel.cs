@@ -45,7 +45,7 @@ namespace AnnoMapEditor
         public string? FileName;
     }
 
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : ViewModelBase
     {
         public Session? Session
         {
@@ -68,7 +68,7 @@ namespace AnnoMapEditor
             get => _dataPathStatus;
             private set => SetProperty(ref _dataPathStatus, value);
         }
-        private DataPathStatus _dataPathStatus = new DataPathStatus();
+        private DataPathStatus _dataPathStatus = new();
 
         public List<MapGroup>? Maps
         {
@@ -173,9 +173,9 @@ namespace AnnoMapEditor
                     new MapGroup("Moderate, Corners", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_corners")), new(@"\/([^\/]+)\.")),
                     new MapGroup("Moderate, Island Arc", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_islandarc")), new(@"\/([^\/]+)\.")),
                     new MapGroup("Moderate, Snowflake", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_snowflake")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("New World, Large", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_l")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("New World, Medium", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_m")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("New World, Small", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_s")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("New World, Large", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_l_")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("New World, Medium", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_m_")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("New World, Small", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_s_")), new(@"\/([^\/]+)\.")),
                     new MapGroup("DLCs", mapTemplates.Where(x => !x.StartsWith(@"data/sessions/")), new(@"data\/([^\/]+)\/.+\/maps\/([^\/]+)"))
                     //new MapGroup("Moderate", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate")), new(@"\/([^\/]+)\."))
                 };
@@ -193,24 +193,5 @@ namespace AnnoMapEditor
                 Maps = new();
             }
         }
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged = delegate { };
-        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        protected void SetProperty<T>(ref T property, T value, string[]? dependingPropertyNames = null, [CallerMemberName] string propertyName = "")
-        {
-            if (property is null && value is null)
-                return;
-
-            if (!(property?.Equals(value) ?? false))
-            {
-                property = value;
-                OnPropertyChanged(propertyName);
-                if (dependingPropertyNames is not null)
-                    foreach (var name in dependingPropertyNames)
-                        OnPropertyChanged(name);
-            }
-        }
-        #endregion
     }
 }
