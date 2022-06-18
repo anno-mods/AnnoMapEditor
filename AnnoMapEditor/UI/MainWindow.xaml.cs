@@ -111,7 +111,7 @@ namespace AnnoMapEditor.UI
             if (mapGroups is null || mapGroups.Count == 0)
             {
                 parentMenu.Items.Add(new MenuItem() {
-                    Header = Settings.Instance.IsLoading ? "(loading RDA...)" : "Set game/RDA path to import.",
+                    Header = Settings.Instance.IsLoading ? "(loading RDA...)" : "Set game/RDA path to import",
                     IsEnabled = false
                 });
                 return;

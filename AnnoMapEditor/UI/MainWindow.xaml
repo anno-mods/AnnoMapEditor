@@ -20,18 +20,18 @@
         <controls:MapView Grid.Column="0" DataContext="{Binding Session, Mode=OneWay}" />
         <StackPanel Grid.Column="0" Margin="16" VerticalAlignment="Top" Orientation="Horizontal">
             <controls:DropDownButton HorizontalAlignment="Left">
-                <ContentControl Content="Open map" />
+                <ContentControl Content="Open" />
                 <controls:DropDownButton.Menu>
                     <ContextMenu Name="openMapMenu" />
                 </controls:DropDownButton.Menu>
             </controls:DropDownButton>
             <controls:DropDownButton HorizontalAlignment="Left"
                                      IsEnabled="{Binding CanExport, UpdateSourceTrigger=PropertyChanged}">
-                <ContentControl Content="Export" />
+                <ContentControl Content="Save" />
                 <controls:DropDownButton.Menu>
                     <ContextMenu>
-                        <MenuItem Header="Save to file..." Click="ExportMap_Click"/>
-                        <MenuItem Header="Export as mod..." Click="ExportMod_Click"/>
+                        <MenuItem Header="As map template..." Click="ExportMap_Click"/>
+                        <MenuItem Header="{Binding DataPathStatus.ExportAsModText, UpdateSourceTrigger=PropertyChanged}" Click="ExportMod_Click" IsEnabled="{Binding DataPathStatus.CanExportAsMod, UpdateSourceTrigger=PropertyChanged}" />
                     </ContextMenu>
                 </controls:DropDownButton.Menu>
             </controls:DropDownButton>

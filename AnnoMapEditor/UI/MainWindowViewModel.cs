@@ -18,6 +18,9 @@ namespace AnnoMapEditor.UI
         public Visibility AutoDetect { get; set; } = Visibility.Collapsed;
         public Visibility Configure { get; set; } = Visibility.Visible;
         public string ConfigureText { get; set; } = string.Empty;
+
+        public bool CanExportAsMod { get; set; }
+        public string ExportAsModText { get; set; } = "";
     }
 
     public class MapGroup
@@ -141,7 +144,9 @@ namespace AnnoMapEditor.UI
                     Status = "loading RDA...",
                     ToolTip = "",
                     Configure = Visibility.Collapsed,
-                    AutoDetect = Visibility.Collapsed
+                    AutoDetect = Visibility.Collapsed,
+                    CanExportAsMod = false,
+                    ExportAsModText = "(loading RDA...)"
                 };
             }
             else if (Settings.IsValidDataPath)
@@ -152,6 +157,8 @@ namespace AnnoMapEditor.UI
                     ToolTip = Settings.DataArchive.Path,
                     ConfigureText = "Change...",
                     AutoDetect = Settings.DataArchive is RdaDataArchive ? Visibility.Collapsed : Visibility.Visible,
+                    CanExportAsMod = Settings.DataArchive is RdaDataArchive,
+                    ExportAsModText = Settings.DataArchive is RdaDataArchive ? "As playable mod..." : "Set game path to save as mod"
                 };
 
                 Dictionary<string, Regex> templateGroups = new()
@@ -185,7 +192,9 @@ namespace AnnoMapEditor.UI
                     Status = "⚠ Game or RDA path not valid.",
                     ToolTip = null,
                     ConfigureText = "Select...",
-                    AutoDetect = Visibility.Visible
+                    AutoDetect = Visibility.Visible,
+                    ExportAsModText = "Set game path to save as mod",
+                    CanExportAsMod = false
                 };
 
                 Maps = new();

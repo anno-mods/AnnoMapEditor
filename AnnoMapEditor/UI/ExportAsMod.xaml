@@ -63,11 +63,11 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <!--<StackPanel Grid.Column="0" Orientation="Horizontal">
                         <emoji:TextBlock Text="Mod path set ✔" />
                         <Button Content="Change..." />
-                    </StackPanel>
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    </StackPanel>-->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
                         <Button Content="Export" Click="Export_Click" IsDefault="True" IsEnabled="{Binding CanExport, UpdateSourceTrigger=PropertyChanged}" />
                         <Button Content="Cancel" Click="Cancel_Click" />
                     </StackPanel>
