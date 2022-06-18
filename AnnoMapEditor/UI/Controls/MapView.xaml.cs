@@ -1,14 +1,13 @@
-﻿using System;
+﻿using AnnoMapEditor.MapTemplates;
+using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using AnnoMapEditor.MapTemplates;
 
-namespace AnnoMapEditor.Controls
+namespace AnnoMapEditor.UI.Controls
 {
     public partial class MapView : UserControl
     {
@@ -21,7 +20,7 @@ namespace AnnoMapEditor.Controls
             SizeChanged += MapView_SizeChanged;
             DataContextChanged += MapView_DataContextChanged;
 
-            Utils.Settings.Instance.PropertyChanged += Settings_PropertyChanged;
+            Settings.Instance.PropertyChanged += Settings_PropertyChanged;
         }
 
         private void MapView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

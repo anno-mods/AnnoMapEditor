@@ -1,10 +1,10 @@
 ﻿using AnnoMapEditor.MapTemplates;
-using AnnoMapEditor.Utils;
+using AnnoMapEditor.UI;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace AnnoMapEditor
+namespace AnnoMapEditor.UI
 {
     /// <summary>
     /// Interaction logic for ExportAsMod.xaml

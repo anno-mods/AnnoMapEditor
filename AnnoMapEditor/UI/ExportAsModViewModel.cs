@@ -1,12 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using System.Windows;
 
-namespace AnnoMapEditor
+namespace AnnoMapEditor.UI
 {
     public class ExportAsModViewModel : ViewModelBase
     {
@@ -16,7 +11,7 @@ namespace AnnoMapEditor
         //    private set => SetProperty(ref _DialogVisibility, value);
         //}
         //private Visibility _DialogVisibility = Visibility.Collapsed; 
-        
+
         public string ModName
         {
             get => _modName;
@@ -36,7 +31,7 @@ namespace AnnoMapEditor
         private string _modID = "";
 
         public bool CanExport => ModName.Trim() != string.Empty;
-        
+
         public Visibility ModExistsWarning
         {
             get => _modExistsWarning;
@@ -46,10 +41,10 @@ namespace AnnoMapEditor
 
         private static bool ModExists(string modName)
         {
-            if (Utils.Settings.Instance.DataPath is null)
+            if (Settings.Instance.DataPath is null)
                 return false;
 
-            string modPath = Path.Combine(Utils.Settings.Instance.DataPath, "mods", "[Map] " + modName);
+            string modPath = Path.Combine(Settings.Instance.DataPath, "mods", "[Map] " + modName);
             return Directory.Exists(modPath);
         }
     }

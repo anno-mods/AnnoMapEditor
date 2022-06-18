@@ -1,15 +1,13 @@
-﻿using Microsoft.Win32;
+﻿using AnnoMapEditor.UI;
+using Microsoft.Win32;
 using System;
-using System.IO;
-using System.Windows;
-
-using AnnoMapEditor.Utils;
-using System.Diagnostics;
-using System.Windows.Controls;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.IO;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls;
 
-namespace AnnoMapEditor
+namespace AnnoMapEditor.UI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

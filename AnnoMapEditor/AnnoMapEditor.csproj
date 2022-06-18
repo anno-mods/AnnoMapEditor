@@ -75,27 +75,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Controls\MapObject.xaml">
+    <Page Update="UI\Controls\MapObject.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Controls\MapView.xaml">
+    <Page Update="UI\Controls\MapView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Styles\Button.xaml">
+    <Page Update="UI\Styles\Button.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Styles\Label.xaml">
+    <Page Update="UI\Styles\Label.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Styles\TextBox.xaml">
+    <Page Update="UI\Styles\TextBox.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Styles\ToggleButton.xaml">
+    <Page Update="UI\Styles\ToggleButton.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

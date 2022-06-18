@@ -1,12 +1,11 @@
-﻿using System.IO;
+﻿using AnnoMapEditor.DataArchives;
+using Microsoft.Win32;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.Windows;
-using AnnoMapEditor.DataArchives;
 
-namespace AnnoMapEditor.Utils
+namespace AnnoMapEditor
 {
     public class Settings : INotifyPropertyChanged
     {

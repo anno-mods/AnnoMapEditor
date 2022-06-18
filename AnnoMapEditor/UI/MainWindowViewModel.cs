@@ -1,17 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.MapTemplates;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
-using AnnoMapEditor.DataArchives;
-using AnnoMapEditor.MapTemplates;
-
-namespace AnnoMapEditor
+namespace AnnoMapEditor.UI
 {
     public class DataPathStatus
     {
@@ -77,9 +75,9 @@ namespace AnnoMapEditor
         }
         private List<MapGroup>? _maps;
 
-        public Utils.Settings Settings { get; private set; }
+        public Settings Settings { get; private set; }
 
-        public MainWindowViewModel(Utils.Settings settings)
+        public MainWindowViewModel(Settings settings)
         {
             Settings = settings;
             Settings.PropertyChanged += Settings_PropertyChanged;

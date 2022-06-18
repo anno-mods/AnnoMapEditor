@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace AnnoMapEditor
+namespace AnnoMapEditor.UI
 {
     public class ViewModelBase : INotifyPropertyChanged
     {

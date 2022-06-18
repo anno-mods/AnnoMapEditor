@@ -206,7 +206,7 @@ namespace AnnoMapEditor.Mods
 
         private async Task CopyFromArchive(string modPath, string filePath)
         {
-            var archive = Utils.Settings.Instance.DataArchive;
+            var archive = Settings.Instance.DataArchive;
             if (archive is null)
                 return;
 

@@ -1,10 +1,8 @@
-﻿using System;
+﻿using AnnoMapEditor.MapTemplates.Serializing;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-
-using AnnoMapEditor.Utils;
-using AnnoMapEditor.MapTemplates.Serializing;
 
 namespace AnnoMapEditor.MapTemplates
 {

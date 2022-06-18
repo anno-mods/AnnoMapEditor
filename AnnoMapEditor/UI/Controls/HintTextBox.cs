@@ -7,7 +7,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace AnnoMapEditor.Controls
+namespace AnnoMapEditor.UI.Controls
 {
     public class HintTextBox : TextBox
     {
