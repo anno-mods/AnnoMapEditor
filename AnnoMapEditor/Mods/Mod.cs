@@ -33,7 +33,7 @@ namespace AnnoMapEditor.Mods
             this.session = session;
         }
 
-        public async Task Save(string modsFolderPath, string modName, string? modID)
+        public async Task<bool> Save(string modsFolderPath, string modName, string? modID)
         {
             string fullModName = "[Map] " + modName;
             string modPath = Path.Combine(modsFolderPath, fullModName);
@@ -48,12 +48,8 @@ namespace AnnoMapEditor.Mods
                 string? sizeSourceMapName = ConvertSizeToMapName(session.PlayableArea.Width);
                 if (sizeSourceMapName is null)
                     throw new Exception("not supported map size");
-                //var mapTemplateInfo = mapGuids.GetValueOrDefault(sizeSourceMapName);
-                //if (mapTemplateInfo is null)
-                //    throw new Exception("not supported map size");
 
-                if (Directory.Exists(modPath))
-                    Directory.Delete(modPath, true);
+                Utils.TryDeleteDirectory(modPath);
                 Directory.CreateDirectory(modPath);
                 await WriteMetaJson(modPath, modName, modID);
 
@@ -74,10 +70,18 @@ namespace AnnoMapEditor.Mods
                 await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_s.a7te");
                 await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_s.a7t");
             }
-            catch (System.Exception e)
+            catch (UnauthorizedAccessException)
             {
-                MessageBox.Show("Could not save mod.", "Save as mod", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show("Failed to save the mod.\n\nIt looks like some files are locked, possibly by another application.\n\nThe mod may be broken now.", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
             }
+            catch (Exception)
+            {
+                MessageBox.Show("Failed to save the mod.\n\nThe mod may be broken now.", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+
+            return true;
         }
 
         private async Task WriteMetaJson(string modPath, string modName, string? modID)
@@ -98,7 +102,7 @@ namespace AnnoMapEditor.Mods
                     ModID = modID ?? ("ame_" + MakeSafeName(modName)),
                     ModName = new(modName),
                     Category = new("Map"),
-                    Description = new($"Select Map Type '{modName}' to play this map.\nWorld and  island sizes are fixed.\n\nThis mod has been created with the {App.Title}.\n\nYou can download the editor at:\nhttps://github.com/anno-mods/AnnoMapEditor/releases/latest"),
+                    Description = new($"Select Map Type '{modName}' to play this map.\nWorld and  island sizes are fixed.\n\nNote: Do not rename the mod folder. It will lead to a freezed loading screen.\nIf you know how to mod, you can rename it if you adjust the assets.xml accordingly. \n\nThis mod has been created with the {App.Title}.\n\nYou can download the editor at:\nhttps://github.com/anno-mods/AnnoMapEditor/releases/latest"),
                     CreatorName = App.TitleShort,
                     CreatorContact = "https://github.com/anno-mods/AnnoMapEditor"
                 };

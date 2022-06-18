@@ -30,8 +30,8 @@ namespace AnnoMapEditor.UI
 
         private async void Export_Click(object sender, RoutedEventArgs e)
         {   
-            await ViewModel.Save();
-            Visibility = Visibility.Collapsed;
+            if (await ViewModel.Save())
+                Visibility = Visibility.Collapsed;
         }
     }
 }

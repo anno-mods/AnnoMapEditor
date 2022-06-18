@@ -66,20 +66,23 @@ namespace AnnoMapEditor.UI
             return Directory.Exists(modPath);
         }
 
-        public async Task Save()
+        public async Task<bool> Save()
         {
             string? modsFolderPath = Settings.Instance.DataPath;
             if (modsFolderPath is not null)
                 modsFolderPath = Path.Combine(modsFolderPath, "mods");
 
             if (!Directory.Exists(modsFolderPath) || Session is null)
-                return; // TODO handle this somehow
+            {
+                Log.Warn("mods/ path or session not set. This shouldn't have happened.");
+                return false;
+            }
 
             Mods.Mod mod = new(Session)
             {
                 MapType = SelectedMapType
             };
-            await mod.Save(modsFolderPath, ModName, ModID);
+            return await mod.Save(modsFolderPath, ModName, ModID);
         }
     }
 }

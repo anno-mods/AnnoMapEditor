@@ -69,7 +69,7 @@
                     </StackPanel>-->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
                         <Button Content="Export" Click="Export_Click" IsDefault="True" IsEnabled="{Binding CanExport, UpdateSourceTrigger=PropertyChanged}" />
-                        <Button Content="Cancel" Click="Cancel_Click" />
+                        <Button Content="Cancel" Click="Cancel_Click" IsCancel="True" />
                     </StackPanel>
                 </Grid>
             </StackPanel>
