@@ -18,7 +18,10 @@ namespace AnnoMapEditor.UI
         public Visibility AutoDetect { get; set; } = Visibility.Collapsed;
         public Visibility Configure { get; set; } = Visibility.Visible;
         public string ConfigureText { get; set; } = string.Empty;
+    }
 
+    public class ExportStatus
+    {
         public bool CanExportAsMod { get; set; }
         public string ExportAsModText { get; set; } = "";
     }
@@ -71,6 +74,13 @@ namespace AnnoMapEditor.UI
         }
         private DataPathStatus _dataPathStatus = new();
 
+        public ExportStatus ExportStatus
+        {
+            get => _exportStatus;
+            private set => SetProperty(ref _exportStatus, value);
+        }
+        private ExportStatus _exportStatus = new();
+
         public List<MapGroup>? Maps
         {
             get => _maps;
@@ -119,6 +129,8 @@ namespace AnnoMapEditor.UI
                 else
                     Session = await Session.FromXmlAsync(filePath);
             }
+
+            UpdateExportStatus();
         }
 
         public async Task SaveMap(string filePath)
@@ -134,6 +146,38 @@ namespace AnnoMapEditor.UI
                 await Session.SaveToXmlAsync(filePath);
         }
 
+        private void UpdateExportStatus()
+        {
+            if (Settings.IsLoading)
+            {
+                // still loading
+                ExportStatus = new ExportStatus()
+                {
+                    CanExportAsMod = false,
+                    ExportAsModText = "(loading RDA...)"
+                };
+            }
+            else if (Settings.IsValidDataPath)
+            {
+                bool supportedFormat = Mods.Mod.CanSave(Session);
+                bool archiveReady = Settings.DataArchive is RdaDataArchive;
+
+                ExportStatus = new ExportStatus()
+                {
+                    CanExportAsMod = archiveReady && supportedFormat,
+                    ExportAsModText = archiveReady ? (supportedFormat ? "As playable mod..." : "As mod: can't save this map size / region as mod (yet) :/") : "As mod: set game path to save"
+                };
+            }
+            else
+            {
+                ExportStatus = new ExportStatus()
+                {
+                    ExportAsModText = "As mod: set game path to save",
+                    CanExportAsMod = false
+                };
+            }
+        }
+
         private void UpdateStatusAndMenus()
         {
             if (Settings.IsLoading)
@@ -145,8 +189,6 @@ namespace AnnoMapEditor.UI
                     ToolTip = "",
                     Configure = Visibility.Collapsed,
                     AutoDetect = Visibility.Collapsed,
-                    CanExportAsMod = false,
-                    ExportAsModText = "(loading RDA...)"
                 };
             }
             else if (Settings.IsValidDataPath)
@@ -157,8 +199,6 @@ namespace AnnoMapEditor.UI
                     ToolTip = Settings.DataArchive.Path,
                     ConfigureText = "Change...",
                     AutoDetect = Settings.DataArchive is RdaDataArchive ? Visibility.Collapsed : Visibility.Visible,
-                    CanExportAsMod = Settings.DataArchive is RdaDataArchive,
-                    ExportAsModText = Settings.DataArchive is RdaDataArchive ? "As playable mod..." : "Set game path to save as mod"
                 };
 
                 Dictionary<string, Regex> templateGroups = new()
@@ -193,12 +233,12 @@ namespace AnnoMapEditor.UI
                     ToolTip = null,
                     ConfigureText = "Select...",
                     AutoDetect = Visibility.Visible,
-                    ExportAsModText = "Set game path to save as mod",
-                    CanExportAsMod = false
                 };
 
                 Maps = new();
             }
+
+            UpdateExportStatus();
         }
     }
 }

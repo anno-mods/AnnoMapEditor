@@ -33,6 +33,18 @@ namespace AnnoMapEditor.Mods
             this.session = session;
         }
 
+        public static bool CanSave(Session? session)
+        {
+            if (session is null)
+                return false;
+
+            string? sizeSourceMapName = ConvertSizeToMapName(session.PlayableArea.Width);
+            if (sizeSourceMapName is null)
+                return false;
+
+            return true;
+        }
+
         public async Task<bool> Save(string modsFolderPath, string modName, string? modID)
         {
             string fullModName = "[Map] " + modName;

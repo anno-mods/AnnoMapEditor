@@ -31,7 +31,7 @@
                 <controls:DropDownButton.Menu>
                     <ContextMenu>
                         <MenuItem Header="As map template..." Click="ExportMap_Click"/>
-                        <MenuItem Header="{Binding DataPathStatus.ExportAsModText, UpdateSourceTrigger=PropertyChanged}" Click="ExportMod_Click" IsEnabled="{Binding DataPathStatus.CanExportAsMod, UpdateSourceTrigger=PropertyChanged}" />
+                        <MenuItem Header="{Binding ExportStatus.ExportAsModText, UpdateSourceTrigger=PropertyChanged}" Click="ExportMod_Click" IsEnabled="{Binding ExportStatus.CanExportAsMod, UpdateSourceTrigger=PropertyChanged}" />
                     </ContextMenu>
                 </controls:DropDownButton.Menu>
             </controls:DropDownButton>
@@ -49,6 +49,8 @@
         <TextBlock Style="{StaticResource DefaultLabelStyle}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8,0,8,0" TextAlignment="Right" 
                    Text="{Binding Session.MapSizeText}"/>
         <TextBlock Style="{StaticResource DefaultLabelStyle}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,0" TextAlignment="Right">
+            <Run>The editor is work in progress.</Run>
+            <LineBreak />
             <Run>Visit GitHub for </Run>
             <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor#roadmap" RequestNavigate="Hyperlink_OpenBrowser">roadmap</Hyperlink>
             <Run>and</Run>
