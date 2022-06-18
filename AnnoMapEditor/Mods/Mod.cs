@@ -85,10 +85,10 @@ namespace AnnoMapEditor.Mods
             Modinfo? modinfo = null;
 
             string modinfoPath = Path.Combine(modPath, "modinfo.json");
-            if (File.Exists(modinfoPath))
-            {
-                modinfo = JsonConvert.DeserializeObject<Modinfo?>(File.ReadAllText(modinfoPath));
-            }
+            //if (File.Exists(modinfoPath))
+            //{
+            //    modinfo = JsonConvert.DeserializeObject<Modinfo?>(File.ReadAllText(modinfoPath));
+            //}
 
             //if (modinfo is null)
             {
@@ -98,7 +98,7 @@ namespace AnnoMapEditor.Mods
                     ModID = modID ?? ("ame_" + MakeSafeName(modName)),
                     ModName = new(modName),
                     Category = new("Map"),
-                    Description = new($"Select Map Type '{modName}' to play this map.\nStarting world size and island size will be ignored.\n\nThis mod has been created by {App.Title}.\n\nYou can download the editor at:\nhttps://github.com/anno-mods/AnnoMapEditor/releases/latest"),
+                    Description = new($"Select Map Type '{modName}' to play this map.\nWorld and  island sizes are fixed.\n\nThis mod has been created with the {App.Title}.\n\nYou can download the editor at:\nhttps://github.com/anno-mods/AnnoMapEditor/releases/latest"),
                     CreatorName = App.TitleShort,
                     CreatorContact = "https://github.com/anno-mods/AnnoMapEditor"
                 };

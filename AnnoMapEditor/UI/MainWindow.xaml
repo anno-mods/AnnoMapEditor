@@ -49,12 +49,10 @@
         <TextBlock Style="{StaticResource DefaultLabelStyle}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8,0,8,0" TextAlignment="Right" 
                    Text="{Binding Session.MapSizeText}"/>
         <TextBlock Style="{StaticResource DefaultLabelStyle}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,0" TextAlignment="Right">
-            <Run>Edit functions are work in progress.</Run>
-            <LineBreak />
             <Run>Visit GitHub for </Run>
             <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor#roadmap" RequestNavigate="Hyperlink_OpenBrowser">roadmap</Hyperlink>
-            <Run> and </Run>
-            <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink>
+            <Run>and</Run>
+            <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
         </TextBlock>
         <local:ExportAsMod x:Name="exportDialog" Grid.Column="0" />
     </Grid>
