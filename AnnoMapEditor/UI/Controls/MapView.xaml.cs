@@ -1,14 +1,13 @@
-﻿using System;
+﻿using AnnoMapEditor.MapTemplates;
+using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using AnnoMapEditor.MapTemplates;
 
-namespace AnnoMapEditor.Controls
+namespace AnnoMapEditor.UI.Controls
 {
     public partial class MapView : UserControl
     {
@@ -21,7 +20,7 @@ namespace AnnoMapEditor.Controls
             SizeChanged += MapView_SizeChanged;
             DataContextChanged += MapView_DataContextChanged;
 
-            Utils.Settings.Instance.PropertyChanged += Settings_PropertyChanged;
+            Settings.Instance.PropertyChanged += Settings_PropertyChanged;
         }
 
         private void MapView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -130,8 +129,8 @@ namespace AnnoMapEditor.Controls
             {
                 island.Position = new MapTemplates.Vector2(ensuredX, session.Size.Y - ensuredY - island.SizeInTiles);
 
-                Canvas.SetLeft(_island, ensuredX);
-                Canvas.SetTop(_island, ensuredY);
+                Canvas.SetLeft(_island, island.Position.X);
+                Canvas.SetTop(_island, session.Size.Y - island.Position.Y - island.SizeInTiles);
             }
         }
     }

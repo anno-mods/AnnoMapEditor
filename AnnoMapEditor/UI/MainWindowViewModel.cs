@@ -1,17 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.MapTemplates;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
-using AnnoMapEditor.DataArchives;
-using AnnoMapEditor.MapTemplates;
-
-namespace AnnoMapEditor
+namespace AnnoMapEditor.UI
 {
     public class DataPathStatus
     {
@@ -20,6 +18,12 @@ namespace AnnoMapEditor
         public Visibility AutoDetect { get; set; } = Visibility.Collapsed;
         public Visibility Configure { get; set; } = Visibility.Visible;
         public string ConfigureText { get; set; } = string.Empty;
+    }
+
+    public class ExportStatus
+    {
+        public bool CanExportAsMod { get; set; }
+        public string ExportAsModText { get; set; } = "";
     }
 
     public class MapGroup
@@ -45,7 +49,7 @@ namespace AnnoMapEditor
         public string? FileName;
     }
 
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : ViewModelBase
     {
         public Session? Session
         {
@@ -68,7 +72,14 @@ namespace AnnoMapEditor
             get => _dataPathStatus;
             private set => SetProperty(ref _dataPathStatus, value);
         }
-        private DataPathStatus _dataPathStatus = new DataPathStatus();
+        private DataPathStatus _dataPathStatus = new();
+
+        public ExportStatus ExportStatus
+        {
+            get => _exportStatus;
+            private set => SetProperty(ref _exportStatus, value);
+        }
+        private ExportStatus _exportStatus = new();
 
         public List<MapGroup>? Maps
         {
@@ -77,9 +88,9 @@ namespace AnnoMapEditor
         }
         private List<MapGroup>? _maps;
 
-        public Utils.Settings Settings { get; private set; }
+        public Settings Settings { get; private set; }
 
-        public MainWindowViewModel(Utils.Settings settings)
+        public MainWindowViewModel(Settings settings)
         {
             Settings = settings;
             Settings.PropertyChanged += Settings_PropertyChanged;
@@ -118,6 +129,8 @@ namespace AnnoMapEditor
                 else
                     Session = await Session.FromXmlAsync(filePath);
             }
+
+            UpdateExportStatus();
         }
 
         public async Task SaveMap(string filePath)
@@ -133,6 +146,38 @@ namespace AnnoMapEditor
                 await Session.SaveToXmlAsync(filePath);
         }
 
+        private void UpdateExportStatus()
+        {
+            if (Settings.IsLoading)
+            {
+                // still loading
+                ExportStatus = new ExportStatus()
+                {
+                    CanExportAsMod = false,
+                    ExportAsModText = "(loading RDA...)"
+                };
+            }
+            else if (Settings.IsValidDataPath)
+            {
+                bool supportedFormat = Mods.Mod.CanSave(Session);
+                bool archiveReady = Settings.DataArchive is RdaDataArchive;
+
+                ExportStatus = new ExportStatus()
+                {
+                    CanExportAsMod = archiveReady && supportedFormat,
+                    ExportAsModText = archiveReady ? (supportedFormat ? "As playable mod..." : "As mod: can't save this map size / region as mod (yet) :/") : "As mod: set game path to save"
+                };
+            }
+            else
+            {
+                ExportStatus = new ExportStatus()
+                {
+                    ExportAsModText = "As mod: set game path to save",
+                    CanExportAsMod = false
+                };
+            }
+        }
+
         private void UpdateStatusAndMenus()
         {
             if (Settings.IsLoading)
@@ -143,7 +188,7 @@ namespace AnnoMapEditor
                     Status = "loading RDA...",
                     ToolTip = "",
                     Configure = Visibility.Collapsed,
-                    AutoDetect = Visibility.Collapsed
+                    AutoDetect = Visibility.Collapsed,
                 };
             }
             else if (Settings.IsValidDataPath)
@@ -173,9 +218,9 @@ namespace AnnoMapEditor
                     new MapGroup("Moderate, Corners", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_corners")), new(@"\/([^\/]+)\.")),
                     new MapGroup("Moderate, Island Arc", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_islandarc")), new(@"\/([^\/]+)\.")),
                     new MapGroup("Moderate, Snowflake", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_snowflake")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("New World, Large", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_l")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("New World, Medium", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_m")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("New World, Small", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_s")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("New World, Large", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_l_")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("New World, Medium", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_m_")), new(@"\/([^\/]+)\.")),
+                    new MapGroup("New World, Small", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_s_")), new(@"\/([^\/]+)\.")),
                     new MapGroup("DLCs", mapTemplates.Where(x => !x.StartsWith(@"data/sessions/")), new(@"data\/([^\/]+)\/.+\/maps\/([^\/]+)"))
                     //new MapGroup("Moderate", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate")), new(@"\/([^\/]+)\."))
                 };
@@ -187,30 +232,13 @@ namespace AnnoMapEditor
                     Status = "⚠ Game or RDA path not valid.",
                     ToolTip = null,
                     ConfigureText = "Select...",
-                    AutoDetect = Visibility.Visible
+                    AutoDetect = Visibility.Visible,
                 };
 
                 Maps = new();
             }
-        }
 
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged = delegate { };
-        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        protected void SetProperty<T>(ref T property, T value, string[]? dependingPropertyNames = null, [CallerMemberName] string propertyName = "")
-        {
-            if (property is null && value is null)
-                return;
-
-            if (!(property?.Equals(value) ?? false))
-            {
-                property = value;
-                OnPropertyChanged(propertyName);
-                if (dependingPropertyNames is not null)
-                    foreach (var name in dependingPropertyNames)
-                        OnPropertyChanged(name);
-            }
+            UpdateExportStatus();
         }
-        #endregion
     }
 }

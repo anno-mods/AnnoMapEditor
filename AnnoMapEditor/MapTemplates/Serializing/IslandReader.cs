@@ -12,10 +12,10 @@ namespace AnnoMapEditor.MapTemplates.Serializing
     {
         public static async Task<int> ReadTileInSizeFromFileAsync(string mapPath)
         {
-            if (Utils.Settings.Instance.DataArchive?.IsValid != true)
+            if (Settings.Instance.DataArchive?.IsValid != true)
                 return 0;
 
-            using Stream? fs = Utils.Settings.Instance.DataArchive.OpenRead(mapPath + @"info");
+            using Stream? fs = Settings.Instance.DataArchive.OpenRead(mapPath + @"info");
             if (fs is null)
                 return 0;
 

@@ -24,7 +24,7 @@ namespace AnnoMapEditor.MapTemplates
             }
 
             value = "Small";
-            InTiles = 128;
+            InTiles = 192;
             IsDefault = size != "Small";
         }
 
@@ -35,12 +35,12 @@ namespace AnnoMapEditor.MapTemplates
                 default:
                     IsDefault = true;
                     value = "Small";
-                    InTiles = 128;
+                    InTiles = 192;
                     break;
                 case 0:
                     IsDefault = false;
                     value = "Small";
-                    InTiles = 128;
+                    InTiles = 192;
                     break;
                 case 1:
                     IsDefault = false;

@@ -1,26 +1,32 @@
-﻿using AnnoMapEditor.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace AnnoMapEditor.DataArchives
 {
     public static class DataArchive
     {
-        public static IDataArchive Open(string? folderPath)
+        public static readonly IDataArchive Default = new InvalidDataPath("");
+
+        public static async Task<IDataArchive> OpenAsync(string? folderPath)
         {
             if (folderPath is null)
-                return new InvalidDataPath("");
+                return Default;
 
             var adjustedPath = AdjustDataPath(folderPath);
 
             if (adjustedPath is null)
-                return new InvalidDataPath(folderPath);
+                return Default;
 
+            IDataArchive archive = Default;
             if (File.Exists(Path.Combine(adjustedPath, "maindata/data0.rda")))
-                return new RdaDataArchive(adjustedPath);
+                archive = new RdaDataArchive(adjustedPath);
+            else
+                archive = new FolderDataArchive(adjustedPath);
 
-            return new FolderDataArchive(adjustedPath);
+            await archive.LoadAsync();
+            return archive;
         }
 
         private static string? AdjustDataPath(string? path)
@@ -46,6 +52,7 @@ namespace AnnoMapEditor.DataArchives
 
         Stream? OpenRead(string filePath);
         IEnumerable<string> Find(string pattern);
+        Task LoadAsync();
     }
 
     public class InvalidDataPath : IDataArchive
@@ -57,6 +64,11 @@ namespace AnnoMapEditor.DataArchives
         public InvalidDataPath(string path)
         {
             Path = path;
+        }
+
+        public Task LoadAsync()
+        {
+            return Task.Run(() => { });
         }
 
         public IEnumerable<string> Find(string pattern)

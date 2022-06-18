@@ -1,14 +1,13 @@
-﻿using Microsoft.Win32;
+﻿using AnnoMapEditor.UI;
+using Microsoft.Win32;
 using System;
-using System.IO;
-using System.Windows;
-
-using AnnoMapEditor.Utils;
-using System.Diagnostics;
-using System.Windows.Controls;
 using System.Collections.Generic;
+using System.IO;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls;
 
-namespace AnnoMapEditor
+namespace AnnoMapEditor.UI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -33,7 +32,7 @@ namespace AnnoMapEditor
                 }
                 catch { }
             }
-            title = $"Community Map Editor for Anno 1800 {productVersion}";
+            title = $"{App.Title} {productVersion}";
             Title = title;
 
             ViewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -112,7 +111,7 @@ namespace AnnoMapEditor
             if (mapGroups is null || mapGroups.Count == 0)
             {
                 parentMenu.Items.Add(new MenuItem() {
-                    Header = Settings.Instance.IsLoading ? "(loading RDA...)" : "Set game/RDA path to import.",
+                    Header = Settings.Instance.IsLoading ? "(loading RDA...)" : "Set game/RDA path to import",
                     IsEnabled = false
                 });
                 return;
@@ -142,7 +141,7 @@ namespace AnnoMapEditor
             }
         }
 
-        private async void Export_Click(object sender, RoutedEventArgs e)
+        private async void ExportMap_Click(object sender, RoutedEventArgs e)
         {
             var picker = new SaveFileDialog
             {
@@ -157,6 +156,23 @@ namespace AnnoMapEditor
             {
                 await ViewModel.SaveMap(picker.FileName);
             }
+        }
+
+        private void ExportMod_Click(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.Session is null)
+                return;
+
+            exportDialog.Show(ViewModel.Session);
+        }
+
+        private void Hyperlink_OpenBrowser(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            var info = new ProcessStartInfo(e.Uri.AbsoluteUri)
+            {
+                UseShellExecute = true,
+            };
+            Process.Start(info);
         }
     }
 }

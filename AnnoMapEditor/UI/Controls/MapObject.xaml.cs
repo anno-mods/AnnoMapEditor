@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using AnnoMapEditor.MapTemplates;
+using System.Collections.Generic;
 using System.IO;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Shapes;
 using System.Windows.Media.Imaging;
-using AnnoMapEditor.MapTemplates;
 
-namespace AnnoMapEditor.Controls
+namespace AnnoMapEditor.UI.Controls
 {
     public partial class MapObject : UserControl
     {
@@ -99,7 +98,7 @@ namespace AnnoMapEditor.Controls
                         png = new();
                         try
                         {
-                            using Stream? stream = Utils.Settings.Instance.DataArchive?.OpenRead(island.ImageFile);
+                            using Stream? stream = Settings.Instance.DataArchive?.OpenRead(island.ImageFile);
                             if (stream is not null)
                             {
                                 png.BeginInit();

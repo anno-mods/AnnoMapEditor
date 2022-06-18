@@ -1,12 +1,11 @@
-﻿using System.IO;
+﻿using AnnoMapEditor.DataArchives;
+using Microsoft.Win32;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.Windows;
-using AnnoMapEditor.DataArchives;
 
-namespace AnnoMapEditor.Utils
+namespace AnnoMapEditor
 {
     public class Settings : INotifyPropertyChanged
     {
@@ -22,7 +21,7 @@ namespace AnnoMapEditor.Utils
                 SetProperty(ref _dataArchive, value);
             }
         }
-        private IDataArchive _dataArchive = DataArchives.DataArchive.Open(null);
+        private IDataArchive _dataArchive = DataArchives.DataArchive.Default;
 
         public string? DataPath 
         {
@@ -57,8 +56,8 @@ namespace AnnoMapEditor.Utils
         {
             IsLoading = true;
 
-            Task.Run(() => {
-                var archive = DataArchives.DataArchive.Open(path);
+            Task.Run(async () => {
+                var archive = await DataArchives.DataArchive.OpenAsync(path);
                 IsLoading = false;
                 Application.Current.Dispatcher.Invoke(() => DataArchive = archive);
             });

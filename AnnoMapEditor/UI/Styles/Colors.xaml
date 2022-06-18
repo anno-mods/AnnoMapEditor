@@ -1,0 +1,12 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Brush x:Key="TextBrush">#e0e0e0</Brush>
+    <Color x:Key="HighlightColor">#007ACC</Color>
+    <Color x:Key="HighlightColorLight">#1C97EA</Color>
+    <Brush x:Key="HighlightBrush">#007ACC</Brush>
+    <Brush x:Key="HighlightLightBrush">#1C97EA</Brush>
+    <Brush x:Key="BackgroundBrush">#1E2328</Brush>
+    <Brush x:Key="ControlBrush">#8024415F</Brush>
+    <Brush x:Key="DisabledBrush">#708090</Brush>
+    <Brush x:Key="DialogBrush">#ef182B3F</Brush>
+</ResourceDictionary>
