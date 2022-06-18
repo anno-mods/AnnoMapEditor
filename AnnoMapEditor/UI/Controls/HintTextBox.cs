@@ -29,6 +29,18 @@ namespace AnnoMapEditor.UI.Controls
             set { SetValue(NullTextProperty, value); }
         }
 
+        public static readonly DependencyProperty MaxTextWidthProperty =
+             DependencyProperty.Register("MaxTextWidth",
+                propertyType: typeof(int),
+                ownerType: typeof(HintTextBox),
+                typeMetadata: new FrameworkPropertyMetadata(defaultValue: 0));
+
+        public int MaxTextWidth
+        {
+            get { return (int)GetValue(MaxTextWidthProperty); }
+            set { SetValue(MaxTextWidthProperty, value); }
+        }
+
         public static readonly DependencyProperty LabelProperty =
              DependencyProperty.Register("Label", 
                  propertyType: typeof(string),

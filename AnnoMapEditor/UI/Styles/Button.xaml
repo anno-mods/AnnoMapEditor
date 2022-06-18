@@ -27,6 +27,9 @@
                             VerticalAlignment="Center" Name="content"/>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsDefault" Value="True">
+                            <Setter Property="Background" Value="{StaticResource HighlightBrush}" />
+                        </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="#24415F" />
                         </Trigger>
@@ -37,6 +40,15 @@
                             <Setter Property="Foreground" Value="{StaticResource DisabledBrush}" />
                             <Setter Property="Background" Value="#4024415F" />
                         </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsDefault" Value="True" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.Setters>
+                                <Setter Property="Background" Value="{StaticResource HighlightLightBrush}" />
+                            </MultiTrigger.Setters>
+                        </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

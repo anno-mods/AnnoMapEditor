@@ -38,14 +38,19 @@
                               ItemsSource="{Binding AllowedMapTypes}"
                               SelectedItem="{Binding SelectedMapType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Mod Name:" />
-                    <controls:HintTextBox Grid.Row="1" Grid.Column="1" Label="[Map] " Hint="enter mod name" Text="{Binding ModName, UpdateSourceTrigger=PropertyChanged}" />
+                    <controls:HintTextBox Grid.Row="1" Grid.Column="1" Label="[Map] " Hint="enter mod name"
+                                          Text="{Binding ModName, UpdateSourceTrigger=PropertyChanged}"
+                                          MaxTextWidth="50" />
                     <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Mod ID:" />
                     <controls:HintTextBox Grid.Row="2" Grid.Column="1" Hint="leave empty to auto generate" Text="{Binding ModID, UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
                 <emoji:TextBlock Grid.Row="1" Grid.Column="1" Text="Replace existing mod with the same name." 
                                  HorizontalAlignment="Right"
                                  Visibility="{Binding ModExistsWarning, UpdateSourceTrigger=PropertyChanged}"/>
-                <Grid MaxWidth="300" Margin="4,6,4,4">
+                <TextBlock Style="{StaticResource DefaultLabelStyle}">
+                    <Run>Select the following map type in Sandbox mode:</Run>
+                </TextBlock>
+                <Grid Width="300" Margin="4,6,4,4">
                     <Image Source="../Assets/maptype.png" />
                     <TextBlock FontFamily="Lucida Bright" Text="{Binding ModName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Foreground="#4F300F"
                                FontSize="10px"
@@ -63,7 +68,7 @@
                         <Button Content="Change..." />
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                        <Button Content="Export" Click="Export_Click" IsEnabled="{Binding CanExport, UpdateSourceTrigger=PropertyChanged}" />
+                        <Button Content="Export" Click="Export_Click" IsDefault="True" IsEnabled="{Binding CanExport, UpdateSourceTrigger=PropertyChanged}" />
                         <Button Content="Cancel" Click="Cancel_Click" />
                     </StackPanel>
                 </Grid>
