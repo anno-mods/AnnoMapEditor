@@ -17,7 +17,7 @@
     <Grid Background="{StaticResource DialogBrush}">
         <Grid Margin="8" MaxWidth="400" VerticalAlignment="Center">
             <StackPanel>
-                <TextBlock Style="{StaticResource HeaderLabelStyle}" Text="Export to Mod"/>
+                <TextBlock Style="{StaticResource HeaderLabelStyle}" Text="Save as playable mod"/>
                 <TextBlock Style="{StaticResource DefaultLabelStyle}">
                     <Run>Generate a mod replacing the selected map type.</Run>
                     <LineBreak />

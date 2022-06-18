@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AnnoMapEditor.DataArchives
 {
@@ -15,6 +16,11 @@ namespace AnnoMapEditor.DataArchives
         public FolderDataArchive(string folderPath)
         {
             Path = folderPath;
+        }
+
+        public Task LoadAsync()
+        {
+            return Task.Run(() => { });
         }
 
         public Stream? OpenRead(string filePath)

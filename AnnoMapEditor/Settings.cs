@@ -21,7 +21,7 @@ namespace AnnoMapEditor
                 SetProperty(ref _dataArchive, value);
             }
         }
-        private IDataArchive _dataArchive = DataArchives.DataArchive.Open(null);
+        private IDataArchive _dataArchive = DataArchives.DataArchive.Default;
 
         public string? DataPath 
         {
@@ -56,8 +56,8 @@ namespace AnnoMapEditor
         {
             IsLoading = true;
 
-            Task.Run(() => {
-                var archive = DataArchives.DataArchive.Open(path);
+            Task.Run(async () => {
+                var archive = await DataArchives.DataArchive.OpenAsync(path);
                 IsLoading = false;
                 Application.Current.Dispatcher.Invoke(() => DataArchive = archive);
             });

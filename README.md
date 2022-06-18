@@ -19,17 +19,25 @@ If it didn't find it, you'll need to set the path manually to your game or a fol
 
 ## Features
 
-- open, view and save `.a7tinfo` and [FileDBReader](https://github.com/anno-mods/FileDBReader) `.xml`
+- open, view and save map templates (`.a7tinfo` and [FileDBReader](https://github.com/anno-mods/FileDBReader) `.xml`)
 - open map templates directly from the `.rda` game archives
+- move islands
+- save as playable mod
 
 ## Roadmap
 
 - move, change islands
 - add, remove islands
 - resize session
-- export as ready-to-play mod
+- fertilities, mine slots
+- save as playable mod for other regions
 
 ## Changelog
+
+### [Unreleased]
+
+- Move islands
+- Save as playable mod
 
 ### 0.3
 
