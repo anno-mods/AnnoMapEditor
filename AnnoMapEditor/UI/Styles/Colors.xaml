@@ -8,4 +8,5 @@
     <Brush x:Key="BackgroundBrush">#1E2328</Brush>
     <Brush x:Key="ControlBrush">#8024415F</Brush>
     <Brush x:Key="DisabledBrush">#708090</Brush>
+    <Brush x:Key="DialogBrush">#ef182B3F</Brush>
 </ResourceDictionary>

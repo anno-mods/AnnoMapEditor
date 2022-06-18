@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace AnnoMapEditor.UI
@@ -11,6 +13,8 @@ namespace AnnoMapEditor.UI
         //    private set => SetProperty(ref _DialogVisibility, value);
         //}
         //private Visibility _DialogVisibility = Visibility.Collapsed; 
+
+        public MapTemplates.Session Session { get; set; }
 
         public string ModName
         {
@@ -39,6 +43,20 @@ namespace AnnoMapEditor.UI
         }
         private Visibility _modExistsWarning = Visibility.Hidden;
 
+        public Mods.MapType SelectedMapType
+        {
+            get => _mapType;
+            set => SetProperty(ref _mapType, value);
+        }
+        private Mods.MapType _mapType = Mods.MapType.Archipelago;
+
+        public IEnumerable<Mods.MapType> AllowedMapTypes
+        {
+            get => _allowedMapTypes;
+            set => SetProperty(ref _allowedMapTypes, value);
+        }
+        private IEnumerable<Mods.MapType> _allowedMapTypes = Mods.MapTypes.GetOldWorldTypes();
+
         private static bool ModExists(string modName)
         {
             if (Settings.Instance.DataPath is null)
@@ -46,6 +64,22 @@ namespace AnnoMapEditor.UI
 
             string modPath = Path.Combine(Settings.Instance.DataPath, "mods", "[Map] " + modName);
             return Directory.Exists(modPath);
+        }
+
+        public async Task Save()
+        {
+            string? modsFolderPath = Settings.Instance.DataPath;
+            if (modsFolderPath is not null)
+                modsFolderPath = Path.Combine(modsFolderPath, "mods");
+
+            if (!Directory.Exists(modsFolderPath) || Session is null)
+                return; // TODO handle this somehow
+
+            Mods.Mod mod = new(Session)
+            {
+                MapType = SelectedMapType
+            };
+            await mod.Save(modsFolderPath, ModName, ModID);
         }
     }
 }

@@ -28,6 +28,7 @@
     </PropertyGroup>
   </Target>
   <ItemGroup>
+    <None Remove="Assets\maptype.png" />
     <None Remove="MapTemplates\Serializing\A7tinfo\a7tinfo.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +96,10 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="UI\Styles\ComboBox.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="UI\Styles\ToggleButton.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
@@ -105,6 +110,10 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>$(MSBuildProjectName).Tests</_Parameter1>
     </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\maptype.png" />
   </ItemGroup>
 
 </Project>

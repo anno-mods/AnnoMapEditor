@@ -6,5 +6,6 @@
         <ResourceDictionary Source="Styles/TextBox.xaml" />
         <ResourceDictionary Source="Styles/HintTextBox.xaml" />
         <ResourceDictionary Source="Styles/Label.xaml" />
+        <ResourceDictionary Source="Styles/ComboBox.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

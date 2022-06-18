@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Linq;
+using System;
 
 /*
  * Map size is somehow relies on the exact map file path. (not true I guess)
@@ -25,6 +26,8 @@ namespace AnnoMapEditor.Mods
     {
         private Session session;
 
+        public MapType MapType { get; set; }
+
         public Mod(Session session)
         {
             this.session = session;
@@ -37,33 +40,41 @@ namespace AnnoMapEditor.Mods
 
             try
             {
-                string mapGroupName = "archipel";
+                string? mapTypeFileName = MapType.ToName();
+                string? mapTypeGuid = MapType.ToGuid();
+                if (mapTypeFileName is null || mapTypeGuid is null)
+                    throw new Exception("invalid MapType");
 
                 string? sizeSourceMapName = ConvertSizeToMapName(session.PlayableArea.Width);
                 if (sizeSourceMapName is null)
-                    return; // TODO message
-                var mapTemplateInfo = mapGuids.GetValueOrDefault(sizeSourceMapName);
-                if (mapTemplateInfo is null)
-                    return; // TODO message
+                    throw new Exception("not supported map size");
+                //var mapTemplateInfo = mapGuids.GetValueOrDefault(sizeSourceMapName);
+                //if (mapTemplateInfo is null)
+                //    throw new Exception("not supported map size");
 
                 if (Directory.Exists(modPath))
                     Directory.Delete(modPath, true);
                 Directory.CreateDirectory(modPath);
                 await WriteMetaJson(modPath, modName, modID);
 
-                await WriteLanguageXml(modPath, modName, mapTemplateInfo.MapType);
+                await WriteLanguageXml(modPath, modName, mapTypeGuid);
 
-                string mapFilePath = $@"data\ame\maps\pool\moderate\{mapGroupName}";
-                await WriteAssetsXml(modPath, fullModName, mapFilePath, mapTemplateInfo.Templates);
+                string mapFilePath = $@"data\ame\maps\pool\moderate\{mapTypeFileName}";
+                await WriteAssetsXml(modPath, fullModName, mapFilePath, MapType);
 
-                await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}-l.a7tinfo"));
-                await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}-m.a7tinfo"));
-                await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}-s.a7tinfo"));
+                await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_l.a7tinfo"));
+                await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_m.a7tinfo"));
+                await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_s.a7tinfo"));
 
-                await CopyFromArchive(modPath, $"{mapFilePath}e");
-                await CopyFromArchive(modPath, mapFilePath);
+                string sizeSourceMapPath = $@"data\sessions\maps\pool\moderate\{sizeSourceMapName}\{sizeSourceMapName}.a7t";
+                await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_l.a7te");
+                await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_l.a7t");
+                await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_m.a7te");
+                await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_m.a7t");
+                await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_s.a7te");
+                await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_s.a7t");
             }
-            catch
+            catch (System.Exception e)
             {
                 MessageBox.Show("Could not save mod.", "Save as mod", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
@@ -115,28 +126,28 @@ namespace AnnoMapEditor.Mods
             await writer.WriteAsync(content);
         }
 
-        private async Task WriteAssetsXml(string modPath, string fullModName, string mapFilePath, string[]? guids)
+        private async Task WriteAssetsXml(string modPath, string fullModName, string mapFilePath, MapType mapType)
         {
-            if (guids is null)
-                return;
-
             string assetsXmlPath = Path.Combine(modPath, @"data\config\export\main\asset\assets.xml");
             string? assetsXmlDir = Path.GetDirectoryName(assetsXmlPath);
             if (assetsXmlDir is not null)
                 Directory.CreateDirectory(assetsXmlDir);
 
+            string fullMapPath = Path.Combine("mods", fullModName, mapFilePath).Replace("\\", "/");
+
+            string[] sizes = new[] { "l", "m", "s" };
+            string[] subSizes = new[] { "l_01", "l_02", "m_01", "m_02", "s_01", "s_02" };
+
             string content = "<ModOps>\n";
 
-            string[] sizeEndings = new[] { "l", "m", "s" };
-            IEnumerable<string> guidsPart = guids.Take(3);
-
-            foreach (var ending in sizeEndings)
+            foreach (var size in sizes)
             {
+                var xpaths = subSizes.Select(x => $"../Standard/Name='{mapType.ToName()}_{size}{x}'");
+
                 content +=
-                    $"  <ModOp Type=\"replace\" GUID=\"{string.Join(',', guidsPart.Take(3))}\" Path=\"/Values/MapTemplate/TemplateFilename\">\n" +
-                    $"    <TemplateFilename>mods/{fullModName}{mapFilePath.Replace("\\", "/")}-{ending}.a7t</TemplateFilename>\n" +
-                    $"  </ModOp>\n";
-                guidsPart = guidsPart.Skip(3);
+                $"  <ModOp Type=\"replace\" Path=\"//MapTemplate[{string.Join(" or ", xpaths)}]/TemplateFilename\">\n" +
+                $"    <TemplateFilename>{fullMapPath}_{size}.a7t</TemplateFilename>\n" +
+                $"  </ModOp>\n";
             }
             content += "</ModOps>\n";
 
@@ -204,19 +215,18 @@ namespace AnnoMapEditor.Mods
             return maps[0];
         }
 
-        private async Task CopyFromArchive(string modPath, string filePath)
+        private async Task CopyFromArchive(string modPath, string sourcePath, string targetPath)
         {
             var archive = Settings.Instance.DataArchive;
             if (archive is null)
                 return;
 
-            await Task.Run(() =>
+            using Stream? inStream = archive.OpenRead(sourcePath);
+            if (inStream is not null)
             {
-                using StreamWriter writer = new(File.Create(Path.Combine(modPath, filePath)));
-                var stream = archive.OpenRead(filePath);
-                if (stream is not null)
-                    writer.Write(stream);
-            });
+                using FileStream outStream = File.Create(Path.Combine(modPath, targetPath));
+                await inStream.CopyToAsync(outStream);
+            }
         }
     }
 }

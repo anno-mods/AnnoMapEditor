@@ -64,7 +64,8 @@ namespace AnnoMapEditor.DataArchives
                     };
                     reader.ReadRDAFile();
                     foreach (var file in reader.rdaFolder.GetAllFiles())
-                        if (file.FileName.EndsWith(".a7tinfo") || file.FileName.EndsWith(".png") || file.FileName.EndsWith(".a7minfo"))
+                        if (file.FileName.EndsWith(".a7tinfo") || file.FileName.EndsWith(".png") || file.FileName.EndsWith(".a7minfo") ||
+                            file.FileName.EndsWith(".a7t") || file.FileName.EndsWith(".a7te"))
                             allFiles[file.FileName] = file;
                     return reader;
                 }
