@@ -9,7 +9,16 @@
         <Setter Property="Margin" Value="2" />
         <Setter Property="FontFamily" Value="Verdana" />
         <Setter Property="FontSize" Value="11px" />
-        <Setter Property="Foreground" Value="#e0e0e0" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="Width" Value="auto" />
+        <Setter Property="Padding" Value="2,6,2,6" />
+    </Style>
+    <Style x:Key="MutedLabelStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="FontFamily" Value="Verdana" />
+        <Setter Property="FontSize" Value="11px" />
+        <Setter Property="Foreground" Value="{StaticResource DisabledBrush}" />
         <Setter Property="Width" Value="auto" />
         <Setter Property="Padding" Value="2,6,2,6" />
     </Style>
@@ -17,7 +26,7 @@
         <Setter Property="Margin" Value="2,2,2,16" />
         <Setter Property="FontFamily" Value="Verdana" />
         <Setter Property="FontSize" Value="16px" />
-        <Setter Property="Foreground" Value="#e0e0e0" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
         <Setter Property="Width" Value="auto" />
         <Setter Property="Padding" Value="2,6,2,6" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />

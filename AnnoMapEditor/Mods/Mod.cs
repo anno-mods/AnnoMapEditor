@@ -1,21 +1,21 @@
 ﻿using AnnoMapEditor.MapTemplates;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Linq;
-using System;
 
 /*
- * Map size is somehow relies on the exact map file path. (not true I guess)
- * 
  * Modloader doesn't support a7t because they are loaded as .rda archive.
  * They specified with "mods/[Map] xyz/data/..."
  * Mistakes lead to endless loading.
  * 
- * The same map file path can't be used for differente TemplateSize at the same time. Leads to endless loading.
+ * The same map file path can't be used for differente TemplateSize at the same time.
+ * Leads to endless loading.
+ * I assume it's because first a pool is created, then maps are assigned to their group leading to an empty list for some groups.
  * 
  * corners_ll_01, snowflake_ll_01 are unused. do they work?
  */
@@ -31,6 +31,7 @@ namespace AnnoMapEditor.Mods
         public Mod(Session session)
         {
             this.session = session;
+            MapType = MapType.Archipelago;
         }
 
         public static bool CanSave(Session? session)
@@ -70,17 +71,14 @@ namespace AnnoMapEditor.Mods
                 string mapFilePath = $@"data\ame\maps\pool\moderate\{mapTypeFileName}";
                 await WriteAssetsXml(modPath, fullModName, mapFilePath, MapType);
 
-                await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_l.a7tinfo"));
-                await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_m.a7tinfo"));
-                await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_s.a7tinfo"));
-
-                string sizeSourceMapPath = $@"data\sessions\maps\pool\moderate\{sizeSourceMapName}\{sizeSourceMapName}.a7t";
-                await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_l.a7te");
-                await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_l.a7t");
-                await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_m.a7te");
-                await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_m.a7t");
-                await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_s.a7te");
-                await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_s.a7t");
+                string[] sizes = new[] { "ll", "lm", "ls", "ml", "mm", "ms", "sl", "sm", "ss" };
+                foreach (var size in sizes)
+                {
+                    await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_{size}.a7tinfo"));
+                    string sizeSourceMapPath = $@"data\sessions\maps\pool\moderate\{sizeSourceMapName}\{sizeSourceMapName}.a7t";
+                    await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_{size}.a7te");
+                    await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_{size}.a7t");
+                }
             }
             catch (UnauthorizedAccessException)
             {
@@ -111,10 +109,18 @@ namespace AnnoMapEditor.Mods
                 modinfo = new()
                 {
                     Version = "1",
-                    ModID = modID ?? ("ame_" + MakeSafeName(modName)),
+                    ModID = string.IsNullOrEmpty(modID) ? $"ame_{MakeSafeName(modName)}_{Guid.NewGuid().ToString().Split('-').FirstOrDefault("")}" : modID,
                     ModName = new(modName),
                     Category = new("Map"),
-                    Description = new($"Select Map Type '{modName}' to play this map.\nWorld and  island sizes are fixed.\n\nNote: Do not rename the mod folder. It will lead to a freezed loading screen.\nIf you know how to mod, you can rename it if you adjust the assets.xml accordingly. \n\nThis mod has been created with the {App.Title}.\n\nYou can download the editor at:\nhttps://github.com/anno-mods/AnnoMapEditor/releases/latest"),
+                    Description = new($"Select Map Type '{modName}' to play this map.\n" +
+                    $"World and  island sizes are fixed.\n" +
+                    $"\n" +
+                    $"Note:\n" +
+                    $"- Do not rename the mod folder. It will lead to a loading screen freeze.\n" +
+                    $"- You can combine map mods as long as they do not replace the same map type.\n" +
+                    $"\n" +
+                    $"This mod has been created with the {App.Title}.\n" +
+                    $"You can download the editor at:\nhttps://github.com/anno-mods/AnnoMapEditor/releases/latest"),
                     CreatorName = App.TitleShort,
                     CreatorContact = "https://github.com/anno-mods/AnnoMapEditor"
                 };
@@ -151,9 +157,18 @@ namespace AnnoMapEditor.Mods
 
             string fullMapPath = Path.Combine("mods", fullModName, mapFilePath).Replace("\\", "/");
 
-            string[] sizes = new[] { "l", "m", "s" };
-            string[] subSizes = new[] { "l_01", "l_02", "m_01", "m_02", "s_01", "s_02" };
+            string content = CreateAssetsModOps(mapType, fullMapPath);
 
+            using StreamWriter writer = new(File.Create(assetsXmlPath));
+            await writer.WriteAsync(content);
+        }
+
+        public static string CreateAssetsModOps(MapType mapType, string fullMapPath)
+        {
+            string[] sizes = new[] { "ll", "lm", "ls", "ml", "mm", "ms", "sl", "sm", "ss" };
+            // some maps have updates sizes, but make sure to only replace one
+            string[] subSizes = new[] { "_01", "_02" };
+            
             string content = "<ModOps>\n";
 
             foreach (var size in sizes)
@@ -161,37 +176,20 @@ namespace AnnoMapEditor.Mods
                 var xpaths = subSizes.Select(x => $"../Standard/Name='{mapType.ToName()}_{size}{x}'");
 
                 content +=
-                $"  <ModOp Type=\"replace\" Path=\"//MapTemplate[{string.Join(" or ", xpaths)}]/TemplateFilename\">\n" +
+                $"  <ModOp Type=\"replace\" Path=\"//MapTemplate[{string.Join(" or ", xpaths)}][last()]/TemplateFilename\">\n" +
                 $"    <TemplateFilename>{fullMapPath}_{size}.a7t</TemplateFilename>\n" +
                 $"  </ModOp>\n";
             }
             content += "</ModOps>\n";
-
-            using StreamWriter writer = new(File.Create(assetsXmlPath));
-            await writer.WriteAsync(content);
+            return content;
         }
 
         private static string MakeSafeName(string unsafeName) => new Regex(@"\W").Replace(unsafeName, "_").ToLower();
 
         private class MapTemplateInfo
         {
-            public string MapType;
-            public string[] Templates;
-        };
-
-        private static MapTemplateInfo Archipelago = new() { MapType = "17079", Templates = new[] { "142012", "141265", "141264", "141269", "141268", "141267", "141272", "141271", "141270" } };
-
-        private static Dictionary<string, MapTemplateInfo> mapGuids = new()
-        {
-            ["moderate_archipel_ll_01"] = Archipelago,
-            ["moderate_archipel_lm_01"] = Archipelago,
-            ["moderate_archipel_ls_01"] = Archipelago,
-            ["moderate_archipel_ml_01"] = Archipelago,
-            ["moderate_archipel_mm_01"] = Archipelago,
-            ["moderate_archipel_ms_01"] = Archipelago,
-            ["moderate_archipel_sl_01"] = Archipelago,
-            ["moderate_archipel_sm_01"] = Archipelago,
-            ["moderate_archipel_ss_01"] = Archipelago,
+            public string MapType = "";
+            public string[] Templates = Array.Empty<string>();
         };
 
         private static string? ConvertSizeToMapName(int playableSize)

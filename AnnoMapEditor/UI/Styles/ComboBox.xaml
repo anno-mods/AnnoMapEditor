@@ -5,50 +5,9 @@
         <ResourceDictionary Source="Colors.xaml" />
         <ResourceDictionary Source="TextBox.xaml" />
     </ResourceDictionary.MergedDictionaries>
-
-
-    <!--Control colors.-->
-    <Color x:Key="WindowColor">#FFE8EDF9</Color>
-    <Color x:Key="ContentAreaColorLight">#FFC5CBF9</Color>
-    <Color x:Key="ContentAreaColorDark">#FF7381F9</Color>
-
-    <Color x:Key="DisabledControlLightColor">#FFE8EDF9</Color>
-    <Color x:Key="DisabledControlDarkColor">#FFC5CBF9</Color>
-    <Color x:Key="DisabledForegroundColor">#FF888888</Color>
-
-    <Color x:Key="SelectedBackgroundColor">#FFC5CBF9</Color>
-    <Color x:Key="SelectedUnfocusedColor">#FFDDDDDD</Color>
-
-    <Color x:Key="ControlLightColor">White</Color>
-    <Color x:Key="ControlMediumColor">#FF7381F9</Color>
-    <Color x:Key="ControlDarkColor">#FF211AA9</Color>
-
-    <Color x:Key="ControlMouseOverColor">#FF3843C4</Color>
-    <Color x:Key="ControlPressedColor">#FF211AA9</Color>
-
-
-    <Color x:Key="GlyphColor">#FF444444</Color>
-    <Color x:Key="GlyphMouseOver">sc#1, 0.004391443, 0.002428215, 0.242281124</Color>
-
-    <!--Border colors-->
-    <Color x:Key="BorderLightColor">#FFCCCCCC</Color>
+    
     <Color x:Key="BorderMediumColor">#FF888888</Color>
-    <Color x:Key="BorderDarkColor">#FF444444</Color>
-
-    <Color x:Key="PressedBorderLightColor">#FF888888</Color>
-    <Color x:Key="PressedBorderDarkColor">#FF444444</Color>
-
-    <Color x:Key="DisabledBorderLightColor">#FFAAAAAA</Color>
-    <Color x:Key="DisabledBorderDarkColor">#FF888888</Color>
-
-    <Color x:Key="DefaultBorderBrushDarkColor">Black</Color>
-
-    <!--Control-specific resources.-->
-    <Color x:Key="HeaderTopColor">#FFC5CBF9</Color>
-    <Color x:Key="DatagridCurrentCellBorderColor">Black</Color>
-    <Color x:Key="SliderTrackDarkColor">#FFC5CBF9</Color>
-
-    <Color x:Key="NavButtonFrameColor">#FF3843C4</Color>
+    <Color x:Key="ControlLightColor">White</Color>
 
     <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
         <Grid>
@@ -57,8 +16,8 @@
                 <ColumnDefinition Width="20" />
             </Grid.ColumnDefinitions>
             <Border x:Name="Border" Grid.ColumnSpan="2" BorderThickness="1"
-                    BorderBrush="{StaticResource ControlBrush}"
-                    Background="{StaticResource ControlBrush}" />
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    Background="{TemplateBinding BorderBrush}" />
             <Border Grid.Column="0" Margin="1" 
                     Background="{StaticResource DialogBrush}"/>
             <Path x:Name="Arrow" Grid.Column="1" 
@@ -66,15 +25,6 @@
                   Width="6" Fill="#f0f0f0" Stretch="Uniform" 
                   Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z "/>
         </Grid>
-        <ControlTemplate.Triggers>
-            <Trigger Property="IsFocused" Value="True">
-                <Setter Property="BorderBrush" TargetName="Border" Value="{StaticResource HighlightBrush}" />
-            </Trigger>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderBrush" TargetName="Border" Value="{StaticResource HighlightLightBrush}"/>
-                <Setter Property="Background" TargetName="Border" Value="{StaticResource HighlightLightBrush}"/>
-            </Trigger>
-        </ControlTemplate.Triggers>
     </ControlTemplate>
 
     <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
@@ -92,11 +42,14 @@
         <Setter Property="MinWidth" Value="80" />
         <Setter Property="Height" Value="24" />
         <Setter Property="Margin" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ComboBox}">
                     <Grid>
                         <ToggleButton x:Name="ToggleButton"
+                                      BorderBrush="{StaticResource ControlBrush}"
                                       Template="{StaticResource ComboBoxToggleButton}"
                                       Grid.Column="2"
                                       Focusable="false"
@@ -151,6 +104,12 @@
                         </Trigger>
                         <Trigger Property="IsGrouping" Value="true">
                             <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="BorderBrush" TargetName="ToggleButton" Value="{StaticResource HighlightBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" TargetName="ToggleButton" Value="{StaticResource HighlightLightBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

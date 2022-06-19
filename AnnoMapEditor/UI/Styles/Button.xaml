@@ -13,16 +13,18 @@
         <Setter Property="Width" Value="auto" />
         <Setter Property="Height" Value="26" />
         <Setter Property="Padding" Value="8,6,8,6" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Border BorderThickness="0"
-                                Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}"
-                                x:Name="border"
-                                CornerRadius="3"
-                                SnapsToDevicePixels="true">
+                    <Border BorderThickness="1"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            x:Name="border"
+                            CornerRadius="3"
+                            SnapsToDevicePixels="true">
                         <ContentPresenter HorizontalAlignment="Center" 
                             VerticalAlignment="Center" Name="content"/>
                     </Border>
@@ -36,6 +38,9 @@
                         <Trigger Property="IsPressed" Value="True">
                             <Setter Property="Background" Value="#182B3F" />
                         </Trigger>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="{StaticResource HighlightBrush}" />
+                        </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource DisabledBrush}" />
                             <Setter Property="Background" Value="#4024415F" />
@@ -47,6 +52,15 @@
                             </MultiTrigger.Conditions>
                             <MultiTrigger.Setters>
                                 <Setter Property="Background" Value="{StaticResource HighlightLightBrush}" />
+                            </MultiTrigger.Setters>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsDefault" Value="True" />
+                                <Condition Property="IsFocused" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.Setters>
+                                <Setter Property="BorderBrush" Value="{StaticResource TextBrush}" />
                             </MultiTrigger.Setters>
                         </MultiTrigger>
                     </ControlTemplate.Triggers>

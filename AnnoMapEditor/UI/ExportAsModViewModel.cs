@@ -7,25 +7,18 @@ namespace AnnoMapEditor.UI
 {
     public class ExportAsModViewModel : ViewModelBase
     {
-        //public Visibility DialogVisibility
-        //{
-        //    get => _DialogVisibility;
-        //    private set => SetProperty(ref _DialogVisibility, value);
-        //}
-        //private Visibility _DialogVisibility = Visibility.Collapsed; 
-
-        public MapTemplates.Session Session { get; set; }
+        public MapTemplates.Session? Session { get; set; }
 
         public string ModName
         {
             get => _modName;
-            set
-            {
-                SetProperty(ref _modName, value, new string[] { "CanExport" });
-                ModExistsWarning = ModExists(value) ? Visibility.Visible : Visibility.Hidden;
-            }
+            set => SetProperty(ref _modName, value, new string[] { nameof(CanExport), nameof(ResultingModName), nameof(ModExistsWarning) });
         }
         private string _modName = "";
+
+        public string ResultingModName => _modName.Trim() == string.Empty ? $"Custom {_mapType}" : _modName;
+        public bool CanExport => true;
+        public string ModExistsWarning => ModExists(ResultingModName) ? $"Replace existing \"[Map] {ResultingModName}\"" : "";
 
         public string ModID
         {
@@ -34,19 +27,10 @@ namespace AnnoMapEditor.UI
         }
         private string _modID = "";
 
-        public bool CanExport => ModName.Trim() != string.Empty;
-
-        public Visibility ModExistsWarning
-        {
-            get => _modExistsWarning;
-            set => SetProperty(ref _modExistsWarning, value);
-        }
-        private Visibility _modExistsWarning = Visibility.Hidden;
-
         public Mods.MapType SelectedMapType
         {
             get => _mapType;
-            set => SetProperty(ref _mapType, value);
+            set => SetProperty(ref _mapType, value, new string[] { nameof(ResultingModName), nameof(ModExistsWarning) });
         }
         private Mods.MapType _mapType = Mods.MapType.Archipelago;
 
@@ -55,7 +39,7 @@ namespace AnnoMapEditor.UI
             get => _allowedMapTypes;
             set => SetProperty(ref _allowedMapTypes, value);
         }
-        private IEnumerable<Mods.MapType> _allowedMapTypes = Mods.MapTypes.GetOldWorldTypes();
+        private IEnumerable<Mods.MapType> _allowedMapTypes = Mods.MapType.GetOldWorldTypes();
 
         private static bool ModExists(string modName)
         {
@@ -82,7 +66,7 @@ namespace AnnoMapEditor.UI
             {
                 MapType = SelectedMapType
             };
-            return await mod.Save(modsFolderPath, ModName, ModID);
+            return await mod.Save(modsFolderPath, ResultingModName, ModID);
         }
     }
 }

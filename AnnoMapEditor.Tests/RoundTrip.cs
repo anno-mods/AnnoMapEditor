@@ -7,11 +7,11 @@ namespace AnnoMapEditor.Tests
     public class RoundTrip
     {
         [Theory]
-        [InlineData("./TestMaps/moderate_c_01.xml")]
-        [InlineData("./TestMaps/campaign_chapter03_colony01.xml")]
-        [InlineData("./TestMaps/moderate_islandarc_ss_01.xml")]
-        [InlineData("./TestMaps/colony02_01.xml")]
-        [InlineData("./TestMaps/scenario_02_colony_01.xml")]
+        [InlineData("./TestData/moderate_c_01.xml")]
+        [InlineData("./TestData/campaign_chapter03_colony01.xml")]
+        [InlineData("./TestData/moderate_islandarc_ss_01.xml")]
+        [InlineData("./TestData/colony02_01.xml")]
+        [InlineData("./TestData/scenario_02_colony_01.xml")]
         public async Task XmlToA7tinfoToXml(string filePath)
         {
             using Stream inputXml = File.OpenRead(filePath);

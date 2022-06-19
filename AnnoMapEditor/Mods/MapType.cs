@@ -4,100 +4,46 @@ using System.ComponentModel;
 
 namespace AnnoMapEditor.Mods
 {
-    public enum MapType
+    public class MapType
     {
-        Archipelago,
-        Atoll,
-        Corners,
-        [Description("Island Arc")]
-        IslandArc,
-        Snowflake
-    }
+        readonly string description;
+        readonly string guid;
+        readonly string assetName;
+        readonly string templateType;
 
-    public static class MapTypes
-    {
-        public static IEnumerable<MapType> GetOldWorldTypes()
+        public static readonly MapType Archipelago = new("Archipelago", guid: "17079", assetName: "moderate_archipel");
+        public static readonly MapType Atoll = new("Atoll", guid: "17080", assetName: "moderate_atoll");
+        public static readonly MapType Corners = new("Corners", guid: "17082", assetName: "moderate_corners");
+        public static readonly MapType IslandArc = new("Island Arc", guid: "17081", assetName: "moderate_islandarc", templateType: "Arc");
+        public static readonly MapType Snowflake = new("Snowflake", guid: "17083", assetName: "moderate_snowflake");
+
+        private MapType(string description, string guid, string assetName, string? templateType = null)
         {
-            return new MapType[] { MapType.Archipelago, MapType.Atoll, MapType.Corners, MapType.IslandArc, MapType.Snowflake };
+            this.description = description;
+            this.guid = guid;
+            this.assetName = assetName;
+            this.templateType = templateType ?? description;
         }
+
+        public override string ToString() => description;
+        public string ToGuid() => guid;
+        public string ToName() => assetName;
+        public string ToTemplateType() => templateType;
+
+        static readonly List<MapType> oldWorld = new() { Archipelago, Atoll, Corners, IslandArc, Snowflake };
+        public bool IsOldWord() => oldWorld.Contains(this);
+        public static IEnumerable<MapType> GetOldWorldTypes() => oldWorld;
+        public static IEnumerable<MapType> GetAllTypes() => new MapType[] { Archipelago, Atoll, Corners, IslandArc, Snowflake };
 
         public static MapType? FromString(string that)
         {
             return that switch
             {
-                nameof(MapType.Archipelago) => MapType.Archipelago,
-                nameof(MapType.Atoll) => MapType.Atoll,
-                nameof(MapType.Corners) => MapType.Corners,
-                "Island Arc" => MapType.IslandArc,
-                nameof(MapType.Snowflake) => MapType.Snowflake,
-                _ => null
-            };
-        }
-    }
-
-    public static class MapTypeExtensions
-    {
-        public static bool IsOldWord(this MapType that)
-        {
-            return that switch
-            {
-                MapType.Archipelago => true,
-                MapType.Atoll => true,
-                MapType.Corners => true,
-                MapType.IslandArc => true,
-                MapType.Snowflake => true,
-                _ => false
-            };
-        }
-
-        public static string ToString(this MapType that)
-        {
-            return that switch
-            {
-                MapType.Archipelago => nameof(MapType.Archipelago),
-                MapType.Atoll => nameof(MapType.Atoll),
-                MapType.Corners => nameof(MapType.Corners),
-                MapType.IslandArc => "Island Arc",
-                MapType.Snowflake => nameof(MapType.Snowflake),
-                _ => ""
-            };
-        }
-
-        public static string? ToName(this MapType that)
-        {
-            return that switch
-            {
-                MapType.Archipelago => "moderate_archipel",
-                MapType.Atoll => "moderate_atoll",
-                MapType.Corners => "moderate_corners",
-                MapType.IslandArc => "moderate_islandarc",
-                MapType.Snowflake => "moderate_snowflake",
-                _ => null
-            };
-        }
-
-        public static string? ToTemplateType(this MapType that)
-        {
-            return that switch
-            {
-                MapType.Archipelago => "Archipelago",
-                MapType.Atoll => "Atoll",
-                MapType.Corners => "Corners",
-                MapType.IslandArc => "Arc",
-                MapType.Snowflake => "Snowflake",
-                _ => null
-            };
-        }
-
-        public static string? ToGuid(this MapType that)
-        {
-            return that switch
-            {
-                MapType.Archipelago => "17079",
-                MapType.Atoll => "17080",
-                MapType.Corners => "17082",
-                MapType.IslandArc => "17081",
-                MapType.Snowflake => "17083",
+                nameof(Archipelago) => Archipelago,
+                nameof(Atoll) => Atoll,
+                nameof(Corners) => Corners,
+                "Island Arc" => IslandArc,
+                nameof(Snowflake) => Snowflake,
                 _ => null
             };
         }
