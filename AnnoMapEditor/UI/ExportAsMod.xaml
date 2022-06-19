@@ -18,7 +18,7 @@
         <Grid Margin="8" MaxWidth="400" VerticalAlignment="Center">
             <StackPanel>
                 <TextBlock Style="{StaticResource HeaderLabelStyle}" Text="Save as playable mod"/>
-                <TextBlock Style="{StaticResource DefaultLabelStyle}">
+                <TextBlock Style="{StaticResource MutedLabelStyle}">
                     <Run>Generate a mod replacing the selected map type.</Run>
                     <LineBreak />
                     <Run>Works only with new save games.</Run>
@@ -41,13 +41,13 @@
                     <controls:HintTextBox Grid.Row="1" Grid.Column="1" Label="[Map] " Hint="enter mod name"
                                           Text="{Binding ModName, UpdateSourceTrigger=PropertyChanged}"
                                           MaxTextWidth="50" />
-                    <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Mod ID:" />
-                    <controls:HintTextBox Grid.Row="2" Grid.Column="1" Hint="leave empty to auto generate" Text="{Binding ModID, UpdateSourceTrigger=PropertyChanged}" />
+                    <!--<TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Mod ID:" />
+                    <controls:HintTextBox Grid.Row="2" Grid.Column="1" Hint="leave empty to auto generate" Text="{Binding ModID, UpdateSourceTrigger=PropertyChanged}" />-->
                 </Grid>
                 <emoji:TextBlock Grid.Row="1" Grid.Column="1" Text="Replace existing mod with the same name." 
                                  HorizontalAlignment="Right"
                                  Visibility="{Binding ModExistsWarning, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Style="{StaticResource DefaultLabelStyle}">
+                <TextBlock Style="{StaticResource MutedLabelStyle}">
                     <Run>Select the following map type in Sandbox mode:</Run>
                 </TextBlock>
                 <Grid Width="300" Margin="4,6,4,4">
