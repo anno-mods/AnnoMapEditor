@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Linq;
-using System;
 
 /*
  * Modloader doesn't support a7t because they are loaded as .rda archive.
@@ -32,6 +31,7 @@ namespace AnnoMapEditor.Mods
         public Mod(Session session)
         {
             this.session = session;
+            MapType = MapType.Archipelago;
         }
 
         public static bool CanSave(Session? session)
@@ -188,23 +188,8 @@ namespace AnnoMapEditor.Mods
 
         private class MapTemplateInfo
         {
-            public string MapType;
-            public string[] Templates;
-        };
-
-        private static MapTemplateInfo Archipelago = new() { MapType = "17079", Templates = new[] { "142012", "141265", "141264", "141269", "141268", "141267", "141272", "141271", "141270" } };
-
-        private static Dictionary<string, MapTemplateInfo> mapGuids = new()
-        {
-            ["moderate_archipel_ll_01"] = Archipelago,
-            ["moderate_archipel_lm_01"] = Archipelago,
-            ["moderate_archipel_ls_01"] = Archipelago,
-            ["moderate_archipel_ml_01"] = Archipelago,
-            ["moderate_archipel_mm_01"] = Archipelago,
-            ["moderate_archipel_ms_01"] = Archipelago,
-            ["moderate_archipel_sl_01"] = Archipelago,
-            ["moderate_archipel_sm_01"] = Archipelago,
-            ["moderate_archipel_ss_01"] = Archipelago,
+            public string MapType = "";
+            public string[] Templates = Array.Empty<string>();
         };
 
         private static string? ConvertSizeToMapName(int playableSize)
