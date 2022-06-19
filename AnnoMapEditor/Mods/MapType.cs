@@ -21,6 +21,11 @@ namespace AnnoMapEditor.Mods
             return new MapType[] { MapType.Archipelago, MapType.Atoll, MapType.Corners, MapType.IslandArc, MapType.Snowflake };
         }
 
+        public static IEnumerable<MapType> GetAllTypes()
+        {
+            return new MapType[] { MapType.Archipelago, MapType.Atoll, MapType.Corners, MapType.IslandArc, MapType.Snowflake };
+        }
+
         public static MapType? FromString(string that)
         {
             return that switch

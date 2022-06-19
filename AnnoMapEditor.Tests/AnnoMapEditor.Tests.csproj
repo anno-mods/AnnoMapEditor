@@ -28,19 +28,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="TestMaps\campaign_chapter03_colony01.xml">
+    <None Update="TestData\assets.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="TestMaps\colony02_01.xml">
+    <None Update="TestData\campaign_chapter03_colony01.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="TestMaps\moderate_c_01.xml">
+    <None Update="TestData\colony02_01.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="TestMaps\moderate_islandarc_ss_01.xml">
+    <None Update="TestData\moderate_c_01.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="TestMaps\scenario_02_colony_01.xml">
+    <None Update="TestData\moderate_islandarc_ss_01.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\scenario_02_colony_01.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Utils\xmltest.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

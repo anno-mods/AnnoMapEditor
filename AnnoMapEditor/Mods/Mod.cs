@@ -70,17 +70,14 @@ namespace AnnoMapEditor.Mods
                 string mapFilePath = $@"data\ame\maps\pool\moderate\{mapTypeFileName}";
                 await WriteAssetsXml(modPath, fullModName, mapFilePath, MapType);
 
-                await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_l.a7tinfo"));
-                await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_m.a7tinfo"));
-                await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_s.a7tinfo"));
-
-                string sizeSourceMapPath = $@"data\sessions\maps\pool\moderate\{sizeSourceMapName}\{sizeSourceMapName}.a7t";
-                await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_l.a7te");
-                await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_l.a7t");
-                await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_m.a7te");
-                await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_m.a7t");
-                await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_s.a7te");
-                await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_s.a7t");
+                string[] sizes = new[] { "ll", "lm", "ls", "ml", "mm", "ms", "sl", "sm", "ss" };
+                foreach (var size in sizes)
+                {
+                    await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_{size}.a7tinfo"));
+                    string sizeSourceMapPath = $@"data\sessions\maps\pool\moderate\{sizeSourceMapName}\{sizeSourceMapName}.a7t";
+                    await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_{size}.a7te");
+                    await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_{size}.a7t");
+                }
             }
             catch (UnauthorizedAccessException)
             {
@@ -114,7 +111,15 @@ namespace AnnoMapEditor.Mods
                     ModID = modID ?? ("ame_" + MakeSafeName(modName)),
                     ModName = new(modName),
                     Category = new("Map"),
-                    Description = new($"Select Map Type '{modName}' to play this map.\nWorld and  island sizes are fixed.\n\nNote: Do not rename the mod folder. It will lead to a freezed loading screen.\nIf you know how to mod, you can rename it if you adjust the assets.xml accordingly. \n\nThis mod has been created with the {App.Title}.\n\nYou can download the editor at:\nhttps://github.com/anno-mods/AnnoMapEditor/releases/latest"),
+                    Description = new($"Select Map Type '{modName}' to play this map.\n" +
+                    $"World and  island sizes are fixed.\n" +
+                    $"\n" +
+                    $"Note:\n" +
+                    $"- Do not rename the mod folder. It will lead to a loading screen freeze.\n" +
+                    $"- You can combine map mods as long as they do not replace the same map type.\n" +
+                    $"\n" +
+                    $"This mod has been created with the {App.Title}.\n" +
+                    $"You can download the editor at:\nhttps://github.com/anno-mods/AnnoMapEditor/releases/latest"),
                     CreatorName = App.TitleShort,
                     CreatorContact = "https://github.com/anno-mods/AnnoMapEditor"
                 };
@@ -151,9 +156,18 @@ namespace AnnoMapEditor.Mods
 
             string fullMapPath = Path.Combine("mods", fullModName, mapFilePath).Replace("\\", "/");
 
-            string[] sizes = new[] { "l", "m", "s" };
-            string[] subSizes = new[] { "l_01", "l_02", "m_01", "m_02", "s_01", "s_02" };
+            string content = CreateAssetsModOps(mapType, fullMapPath);
 
+            using StreamWriter writer = new(File.Create(assetsXmlPath));
+            await writer.WriteAsync(content);
+        }
+
+        public static string CreateAssetsModOps(MapType mapType, string fullMapPath)
+        {
+            string[] sizes = new[] { "ll", "lm", "ls", "ml", "mm", "ms", "sl", "sm", "ss" };
+            // some maps have updates sizes, but make sure to only replace one
+            string[] subSizes = new[] { "_01", "_02" };
+            
             string content = "<ModOps>\n";
 
             foreach (var size in sizes)
@@ -161,14 +175,12 @@ namespace AnnoMapEditor.Mods
                 var xpaths = subSizes.Select(x => $"../Standard/Name='{mapType.ToName()}_{size}{x}'");
 
                 content +=
-                $"  <ModOp Type=\"replace\" Path=\"//MapTemplate[{string.Join(" or ", xpaths)}]/TemplateFilename\">\n" +
+                $"  <ModOp Type=\"replace\" Path=\"//MapTemplate[{string.Join(" or ", xpaths)}][last()]/TemplateFilename\">\n" +
                 $"    <TemplateFilename>{fullMapPath}_{size}.a7t</TemplateFilename>\n" +
                 $"  </ModOp>\n";
             }
             content += "</ModOps>\n";
-
-            using StreamWriter writer = new(File.Create(assetsXmlPath));
-            await writer.WriteAsync(content);
+            return content;
         }
 
         private static string MakeSafeName(string unsafeName) => new Regex(@"\W").Replace(unsafeName, "_").ToLower();
