@@ -22,6 +22,7 @@ namespace AnnoMapEditor.UI
         {
             ViewModel.Session = session;
             Visibility = Visibility.Visible;
+            nameInput.Focus();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)

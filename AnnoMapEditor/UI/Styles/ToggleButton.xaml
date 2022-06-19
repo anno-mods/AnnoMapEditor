@@ -25,7 +25,9 @@
                                 SnapsToDevicePixels="true">
                         <StackPanel Orientation="Horizontal">
                             <ContentPresenter HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center" Name="content" />
+                                              VerticalAlignment="Center"
+                                              Focusable="False"
+                                              Name="content" />
                             <Path x:Name="BtnArrow" Margin="8,0,0,0" VerticalAlignment="Center" Width="6" Fill="#f0f0f0"
                                       Stretch="Uniform" HorizontalAlignment="Right"
                                       Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z "/>

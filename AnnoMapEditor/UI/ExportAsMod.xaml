@@ -38,7 +38,9 @@
                               ItemsSource="{Binding AllowedMapTypes}"
                               SelectedItem="{Binding SelectedMapType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Mod Name:" />
-                    <controls:HintTextBox Grid.Row="1" Grid.Column="1" Label="[Map] " Hint="enter mod name"
+                    <controls:HintTextBox Grid.Row="1" Grid.Column="1"
+                                          x:Name="nameInput"
+                                          Label="[Map] " Hint="enter mod name"
                                           Text="{Binding ModName, UpdateSourceTrigger=PropertyChanged}"
                                           PreviewTextInput="HintTextBox_PreviewTextInput"
                                           DataObject.Pasting="HintTextBox_Pasting"
