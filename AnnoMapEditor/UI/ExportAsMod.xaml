@@ -33,7 +33,7 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Map Type:" />
+                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Replace:" />
                     <ComboBox Grid.Row="0" Grid.Column="1" IsReadOnly="True"
                               ItemsSource="{Binding AllowedMapTypes}"
                               SelectedItem="{Binding SelectedMapType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />

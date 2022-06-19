@@ -5,7 +5,7 @@ This project is not affiliated in any way with Ubisoft.
 Anno 1800 is a trademark of Ubisoft Entertainment in the US and/or other countries.
 Anno is a trademark of Ubisoft GmbH in the US and/or other countries.
 
-![](./doc/screenshot-1.jpg)
+![](./doc/export-as-mod.gif)
 
 The current version of the map editor is only useful if you know how to mod and work with extracted RDA files.
 
@@ -19,25 +19,29 @@ If it didn't find it, you'll need to set the path manually to your game or a fol
 
 ## Features
 
-- open, view and save map templates (`.a7tinfo` and [FileDBReader](https://github.com/anno-mods/FileDBReader) `.xml`)
-- open map templates directly from the `.rda` game archives
-- move islands
-- save as playable mod
+- open map templates from the game, or extracted files (`.a7tinfo` and [FileDBReader](https://github.com/anno-mods/FileDBReader) `.xml`)
+- rearrange islands
+- save as ready-to-play mod (Old World in Sandbox mode only)
+- save as map template for manual modding
 
 ## Roadmap
 
-- move, change islands
 - add, remove islands
+- change islands type
 - resize session
 - fertilities, mine slots
-- save as playable mod for other regions
+- save Cap Trelawney, Arctic, Enbesa as mod
+- save New World as mod mod after DLC12
+
+There won't be a save as new region.
+It's not reliable to do so without manual editing.
 
 ## Changelog
 
-### [Unreleased]
+### 0.4
 
 - Move islands
-- Save as playable mod
+- Save as playable mod (Old World only)
 
 ### 0.3
 
