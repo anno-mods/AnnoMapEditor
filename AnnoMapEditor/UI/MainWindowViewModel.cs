@@ -57,8 +57,14 @@ namespace AnnoMapEditor.UI
             private set => SetProperty(ref _session, value, new string[] { "CanExport" });
         }
         private Session? _session;
-
         public bool CanExport => _session is not null;
+
+        public Island? SelectedIsland
+        {
+            get => _selectedIsland;
+            set => SetProperty(ref _selectedIsland, value);
+        }
+        private Island? _selectedIsland;
 
         public string? SessionFilePath
         {

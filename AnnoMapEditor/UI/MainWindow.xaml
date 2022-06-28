@@ -16,27 +16,50 @@
     <Grid VerticalAlignment="Stretch">
         <Grid.Resources>
             <controls:VisibilityToBool x:Key="FalseOnVisible" OnVisible="False" />
+            <controls:ObjectToVisibility x:Key="CollapsedOnNull" />
         </Grid.Resources>
         <Grid x:Name="mainContent" IsEnabled="{Binding ElementName=exportDialog, Path=Visibility, Converter={StaticResource FalseOnVisible}}">
-            <controls:MapView Grid.Column="0" DataContext="{Binding Session, Mode=OneWay}" />
-            <StackPanel Grid.Column="0" Margin="16" VerticalAlignment="Top" Orientation="Horizontal">
-                <controls:DropDownButton HorizontalAlignment="Left">
-                    <ContentControl Content="Open" />
-                    <controls:DropDownButton.Menu>
-                        <ContextMenu Name="openMapMenu" />
-                    </controls:DropDownButton.Menu>
-                </controls:DropDownButton>
-                <controls:DropDownButton HorizontalAlignment="Left"
+            <controls:MapView Grid.Column="0"
+                              SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              DataContext="{Binding Session, Mode=OneWay}" />
+            <StackPanel Grid.Column="0"
+                        VerticalAlignment="Top"
+                        Margin="16,8">
+                <TextBlock Style="{StaticResource HeaderLabelStyle}"
+                           Text="Session"
+                           Margin="0,0,0,4" />
+                <StackPanel Margin="0,0,0,4" VerticalAlignment="Top" Orientation="Horizontal">
+                    <controls:DropDownButton HorizontalAlignment="Left">
+                        <ContentControl Content="Open" />
+                        <controls:DropDownButton.Menu>
+                            <ContextMenu Name="openMapMenu" />
+                        </controls:DropDownButton.Menu>
+                    </controls:DropDownButton>
+                    <controls:DropDownButton HorizontalAlignment="Left"
                                          IsEnabled="{Binding CanExport, UpdateSourceTrigger=PropertyChanged}">
-                    <ContentControl Content="Save" />
-                    <controls:DropDownButton.Menu>
-                        <ContextMenu>
-                            <MenuItem Header="As map template..." Click="ExportMap_Click"/>
-                            <MenuItem Header="{Binding ExportStatus.ExportAsModText, UpdateSourceTrigger=PropertyChanged}" Click="ExportMod_Click" IsEnabled="{Binding ExportStatus.CanExportAsMod, UpdateSourceTrigger=PropertyChanged}" />
-                        </ContextMenu>
-                    </controls:DropDownButton.Menu>
-                </controls:DropDownButton>
+                        <ContentControl Content="Save" />
+                        <controls:DropDownButton.Menu>
+                            <ContextMenu>
+                                <MenuItem Header="As map template..." Click="ExportMap_Click"/>
+                                <MenuItem Header="{Binding ExportStatus.ExportAsModText, UpdateSourceTrigger=PropertyChanged}" Click="ExportMod_Click" IsEnabled="{Binding ExportStatus.CanExportAsMod, UpdateSourceTrigger=PropertyChanged}" />
+                            </ContextMenu>
+                        </controls:DropDownButton.Menu>
+                    </controls:DropDownButton>
+                </StackPanel>
+                <TextBlock Style="{StaticResource DefaultLabelStyle}"
+                           HorizontalAlignment="Left"
+                           Text="{Binding Session.MapSizeText}"/>
             </StackPanel>
+            <StackPanel Grid.Column="0"
+                        HorizontalAlignment="Right"
+                        Margin="16,8">
+                <TextBlock x:Name="IslandInfo"
+                           Visibility="{Binding SelectedIsland, Converter={StaticResource CollapsedOnNull}, UpdateSourceTrigger=PropertyChanged}"
+                           Style="{StaticResource HeaderLabelStyle}"
+                           Margin="0,0,0,4"
+                           Text="Island" />
+            </StackPanel>
+            <!-- bottom -->
             <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="8,0,0,0">
                 <emoji:TextBlock Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"
                                  ToolTip="{Binding DataPathStatus.ToolTip, UpdateSourceTrigger=PropertyChanged}" />
@@ -47,8 +70,6 @@
                 <Button Click="AutoDetect_Click" HorizontalAlignment="Left"
                         Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}">Auto detect</Button>
             </StackPanel>
-            <TextBlock Style="{StaticResource DefaultLabelStyle}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8,0,8,0" TextAlignment="Right" 
-                       Text="{Binding Session.MapSizeText}"/>
             <TextBlock Style="{StaticResource DefaultLabelStyle}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,0" TextAlignment="Right">
                 <Run>The editor is work in progress.</Run>
                 <LineBreak />

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -13,6 +14,32 @@ namespace AnnoMapEditor.UI.Controls
     {
         Session? session;
 
+        public static readonly DependencyProperty SelectedIslandProperty =
+             DependencyProperty.Register("SelectedIsland",
+                propertyType: typeof(Island),
+                ownerType: typeof(MapView),
+                typeMetadata: new FrameworkPropertyMetadata(defaultValue: null));
+
+        public Island? SelectedIsland
+        {
+            get { return (Island?)GetValue(SelectedIslandProperty); }
+            set
+            {
+                if ((Island?)GetValue(SelectedIslandProperty) != value)
+                {
+                    SetValue(SelectedIslandProperty, value);
+                    SelectedIslandChanged?.Invoke(this, new() { Island = value });
+                }
+            }
+        }
+
+        public class SelectedIslandChangedEventArgs
+        {
+            public Island? Island { get; set; }
+        }
+        public delegate void SelectionChangedEventHandler(object sender, SelectedIslandChangedEventArgs e);
+        public event SelectionChangedEventHandler? SelectedIslandChanged;
+
         public MapView()
         {
             InitializeComponent();
@@ -21,6 +48,12 @@ namespace AnnoMapEditor.UI.Controls
             DataContextChanged += MapView_DataContextChanged;
 
             Settings.Instance.PropertyChanged += Settings_PropertyChanged;
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            SelectedIsland = null;
+            base.OnMouseDown(e);
         }
 
         private void MapView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -74,7 +107,7 @@ namespace AnnoMapEditor.UI.Controls
             var islands = session.Islands.Where(x => !x.Hide);
             foreach (var island in islands)
             {
-                var obj = new MapObject(session)
+                var obj = new MapObject(session, this)
                 {
                     DataContext = island
                 };

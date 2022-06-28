@@ -19,7 +19,8 @@ namespace AnnoMapEditor.UI.Controls
             ["ThirdParty"] = new(Color.FromArgb(255, 189, 73, 228)),
             ["Decoration"] = new(Color.FromArgb(255, 151, 162, 125)),
             ["PirateIsland"] = new(Color.FromArgb(255, 186, 0, 36)),
-            ["Cliff"] = new(Color.FromArgb(255, 103, 105, 114))
+            ["Cliff"] = new(Color.FromArgb(255, 103, 105, 114)),
+            ["Selected"] = new(Color.FromArgb(255, 255, 255, 255))
         };
         static readonly Dictionary<IslandType, int> ZIndex = new()
         {
@@ -33,19 +34,41 @@ namespace AnnoMapEditor.UI.Controls
         static readonly SolidColorBrush White = new(Color.FromArgb(255, 255, 255, 255));
         static readonly SolidColorBrush Yellow = new(Color.FromArgb(255, 234, 224, 83));
         readonly Session session;
+        readonly MapView container;
 
         public Point MouseOffset;
 
-        public MapObject(Session session)
+        private bool isSelected;
+        private Rectangle? borderRectangle;
+
+        public MapObject(Session session, MapView container)
         {
             InitializeComponent();
 
             this.session = session;
+            this.container = container;
             DataContextChanged += MapObject_DataContextChanged;
-            MouseMove += OnMouseMove;
+            this.container.SelectedIslandChanged += Container_SelectedIslandChanged;
         }
 
-        private void OnMouseMove(object sender, MouseEventArgs e)
+        private void Container_SelectedIslandChanged(object sender, MapView.SelectedIslandChangedEventArgs e)
+        {
+            isSelected = e.Island == DataContext;
+
+            if (DataContext is not Island island)
+                return;
+
+            if (borderRectangle is not null)
+                borderRectangle.Stroke = MapObjectColors[isSelected ? "Selected" : island.Type.ToString()];
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            container.SelectedIsland = DataContext as Island;
+            e.Handled = true;
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
@@ -126,18 +149,18 @@ namespace AnnoMapEditor.UI.Controls
                 }
 
 
-                Rectangle rect = new();
-                if (image is not null)
+                Rectangle rect = new()
                 {
-                    rect.Stroke = MapObjectColors[island.Type.ToString()];
-                    rect.StrokeThickness = 5;
-                }
-                else
-                {
-                    rect.Fill = MapObjectColors[island.Type.ToString()];
-                }
+                    Stroke = MapObjectColors[island.Type.ToString()],
+                    StrokeThickness = 5
+                };
+                //if (image is null)
+                //{
+                //    rect.Fill = MapObjectColors[island.Type.ToString()];
+                //}
                 rect.Width = island.SizeInTiles;
                 rect.Height = island.SizeInTiles;
+                borderRectangle = rect;
                 canvas.Children.Add(rect);
 
                 var circle = new Ellipse()
