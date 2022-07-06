@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="AnnoMapEditor.UI.Controls.IslandProperties"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles.xaml" />
+                <ResourceDictionary>
+                    <local:ObjectToVisibility x:Key="CollapsedOnNull" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <StackPanel Visibility="{Binding Converter={StaticResource CollapsedOnNull}, UpdateSourceTrigger=PropertyChanged}">
+        <TextBlock x:Name="Header"
+                   Style="{StaticResource HeaderLabelStyle}"
+                   HorizontalAlignment="Right"
+                   Margin="0,0,0,4" />
+        <StackPanel x:Name="IslandProps"
+                    Margin="0">
+            <ComboBox x:Name="TypeComboBox"
+                      Margin="0"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

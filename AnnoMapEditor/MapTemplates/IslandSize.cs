@@ -10,6 +10,8 @@ namespace AnnoMapEditor.MapTemplates
 
         private readonly string value;
 
+        public short? ElementValue { get; set; }
+
         public int InTiles { get; private init; }
         public bool IsDefault { get; private init; }
 
@@ -20,16 +22,19 @@ namespace AnnoMapEditor.MapTemplates
                 value = size;
                 InTiles = size == "Medium" ? 320 : 384;
                 IsDefault = false;
+                ElementValue = size == "Medium" ? (short)1 : (short)2;
                 return;
             }
 
             value = "Small";
             InTiles = 192;
             IsDefault = size != "Small";
+            ElementValue = 0;
         }
 
         public IslandSize(short? size)
         {
+            ElementValue = size;
             switch (size)
             {
                 default:

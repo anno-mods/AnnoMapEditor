@@ -16,7 +16,6 @@
     <Grid VerticalAlignment="Stretch">
         <Grid.Resources>
             <controls:VisibilityToBool x:Key="FalseOnVisible" OnVisible="False" />
-            <controls:ObjectToVisibility x:Key="CollapsedOnNull" />
         </Grid.Resources>
         <Grid x:Name="mainContent" IsEnabled="{Binding ElementName=exportDialog, Path=Visibility, Converter={StaticResource FalseOnVisible}}">
             <controls:MapView Grid.Column="0"
@@ -50,15 +49,10 @@
                            HorizontalAlignment="Left"
                            Text="{Binding Session.MapSizeText}"/>
             </StackPanel>
-            <StackPanel Grid.Column="0"
-                        HorizontalAlignment="Right"
-                        Margin="16,8">
-                <TextBlock x:Name="IslandInfo"
-                           Visibility="{Binding SelectedIsland, Converter={StaticResource CollapsedOnNull}, UpdateSourceTrigger=PropertyChanged}"
-                           Style="{StaticResource HeaderLabelStyle}"
-                           Margin="0,0,0,4"
-                           Text="Island" />
-            </StackPanel>
+            <controls:IslandProperties Grid.Column="0"
+                                       HorizontalAlignment="Right"
+                                       Margin="16,8"
+                                       DataContext="{Binding SelectedIsland, UpdateSourceTrigger=PropertyChanged}" />
             <!-- bottom -->
             <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="8,0,0,0">
                 <emoji:TextBlock Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"

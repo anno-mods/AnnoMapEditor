@@ -41,6 +41,8 @@ namespace AnnoMapEditor.UI.Controls
         private bool isSelected;
         private Rectangle? borderRectangle;
 
+        private Island? island;
+
         public MapObject(Session session, MapView container)
         {
             InitializeComponent();
@@ -49,6 +51,17 @@ namespace AnnoMapEditor.UI.Controls
             this.container = container;
             DataContextChanged += MapObject_DataContextChanged;
             this.container.SelectedIslandChanged += Container_SelectedIslandChanged;
+
+            if (DataContext is Island island)
+            {
+                this.island = island;
+                island.IslandChanged += Island_IslandChanged;
+            }
+        }
+
+        private void Island_IslandChanged()
+        {
+            Update();
         }
 
         private void Container_SelectedIslandChanged(object sender, MapView.SelectedIslandChangedEventArgs e)
@@ -79,8 +92,22 @@ namespace AnnoMapEditor.UI.Controls
 
         private void MapObject_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            if (this.island is not null)
+                this.island.IslandChanged -= Island_IslandChanged;
+            if (DataContext is Island island)
+            {
+                this.island = island;
+                island.IslandChanged += Island_IslandChanged;
+            }
+            Update();
+        }
+
+        private void Update()
+        {
             if (DataContext is not Island island)
                 return;
+
+            canvas.Children.Clear();
 
             if (island.ElementType == 2)
             {
@@ -104,7 +131,6 @@ namespace AnnoMapEditor.UI.Controls
             }
             else
             {
-
                 Width = island.SizeInTiles;
                 Height = island.SizeInTiles;
                 Canvas.SetLeft(this, island.Position.X);
@@ -151,15 +177,11 @@ namespace AnnoMapEditor.UI.Controls
 
                 Rectangle rect = new()
                 {
-                    Stroke = MapObjectColors[island.Type.ToString()],
-                    StrokeThickness = 5
+                    Stroke = MapObjectColors[isSelected ? "Selected" : island.Type.ToString()],
+                    StrokeThickness = 5,
+                    Width = island.SizeInTiles,
+                    Height = island.SizeInTiles
                 };
-                //if (image is null)
-                //{
-                //    rect.Fill = MapObjectColors[island.Type.ToString()];
-                //}
-                rect.Width = island.SizeInTiles;
-                rect.Height = island.SizeInTiles;
                 borderRectangle = rect;
                 canvas.Children.Add(rect);
 
