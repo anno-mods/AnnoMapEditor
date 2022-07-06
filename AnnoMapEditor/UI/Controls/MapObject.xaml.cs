@@ -22,6 +22,16 @@ namespace AnnoMapEditor.UI.Controls
             ["Cliff"] = new(Color.FromArgb(255, 103, 105, 114)),
             ["Selected"] = new(Color.FromArgb(255, 255, 255, 255))
         };
+        static readonly Dictionary<string, SolidColorBrush> MapObjectBackgrounds = new()
+        {
+            ["Normal"] = new(Color.FromArgb(32, 8, 172, 137)),
+            ["Starter"] = new(Color.FromArgb(32, 130, 172, 8)),
+            ["ThirdParty"] = new(Color.FromArgb(32, 189, 73, 228)),
+            ["Decoration"] = new(Color.FromArgb(32, 151, 162, 125)),
+            ["PirateIsland"] = new(Color.FromArgb(32, 186, 0, 36)),
+            ["Cliff"] = new(Color.FromArgb(32, 103, 105, 114)),
+            ["Selected"] = new(Color.FromArgb(32, 255, 255, 255))
+        };
         static readonly Dictionary<IslandType, int> ZIndex = new()
         {
             [IslandType.Normal] = 3,
@@ -141,36 +151,34 @@ namespace AnnoMapEditor.UI.Controls
                 if (island.ImageFile != null)
                 {
                     image = new();
-                    BitmapImage? png = null;
-                    //await System.Threading.Tasks.Task.Run(() =>
-                    //{
-                        png = new();
-                        try
+                    BitmapImage? png = new();
+                    try
+                    {
+                        using Stream? stream = Settings.Instance.DataArchive?.OpenRead(island.ImageFile);
+                        if (stream is not null)
                         {
-                            using Stream? stream = Settings.Instance.DataArchive?.OpenRead(island.ImageFile);
-                            if (stream is not null)
-                            {
-                                png.BeginInit();
-                                png.StreamSource = stream;
-                                png.CacheOption = BitmapCacheOption.OnLoad;
-                                png.EndInit();
-                                png.Freeze();
-                            }
+                            png.BeginInit();
+                            png.StreamSource = stream;
+                            png.CacheOption = BitmapCacheOption.OnLoad;
+                            png.EndInit();
+                            png.Freeze();
                         }
-                        catch
-                        {
-                            png = null;
-                        }
-                    //});
+                    }
+                    catch
+                    {
+                        png = null;
+                    }
 
                     if (png is not null)
                     {
-                        image.Width = island.SizeInTiles;
-                        image.Height = island.SizeInTiles;
+                        image.Width = island.MapSizeInTiles;
+                        image.Height = island.MapSizeInTiles;
                         image.RenderTransform = new RotateTransform(island.Rotation * -90);
                         image.RenderTransformOrigin = new Point(0.5, 0.5);
                         image.Source = png;
                         canvas.Children.Add(image);
+                        Canvas.SetLeft(image, 0);
+                        Canvas.SetTop(image, island.SizeInTiles - island.MapSizeInTiles);
                     }
                 }
 
@@ -178,6 +186,7 @@ namespace AnnoMapEditor.UI.Controls
                 Rectangle rect = new()
                 {
                     Stroke = MapObjectColors[isSelected ? "Selected" : island.Type.ToString()],
+                    Fill = MapObjectBackgrounds[island.Type.ToString()],
                     StrokeThickness = 5,
                     Width = island.SizeInTiles,
                     Height = island.SizeInTiles

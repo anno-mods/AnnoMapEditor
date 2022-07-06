@@ -24,12 +24,13 @@ namespace AnnoMapEditor.MapTemplates
         public int ElementType { get; set; } = 0;
         public Vector2 Position { get; set; } = new Vector2(0, 0);
         public IslandSize Size { get; set; } = IslandSize.Small;
-        public int SizeInTiles { get; set; } = 0;
+        public int SizeInTiles => (IsPool || MapSizeInTiles == 0) ? Size.InTiles : MapSizeInTiles;
         public IslandType Type { get; set; } = IslandType.Normal;
         public bool Hide { get; set; } = false;
         public string? ImageFile { get; set; }
         public int Rotation { get; set; } = 0;
         public string? MapPath { get; set; }
+        public int MapSizeInTiles { get; private set; }
         public string? AssumedMapPath { get; private set; }
         public bool IsPool => string.IsNullOrEmpty(MapPath);
         public string? Label { get; set; }
@@ -117,7 +118,7 @@ namespace AnnoMapEditor.MapTemplates
             // fallback to read out map file
             int sizeInTiles = await IslandReader.ReadTileInSizeFromFileAsync(AssumedMapPath);
             if (sizeInTiles != 0)
-                SizeInTiles = sizeInTiles;
+                MapSizeInTiles = sizeInTiles;
 
             if (Settings.Instance.DataPath is not null)
             {
@@ -136,13 +137,13 @@ namespace AnnoMapEditor.MapTemplates
         {
             if (ElementType == 2)
             {
-                SizeInTiles = 1;
+                MapSizeInTiles = 1;
                 return;
             }
 
             string? mapPath = MapPath;
             if (mapPath is not null && SpecialIslands.CachedSizes.ContainsKey(mapPath))
-                SizeInTiles = SpecialIslands.CachedSizes[mapPath];
+                MapSizeInTiles = SpecialIslands.CachedSizes[mapPath];
 
             if (mapPath == null)
             {
@@ -160,9 +161,6 @@ namespace AnnoMapEditor.MapTemplates
                 else if (mapPath.Contains("_m_") && Size.IsDefault)
                     Size = IslandSize.Medium;
             }
-
-            if (SizeInTiles == 0)
-                SizeInTiles = Size.InTiles;
 
             AssumedMapPath = mapPath;
             await UpdateExternalDataAsync();
