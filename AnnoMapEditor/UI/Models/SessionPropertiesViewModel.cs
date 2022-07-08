@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AnnoMapEditor.UI.Controls
+namespace AnnoMapEditor.UI.Models
 {
     public class SessionPropertiesViewModel : ViewModelBase
     {

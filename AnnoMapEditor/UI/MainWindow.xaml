@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AnnoMapEditor.UI"
         xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
+        xmlns:models="clr-namespace:AnnoMapEditor.UI.Models"
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
-        d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
+        d:DataContext="{d:DesignInstance Type=models:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="MainWindow" Height="600" Width="1000"
         Background="{StaticResource BackgroundBrush}">
     <Window.Resources>
         <ResourceDictionary Source="Styles.xaml" />
@@ -47,6 +48,10 @@
                 </StackPanel>
                 <controls:SessionProperties
                     DataContext="{Binding SessionProperties}"
+                    HorizontalAlignment="Left" />
+                <emoji:TextBlock
+                    Style="{StaticResource DefaultLabelStyle}"
+                    Text="{Binding SessionChecker.Status, UpdateSourceTrigger=PropertyChanged}" 
                     HorizontalAlignment="Left" />
             </StackPanel>
             <controls:IslandProperties Grid.Column="0"

@@ -93,7 +93,7 @@ namespace AnnoMapEditor.UI.Controls
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed && isSelected)
             {
                 MouseOffset = Mouse.GetPosition(this);
                 DragDrop.DoDragDrop(this, this, DragDropEffects.Move);                

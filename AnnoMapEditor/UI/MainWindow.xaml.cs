@@ -1,11 +1,11 @@
-﻿using AnnoMapEditor.UI;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using AnnoMapEditor.UI.Models;
 
 namespace AnnoMapEditor.UI
 {

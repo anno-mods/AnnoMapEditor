@@ -20,9 +20,22 @@ If it didn't find it, you'll need to set the path manually to your game or a fol
 ## Features
 
 - open map templates from the game, or extracted files (`.a7tinfo` and [FileDBReader](https://github.com/anno-mods/FileDBReader) `.xml`)
-- rearrange islands
+- rearrange islands, change island pool type
 - save as ready-to-play mod (Old World in Sandbox mode only)
 - save as map template for manual modding
+
+## How to Use
+
+Most things are self-explanatory.
+
+Sometimes you will see some warnings on the left side:
+
+- Too many small/medium/large pool islands: The game uses every island variation only once.
+  If you have too many pool islands, the game will just omit the remaining ones.
+
+  Keep in mind, third party and pirate slots may turn into small islands depending on game settings.
+
+Have a look at the [Modding Guide](https://github.com/anno-mods/modding-guide) if you need help how to create more complex map mods or even new sessions.
 
 ## Roadmap
 
@@ -37,6 +50,10 @@ There won't be a save as new region.
 It's not reliable to do so without manual editing.
 
 ## Changelog
+
+### 0.5
+
+- Change island pool type
 
 ### 0.4
 

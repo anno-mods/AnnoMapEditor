@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
-             d:DataContext="{d:DesignInstance Type=local:SessionPropertiesViewModel}"
+             xmlns:models="clr-namespace:AnnoMapEditor.UI.Models"
+             d:DataContext="{d:DesignInstance Type=models:SessionPropertiesViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="300">
     <UserControl.Resources>

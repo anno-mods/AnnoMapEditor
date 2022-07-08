@@ -1,6 +1,5 @@
 ﻿using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.MapTemplates;
-using AnnoMapEditor.UI.Controls;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -10,7 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace AnnoMapEditor.UI
+namespace AnnoMapEditor.UI.Models
 {
     public class DataPathStatus
     {
@@ -60,15 +59,18 @@ namespace AnnoMapEditor.UI
                 if (value != _session)
                 {
                     SetProperty(ref _session, value, new string[] { nameof(CanExport) });
+                    SelectedIsland = null;
                     SessionProperties = value is null ? null : new(value);
                     OnPropertyChanged(nameof(SessionProperties));
-                    SelectedIsland = null;
+                    SessionChecker = value is null ? null : new(value);
+                    OnPropertyChanged(nameof(SessionChecker));
                 }
             }
         }
         private Session? _session;
         public bool CanExport => _session is not null;
         public SessionPropertiesViewModel? SessionProperties { get; private set; }
+        public SessionChecker? SessionChecker { get; private set; }
 
         public Island? SelectedIsland
         {
@@ -182,7 +184,7 @@ namespace AnnoMapEditor.UI
                 ExportStatus = new ExportStatus()
                 {
                     CanExportAsMod = archiveReady && supportedFormat,
-                    ExportAsModText = archiveReady ? (supportedFormat ? "As playable mod..." : "As mod: can't save this map size / region as mod (yet) :/") : "As mod: set game path to save"
+                    ExportAsModText = archiveReady ? supportedFormat ? "As playable mod..." : "As mod: can't save this map size / region as mod (yet) :/" : "As mod: set game path to save"
                 };
             }
             else
