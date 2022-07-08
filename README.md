@@ -27,7 +27,7 @@ If it didn't find it, you'll need to set the path manually to your game or a fol
 ## Roadmap
 
 - add, remove islands
-- change islands type
+- change fixed islands type
 - resize session
 - fertilities, mine slots
 - save Cap Trelawney, Arctic, Enbesa as mod

@@ -62,6 +62,7 @@ namespace AnnoMapEditor.UI
                     SetProperty(ref _session, value, new string[] { nameof(CanExport) });
                     SessionProperties = value is null ? null : new(value);
                     OnPropertyChanged(nameof(SessionProperties));
+                    SelectedIsland = null;
                 }
             }
         }
