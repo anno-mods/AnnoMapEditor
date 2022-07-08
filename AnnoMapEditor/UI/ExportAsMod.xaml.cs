@@ -1,5 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates;
-using AnnoMapEditor.UI;
+using AnnoMapEditor.UI.Models;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;

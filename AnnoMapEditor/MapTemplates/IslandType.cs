@@ -1,16 +1,10 @@
 ﻿using System;
+using System.Linq;
 
 namespace AnnoMapEditor.MapTemplates
 {
     public struct IslandType
     {
-        public static readonly IslandType Normal = new("Normal");
-        public static readonly IslandType Starter = new("Starter");
-        public static readonly IslandType ThirdParty = new("ThirdParty");
-        public static readonly IslandType Decoration = new("Decoration");
-        public static readonly IslandType PirateIsland = new("PirateIsland");
-        public static readonly IslandType Cliff = new("Cliff");
-
         private static readonly string[] RandomIDs = new[]
         {
             "Normal",
@@ -21,11 +15,20 @@ namespace AnnoMapEditor.MapTemplates
             "Cliff",
             "Normal" // clamp
         };
+        
+        public static readonly IslandType Normal = new("Normal");
+        public static readonly IslandType Starter = new("Starter");
+        public static readonly IslandType ThirdParty = new("ThirdParty");
+        public static readonly IslandType Decoration = new("Decoration");
+        public static readonly IslandType PirateIsland = new("PirateIsland");
+        public static readonly IslandType Cliff = new("Cliff");
 
         private readonly string value;
+        public readonly short ElementValue { get; }
 
         public IslandType(string? type)
         {
+            ElementValue = (short?)RandomIDs.IndexOf((x) => x == type) ?? 0;
             if (type == "Starter" || type == "ThirdParty" || type == "Decoration")
             {
                 value = type;
@@ -47,6 +50,7 @@ namespace AnnoMapEditor.MapTemplates
 
         public IslandType(short? type)
         {
+            ElementValue = type ?? 0;
             if (type is null)
             {
                 value = "Normal";

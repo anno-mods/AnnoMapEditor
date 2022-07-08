@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace AnnoMapEditor.UI
+namespace AnnoMapEditor.MapTemplates
 {
-    public class ViewModelBase : INotifyPropertyChanged
+    public class ObservableBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

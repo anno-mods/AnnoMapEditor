@@ -19,7 +19,18 @@ namespace AnnoMapEditor.UI.Controls
             ["ThirdParty"] = new(Color.FromArgb(255, 189, 73, 228)),
             ["Decoration"] = new(Color.FromArgb(255, 151, 162, 125)),
             ["PirateIsland"] = new(Color.FromArgb(255, 186, 0, 36)),
-            ["Cliff"] = new(Color.FromArgb(255, 103, 105, 114))
+            ["Cliff"] = new(Color.FromArgb(255, 103, 105, 114)),
+            ["Selected"] = new(Color.FromArgb(255, 255, 255, 255))
+        };
+        static readonly Dictionary<string, SolidColorBrush> MapObjectBackgrounds = new()
+        {
+            ["Normal"] = new(Color.FromArgb(32, 8, 172, 137)),
+            ["Starter"] = new(Color.FromArgb(32, 130, 172, 8)),
+            ["ThirdParty"] = new(Color.FromArgb(32, 189, 73, 228)),
+            ["Decoration"] = new(Color.FromArgb(32, 151, 162, 125)),
+            ["PirateIsland"] = new(Color.FromArgb(32, 186, 0, 36)),
+            ["Cliff"] = new(Color.FromArgb(32, 103, 105, 114)),
+            ["Selected"] = new(Color.FromArgb(32, 255, 255, 255))
         };
         static readonly Dictionary<IslandType, int> ZIndex = new()
         {
@@ -33,21 +44,56 @@ namespace AnnoMapEditor.UI.Controls
         static readonly SolidColorBrush White = new(Color.FromArgb(255, 255, 255, 255));
         static readonly SolidColorBrush Yellow = new(Color.FromArgb(255, 234, 224, 83));
         readonly Session session;
+        readonly MapView container;
 
         public Point MouseOffset;
 
-        public MapObject(Session session)
+        private bool isSelected;
+        private Rectangle? borderRectangle;
+
+        private Island? island;
+
+        public MapObject(Session session, MapView container)
         {
             InitializeComponent();
 
             this.session = session;
+            this.container = container;
             DataContextChanged += MapObject_DataContextChanged;
-            MouseMove += OnMouseMove;
+            this.container.SelectedIslandChanged += Container_SelectedIslandChanged;
+
+            if (DataContext is Island island)
+            {
+                this.island = island;
+                island.IslandChanged += Island_IslandChanged;
+            }
         }
 
-        private void OnMouseMove(object sender, MouseEventArgs e)
+        private void Island_IslandChanged()
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            Update();
+        }
+
+        private void Container_SelectedIslandChanged(object sender, MapView.SelectedIslandChangedEventArgs e)
+        {
+            isSelected = e.Island == DataContext;
+
+            if (DataContext is not Island island)
+                return;
+
+            if (borderRectangle is not null)
+                borderRectangle.Stroke = MapObjectColors[isSelected ? "Selected" : island.Type.ToString()];
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            container.SelectedIsland = DataContext as Island;
+            e.Handled = true;
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed && isSelected)
             {
                 MouseOffset = Mouse.GetPosition(this);
                 DragDrop.DoDragDrop(this, this, DragDropEffects.Move);                
@@ -56,8 +102,22 @@ namespace AnnoMapEditor.UI.Controls
 
         private void MapObject_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            if (this.island is not null)
+                this.island.IslandChanged -= Island_IslandChanged;
+            if (DataContext is Island island)
+            {
+                this.island = island;
+                island.IslandChanged += Island_IslandChanged;
+            }
+            Update();
+        }
+
+        private void Update()
+        {
             if (DataContext is not Island island)
                 return;
+
+            canvas.Children.Clear();
 
             if (island.ElementType == 2)
             {
@@ -81,7 +141,6 @@ namespace AnnoMapEditor.UI.Controls
             }
             else
             {
-
                 Width = island.SizeInTiles;
                 Height = island.SizeInTiles;
                 Canvas.SetLeft(this, island.Position.X);
@@ -92,52 +151,47 @@ namespace AnnoMapEditor.UI.Controls
                 if (island.ImageFile != null)
                 {
                     image = new();
-                    BitmapImage? png = null;
-                    //await System.Threading.Tasks.Task.Run(() =>
-                    //{
-                        png = new();
-                        try
+                    BitmapImage? png = new();
+                    try
+                    {
+                        using Stream? stream = Settings.Instance.DataArchive?.OpenRead(island.ImageFile);
+                        if (stream is not null)
                         {
-                            using Stream? stream = Settings.Instance.DataArchive?.OpenRead(island.ImageFile);
-                            if (stream is not null)
-                            {
-                                png.BeginInit();
-                                png.StreamSource = stream;
-                                png.CacheOption = BitmapCacheOption.OnLoad;
-                                png.EndInit();
-                                png.Freeze();
-                            }
+                            png.BeginInit();
+                            png.StreamSource = stream;
+                            png.CacheOption = BitmapCacheOption.OnLoad;
+                            png.EndInit();
+                            png.Freeze();
                         }
-                        catch
-                        {
-                            png = null;
-                        }
-                    //});
+                    }
+                    catch
+                    {
+                        png = null;
+                    }
 
                     if (png is not null)
                     {
-                        image.Width = island.SizeInTiles;
-                        image.Height = island.SizeInTiles;
+                        image.Width = island.MapSizeInTiles;
+                        image.Height = island.MapSizeInTiles;
                         image.RenderTransform = new RotateTransform(island.Rotation * -90);
                         image.RenderTransformOrigin = new Point(0.5, 0.5);
                         image.Source = png;
                         canvas.Children.Add(image);
+                        Canvas.SetLeft(image, 0);
+                        Canvas.SetTop(image, island.SizeInTiles - island.MapSizeInTiles);
                     }
                 }
 
 
-                Rectangle rect = new();
-                if (image is not null)
+                Rectangle rect = new()
                 {
-                    rect.Stroke = MapObjectColors[island.Type.ToString()];
-                    rect.StrokeThickness = 5;
-                }
-                else
-                {
-                    rect.Fill = MapObjectColors[island.Type.ToString()];
-                }
-                rect.Width = island.SizeInTiles;
-                rect.Height = island.SizeInTiles;
+                    Stroke = MapObjectColors[isSelected ? "Selected" : island.Type.ToString()],
+                    Fill = MapObjectBackgrounds[island.Type.ToString()],
+                    StrokeThickness = 5,
+                    Width = island.SizeInTiles,
+                    Height = island.SizeInTiles
+                };
+                borderRectangle = rect;
                 canvas.Children.Add(rect);
 
                 var circle = new Ellipse()

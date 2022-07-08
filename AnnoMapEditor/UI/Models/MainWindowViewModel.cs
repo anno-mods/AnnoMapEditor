@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace AnnoMapEditor.UI
+namespace AnnoMapEditor.UI.Models
 {
     public class DataPathStatus
     {
@@ -54,11 +54,30 @@ namespace AnnoMapEditor.UI
         public Session? Session
         {
             get => _session;
-            private set => SetProperty(ref _session, value, new string[] { "CanExport" });
+            private set
+            {
+                if (value != _session)
+                {
+                    SetProperty(ref _session, value, new string[] { nameof(CanExport) });
+                    SelectedIsland = null;
+                    SessionProperties = value is null ? null : new(value);
+                    OnPropertyChanged(nameof(SessionProperties));
+                    SessionChecker = value is null ? null : new(value);
+                    OnPropertyChanged(nameof(SessionChecker));
+                }
+            }
         }
         private Session? _session;
-
         public bool CanExport => _session is not null;
+        public SessionPropertiesViewModel? SessionProperties { get; private set; }
+        public SessionChecker? SessionChecker { get; private set; }
+
+        public Island? SelectedIsland
+        {
+            get => _selectedIsland;
+            set => SetProperty(ref _selectedIsland, value);
+        }
+        private Island? _selectedIsland;
 
         public string? SessionFilePath
         {
@@ -165,7 +184,7 @@ namespace AnnoMapEditor.UI
                 ExportStatus = new ExportStatus()
                 {
                     CanExportAsMod = archiveReady && supportedFormat,
-                    ExportAsModText = archiveReady ? (supportedFormat ? "As playable mod..." : "As mod: can't save this map size / region as mod (yet) :/") : "As mod: set game path to save"
+                    ExportAsModText = archiveReady ? supportedFormat ? "As playable mod..." : "As mod: can't save this map size / region as mod (yet) :/" : "As mod: set game path to save"
                 };
             }
             else

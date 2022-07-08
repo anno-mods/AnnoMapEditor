@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace AnnoMapEditor.UI
+namespace AnnoMapEditor.UI.Models
 {
     public class ExportAsModViewModel : ViewModelBase
     {
