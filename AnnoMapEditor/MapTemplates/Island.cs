@@ -125,6 +125,7 @@ namespace AnnoMapEditor.MapTemplates
                 string activeMapImagePath = Path.Combine(Path.GetDirectoryName(AssumedMapPath) ?? "", "_gamedata", Path.GetFileNameWithoutExtension(AssumedMapPath), "mapimage.png");
                 ImageFile = activeMapImagePath;
             }
+            IslandChanged?.Invoke();
         }
 
         public async Task UpdateAsync()
@@ -133,7 +134,7 @@ namespace AnnoMapEditor.MapTemplates
             IslandChanged?.Invoke();
         }
 
-        private async Task InitAsync(Region region)
+        public async Task InitAsync(Region region)
         {
             if (ElementType == 2)
             {

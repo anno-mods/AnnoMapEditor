@@ -98,6 +98,13 @@ namespace AnnoMapEditor.MapTemplates
             foreach (var island in Islands)
                 await island.UpdateExternalDataAsync();
         }
+
+        public async Task UpdateAsync()
+        {
+            foreach (var island in Islands)
+                await island.InitAsync(Region);
+        }
+
         public Serializing.A7tinfo.MapTemplateDocumentExport? ToTemplate()
         {
             if (template.MapTemplate is null)

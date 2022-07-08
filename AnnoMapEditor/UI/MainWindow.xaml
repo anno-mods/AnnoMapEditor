@@ -45,9 +45,9 @@
                         </controls:DropDownButton.Menu>
                     </controls:DropDownButton>
                 </StackPanel>
-                <TextBlock Style="{StaticResource DefaultLabelStyle}"
-                           HorizontalAlignment="Left"
-                           Text="{Binding Session.MapSizeText}"/>
+                <controls:SessionProperties
+                    DataContext="{Binding SessionProperties}"
+                    HorizontalAlignment="Left" />
             </StackPanel>
             <controls:IslandProperties Grid.Column="0"
                                        HorizontalAlignment="Right"

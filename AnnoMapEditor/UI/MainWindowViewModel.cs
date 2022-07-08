@@ -1,5 +1,6 @@
 ﻿using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.UI.Controls;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -54,10 +55,19 @@ namespace AnnoMapEditor.UI
         public Session? Session
         {
             get => _session;
-            private set => SetProperty(ref _session, value, new string[] { "CanExport" });
+            private set
+            {
+                if (value != _session)
+                {
+                    SetProperty(ref _session, value, new string[] { nameof(CanExport) });
+                    SessionProperties = value is null ? null : new(value);
+                    OnPropertyChanged(nameof(SessionProperties));
+                }
+            }
         }
         private Session? _session;
         public bool CanExport => _session is not null;
+        public SessionPropertiesViewModel? SessionProperties { get; private set; }
 
         public Island? SelectedIsland
         {
