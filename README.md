@@ -26,7 +26,11 @@ If it didn't find it, you'll need to set the path manually to your game or a fol
 
 ## How to Use
 
-Most things are self-explanatory.
+Open an existing map, change it to your liking and safe it as a mod.
+Only Old World maps can currently be saved as mod.
+All other maps are only useful for modders.
+
+Have a look at the [Modding Guide](https://github.com/anno-mods/modding-guide) if you need help how to create more complex map mods or even new sessions.
 
 Sometimes you will see some warnings on the left side:
 
@@ -34,8 +38,6 @@ Sometimes you will see some warnings on the left side:
   If you have too many pool islands, the game will just omit the remaining ones.
 
   Keep in mind, third party and pirate slots may turn into small islands depending on game settings.
-
-Have a look at the [Modding Guide](https://github.com/anno-mods/modding-guide) if you need help how to create more complex map mods or even new sessions.
 
 ## Roadmap
 

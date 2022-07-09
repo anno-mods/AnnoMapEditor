@@ -19,6 +19,7 @@ namespace AnnoMapEditor
                 if (_dataArchive is System.IDisposable disposable)
                     disposable.Dispose();
                 SetProperty(ref _dataArchive, value);
+                OnPropertyChanged(nameof(DataPath));
             }
         }
         private IDataArchive _dataArchive = DataArchives.DataArchive.Default;

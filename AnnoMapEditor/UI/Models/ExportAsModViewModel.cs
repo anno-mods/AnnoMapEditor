@@ -41,6 +41,17 @@ namespace AnnoMapEditor.UI.Models
         }
         private IEnumerable<Mods.MapType> _allowedMapTypes = Mods.MapType.GetOldWorldTypes();
 
+        public ExportAsModViewModel()
+        {
+            Settings.Instance.PropertyChanged += Settings_PropertyChanged;
+        }
+
+        private void Settings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Settings.DataPath))
+                OnPropertyChanged(nameof(ModExistsWarning));
+        }
+
         private static bool ModExists(string modName)
         {
             if (Settings.Instance.DataPath is null)
