@@ -61,9 +61,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="UI\Controls\SessionProperties.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="UserSettings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
