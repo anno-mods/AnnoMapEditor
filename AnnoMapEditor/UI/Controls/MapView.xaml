@@ -15,10 +15,7 @@
             <Canvas 
                 Name="sessionCanvas"
                 Width="0"
-                Height="0"
-                AllowDrop="True"
-                Drop="sessionCanvas_Drop"
-                DragOver="sessionCanvas_DragOver" />
+                Height="0" />
             <Canvas
                 Name="addIslandCanvas" />
         </Canvas>

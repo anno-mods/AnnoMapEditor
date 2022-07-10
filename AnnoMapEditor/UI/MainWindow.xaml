@@ -71,7 +71,7 @@
                 <Button Click="AutoDetect_Click" HorizontalAlignment="Left"
                         Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}">Auto detect</Button>
             </StackPanel>
-            <TextBlock Style="{StaticResource DefaultLabelStyle}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,0" TextAlignment="Right">
+            <TextBlock Style="{StaticResource MutedLabelStyle}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,0" TextAlignment="Right">
                 <Run>The editor is work in progress.</Run>
                 <LineBreak />
                 <Run>Visit GitHub for </Run>

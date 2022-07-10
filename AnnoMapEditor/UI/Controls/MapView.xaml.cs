@@ -176,20 +176,14 @@ namespace AnnoMapEditor.UI.Controls
             float scale = (float)Math.Min(requiredScaleX, requiredScaleY);
 
             sessionCanvas.RenderTransform = new ScaleTransform(scale, scale);
-            //sessionCanvas.Scale = new Vector3(scale, scale, 1);
             rotationCanvas.Width = scale * session.Size.X;
             rotationCanvas.Height = scale * session.Size.Y;
         }
 
-        private void sessionCanvas_Drop(object sender, DragEventArgs e)
+        public void ReleaseMapObject(MapObject mapObject)
         {
-            if (session is null || 
-                e.Data?.GetData(typeof(MapObject)) is not MapObject mapObject || 
-                mapObject.DataContext is not Island island)
+            if (session is null || mapObject.DataContext is not Island island)
                 return;
-
-            Vector2 position = new (e.GetPosition(sessionCanvas));
-            MoveMapObject(mapObject, position - mapObject.MouseOffset);
 
             if (mapObject.IsMarkedForDeletion)
             {
@@ -198,17 +192,14 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
-        private void sessionCanvas_DragOver(object sender, DragEventArgs e)
+        public void MoveMapObject(MapObject mapObject, Vector2 position)
         {
-            if (session is null ||
-                e.Data?.GetData(typeof(MapObject)) is not MapObject mapObject)
-                return;
+            if (session is null) return;
 
-            Vector2 position = new(e.GetPosition(sessionCanvas));
-            MoveMapObject(mapObject, position - mapObject.MouseOffset);
+            _MoveMapObject(mapObject, position);
         }
 
-        private void MoveMapObject(MapObject mapObject, Vector2 position)
+        private void _MoveMapObject(MapObject mapObject, Vector2 position)
         {
             if (session is null || mapObject.DataContext is not Island island) return;
 

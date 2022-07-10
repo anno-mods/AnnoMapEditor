@@ -100,18 +100,31 @@ namespace AnnoMapEditor.UI.Controls
                 borderRectangle.Stroke = MapObjectColors[isSelected ? "Selected" : island.Type.ToString()];
         }
 
-        protected override void OnMouseDown(MouseButtonEventArgs e)
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             container.SelectedIsland = DataContext as Island;
+            MouseOffset = new(Mouse.GetPosition(this));
             e.Handled = true;
+            base.OnMouseLeftButtonDown(e);
+            Mouse.Capture(this);
+        }
+
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+        {
+            if (isSelected)
+            {
+                container.ReleaseMapObject(this);
+            }
+            Mouse.Capture(null);
+            e.Handled = true;
+            base.OnMouseLeftButtonUp(e);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && isSelected)
             {
-                MouseOffset = new (Mouse.GetPosition(this));
-                DragDrop.DoDragDrop(this, this, DragDropEffects.Move);                
+                container.MoveMapObject(this, new Vector2(e.GetPosition(container.sessionCanvas)) - MouseOffset);
             }
         }
 
