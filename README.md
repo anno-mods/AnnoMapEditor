@@ -5,7 +5,7 @@ This project is not affiliated in any way with Ubisoft.
 Anno 1800 is a trademark of Ubisoft Entertainment in the US and/or other countries.
 Anno is a trademark of Ubisoft GmbH in the US and/or other countries.
 
-![](./doc/export-as-mod.gif)
+![](./doc/editor-v0.5.gif)
 
 The current version of the map editor is only useful if you know how to mod and work with extracted RDA files.
 
@@ -41,7 +41,6 @@ Sometimes you will see some warnings on the left side:
 
 ## Roadmap
 
-- add, remove islands
 - change fixed islands type
 - resize session
 - fertilities, mine slots
@@ -55,7 +54,7 @@ It's not reliable to do so without manual editing.
 
 ### 0.5
 
-- Change island pool type
+- Add, remove, change pool islands
 
 ### 0.4
 
