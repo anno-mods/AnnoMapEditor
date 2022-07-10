@@ -106,6 +106,7 @@ namespace AnnoMapEditor.MapTemplates
             {
                 Element = new Serializing.A7tinfo.Element()
             };
+            IslandChanged?.Invoke();
         }
 
         public Serializing.A7tinfo.TemplateElement? ToTemplate()

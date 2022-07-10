@@ -45,6 +45,8 @@ namespace AnnoMapEditor.UI.Controls
     /// </summary>
     public partial class IslandProperties : UserControl
     {
+        Island? _island;
+
         public IslandProperties()
         {
             InitializeComponent();
@@ -76,44 +78,65 @@ namespace AnnoMapEditor.UI.Controls
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            if (_island is not null)
+            {
+                _island.IslandChanged -= Island_IslandChanged;
+                _island = null;
+            }
+
             if (DataContext is Island island)
             {
-                Header.Text = island.ElementType == 2 ? "Start" : "Island";
-                IslandProps.Visibility = island.ElementType == 2 ? Visibility.Collapsed : Visibility.Visible;
+                UpdateIslandProperties(island);
+                _island = island;
+                _island.IslandChanged += Island_IslandChanged;
+            }
+        }
 
-                TypeComboBox.Visibility = Visibility.Visible;
-                if (island.IsPool && island.Type == IslandType.Normal)
-                {
-                    // standard islands
-                    if (island.Size == IslandSize.Large)
-                        TypeComboBox.SelectedItem = UserIslandType.Large;
-                    else if (island.Size == IslandSize.Medium)
-                        TypeComboBox.SelectedItem = UserIslandType.Medium;
-                    else
-                        TypeComboBox.SelectedItem = UserIslandType.Small;
-                }
-                else if (island.IsPool && island.Type == IslandType.Starter)
-                {
-                    // starter islands with oil
-                    if (island.Size == IslandSize.Large)
-                        TypeComboBox.SelectedItem = UserIslandType.LargeStarter;
-                    else
-                        TypeComboBox.SelectedItem = UserIslandType.MediumStarter;
-                    // no small allowed
-                }
-                else if (island.Type == IslandType.PirateIsland)
-                {
-                    TypeComboBox.SelectedItem = UserIslandType.Pirate;
-                }
-                else if (island.Type == IslandType.ThirdParty)
-                {
-                    TypeComboBox.SelectedItem = UserIslandType.ThirdParty;
-                }
+        private void Island_IslandChanged()
+        {
+            if (_island != null)
+                UpdateIslandProperties(_island);
+        }
+
+        private void UpdateIslandProperties(Island island)
+        {
+            Header.Text = island.ElementType == 2 ? "Start" : "Island";
+            IslandProps.Visibility = island.ElementType == 2 ? Visibility.Collapsed : Visibility.Visible;
+
+            TypeComboBox.IsEnabled = !island.IsNew;
+
+            TypeComboBox.Visibility = Visibility.Visible;
+            if (island.IsPool && island.Type == IslandType.Normal)
+            {
+                // standard islands
+                if (island.Size == IslandSize.Large)
+                    TypeComboBox.SelectedItem = UserIslandType.Large;
+                else if (island.Size == IslandSize.Medium)
+                    TypeComboBox.SelectedItem = UserIslandType.Medium;
                 else
-                {
-                    TypeComboBox.SelectedItem = null;
-                    TypeComboBox.Visibility = Visibility.Collapsed;
-                }
+                    TypeComboBox.SelectedItem = UserIslandType.Small;
+            }
+            else if (island.IsPool && island.Type == IslandType.Starter)
+            {
+                // starter islands with oil
+                if (island.Size == IslandSize.Large)
+                    TypeComboBox.SelectedItem = UserIslandType.LargeStarter;
+                else
+                    TypeComboBox.SelectedItem = UserIslandType.MediumStarter;
+                // no small allowed
+            }
+            else if (island.Type == IslandType.PirateIsland)
+            {
+                TypeComboBox.SelectedItem = UserIslandType.Pirate;
+            }
+            else if (island.Type == IslandType.ThirdParty)
+            {
+                TypeComboBox.SelectedItem = UserIslandType.ThirdParty;
+            }
+            else
+            {
+                TypeComboBox.SelectedItem = null;
+                TypeComboBox.Visibility = Visibility.Collapsed;
             }
         }
     }

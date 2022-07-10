@@ -189,6 +189,7 @@ namespace AnnoMapEditor.UI.Controls
             {
                 sessionCanvas.Children.Remove(mapObject);
                 session.RemoveIsland(island);
+                SelectedIsland = null;
             }
         }
 

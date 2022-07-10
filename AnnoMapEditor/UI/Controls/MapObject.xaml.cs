@@ -59,6 +59,7 @@ namespace AnnoMapEditor.UI.Controls
         }
 
         private bool isSelected;
+        private bool isMoving;
         private Rectangle? borderRectangle;
 
         private Island? island;
@@ -92,17 +93,21 @@ namespace AnnoMapEditor.UI.Controls
         private void Container_SelectedIslandChanged(object sender, MapView.SelectedIslandChangedEventArgs e)
         {
             isSelected = e.Island == DataContext;
+            UpdateSelectionBorder();
+        }
 
-            if (DataContext is not Island island)
-                return;
-
-            if (borderRectangle is not null)
+        private void UpdateSelectionBorder()
+        {
+            if (borderRectangle is not null && island is not null)
                 borderRectangle.Stroke = MapObjectColors[isSelected ? "Selected" : island.Type.ToString()];
         }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            container.SelectedIsland = DataContext as Island;
+            if (DataContext is not Island island)
+                return;
+
+            container.SelectedIsland = island;
             MouseOffset = new(Mouse.GetPosition(this));
             e.Handled = true;
             base.OnMouseLeftButtonDown(e);
@@ -112,9 +117,7 @@ namespace AnnoMapEditor.UI.Controls
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             if (isSelected)
-            {
                 container.ReleaseMapObject(this);
-            }
             Mouse.Capture(null);
             e.Handled = true;
             base.OnMouseLeftButtonUp(e);
@@ -208,16 +211,15 @@ namespace AnnoMapEditor.UI.Controls
                 }
 
 
-                Rectangle rect = new()
+                borderRectangle = new()
                 {
-                    Stroke = MapObjectColors[isSelected ? "Selected" : island.Type.ToString()],
                     Fill = MapObjectBackgrounds[island.Type.ToString()],
                     StrokeThickness = Vector2.Tile.Y,
                     Width = island.SizeInTiles,
                     Height = island.SizeInTiles
                 };
-                borderRectangle = rect;
-                canvas.Children.Add(rect);
+                UpdateSelectionBorder();
+                canvas.Children.Add(borderRectangle);
 
                 var circle = new Ellipse()
                 {

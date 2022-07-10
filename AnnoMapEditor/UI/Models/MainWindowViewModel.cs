@@ -184,7 +184,7 @@ namespace AnnoMapEditor.UI.Models
                 ExportStatus = new ExportStatus()
                 {
                     CanExportAsMod = archiveReady && supportedFormat,
-                    ExportAsModText = archiveReady ? supportedFormat ? "As playable mod..." : "As mod: can't save this map size / region as mod (yet) :/" : "As mod: set game path to save"
+                    ExportAsModText = archiveReady ? supportedFormat ? "As playable mod..." : "As mod: only works with Old World maps currently" : "As mod: set game path to save"
                 };
             }
             else
