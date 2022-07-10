@@ -48,6 +48,16 @@ namespace AnnoMapEditor.UI.Controls
 
         public Vector2 MouseOffset;
 
+        public bool IsMarkedForDeletion
+        {
+            get => crossOut.Visibility == Visibility.Visible;
+            set
+            {
+                if (value != IsMarkedForDeletion)
+                    crossOut.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
         private bool isSelected;
         private Rectangle? borderRectangle;
 
@@ -61,6 +71,7 @@ namespace AnnoMapEditor.UI.Controls
             this.container = container;
             DataContextChanged += MapObject_DataContextChanged;
             this.container.SelectedIslandChanged += Container_SelectedIslandChanged;
+            MouseOffset = Vector2.Zero;
 
             if (DataContext is Island island)
             {

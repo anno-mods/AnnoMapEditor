@@ -153,5 +153,11 @@ namespace AnnoMapEditor.MapTemplates
             Task.Run(async () => await island.InitAsync(Region));
             IslandCollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
+
+        public void RemoveIsland(Island island)
+        {
+            _islands.Remove(island);
+            IslandCollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
     }
 }

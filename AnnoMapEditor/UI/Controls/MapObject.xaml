@@ -5,9 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    d:DesignHeight="192" d:DesignWidth="192"
     Width="1"
     Height="1">
-
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -24,5 +24,24 @@
             </Border.RenderTransform>
             <TextBlock Foreground="White"  Name="title" FontSize="50" TextAlignment="Center" />
         </Border>
+
+        <Grid
+            x:Name="crossOut"
+            Visibility="Collapsed">
+            <Line
+                X1="0"
+                Y1="0"
+                X2="{Binding ElementName=crossOut, Path=ActualHeight}"
+                Y2="{Binding ElementName=crossOut, Path=ActualHeight}" 
+                Stroke="#BA0024"
+                StrokeThickness="8"/>
+            <Line
+                X1="0"
+                Y1="{Binding ElementName=crossOut, Path=ActualHeight}"
+                X2="{Binding ElementName=crossOut, Path=ActualWidth}"
+                Y2="0"
+                Stroke="#BA0024"
+                StrokeThickness="8" />
+        </Grid>
     </Grid>
 </UserControl>

@@ -12,8 +12,6 @@ namespace AnnoMapEditor.MapTemplates
         public static readonly Vector2 Zero = new(0, 0);
         public static readonly Vector2 Tile = new(8, 8);
 
-        private static int Normalize(int x) => (x + 4) / 8 * 8; 
-
         public int X 
         {
             get => _x;
@@ -27,6 +25,8 @@ namespace AnnoMapEditor.MapTemplates
             set => _y = Normalize(value);
         }
         private int _y = 0;
+
+        public double Length => Math.Sqrt(X * X + Y * Y);
 
         public Vector2(int x, int y)
         {
@@ -96,6 +96,8 @@ namespace AnnoMapEditor.MapTemplates
         {
             return X >= area.X && Y >= area.Y && X < area.X + area.Width && Y < area.Y + area.Height;
         }
+
+        private static int Normalize(int x) => (x + 4) / 8 * 8;
     }
 
     public struct Rect2
