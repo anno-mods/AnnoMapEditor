@@ -46,10 +46,9 @@ namespace AnnoMapEditor.Mods
             return true;
         }
 
-        public async Task<bool> Save(string modsFolderPath, string modName, string? modID)
+        public async Task<bool> Save(string modPath, string modName, string? modID)
         {
             string fullModName = "[Map] " + modName;
-            string modPath = Path.Combine(modsFolderPath, fullModName);
 
             try
             {
