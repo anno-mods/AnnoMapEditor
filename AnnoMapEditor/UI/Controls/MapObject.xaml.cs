@@ -46,7 +46,7 @@ namespace AnnoMapEditor.UI.Controls
         readonly Session session;
         readonly MapView container;
 
-        public Point MouseOffset;
+        public Vector2 MouseOffset;
 
         private bool isSelected;
         private Rectangle? borderRectangle;
@@ -71,7 +71,11 @@ namespace AnnoMapEditor.UI.Controls
 
         private void Island_IslandChanged()
         {
-            Update();
+            // island updates may come from background threads, make sure to update in UI
+            if (Dispatcher.CheckAccess())
+                Update();
+            else
+                Dispatcher.Invoke(() => Update());
         }
 
         private void Container_SelectedIslandChanged(object sender, MapView.SelectedIslandChangedEventArgs e)
@@ -95,7 +99,7 @@ namespace AnnoMapEditor.UI.Controls
         {
             if (e.LeftButton == MouseButtonState.Pressed && isSelected)
             {
-                MouseOffset = Mouse.GetPosition(this);
+                MouseOffset = new (Mouse.GetPosition(this));
                 DragDrop.DoDragDrop(this, this, DragDropEffects.Move);                
             }
         }
@@ -123,19 +127,18 @@ namespace AnnoMapEditor.UI.Controls
             {
                 var circle = new Ellipse()
                 {
-                    Width = 20,
-                    Height = 20,
+                    Width = 24,
+                    Height = 24,
                     Fill = Yellow,
                 };
 
-                Canvas.SetLeft(circle, -10);
-                Canvas.SetTop(circle, -10);
+                Canvas.SetLeft(circle, -8);
+                Canvas.SetTop(circle, -8 - 1);
                 canvas.Children.Add(circle);
 
                 Width = 1;
                 Height = 1;
-                Canvas.SetLeft(this, island.Position.X);
-                Canvas.SetTop(this, session.Size.Y - island.Position.Y);
+                this.SetPosition(island.Position.FlipY(session.Size.Y));
                 Panel.SetZIndex(this, 100);
                 return;
             }
@@ -143,11 +146,10 @@ namespace AnnoMapEditor.UI.Controls
             {
                 Width = island.SizeInTiles;
                 Height = island.SizeInTiles;
-                Canvas.SetLeft(this, island.Position.X);
-                Canvas.SetTop(this, session.Size.Y - island.Position.Y - island.SizeInTiles);
+                this.SetPosition(island.Position.FlipY(session.Size.Y - island.SizeInTiles));
                 Panel.SetZIndex(this, ZIndex[island.Type]);
 
-                Image? image = null;
+                Image? image;
                 if (island.ImageFile != null)
                 {
                     image = new();
@@ -177,8 +179,7 @@ namespace AnnoMapEditor.UI.Controls
                         image.RenderTransformOrigin = new Point(0.5, 0.5);
                         image.Source = png;
                         canvas.Children.Add(image);
-                        Canvas.SetLeft(image, 0);
-                        Canvas.SetTop(image, island.SizeInTiles - island.MapSizeInTiles);
+                        image.SetPosition(new Vector2(0, island.SizeInTiles - island.MapSizeInTiles));
                     }
                 }
 
@@ -187,7 +188,7 @@ namespace AnnoMapEditor.UI.Controls
                 {
                     Stroke = MapObjectColors[isSelected ? "Selected" : island.Type.ToString()],
                     Fill = MapObjectBackgrounds[island.Type.ToString()],
-                    StrokeThickness = 5,
+                    StrokeThickness = Vector2.Tile.Y,
                     Width = island.SizeInTiles,
                     Height = island.SizeInTiles
                 };
@@ -196,13 +197,12 @@ namespace AnnoMapEditor.UI.Controls
 
                 var circle = new Ellipse()
                 {
-                    Width = 10,
-                    Height = 10,
+                    Width = 8, // technically, should be 8 like the stroke but due to visual illusion 10 is better
+                    Height = 8,
                     Fill = White,
                 };
 
-                Canvas.SetLeft(circle, 0);
-                Canvas.SetTop(circle, island.SizeInTiles - 10);
+                circle.SetPosition(Vector2.Zero.FlipY(island.SizeInTiles));
                 canvas.Children.Add(circle);
 
                 if (!string.IsNullOrEmpty(island.Label))

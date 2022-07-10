@@ -12,13 +12,15 @@
             <Canvas.RenderTransform>
                 <RotateTransform Angle="-45"/>
             </Canvas.RenderTransform>
-            <Canvas Name="sessionCanvas"
-                    Width="0"
-                    Height="0"
-                    AllowDrop="True"
-                    Drop="sessionCanvas_Drop"
-                    DragOver="sessionCanvas_Drop">
-            </Canvas>
+            <Canvas 
+                Name="sessionCanvas"
+                Width="0"
+                Height="0"
+                AllowDrop="True"
+                Drop="sessionCanvas_Drop"
+                DragOver="sessionCanvas_Drop" />
+            <Canvas
+                Name="addIslandCanvas" />
         </Canvas>
     </Grid>
 </UserControl>

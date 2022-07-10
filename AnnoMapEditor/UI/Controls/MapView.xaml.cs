@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,6 +11,15 @@ using System.Windows.Shapes;
 
 namespace AnnoMapEditor.UI.Controls
 {
+    public static class CanvasExtensions
+    {
+        public static void SetPosition(this UIElement that, Vector2 position)
+        {
+            Canvas.SetLeft(that, position.X);
+            Canvas.SetTop(that, position.Y);
+        }
+    }
+
     public partial class MapView : UserControl
     {
         Session? session;
@@ -95,7 +105,7 @@ namespace AnnoMapEditor.UI.Controls
                 Height = session.PlayableArea.Height
             };
             Canvas.SetLeft(playableArea, session.PlayableArea.X);
-            Canvas.SetTop(playableArea, session.Size.Y - session.PlayableArea.Height - session.PlayableArea.Y);
+            Canvas.SetTop(playableArea, session.Size.Y - session.PlayableArea.Height - session.PlayableArea.Y - 1);
             sessionCanvas.Children.Add(playableArea);
 
             double requiredScaleX = sessionCanvas.ActualWidth / session.Size.X;
@@ -104,6 +114,7 @@ namespace AnnoMapEditor.UI.Controls
             sessionCanvas.RenderTransform = new ScaleTransform(scale, scale);
             //sessionCanvas.Scale = new Vector3(scale, scale, 1);
 
+            // add session islands
             var islands = session.Islands.Where(x => !x.Hide);
             foreach (var island in islands)
             {
@@ -114,7 +125,42 @@ namespace AnnoMapEditor.UI.Controls
                 sessionCanvas.Children.Add(obj);
             }
 
+            // create add islands
+            CreateAddIsland(IslandSize.Small, IslandType.PirateIsland);
+            CreateAddIsland(IslandSize.Small, IslandType.ThirdParty);
+            CreateAddIsland(IslandSize.Small, IslandType.Normal);
+            CreateAddIsland(IslandSize.Medium, IslandType.Normal);
+            CreateAddIsland(IslandSize.Large, IslandType.Normal);
+
             UpdateSize();
+        }
+
+        private void CreateAddIsland(IslandSize size, IslandType type)
+        {
+            if (session is null) return;
+
+            int islandLength = IslandSize.Small.InTiles * 2 + 10 +
+                    IslandSize.Medium.InTiles + 25 +
+                    IslandSize.Large.InTiles + 25;
+            int offset = Math.Max(250, (session.Size.Y - islandLength) / 2);
+
+            Action<int, int> add = (x, y) => _ = sessionCanvas.Children.Add(new MapObject(session, this)
+            {
+                DataContext = Island.Create(size, type, session.Size + new Vector2(x, y))
+            });
+
+            // pirate & 3rd party
+            if (size == IslandSize.Small && type == IslandType.PirateIsland)
+                add(20, -offset - IslandSize.Small.InTiles);
+            else if (size == IslandSize.Small && type == IslandType.ThirdParty)
+                add(40 + IslandSize.Small.InTiles, -offset - 10 - IslandSize.Small.InTiles * 2);
+            // player islands
+            else if (size == IslandSize.Small && type == IslandType.Normal)
+                add(20, -offset - 10 - IslandSize.Small.InTiles * 2);
+            else if (size == IslandSize.Large && type == IslandType.Normal)
+                add(20, -offset - 35 - IslandSize.Small.InTiles * 2 - IslandSize.Large.InTiles);
+            else if (size == IslandSize.Medium && type == IslandType.Normal)
+                add(20, -offset - 60 - IslandSize.Small.InTiles * 2 - IslandSize.Medium.InTiles - IslandSize.Large.InTiles);
         }
 
         void UpdateSize()
@@ -137,34 +183,28 @@ namespace AnnoMapEditor.UI.Controls
 
         private void sessionCanvas_Drop(object sender, DragEventArgs e)
         {
-            MapObject? _island = e.Data?.GetData(typeof(MapObject)) as MapObject;
-            if (_island is null) return;
+            if (e.Data?.GetData(typeof(MapObject)) is not MapObject mapObject) return;
 
-            Point position = e.GetPosition(sessionCanvas);
-            MoveMapObject(_island, position.X - _island.MouseOffset.X, position.Y - _island.MouseOffset.Y);
-
+            Vector2 position = new (e.GetPosition(sessionCanvas));
+            MoveMapObject(mapObject, position - mapObject.MouseOffset);
         }
 
-        private void MoveMapObject(MapObject _island, double x, double y)
+        private void MoveMapObject(MapObject mapObject, Vector2 position)
         {
-            if (session is null) return;
+            if (session is null || mapObject.DataContext is not Island island) return;
 
-            //Rect2 area = session.PlayableArea;
-            var minX = 0;
-            var maxX = session.Size.X - _island.Height;
-            var minY = 0;
-            var maxY = session.Size.Y - _island.Width;
+            var mapArea = new Rect2(session.Size - island.SizeInTiles + Vector2.Tile);
+            var ensured = island.IsNew ? position : position.Clamp(mapArea);
 
-            var ensuredX = (int)Math.Clamp(x, minX, maxX);
-            var ensuredY = (int)Math.Clamp(y, minY, maxY);
-
-            if (_island.DataContext is Island island)
+            if (island.IsNew && position.Within(mapArea))
             {
-                island.Position = new MapTemplates.Vector2(ensuredX, session.Size.Y - ensuredY - island.SizeInTiles);
-
-                Canvas.SetLeft(_island, island.Position.X);
-                Canvas.SetTop(_island, session.Size.Y - island.Position.Y - island.SizeInTiles);
+                // convert add island to real island when entering session area
+                session.AddIsland(island);
+                CreateAddIsland(island.Size, island.Type);
             }
+
+            island.Position = ensured.FlipY(session.Size.Y - island.SizeInTiles);
+            mapObject.SetPosition(ensured);
         }
     }
 }

@@ -25,9 +25,11 @@
             <StackPanel Grid.Column="0"
                         VerticalAlignment="Top"
                         Margin="16,8">
-                <TextBlock Style="{StaticResource HeaderLabelStyle}"
-                           Text="Session"
-                           Margin="0,0,0,4" />
+                <TextBlock
+                    Style="{StaticResource HeaderLabelStyle}"
+                    HorizontalAlignment="Left"
+                    Text="Session"
+                    Margin="0,0,0,4" />
                 <StackPanel Margin="0,0,0,4" VerticalAlignment="Top" Orientation="Horizontal">
                     <controls:DropDownButton HorizontalAlignment="Left">
                         <ContentControl Content="Open" />
