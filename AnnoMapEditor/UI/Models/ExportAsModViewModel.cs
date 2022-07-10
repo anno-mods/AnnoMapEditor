@@ -7,30 +7,56 @@ namespace AnnoMapEditor.UI.Models
 {
     public class ExportAsModViewModel : ViewModelBase
     {
-        public MapTemplates.Session? Session { get; set; }
+        enum ModStatus
+        {
+            NotFound,
+            Active,
+            Inactive
+        }
+
+        public MapTemplates.Session? Session
+        { 
+            get => _session;
+            set
+            {
+                _session = value;
+                CheckExistingMod();
+            }
+        }
+        MapTemplates.Session? _session;
 
         public string ModName
         {
             get => _modName;
-            set => SetProperty(ref _modName, value, new string[] { nameof(CanExport), nameof(ResultingModName), nameof(ModExistsWarning) });
+            set
+            {
+                SetProperty(ref _modName, value);
+                CheckExistingMod();
+            }
         }
-        private string _modName = "";
+        private string _modName = string.Empty;
 
-        public string ResultingModName => _modName.Trim() == string.Empty ? $"Custom {_mapType}" : _modName;
+        public string ResultingModName { get; private set; } = string.Empty;
+        public string ResultingFullModName { get; private set; } = string.Empty;
+
         public bool CanExport => true;
-        public string ModExistsWarning => ModExists(ResultingModName) ? $"Replace existing \"[Map] {ResultingModName}\"" : "";
+        public string ModExistsWarning { get; private set; } = string.Empty;
 
         public string ModID
         {
             get => _modID;
             set => SetProperty(ref _modID, value);
         }
-        private string _modID = "";
+        private string _modID = string.Empty;
 
         public Mods.MapType SelectedMapType
         {
             get => _mapType;
-            set => SetProperty(ref _mapType, value, new string[] { nameof(ResultingModName), nameof(ModExistsWarning) });
+            set
+            {
+                SetProperty(ref _mapType, value);
+                CheckExistingMod();
+            }
         }
         private Mods.MapType _mapType = Mods.MapType.Archipelago;
 
@@ -41,13 +67,41 @@ namespace AnnoMapEditor.UI.Models
         }
         private IEnumerable<Mods.MapType> _allowedMapTypes = Mods.MapType.GetOldWorldTypes();
 
-        private static bool ModExists(string modName)
+        public ExportAsModViewModel()
+        {
+            Settings.Instance.PropertyChanged += Settings_PropertyChanged;
+        }
+
+        private void Settings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Settings.DataPath))
+                CheckExistingMod();
+        }
+
+        private void CheckExistingMod()
+        {
+            ResultingModName = (_modName.Trim() == string.Empty ? $"Custom {_mapType}" : _modName);
+            string modName = "[Map] " + ResultingModName;
+            ModStatus status = ModExists(modName);
+            if (status == ModStatus.Inactive)
+                modName = "-" + modName;
+            ResultingFullModName = modName;
+            ModExistsWarning = status != ModStatus.NotFound ? $"Replace existing \"{ResultingFullModName}\"" : "";
+            OnPropertyChanged(nameof(ResultingModName));
+            OnPropertyChanged(nameof(ModExistsWarning));
+        }
+
+        private static ModStatus ModExists(string modName)
         {
             if (Settings.Instance.DataPath is null)
-                return false;
+                return ModStatus.NotFound;
 
-            string modPath = Path.Combine(Settings.Instance.DataPath, "mods", "[Map] " + modName);
-            return Directory.Exists(modPath);
+            string activeModPath = Path.Combine(Settings.Instance.DataPath, "mods", modName);
+            if (Directory.Exists(activeModPath))
+                return ModStatus.Active;
+
+            string inactiveModPath = Path.Combine(Settings.Instance.DataPath, "mods", "-" + modName);
+            return Directory.Exists(inactiveModPath) ? ModStatus.Inactive : ModStatus.NotFound;
         }
 
         public async Task<bool> Save()
@@ -66,7 +120,9 @@ namespace AnnoMapEditor.UI.Models
             {
                 MapType = SelectedMapType
             };
-            return await mod.Save(modsFolderPath, ResultingModName, ModID);
+
+            CheckExistingMod();
+            return await mod.Save(Path.Combine(modsFolderPath, ResultingFullModName), ResultingModName, ModID);
         }
     }
 }

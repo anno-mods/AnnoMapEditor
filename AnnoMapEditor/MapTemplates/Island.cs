@@ -32,12 +32,14 @@ namespace AnnoMapEditor.MapTemplates
         public string? MapPath { get; set; }
         public int MapSizeInTiles { get; private set; }
         public string? AssumedMapPath { get; private set; }
-        public bool IsPool => string.IsNullOrEmpty(MapPath);
+        public bool IsPool => ElementType != 2 && string.IsNullOrEmpty(MapPath);
         public string? Label { get; set; }
+
+        public bool IsNew => template is null;
 
         private static readonly Random rnd = new((int)DateTime.Now.Ticks);
 
-        private Serializing.A7tinfo.TemplateElement template;
+        private Serializing.A7tinfo.TemplateElement? template;
 
         private Region Region { get; }
 
@@ -47,7 +49,6 @@ namespace AnnoMapEditor.MapTemplates
         private Island(Region region)
         {
             Region = region;
-            template = new Serializing.A7tinfo.TemplateElement();
         }
 
         public async Task<Island> CloneAsync()
@@ -87,11 +88,33 @@ namespace AnnoMapEditor.MapTemplates
             return island;
         }
 
-        public Serializing.A7tinfo.TemplateElement ToTemplate()
+        public static Island Create(IslandSize size, IslandType type, Vector2 position)
         {
-            if (template.Element is null)
+            var island = new Island(Region.Moderate)
+            {
+                ElementType = 1,
+                Position = position,
+                Size = size,
+                Type = type
+            };
+            return island;
+        }
+
+        public void CreateTemplate()
+        {
+            template = new Serializing.A7tinfo.TemplateElement
+            {
+                Element = new Serializing.A7tinfo.Element()
+            };
+            IslandChanged?.Invoke();
+        }
+
+        public Serializing.A7tinfo.TemplateElement? ToTemplate()
+        {
+            if (template?.Element is null)
                 return template;
 
+            template.ElementType = ElementType;
             template.Element.Position = new int[] { Position.X, Position.Y };
             template.Element.Size = Size.ElementValue;
             if (IsPool)
@@ -138,7 +161,7 @@ namespace AnnoMapEditor.MapTemplates
         {
             if (ElementType == 2)
             {
-                MapSizeInTiles = 1;
+                MapSizeInTiles = Vector2.Tile.X;
                 return;
             }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,19 +11,23 @@ namespace AnnoMapEditor.MapTemplates
 {
     public class Session
     {
-        public List<Island> Islands { get; private set; }
+        public IReadOnlyList<Island> Islands => _islands;
+        private List<Island> _islands;
+
         public Vector2 Size { get; private set; }
         public Rect2 PlayableArea { get; private set; }
         public Region Region { get; set; }
 
         private Serializing.A7tinfo.MapTemplateDocument template;
 
+        public event NotifyCollectionChangedEventHandler? IslandCollectionChanged;
+
         public string MapSizeText => $"Size: {Size.X}, Playable: {PlayableArea.Width}";
 
         public Session()
         {
             Size = new Vector2(0, 0);
-            Islands = new List<Island>();
+            _islands = new List<Island>();
             template = new Serializing.A7tinfo.MapTemplateDocument();
         }
 
@@ -77,7 +82,7 @@ namespace AnnoMapEditor.MapTemplates
             Session session = new()
             {
                 Region = region,
-                Islands = new List<Island>(await Task.WhenAll(islands)),
+                _islands = new List<Island>(await Task.WhenAll(islands)),
                 Size = new Vector2(document.MapTemplate?.Size),
                 PlayableArea = new Rect2(document.MapTemplate?.PlayableArea),
                 template = document
@@ -112,7 +117,7 @@ namespace AnnoMapEditor.MapTemplates
 
             return new Serializing.A7tinfo.MapTemplateDocumentExport()
             {
-                MapTemplate = new Serializing.A7tinfo.MapTemplateExport(template.MapTemplate, Islands.Select(x => x.ToTemplate()))
+                MapTemplate = new Serializing.A7tinfo.MapTemplateExport(template.MapTemplate, Islands.Select(x => x.ToTemplate()).Where(x => x is not null)!)
             };
         }
 
@@ -139,6 +144,20 @@ namespace AnnoMapEditor.MapTemplates
             using Stream file = File.OpenWrite(filePath);
             file.SetLength(0); // clear
             await Serializer.WriteAsync(export, file);
+        }
+
+        public void AddIsland(Island island)
+        {
+            island.CreateTemplate();
+            _islands.Add(island);
+            Task.Run(async () => await island.InitAsync(Region));
+            IslandCollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        public void RemoveIsland(Island island)
+        {
+            _islands.Remove(island);
+            IslandCollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
     }
 }
