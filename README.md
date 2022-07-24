@@ -9,8 +9,9 @@ Anno is a trademark of Ubisoft GmbH in the US and/or other countries.
 
 ## Setup
 
-You need to install [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) to run the application.
-It should prompt you to download it.
+You need to install [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0/runtime?cid=getdotnetcore) to run the application.
+If you don't have it yet it will prompt you to download it.
+Select "Run desktop apps, Download x64".
 
 Once started, the editor will detect your game path automatically.
 If it didn't find it, you'll need to set the path manually to your game or a folder with all RDA `data/` extracted.
