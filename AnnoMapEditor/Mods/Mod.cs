@@ -131,20 +131,25 @@ namespace AnnoMapEditor.Mods
 
         private async Task WriteLanguageXml(string modPath, string name, string guid)
         {
-            string languageXmlPath = Path.Combine(modPath, @"data\config\gui\texts_english.xml");
-            string? languageXmlDir = Path.GetDirectoryName(languageXmlPath);
-            if (languageXmlDir is not null)
-                Directory.CreateDirectory(languageXmlDir);
+            string[] languages = new string[] { "chinese", "english", "french", "german", "italian", "japanese", "korean", "polish", "russian", "spanish", "taiwanese" };
 
-            string content = 
-                $"<ModOps>\n" +
-                $"  <ModOp Type=\"replace\" Path=\"//TextExport/Texts/Text[GUID='{guid}']/Text\">\n" +
-                $"    <Text>{name}</Text>\n" +
-                $"  </ModOp>\n" +
-                $"</ModOps>\n";
+            foreach (var language in languages)
+            {
+                string languageXmlPath = Path.Combine(modPath, $@"data\config\gui\texts_{language}.xml");
+                string? languageXmlDir = Path.GetDirectoryName(languageXmlPath);
+                if (languageXmlDir is not null)
+                    Directory.CreateDirectory(languageXmlDir);
 
-            using StreamWriter writer = new(File.Create(languageXmlPath));
-            await writer.WriteAsync(content);
+                string content =
+                    $"<ModOps>\n" +
+                    $"  <ModOp Type=\"replace\" Path=\"//TextExport/Texts/Text[GUID='{guid}']/Text\">\n" +
+                    $"    <Text>{name}</Text>\n" +
+                    $"  </ModOp>\n" +
+                    $"</ModOps>\n";
+
+                using StreamWriter writer = new(File.Create(languageXmlPath));
+                await writer.WriteAsync(content);
+            }
         }
 
         private async Task WriteAssetsXml(string modPath, string fullModName, string mapFilePath, MapType mapType)
