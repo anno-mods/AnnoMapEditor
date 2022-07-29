@@ -112,7 +112,7 @@ namespace AnnoMapEditor.Mods
                     ModName = new(modName),
                     Category = new("Map"),
                     Description = new($"Select Map Type '{modName}' to play this map.\n" +
-                    $"World and  island sizes are fixed.\n" +
+                    $"World and island sizes are fixed.\n" +
                     $"\n" +
                     $"Note:\n" +
                     $"- Do not rename the mod folder. It will lead to a loading screen freeze.\n" +
