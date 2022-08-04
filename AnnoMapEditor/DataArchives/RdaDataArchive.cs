@@ -60,8 +60,8 @@ namespace AnnoMapEditor.DataArchives
                     .Where(x => System.IO.Path.GetFileName(x).StartsWith("data") && 
                         !x.EndsWith("data0.rda") && !x.EndsWith("data1.rda") && !x.EndsWith("data2.rda") && !x.EndsWith("data3.rda") && 
                         !x.EndsWith("data4.rda") && !x.EndsWith("data7.rda") && !x.EndsWith("data8.rda") && !x.EndsWith("data9.rda"))
-                    // load highest numbers first
-                    .Reverse();
+                    // load highest numbers last to overwrite lower numbers
+                    .OrderBy(x => int.TryParse(System.IO.Path.GetFileNameWithoutExtension(x)["data".Length..], out int result) ? result : 0);
                 readers = archives.Select(x =>
                 {
                     try
