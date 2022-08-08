@@ -87,7 +87,7 @@ namespace AnnoMapEditor.DataArchives
                 if (readers.Length == 0)
                 {
                     Log.Warn($"No .rda files found at {System.IO.Path.Combine(Path, "maindata")}");
-                    MessageBox.Show($"Something went wrong opening the RDA files.\n\nDo you another Editor or the RDAExplorer open by any chance?\n\nLog file: {Log.LogFilePath}", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    MessageBox.Show($"Something went wrong opening the RDA files.\n\nDo you have another Editor or the RDAExplorer open by any chance?\n\nLog file: {Log.LogFilePath}", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 }
             });
         }
