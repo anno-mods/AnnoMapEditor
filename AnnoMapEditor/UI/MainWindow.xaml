@@ -81,5 +81,6 @@
             </TextBlock>
         </Grid>
         <local:ExportAsMod x:Name="exportDialog" Grid.Column="0" />
+        <local:CreateNewMap x:Name="newMapDialog" Grid.Column="0" />
     </Grid>
 </Window>

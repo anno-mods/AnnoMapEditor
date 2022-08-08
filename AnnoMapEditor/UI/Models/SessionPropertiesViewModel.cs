@@ -22,10 +22,18 @@ namespace AnnoMapEditor.UI.Models
                     _selectedRegion = value;
                     _session.Region = value;
                     _ = _session.UpdateAsync();
+                    OnSelectedRegionChanged();
                 }
             }
         }
         private Region _selectedRegion;
+
+        public event EventHandler? SelectedRegionChanged;
+
+        private void OnSelectedRegionChanged()
+        {
+            SelectedRegionChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         public Region[] Regions { get; } = Region.All;
 

@@ -98,6 +98,42 @@ namespace AnnoMapEditor.MapTemplates
             return session;
         }
 
+        public static Session? FromNewMapDimensions(int mapSize, int playableSize, Region region)
+        {
+            int margin = (mapSize - playableSize) / 2;
+
+            List<Island> startingSpots = Island.CreateNewStartingSpots(playableSize, margin, region);
+
+            Serializing.A7tinfo.MapTemplateDocument createdTemplateDoc = new Serializing.A7tinfo.MapTemplateDocument()
+            {
+                MapTemplate = new Serializing.A7tinfo.MapTemplate()
+                {
+                    Size = new int[] { mapSize, mapSize },
+                    PlayableArea = new int[] { margin, margin, playableSize + margin, playableSize + margin },
+                    ElementCount = 4
+                }
+            };
+
+            Session session = new()
+            {
+                Region = region,
+                _islands = new List<Island>(),
+                Size = new Vector2(createdTemplateDoc.MapTemplate.Size),
+                PlayableArea = new Rect2(createdTemplateDoc.MapTemplate.PlayableArea),
+                template = createdTemplateDoc
+            };
+
+            foreach (Island s in startingSpots)
+            {
+                session.AddIsland(s);
+            }
+
+            if (session.Size.X == 0)
+                return null;
+
+            return session;
+        }
+
         public async Task UpdateExternalDataAsync()
         {
             foreach (var island in Islands)
