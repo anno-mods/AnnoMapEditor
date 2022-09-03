@@ -123,6 +123,13 @@ namespace AnnoMapEditor.UI.Controls
             base.OnMouseLeftButtonUp(e);
         }
 
+        protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
+        {
+            if (isSelected)
+                e.Handled = true;
+            base.OnMouseRightButtonDown(e);
+        }
+
         protected override void OnMouseMove(MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && isSelected)
