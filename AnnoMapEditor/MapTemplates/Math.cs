@@ -87,9 +87,14 @@ namespace AnnoMapEditor.MapTemplates
             return new Vector2(Math.Clamp(X, min.X, max.X), Math.Clamp(Y, min.Y, max.Y));
         }
 
-        public Vector2 FlipY(int sessionSize)
+        public Vector2 FlipY(int sessionSizeY)
         {
-            return new Vector2(X, sessionSize - Y - 8);
+            return new Vector2(X, sessionSizeY - Y);
+        }
+
+        public Vector2 FlipYItem(int sessionSizeY, int itemSizeY)
+        {
+            return new Vector2(X, sessionSizeY - itemSizeY - Y);
         }
 
         public bool Within(Rect2 area)
