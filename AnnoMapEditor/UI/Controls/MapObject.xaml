@@ -24,6 +24,19 @@
             </Border.RenderTransform>
             <TextBlock Foreground="White"  Name="title" FontSize="50" TextAlignment="Center" />
         </Border>
+        <Border Name="startPosition"
+                Grid.Column="0"
+                Width="64"
+                Height="64"
+                CornerRadius="32"
+                Background="#ffff00"
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                RenderTransformOrigin=".5,.5">
+            <Border.RenderTransform>
+                <RotateTransform Angle="45" />
+            </Border.RenderTransform>
+            <TextBlock Foreground="Black" Name="startNumber" FontSize="50" TextAlignment="Center" />
+        </Border>
 
         <Grid
             x:Name="crossOut"

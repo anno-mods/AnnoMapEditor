@@ -42,6 +42,7 @@ namespace AnnoMapEditor.MapTemplates
         private Serializing.A7tinfo.TemplateElement? template;
 
         private Region Region { get; }
+        public int Counter { get; set; }
 
         public delegate void IslandChangedHandler();
         public event IslandChangedHandler? IslandChanged;
