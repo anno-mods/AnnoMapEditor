@@ -108,7 +108,7 @@ namespace AnnoMapEditor.UI
             parentMenu.Items.Add(openFile);
             parentMenu.Items.Add(new Separator());
 
-            MenuItem newFile = new() { Header = "New Map file..." };
+            MenuItem newFile = new() { Header = "New Map file" };
             newFile.Click += NewMapFile_Click;
             parentMenu.Items.Add(newFile);
             parentMenu.Items.Add(new Separator());
@@ -173,15 +173,7 @@ namespace AnnoMapEditor.UI
 
         private void NewMapFile_Click(object sender, RoutedEventArgs e)
         {
-            newMapDialog.CreateNewMapEvent += CreateNewMapTemplate;
-            newMapDialog.Show();
-        }
-
-        private void CreateNewMapTemplate(object? sender, CreateNewMapEventArgs newMapArgs)
-        {
-            newMapDialog.CreateNewMapEvent -= CreateNewMapTemplate;
-
-            ViewModel.CreateNewMap(newMapArgs.MapSize, newMapArgs.PlayableSize);
+            ViewModel.CreateNewMap();
         }
 
         private void Hyperlink_OpenBrowser(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)

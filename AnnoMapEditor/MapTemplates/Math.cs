@@ -62,6 +62,12 @@ namespace AnnoMapEditor.MapTemplates
             Y = (int)point.Y;
         }
 
+        public Vector2(Vector2 vector2)
+        {
+            X = vector2.X;
+            Y = vector2.Y;
+        }
+
         public static Vector2 operator + (Vector2 a, Vector2 b)
         {
             return new Vector2(a.X + b.X, a.Y + b.Y);

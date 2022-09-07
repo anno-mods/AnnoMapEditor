@@ -42,7 +42,7 @@ namespace AnnoMapEditor.DataArchives
 
         private RDAReader[]? readers;
 
-        readonly Dictionary<string, RDAFile> allFiles = new();
+        Dictionary<string, RDAFile> allFiles { get; } = new();
 
         public RdaDataArchive(string folderPath)
         {

@@ -62,13 +62,13 @@ namespace AnnoMapEditor.UI.Models
                     SetProperty(ref _session, value, new string[] { nameof(CanExport) });
                     SelectedIsland = null;
 
-                    if(SessionProperties != null) 
+                    if(SessionProperties is not null) 
                         SessionProperties.SelectedRegionChanged -= SelectedRegionChanged;
 
                     SessionProperties = value is null ? null : new(value);
                     OnPropertyChanged(nameof(SessionProperties));
 
-                    if(SessionProperties != null)
+                    if(SessionProperties is not null)
                         SessionProperties.SelectedRegionChanged += SelectedRegionChanged;
 
                     SessionChecker = value is null ? null : new(value);
@@ -166,11 +166,14 @@ namespace AnnoMapEditor.UI.Models
             UpdateExportStatus();
         }
 
-        public void CreateNewMap(int mapSize, int playableSize)
+        public void CreateNewMap()
         {
+            const int DEFAULT_MAP_SIZE = 2560;
+            const int DEFAULT_PLAYABLE_SIZE = 2160;
+
             SessionFilePath = null;
 
-            Session = Session.FromNewMapDimensions(mapSize, playableSize, Region.Moderate);
+            Session = Session.FromNewMapDimensions(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, Region.Moderate);
 
             UpdateExportStatus();
         }
