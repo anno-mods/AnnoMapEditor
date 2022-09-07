@@ -2,8 +2,9 @@
 using System.IO;
 using System.Text;
 
-namespace AnnoMapEditor.Mods.FileCreation
+namespace AnnoMapEditor.MapTemplates.Serializing.A7t.FileCreation
 {
+    [Obsolete("This class is part of a fully custom a7t XML Exporter. It will be replaced with an Implementation based on FileDBSerializer as soon as possible.")]
     internal abstract class XMLCreatorBase
     {
         public abstract XMLItem MakeXML();

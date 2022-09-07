@@ -25,10 +25,6 @@ namespace AnnoMapEditor.MapTemplates.Serializing.A7tinfo
         public TemplateElement[]? TemplateElement { get; set; }
     }
 
-    public class Empty
-    {
-    }
-
     public class TemplateElement
     {
         public int? ElementType { get; set; }

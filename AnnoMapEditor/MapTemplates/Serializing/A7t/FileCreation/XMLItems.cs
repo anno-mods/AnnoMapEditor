@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace AnnoMapEditor.Mods.FileCreation
+namespace AnnoMapEditor.MapTemplates.Serializing.A7t.FileCreation
 {
+    [Obsolete("This class is part of a fully custom a7t XML Exporter. It will be replaced with an Implementation based on FileDBSerializer as soon as possible.")]
     internal abstract class XMLItem
     {
         public XMLItem(string name, int indentationDepth, bool trailingNewline = true)
@@ -34,6 +35,7 @@ namespace AnnoMapEditor.Mods.FileCreation
         public abstract void WriteToStream(StreamWriter stream);
     }
 
+    [Obsolete("This class is part of a fully custom a7t XML Exporter. It will be replaced with an Implementation based on FileDBSerializer as soon as possible.")]
     internal class XMLSection : XMLItem
     {
         public XMLSection(string name, int indentationDepth, bool trailingNewline = true) : base(name, indentationDepth, trailingNewline)
@@ -93,6 +95,7 @@ namespace AnnoMapEditor.Mods.FileCreation
         }
     }
 
+    [Obsolete("This class is part of a fully custom a7t XML Exporter. It will be replaced with an Implementation based on FileDBSerializer as soon as possible.")]
     internal class XMLValueEntry : XMLItem
     {
         public XMLValueEntry(string name, int indentationDepth, string? value) : base(name, indentationDepth)
@@ -127,6 +130,7 @@ namespace AnnoMapEditor.Mods.FileCreation
         }
     }
 
+    [Obsolete("This class is part of a fully custom a7t XML Exporter. It will be replaced with an Implementation based on FileDBSerializer as soon as possible.")]
     internal class XMLActionEntry : XMLItem
     {
         public XMLActionEntry(string name, int indentationDepth, XMLEntryContent value) : base(name, indentationDepth)
@@ -154,6 +158,7 @@ namespace AnnoMapEditor.Mods.FileCreation
         }
     }
 
+    [Obsolete("This class is part of a fully custom a7t XML Exporter. It will be replaced with an Implementation based on FileDBSerializer as soon as possible.")]
     internal class XMLEntryContent
     {
         public XMLEntryContent(Func<string> stringMaker) : this(stringMaker, 1)

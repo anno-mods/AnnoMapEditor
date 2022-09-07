@@ -1,13 +1,13 @@
 ﻿using AnnoMapEditor.MapTemplates;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Linq;
-using AnnoMapEditor.Mods.FileCreation;
+using AnnoMapEditor.MapTemplates.Serializing.A7te;
+using AnnoMapEditor.MapTemplates.Serializing.A7t;
 
 /*
  * Modloader doesn't support a7t because they are loaded as .rda archive.
@@ -78,13 +78,13 @@ namespace AnnoMapEditor.Mods
                 string basePath = Path.Combine(modPath, $"{mapFilePath}");
                 await session.SaveAsync(basePath + $"_{size}.a7tinfo");
 
-                A7TCreator a7t = new A7TCreator(session.Size.X, session.PlayableArea.Width);
+                //a7t Creation
                 string a7tPath = basePath + $"_{size}.a7t";
-                await Task.Run(() => a7t.CreateA7T(a7tPath));
+                await Task.Run(() => new A7tExporter(session.Size.X, session.PlayableArea.Width).ExportA7T(a7tPath));
 
-                XMLCreatorA7TE a7te = new XMLCreatorA7TE(session.Size.X);
+                //a7te Creation
                 string a7tePath = basePath + $"_{size}.a7te";
-                await Task.Run(() => a7te.WriteXMLToFile(a7tePath));
+                await Task.Run(() => new A7teExporter(session.Size.X).ExportA7te(a7tePath));
 
                 //copy a7t and a7te to remaining entries
                 for (int i = 1; i<sizes.Length; i++)
@@ -143,7 +143,7 @@ namespace AnnoMapEditor.Mods
             }
 
             using StreamWriter writer = new(File.Create(modinfoPath));
-            await writer.WriteAsync(JsonConvert.SerializeObject(modinfo, Formatting.Indented));
+            await writer.WriteAsync(JsonConvert.SerializeObject(modinfo, Newtonsoft.Json.Formatting.Indented));
         }
 
         private async Task WriteLanguageXml(string modPath, string name, string guid)

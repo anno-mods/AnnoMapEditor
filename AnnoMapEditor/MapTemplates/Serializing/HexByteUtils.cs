@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 
-namespace AnnoMapEditor.Mods.FileCreation
+namespace AnnoMapEditor.MapTemplates.Serializing
 {
     internal static class HexByteUtils
     {
@@ -37,8 +38,8 @@ namespace AnnoMapEditor.Mods.FileCreation
         public static string BoolToHex(bool input)
         {
             if (input)
-                return ByteToHex((byte)1);
-            return ByteToHex((byte)0);
+                return ByteToHex(1);
+            return ByteToHex(0);
         }
 
         public static string FloatToLittleEndianHex(float input)
@@ -72,9 +73,14 @@ namespace AnnoMapEditor.Mods.FileCreation
             return toReverse;
         }
 
-        private static string BytesToContinuousHex(byte[] input)
+        public static string BytesToContinuousHex(byte[] input)
         {
             return BitConverter.ToString(input).Replace("-", string.Empty);
+        }
+
+        public static byte[] ContinuousHexToByteArray(string input)
+        {
+            return Enumerable.Range(0, input.Length / 2).Select(x => Convert.ToByte(input.Substring(x * 2, 2), 16)).ToArray();
         }
     }
 }

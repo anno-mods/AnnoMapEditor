@@ -1,19 +1,23 @@
 ﻿using System;
 using System.Text;
-using static AnnoMapEditor.Mods.FileCreation.HexByteUtils;
+using static AnnoMapEditor.MapTemplates.Serializing.HexByteUtils;
 
-namespace AnnoMapEditor.Mods.FileCreation
+namespace AnnoMapEditor.MapTemplates.Serializing.A7t.FileCreation
 {
+
+    [Obsolete("This class is part of a fully custom a7t XML Exporter. It will be replaced with an Implementation based on FileDBSerializer as soon as possible.")]
     internal class XMLCreatorA7T : XMLCreatorBase
     {
-        public XMLCreatorA7T(int mapSize, int usableArea)
+        public XMLCreatorA7T(int mapSize, int usableArea, byte[] nestedData)
         {
             MapSize = mapSize;
             UsableArea = usableArea;
+            NestedData = nestedData;
         }
 
         private int MapSize { get; }
         private int UsableArea { get; }
+        private byte[] NestedData { get; }
         public override XMLItem MakeXML()
         {
             XMLSection root = new XMLSection("Content", 0, false);
@@ -215,15 +219,9 @@ namespace AnnoMapEditor.Mods.FileCreation
             areaManagerData.AddValueChild("None", Int16ToLittleEndianHex(1));
             var areaManagerDataNoneSection = areaManagerData.AddChildSection("None");
 
-            //TODO Data creation mit extra XML Creation
-            areaManagerDataNoneSection.AddValueChild("ByteCount", Int32ToLittleEndianHex(351));
-            areaManagerDataNoneSection.AddValueChild("Data",
-                "020001800800000000000000000280080000000000000000030000000380000400050006000100048004010000000600000000000000000000000" +
-                "70008000000000009000A00000000000B000A00000000000C000A0000000000000000000B456469746F724F626A656374000C004E617475726550" +
-                "7265736574000B006F626A65637473000A004F626A65637447726F7570436F6C6C656374696F6E0007004F626A65637447726F757073000800466" +
-                "96C74657200060047616D654F626A656374000900526F6F740005005175657565644368616E6765475549440003004F626A65637447726F757046" +
-                "696C746572436F6C6C656374696F6E000400417265614F626A6563744D616E6167657200020004466F6C646572494400048051756575656444656" +
-                "C657465730003804E6F6E47616D654F626A6563744944436F756E74657200028047616D654F626A6563744944436F756E7465720001805E000000");
+            //Vanilla nested data is 351 bytes long
+            areaManagerDataNoneSection.AddValueChild("ByteCount", Int32ToLittleEndianHex(NestedData.Length));
+            areaManagerDataNoneSection.AddValueChild("Data", BytesToContinuousHex(NestedData));
 
 
             return root;

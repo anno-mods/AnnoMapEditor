@@ -30,6 +30,7 @@
   <ItemGroup>
     <None Remove="Assets\maptype.png" />
     <None Remove="MapTemplates\Serializing\A7tinfo\a7tinfo.xml" />
+    <None Remove="MapTemplates\Serializing\A7t\map_Gamedata.xml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\app.ico" />
@@ -38,6 +39,9 @@
     <EmbeddedResource Include="MapTemplates\Serializing\A7tinfo\a7tinfo.xml">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="MapTemplates\Serializing\A7t\map_Gamedata.xml">
+		<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	</EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
