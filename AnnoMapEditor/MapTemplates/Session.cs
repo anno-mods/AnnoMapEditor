@@ -95,6 +95,12 @@ namespace AnnoMapEditor.MapTemplates
             if (session.template.MapTemplate is not null)
                 session.template.MapTemplate.TemplateElement = null;
 
+            // number starting positions
+            int counter = 0;
+            foreach (var island in session.Islands)
+                if (island.ElementType == 2)
+                    island.Counter = counter++;
+
             if (session.Size.X == 0)
                 return null;
 

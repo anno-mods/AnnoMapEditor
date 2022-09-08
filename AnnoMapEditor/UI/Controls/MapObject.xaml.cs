@@ -43,6 +43,7 @@ namespace AnnoMapEditor.UI.Controls
         };
         static readonly SolidColorBrush White = new(Color.FromArgb(255, 255, 255, 255));
         static readonly SolidColorBrush Yellow = new(Color.FromArgb(255, 234, 224, 83));
+        static readonly SolidColorBrush Red = new(Color.FromArgb(255, 234, 83, 83));
         readonly Session session;
         readonly MapView container;
 
@@ -100,6 +101,7 @@ namespace AnnoMapEditor.UI.Controls
         {
             if (borderRectangle is not null && island is not null)
                 borderRectangle.Stroke = MapObjectColors[isSelected ? "Selected" : island.Type.ToString()];
+            startPosition.Background = isSelected ? White : (island?.Counter == 0 ? Yellow : Red);
         }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -159,21 +161,23 @@ namespace AnnoMapEditor.UI.Controls
 
             if (island.ElementType == 2)
             {
-                var circle = new Ellipse()
-                {
-                    Width = 24,
-                    Height = 24,
-                    Fill = Yellow,
-                };
-
-                Canvas.SetLeft(circle, -8);
-                Canvas.SetTop(circle, -8 - 1);
-                canvas.Children.Add(circle);
-
-                Width = 1;
-                Height = 1;
-                this.SetPosition(island.Position.FlipY(session.Size.Y));
+                Width = 64;
+                Height = 64;
+                this.SetPosition((island.Position - new Vector2(32, 32)).FlipY(session.Size.Y));
                 Panel.SetZIndex(this, 100);
+
+                // TODO the order of AIs is odd, may be incorrect?
+                startNumber.Text = island.Counter switch
+                {
+                    0 => "P",
+                    1 => "3",
+                    2 => "1",
+                    3 => "2",
+                    _ => island.Counter.ToString()
+                };
+                startPosition.Background = isSelected ? White : (island?.Counter == 0 ? Yellow : Red);
+                startPosition.Visibility = Visibility.Visible;
+                titleBackground.Visibility = Visibility.Collapsed;
                 return;
             }
             else
@@ -255,6 +259,7 @@ namespace AnnoMapEditor.UI.Controls
                     title.Text = "";
 
                 titleBackground.Visibility = title.Text == "" ? Visibility.Collapsed : Visibility.Visible;
+                startPosition.Visibility = Visibility.Collapsed;
             }
         }
     }
