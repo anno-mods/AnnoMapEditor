@@ -108,6 +108,11 @@ namespace AnnoMapEditor.UI
             parentMenu.Items.Add(openFile);
             parentMenu.Items.Add(new Separator());
 
+            MenuItem newFile = new() { Header = "New Map file" };
+            newFile.Click += NewMapFile_Click;
+            parentMenu.Items.Add(newFile);
+            parentMenu.Items.Add(new Separator());
+
             if (mapGroups is null || mapGroups.Count == 0)
             {
                 parentMenu.Items.Add(new MenuItem() {
@@ -164,6 +169,11 @@ namespace AnnoMapEditor.UI
                 return;
 
             exportDialog.Show(ViewModel.Session);
+        }
+
+        private void NewMapFile_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.CreateNewMap();
         }
 
         private void Hyperlink_OpenBrowser(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)

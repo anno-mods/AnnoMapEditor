@@ -100,6 +100,32 @@ namespace AnnoMapEditor.MapTemplates
             return island;
         }
 
+        public static List<Island> CreateNewStartingSpots(int playableSize, int margin, Region region)
+        {
+            const int SPACING = 32;
+
+            List<Island> starts = new List<Island>()
+            {
+                CreateStartingSpot(region, margin + SPACING, playableSize + margin - SPACING),
+                CreateStartingSpot(region, margin + SPACING, playableSize + margin - 2* SPACING),
+                CreateStartingSpot(region, margin + 2*SPACING, playableSize + margin - SPACING),
+                CreateStartingSpot(region, margin + 2*SPACING, playableSize + margin - 2*SPACING),
+            };
+
+            return starts;
+
+
+        }
+
+        private static Island CreateStartingSpot(Region region, int x, int y)
+        {
+            return new Island(region)
+            {
+                ElementType = 2,
+                Position = new Vector2(x, y)
+            };
+        }
+
         public void CreateTemplate()
         {
             template = new Serializing.A7tinfo.TemplateElement

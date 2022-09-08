@@ -1,5 +1,6 @@
 ﻿using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.MapTemplates;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -60,8 +61,16 @@ namespace AnnoMapEditor.UI.Models
                 {
                     SetProperty(ref _session, value, new string[] { nameof(CanExport) });
                     SelectedIsland = null;
+
+                    if(SessionProperties is not null) 
+                        SessionProperties.SelectedRegionChanged -= SelectedRegionChanged;
+
                     SessionProperties = value is null ? null : new(value);
                     OnPropertyChanged(nameof(SessionProperties));
+
+                    if(SessionProperties is not null)
+                        SessionProperties.SelectedRegionChanged += SelectedRegionChanged;
+
                     SessionChecker = value is null ? null : new(value);
                     OnPropertyChanged(nameof(SessionChecker));
                 }
@@ -131,6 +140,11 @@ namespace AnnoMapEditor.UI.Models
             }
         }
 
+        private void SelectedRegionChanged(object? sender, EventArgs _)
+        {
+            UpdateExportStatus();
+        }
+
         public async Task OpenMap(string filePath, bool fromArchive = false)
         {
             SessionFilePath = Path.GetFileName(filePath);
@@ -148,6 +162,18 @@ namespace AnnoMapEditor.UI.Models
                 else
                     Session = await Session.FromXmlAsync(filePath);
             }
+
+            UpdateExportStatus();
+        }
+
+        public void CreateNewMap()
+        {
+            const int DEFAULT_MAP_SIZE = 2560;
+            const int DEFAULT_PLAYABLE_SIZE = 2160;
+
+            SessionFilePath = null;
+
+            Session = Session.FromNewMapDimensions(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, Region.Moderate);
 
             UpdateExportStatus();
         }

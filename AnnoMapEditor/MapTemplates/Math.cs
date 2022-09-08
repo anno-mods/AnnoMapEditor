@@ -62,6 +62,12 @@ namespace AnnoMapEditor.MapTemplates
             Y = (int)point.Y;
         }
 
+        public Vector2(Vector2 vector2)
+        {
+            X = vector2.X;
+            Y = vector2.Y;
+        }
+
         public static Vector2 operator + (Vector2 a, Vector2 b)
         {
             return new Vector2(a.X + b.X, a.Y + b.Y);
@@ -87,9 +93,14 @@ namespace AnnoMapEditor.MapTemplates
             return new Vector2(Math.Clamp(X, min.X, max.X), Math.Clamp(Y, min.Y, max.Y));
         }
 
-        public Vector2 FlipY(int sessionSize)
+        public Vector2 FlipY(int sessionSizeY)
         {
-            return new Vector2(X, sessionSize - Y - 8);
+            return new Vector2(X, sessionSizeY - Y);
+        }
+
+        public Vector2 FlipYItem(int sessionSizeY, int itemSizeY)
+        {
+            return new Vector2(X, sessionSizeY - itemSizeY - Y);
         }
 
         public bool Within(Rect2 area)

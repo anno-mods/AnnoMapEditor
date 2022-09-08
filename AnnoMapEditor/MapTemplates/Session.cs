@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace AnnoMapEditor.MapTemplates
         private Serializing.A7tinfo.MapTemplateDocument template;
 
         public event NotifyCollectionChangedEventHandler? IslandCollectionChanged;
+        public event EventHandler<SessionResizeEventArgs>? MapSizeConfigChanged;
+        public event EventHandler? MapSizeConfigCommitted;
 
         public string MapSizeText => $"Size: {Size.X}, Playable: {PlayableArea.Width}";
 
@@ -98,6 +101,73 @@ namespace AnnoMapEditor.MapTemplates
             return session;
         }
 
+        public static Session? FromNewMapDimensions(int mapSize, int playableSize, Region region)
+        {
+            int margin = (mapSize - playableSize) / 2;
+
+            List<Island> startingSpots = Island.CreateNewStartingSpots(playableSize, margin, region);
+
+            Serializing.A7tinfo.MapTemplateDocument createdTemplateDoc = new Serializing.A7tinfo.MapTemplateDocument()
+            {
+                MapTemplate = new Serializing.A7tinfo.MapTemplate()
+                {
+                    Size = new int[] { mapSize, mapSize },
+                    PlayableArea = new int[] { margin, margin, playableSize + margin, playableSize + margin },
+                    ElementCount = 4
+                }
+            };
+
+            Session session = new()
+            {
+                Region = region,
+                _islands = new List<Island>(),
+                Size = new Vector2(createdTemplateDoc.MapTemplate.Size),
+                PlayableArea = new Rect2(createdTemplateDoc.MapTemplate.PlayableArea),
+                template = createdTemplateDoc
+            };
+
+            foreach (Island s in startingSpots)
+            {
+                session.AddIsland(s);
+            }
+
+            if (session.Size.X == 0)
+                return null;
+
+            return session;
+        }
+
+        public void ResizeSession(int mapSize, int playableSize)
+        {
+            int margin = (mapSize - playableSize) / 2;
+
+            Vector2 oldMapSize = new Vector2(Size);
+            Size = new Vector2(mapSize, mapSize);
+
+            Vector2 oldPlayableSize = new Vector2(PlayableArea.Width, PlayableArea.Height);
+            PlayableArea = new Rect2(new int[] { margin, margin, playableSize + margin, playableSize + margin });
+
+            MapSizeConfigChanged?.Invoke(this, new SessionResizeEventArgs(oldMapSize, oldPlayableSize));
+        }
+
+        public void ResizeAndCommitSession(int mapSize, int playableSize)
+        {
+            int margin = (mapSize - playableSize) / 2;
+
+            //Commit means write to template
+            template.MapTemplate.Size = new int[] { mapSize, mapSize };
+            template.MapTemplate.PlayableArea = new int[] { margin, margin, playableSize + margin, playableSize + margin };
+
+            Vector2 oldMapSize = new Vector2(Size);
+            Size = new Vector2(template.MapTemplate.Size);
+
+            Vector2 oldPlayableSize = new Vector2(PlayableArea.Width, PlayableArea.Height);
+            PlayableArea = new Rect2(template.MapTemplate.PlayableArea);
+
+            MapSizeConfigChanged?.Invoke(this, new SessionResizeEventArgs(oldMapSize, oldPlayableSize));
+            MapSizeConfigCommitted?.Invoke(this, new EventArgs());
+        }
+
         public async Task UpdateExternalDataAsync()
         {
             foreach (var island in Islands)
@@ -158,6 +228,18 @@ namespace AnnoMapEditor.MapTemplates
         {
             _islands.Remove(island);
             IslandCollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        public class SessionResizeEventArgs : EventArgs
+        {
+            public SessionResizeEventArgs(Vector2 oldMapSize, Vector2 oldPlayableSize)
+            {
+                OldMapSize = new Vector2(oldMapSize);
+                OldPlayableSize = new Vector2(oldPlayableSize);
+            }
+
+            public Vector2 OldMapSize { get; }
+            public Vector2 OldPlayableSize { get; }
         }
     }
 }

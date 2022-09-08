@@ -1,12 +1,13 @@
 ﻿using AnnoMapEditor.MapTemplates;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Linq;
+using AnnoMapEditor.MapTemplates.Serializing.A7te;
+using AnnoMapEditor.MapTemplates.Serializing.A7t;
 
 /*
  * Modloader doesn't support a7t because they are loaded as .rda archive.
@@ -39,8 +40,7 @@ namespace AnnoMapEditor.Mods
             if (session is null)
                 return false;
 
-            string? sizeSourceMapName = ConvertSizeToMapName(session.PlayableArea.Width);
-            if (sizeSourceMapName is null)
+            if (session.Region != Region.Moderate)
                 return false;
 
             return true;
@@ -57,9 +57,10 @@ namespace AnnoMapEditor.Mods
                 if (mapTypeFileName is null || mapTypeGuid is null)
                     throw new Exception("invalid MapType");
 
-                string? sizeSourceMapName = ConvertSizeToMapName(session.PlayableArea.Width);
-                if (sizeSourceMapName is null)
-                    throw new Exception("not supported map size");
+                if(session.Region != Region.Moderate)
+                {
+                    throw new Exception("not supported map region");
+                }
 
                 Utils.TryDeleteDirectory(modPath);
                 Directory.CreateDirectory(modPath);
@@ -71,12 +72,28 @@ namespace AnnoMapEditor.Mods
                 await WriteAssetsXml(modPath, fullModName, mapFilePath, MapType);
 
                 string[] sizes = new[] { "ll", "lm", "ls", "ml", "mm", "ms", "sl", "sm", "ss" };
-                foreach (var size in sizes)
+
+                //Create first entry with custom a7t and a7te
+                string size = sizes[0];
+                string basePath = Path.Combine(modPath, $"{mapFilePath}");
+                await session.SaveAsync(basePath + $"_{size}.a7tinfo");
+
+                //a7t Creation
+                string a7tPath = basePath + $"_{size}.a7t";
+                await Task.Run(() => new A7tExporter(session.Size.X, session.PlayableArea.Width).ExportA7T(a7tPath));
+
+                //a7te Creation
+                string a7tePath = basePath + $"_{size}.a7te";
+                await Task.Run(() => new A7teExporter(session.Size.X).ExportA7te(a7tePath));
+
+                //copy a7t and a7te to remaining entries
+                for (int i = 1; i<sizes.Length; i++)
                 {
+                    size = sizes[i];
+
                     await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_{size}.a7tinfo"));
-                    string sizeSourceMapPath = $@"data\sessions\maps\pool\moderate\{sizeSourceMapName}\{sizeSourceMapName}.a7t";
-                    await CopyFromArchive(modPath, $"{sizeSourceMapPath}e", $"{mapFilePath}_{size}.a7te");
-                    await CopyFromArchive(modPath, sizeSourceMapPath, $"{mapFilePath}_{size}.a7t");
+                    File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}.a7t");
+                    File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}.a7te");
                 }
             }
             catch (UnauthorizedAccessException)
@@ -126,7 +143,7 @@ namespace AnnoMapEditor.Mods
             }
 
             using StreamWriter writer = new(File.Create(modinfoPath));
-            await writer.WriteAsync(JsonConvert.SerializeObject(modinfo, Formatting.Indented));
+            await writer.WriteAsync(JsonConvert.SerializeObject(modinfo, Newtonsoft.Json.Formatting.Indented));
         }
 
         private async Task WriteLanguageXml(string modPath, string name, string guid)
@@ -189,60 +206,5 @@ namespace AnnoMapEditor.Mods
         }
 
         private static string MakeSafeName(string unsafeName) => new Regex(@"\W").Replace(unsafeName, "_").ToLower();
-
-        private class MapTemplateInfo
-        {
-            public string MapType = "";
-            public string[] Templates = Array.Empty<string>();
-        };
-
-        private static string? ConvertSizeToMapName(int playableSize)
-        {
-            Dictionary<int, string[]> pairs = new()
-            {
-                [2160] = new[] { "moderate_atoll_ll_01", "moderate_atoll_lm_01", "moderate_atoll_ls_01",
-                    "moderate_islandarc_ll_01", "moderate_islandarc_lm_01", "moderate_islandarc_ls_01" },
-                [1656] = new[] { "moderate_archipel_ll_01", "moderate_archipel_lm_01", "moderate_archipel_ls_01",
-                    "moderate_corners_lm_01", "moderate_corners_ll_02", "moderate_corners_ls_01",
-                    "moderate_snowflake_ll_02", "moderate_snowflake_lm_01", "moderate_snowflake_ls_01" },
-                [1648] = new[] { "moderate_atoll_ml_01", "moderate_atoll_mm_01", "moderate_atoll_ms_01",
-                    "moderate_islandarc_ml_01", "moderate_islandarc_mm_01", "moderate_islandarc_ms_01" },
-                [1440] = new[] { "moderate_corners_ml_01" },
-                [1392] = new[] { "moderate_archipel_ml_01" },
-                [1368] = new[] { "moderate_snowflake_mm_01" },
-                [1360] = new[] { "moderate_corners_sl_01", "moderate_snowflake_ml_01" },
-                [1352] = new[] { "moderate_snowflake_sm_01" },
-                [1344] = new[] { "moderate_corners_sm_01" },
-                [1336] = new[] { "moderate_atoll_sl_01", "moderate_atoll_sm_01", "moderate_atoll_ss_01",
-                    "moderate_corners_mm_01", "moderate_corners_ms_01",
-                    "moderate_islandarc_sl_01", "moderate_islandarc_sm_01", "moderate_islandarc_ss_01",
-                    "moderate_snowflake_ms_01" },
-                [1328] = new[] { "moderate_snowflake_sl_01" },
-                [1312] = new[] { "moderate_archipel_mm_01", "moderate_archipel_ms_01" },
-                [1224] = new[] { "moderate_archipel_sm_01" },
-                [1208] = new[] { "moderate_corners_ss_01", "moderate_snowflake_ss_01" },
-                [1200] = new[] { "moderate_archipel_sl_01", "moderate_archipel_ss_01" },
-            };
-
-            string[]? maps = pairs.GetValueOrDefault(playableSize);
-            if (maps is null || maps.Length == 0)
-                return null;
-
-            return maps[0];
-        }
-
-        private async Task CopyFromArchive(string modPath, string sourcePath, string targetPath)
-        {
-            var archive = Settings.Instance.DataArchive;
-            if (archive is null)
-                return;
-
-            using Stream? inStream = archive.OpenRead(sourcePath);
-            if (inStream is not null)
-            {
-                using FileStream outStream = File.Create(Path.Combine(modPath, targetPath));
-                await inStream.CopyToAsync(outStream);
-            }
-        }
     }
 }

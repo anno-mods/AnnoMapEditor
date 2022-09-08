@@ -123,6 +123,13 @@ namespace AnnoMapEditor.UI.Controls
             base.OnMouseLeftButtonUp(e);
         }
 
+        protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
+        {
+            if (isSelected)
+                e.Handled = true;
+            base.OnMouseRightButtonDown(e);
+        }
+
         protected override void OnMouseMove(MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && isSelected)
@@ -173,7 +180,7 @@ namespace AnnoMapEditor.UI.Controls
             {
                 Width = island.SizeInTiles;
                 Height = island.SizeInTiles;
-                this.SetPosition(island.Position.FlipY(session.Size.Y - island.SizeInTiles));
+                this.SetPosition(island.Position.FlipYItem(session.Size.Y, island.SizeInTiles));
                 Panel.SetZIndex(this, ZIndex[island.Type]);
 
                 Image? image;
@@ -221,14 +228,15 @@ namespace AnnoMapEditor.UI.Controls
                 UpdateSelectionBorder();
                 canvas.Children.Add(borderRectangle);
 
+                const int CIRCLE_DIAMETER = 8;
                 var circle = new Ellipse()
                 {
-                    Width = 8, // technically, should be 8 like the stroke but due to visual illusion 10 is better
-                    Height = 8,
+                    Width = CIRCLE_DIAMETER, // technically, should be 8 like the stroke but due to visual illusion 10 is better
+                    Height = CIRCLE_DIAMETER,
                     Fill = White,
                 };
 
-                circle.SetPosition(Vector2.Zero.FlipY(island.SizeInTiles));
+                circle.SetPosition(Vector2.Zero.FlipYItem(island.SizeInTiles, CIRCLE_DIAMETER));
                 canvas.Children.Add(circle);
 
                 if (!string.IsNullOrEmpty(island.Label))
