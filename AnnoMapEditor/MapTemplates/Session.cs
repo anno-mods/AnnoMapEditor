@@ -132,9 +132,12 @@ namespace AnnoMapEditor.MapTemplates
                 template = createdTemplateDoc
             };
 
-            foreach (Island s in startingSpots)
+
+            int startingSpotCounter = 0;
+            foreach (Island startingSpot in startingSpots)
             {
-                session.AddIsland(s);
+                startingSpot.Counter = startingSpotCounter++;
+                session.AddIsland(startingSpot);
             }
 
             if (session.Size.X == 0)

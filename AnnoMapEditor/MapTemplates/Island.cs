@@ -103,12 +103,12 @@ namespace AnnoMapEditor.MapTemplates
 
         public static List<Island> CreateNewStartingSpots(int playableSize, int margin, Region region)
         {
-            const int SPACING = 32;
+            const int SPACING = 64;
 
             List<Island> starts = new List<Island>()
             {
                 CreateStartingSpot(region, margin + SPACING, playableSize + margin - SPACING),
-                CreateStartingSpot(region, margin + SPACING, playableSize + margin - 2* SPACING),
+                CreateStartingSpot(region, margin + SPACING, playableSize + margin - 2*SPACING),
                 CreateStartingSpot(region, margin + 2*SPACING, playableSize + margin - SPACING),
                 CreateStartingSpot(region, margin + 2*SPACING, playableSize + margin - 2*SPACING),
             };
