@@ -159,11 +159,13 @@ namespace AnnoMapEditor.UI.Controls
 
             canvas.Children.Clear();
 
+            const int MAP_PIN_SIZE = 64;
+
             if (island.ElementType == 2)
             {
-                Width = 64;
-                Height = 64;
-                this.SetPosition((island.Position - new Vector2(32, 32)).FlipY(session.Size.Y));
+                Width = MAP_PIN_SIZE;
+                Height = MAP_PIN_SIZE;
+                this.SetPosition((island.Position).FlipYItem(session.Size.Y, MAP_PIN_SIZE));
                 Panel.SetZIndex(this, 100);
 
                 // TODO the order of AIs is odd, may be incorrect?
