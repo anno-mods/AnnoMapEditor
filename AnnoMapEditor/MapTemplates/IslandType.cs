@@ -26,6 +26,9 @@ namespace AnnoMapEditor.MapTemplates
         private readonly string value;
         public readonly short ElementValue { get; }
 
+        public bool IsNormalOrStarter => value == nameof(Starter) || value == nameof(Normal);
+        public bool IsSameWithoutOil(IslandType that) => IsNormalOrStarter && that.IsNormalOrStarter || value == that.value;
+
         public IslandType(string? type)
         {
             ElementValue = (short?)RandomIDs.IndexOf((x) => x == type) ?? 0;

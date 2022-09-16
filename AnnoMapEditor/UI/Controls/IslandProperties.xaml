@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
+             xmlns:maptemplates="clr-namespace:AnnoMapEditor.MapTemplates"
+             d:DataContext="{d:DesignInstance Type=maptemplates:Island}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="300">
     <UserControl.Resources>
@@ -17,14 +19,18 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <StackPanel Visibility="{Binding Converter={StaticResource CollapsedOnNull}, UpdateSourceTrigger=PropertyChanged}">
-        <TextBlock x:Name="Header"
+        <TextBlock Name="Header"
                    Style="{StaticResource HeaderLabelStyle}"
                    HorizontalAlignment="Right"
                    Margin="0,0,0,4" />
-        <StackPanel x:Name="IslandProps"
+        <StackPanel Name="IslandProps"
                     Margin="0">
-            <ComboBox x:Name="TypeComboBox"
+            <ComboBox Name="TypeComboBox"
                       Margin="0"/>
+            <local:FancyToggle
+                x:Name="IsStarterCheckBox"
+                OffText="No oil"
+                OnText="With oil"/>
         </StackPanel>
     </StackPanel>
 </UserControl>

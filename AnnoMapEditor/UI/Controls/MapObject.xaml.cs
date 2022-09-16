@@ -255,7 +255,7 @@ namespace AnnoMapEditor.UI.Controls
                 {
                     title.Text = island.Size.ToString();
                     if (island.Type == IslandType.Starter)
-                        title.Text = "Starter\n" + title.Text;
+                        title.Text = title.Text + "\nwith oil";
                 }
                 else
                     title.Text = "";

@@ -4,20 +4,19 @@ using System.Windows.Controls;
 
 namespace AnnoMapEditor.UI.Controls
 {
-
     public class UserIslandType
     {
-        public static readonly UserIslandType Small = new("Small Island") { Size = IslandSize.Small, Type = IslandType.Normal };
-        public static readonly UserIslandType Medium = new("Medium Island") { Size = IslandSize.Medium, Type = IslandType.Normal };
-        public static readonly UserIslandType Large = new("Large Island") { Size = IslandSize.Large, Type = IslandType.Normal };
-        public static readonly UserIslandType ThirdParty = new("3rd Party Slot") { Size = IslandSize.Small, Type = IslandType.ThirdParty };
-        public static readonly UserIslandType Pirate = new("Pirate Slot") { Size = IslandSize.Small, Type = IslandType.PirateIsland };
-        public static readonly UserIslandType LargeStarter = new("Larger Starter") { Size = IslandSize.Large, Type = IslandType.Starter };
-        public static readonly UserIslandType MediumStarter = new("Medium Starter") { Size = IslandSize.Medium, Type = IslandType.Starter };
+        public static readonly UserIslandType Small = new("Small Island", IslandSize.Small, IslandType.Normal);
+        public static readonly UserIslandType Medium = new("Medium Island", IslandSize.Medium, IslandType.Normal);
+        public static readonly UserIslandType Large = new("Large Island", IslandSize.Large, IslandType.Normal);
+        public static readonly UserIslandType ThirdParty = new("3rd Party Slot", IslandSize.Small, IslandType.ThirdParty);
+        public static readonly UserIslandType Pirate = new("Pirate Slot", IslandSize.Small, IslandType.PirateIsland);
+        //public static readonly UserIslandType LargeStarter = new("Larger Starter") { Size = IslandSize.Large, Type = IslandType.Starter };
+        //public static readonly UserIslandType MediumStarter = new("Medium Starter") { Size = IslandSize.Medium, Type = IslandType.Starter };
 
         public static readonly UserIslandType[] All = new[] {
-            LargeStarter,
-            MediumStarter,
+            //LargeStarter,
+            //MediumStarter,
             Large,
             Medium,
             Small,
@@ -26,12 +25,14 @@ namespace AnnoMapEditor.UI.Controls
         };
 
         public string Name { get; init; }
-        public IslandSize? Size { get; init; }
-        public IslandType? Type { get; init; }
+        public IslandSize Size { get; init; }
+        public IslandType Type { get; init; }
 
-        public UserIslandType(string name)
+        public UserIslandType(string name, IslandSize size, IslandType type)
         {
             Name = name;
+            Type = type;
+            Size = size;
         }
 
         public override string ToString()
@@ -55,23 +56,30 @@ namespace AnnoMapEditor.UI.Controls
 
             DataContextChanged += OnDataContextChanged;
             TypeComboBox.SelectionChanged += OnTypeSelectionChanged;
+            IsStarterCheckBox.ValueChanged += OnIsStarterCheckChanged;
         }
 
-        private void OnTypeSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnIsStarterCheckChanged(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is not Island island)
+                return;
+
+            island.IsStarter = IsStarterCheckBox.IsChecked;
+        }
+
+        private async void OnTypeSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DataContext is Island island && TypeComboBox.SelectedItem is UserIslandType type)
             {
-                if (type.Size is not null && type.Size != island.Size ||
-                    type.Type is not null && type.Type != island.Type)
+                if (type.Size != island.Size || !type.Type.IsSameWithoutOil(island.Type))
                 {
-                    if (type.Size is not null)
-                        island.Size = (IslandSize)type.Size;
-                    if (type.Type is not null)
-                        island.Type = (IslandType)type.Type;
+                    island.Size = type.Size;
+                    if (type.Size == IslandSize.Small || !island.Type.IsSameWithoutOil(type.Type))
+                        island.Type = type.Type;
                     island.MapPath = null;
 
                     // triggers reselection from pool
-                    island.UpdateAsync().ContinueWith((x) => { });
+                    await island.UpdateAsync();
                 }
             }
         }
@@ -103,10 +111,12 @@ namespace AnnoMapEditor.UI.Controls
             Header.Text = island.ElementType == 2 ? "Start" : "Island";
             IslandProps.Visibility = island.ElementType == 2 ? Visibility.Collapsed : Visibility.Visible;
 
-            TypeComboBox.IsEnabled = !island.IsNew;
+            IsStarterCheckBox.IsChecked = island.IsStarter;
+            IsStarterCheckBox.IsEnabled = !island.IsNew && (island.Type == IslandType.Starter || island.Type == IslandType.Normal) && island.Size != IslandSize.Small;
 
+            TypeComboBox.IsEnabled = !island.IsNew;
             TypeComboBox.Visibility = Visibility.Visible;
-            if (island.IsPool && island.Type == IslandType.Normal)
+            if (island.IsPool && island.Type.IsNormalOrStarter)
             {
                 // standard islands
                 if (island.Size == IslandSize.Large)
@@ -116,15 +126,15 @@ namespace AnnoMapEditor.UI.Controls
                 else
                     TypeComboBox.SelectedItem = UserIslandType.Small;
             }
-            else if (island.IsPool && island.Type == IslandType.Starter)
-            {
-                // starter islands with oil
-                if (island.Size == IslandSize.Large)
-                    TypeComboBox.SelectedItem = UserIslandType.LargeStarter;
-                else
-                    TypeComboBox.SelectedItem = UserIslandType.MediumStarter;
-                // no small allowed
-            }
+            //else if (island.IsPool && island.Type == IslandType.Starter)
+            //{
+            //    // starter islands with oil
+            //    if (island.Size == IslandSize.Large)
+            //        TypeComboBox.SelectedItem = UserIslandType.Large;
+            //    else
+            //        TypeComboBox.SelectedItem = UserIslandType.Medium;
+            //    // no small allowed
+            //}
             else if (island.Type == IslandType.PirateIsland)
             {
                 TypeComboBox.SelectedItem = UserIslandType.Pirate;
