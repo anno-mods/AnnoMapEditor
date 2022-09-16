@@ -7,5 +7,7 @@
         <ResourceDictionary Source="Styles/HintTextBox.xaml" />
         <ResourceDictionary Source="Styles/Label.xaml" />
         <ResourceDictionary Source="Styles/ComboBox.xaml" />
+        <ResourceDictionary Source="Styles/DropDownButton.xaml" />
+        <ResourceDictionary Source="Styles/FancyToggle.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
