@@ -47,6 +47,8 @@ namespace AnnoMapEditor.UI.Controls
         readonly Session session;
         readonly MapView container;
 
+        public const int MAP_PIN_SIZE = 64;
+
         public Vector2 MouseOffset;
 
         public bool IsMarkedForDeletion
@@ -158,8 +160,6 @@ namespace AnnoMapEditor.UI.Controls
                 return;
 
             canvas.Children.Clear();
-
-            const int MAP_PIN_SIZE = 64;
 
             if (island.ElementType == 2)
             {

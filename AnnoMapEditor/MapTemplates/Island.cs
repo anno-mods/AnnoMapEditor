@@ -54,6 +54,7 @@ namespace AnnoMapEditor.MapTemplates
 
         public string? AssumedMapPath { get; private set; }
         public bool IsPool => ElementType != 2 && string.IsNullOrEmpty(MapPath);
+        public bool IsStartingSpot => ElementType == 2;
         public bool IsNew => template is null;
 
         // TODO create view model of islands
