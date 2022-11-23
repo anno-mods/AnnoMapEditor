@@ -9,28 +9,30 @@ namespace AnnoMapEditor.MapTemplates
     public struct Region
     {
         #region Region enums
-        public static readonly Region Moderate = new("Moderate", "Moderate",
+        //Technically, Cape Trelawney is in Moderate Region but has ambientName "Moderate_01_day_night_st",
+        //but we don't allow Mod exports for that anyways
+        public static readonly Region Moderate = new("Moderate", "Moderate", "Moderate_01_day_night", 
             new()
             {
                 [IslandSize.Small] = new Pool("data/sessions/islands/pool/moderate/moderate_s_{0}/moderate_s_{0}.a7m", 12),
                 [IslandSize.Medium] = new Pool("data/sessions/islands/pool/moderate/moderate_m_{0}/moderate_m_{0}.a7m", 9),
                 [IslandSize.Large] = new Pool("data/sessions/islands/pool/moderate/moderate_l_{0}/moderate_l_{0}.a7m", 14)
             });
-        public static readonly Region NewWorld = new("NewWorld", "New World",
+        public static readonly Region NewWorld = new("NewWorld", "New World", "south_america_caribic_01",
             new()
             {
                 [IslandSize.Small] = new Pool("data/sessions/islands/pool/colony01/colony01_s_{0}/colony01_s_{0}.a7m", 4),
                 [IslandSize.Medium] = new Pool("data/sessions/islands/pool/colony01/colony01_m_{0}/colony01_m_{0}.a7m", 6),
                 [IslandSize.Large] = new Pool("data/sessions/islands/pool/colony01/colony01_l_{0}/colony01_l_{0}.a7m", 5)
             });
-        public static readonly Region Arctic = new("Arctic", "Arctic",
+        public static readonly Region Arctic = new("Arctic", "Arctic", "DLC03_01",
             new()
             {
                 [IslandSize.Small] = new Pool("data/dlc03/sessions/islands/pool/colony03_a01_{0}/colony03_a01_{0}.a7m", 8),
                 [IslandSize.Medium] = new Pool("data/dlc03/sessions/islands/pool/colony03_a02_{0}/colony03_a02_{0}.a7m", 4),
                 [IslandSize.Large] = new Pool("data/dlc03/sessions/islands/pool/moderate/moderate_l_{0}/moderate_l_{0}.a7m", 14)
             });
-        public static readonly Region Enbesa = new("Enbesa", "Enbesa",
+        public static readonly Region Enbesa = new("Enbesa", "Enbesa", "Colony_02",
             new()
             {
                 [IslandSize.Small] = new Pool("data/dlc06/sessions/islands/pool/colony02_s_{0}/colony02_s_{0}.a7m", new int[] { 1, 2, 3, 5 }),
@@ -41,6 +43,7 @@ namespace AnnoMapEditor.MapTemplates
         #endregion
 
         public string Name { get; init; }
+        public string AmbientName { get; init; }
 
         private static readonly Random rnd = new((int)DateTime.Now.Ticks);
 
@@ -70,10 +73,11 @@ namespace AnnoMapEditor.MapTemplates
         public Dictionary<IslandSize, Pool> PoolIslands { get; private init; }
         #endregion
 
-        private Region(string type, string name, Dictionary<IslandSize, Pool> poolIslands)
+        private Region(string type, string name, string ambientName, Dictionary<IslandSize, Pool> poolIslands)
         {
             value = type;
             Name = name;
+            AmbientName = ambientName;
             PoolIslands = poolIslands;
         }
 

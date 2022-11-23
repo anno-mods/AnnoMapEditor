@@ -24,7 +24,7 @@ namespace AnnoMapEditor.MapTemplates.Serializing
                     var version = VersionDetector.GetCompressionVersion(stream);
                     stream.Seek(0, SeekOrigin.Begin);
                     return FileDBConvert.DeserializeObject<T>(stream,
-                        new FileDBSerializerOptions() { Version = version, IgnoreMissingProperties = true });
+                        new FileDBSerializerOptions() { Version = version });
                 }
                 catch
                 {
@@ -53,14 +53,14 @@ namespace AnnoMapEditor.MapTemplates.Serializing
                     XmlDocument xmlWithBytes = new XmlExporter().Export(xmlDocument, new(interpreterDocument));
 
                     // convert to FileDB
-                    XmlFileDbConverter<FileDBDocument_V1> converter = new();
+                    XmlFileDbConverter converter = new(FileDBDocumentVersion.Version1);
                     IFileDBDocument doc = converter.ToFileDb(xmlWithBytes);
 
                     // construct deserialize into objects
                     FileDBDocumentDeserializer<T> deserializer = new(new FileDBSerializerOptions() { IgnoreMissingProperties = true });
                     return deserializer.GetObjectStructureFromFileDBDocument(doc);
                 }
-                catch
+                catch(System.Exception ex)
                 {
                     return null;
                 }

@@ -80,7 +80,7 @@ namespace AnnoMapEditor.Mods
 
                 //a7t Creation
                 string a7tPath = basePath + $"_{size}.a7t";
-                await Task.Run(() => new A7tExporter(session.Size.X, session.PlayableArea.Width).ExportA7T(a7tPath));
+                await Task.Run(() => new A7tExporter(session.Size.X, session.PlayableArea.Width, session.Region).ExportA7T(a7tPath));
 
                 //a7te Creation
                 string a7tePath = basePath + $"_{size}.a7te";

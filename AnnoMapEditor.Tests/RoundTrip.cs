@@ -19,21 +19,31 @@ namespace AnnoMapEditor.Tests
 
             Assert.NotNull(session);
 
-            Stream a7tinfo = new MemoryStream();
             var export = session!.ToTemplate();
             Assert.NotNull(export);
-            await Serializer.WriteAsync(export!, a7tinfo);
 
-            a7tinfo.Position = 0;
-            session = await Session.FromA7tinfoAsync(a7tinfo, filePath);
-            Assert.NotNull(session);
+            using (Stream a7tinfo = new MemoryStream())
+            {
+                await Serializer.WriteAsync(export!, a7tinfo);
 
-            StreamWriter outputXml = new(new MemoryStream());
+                a7tinfo.Position = 0;
+                session = await Session.FromA7tinfoAsync(a7tinfo, filePath);
+                Assert.NotNull(session);
+            }
+
             var template = session!.ToTemplate();
             Assert.NotNull(template);
-            await Serializer.WriteToXmlAsync(template!, outputXml.BaseStream);
 
-            Assert.True(StreamComparer.AreEqual(inputXml, outputXml.BaseStream));
+            using (MemoryStream outStream = new MemoryStream())
+            {
+                await Serializer.WriteToXmlAsync(template!, outStream);
+
+                //Uncomment for debugging:
+                //string content = System.Text.Encoding.UTF8.GetString(outStream.ToArray());
+                //outStream.Seek(0, SeekOrigin.Begin);
+
+                Assert.True(StreamComparer.AreEqual(inputXml, outStream));
+            }
         }
     }
 }

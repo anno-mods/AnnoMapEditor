@@ -1,8 +1,10 @@
-﻿using AnnoMapEditor.MapTemplates.Serializing;
+﻿using Anno_FileDBModels.Anno1800.MapTemplate;
+using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AnnoMapEditor.MapTemplates
@@ -73,7 +75,7 @@ namespace AnnoMapEditor.MapTemplates
 
         private static readonly Random rnd = new((int)DateTime.Now.Ticks);
 
-        private Serializing.A7tinfo.TemplateElement? template;
+        private TemplateElement? template;
 
         private Region Region { get; }
         public int Counter { get; set; }
@@ -104,7 +106,7 @@ namespace AnnoMapEditor.MapTemplates
             return island;
         }
 
-        public static async Task<Island> FromSerialized(Serializing.A7tinfo.TemplateElement templateElement, Region region)
+        public static async Task<Island> FromSerialized(TemplateElement templateElement, Region region)
         {
             var element = templateElement.Element;
             var island = new Island(region)
@@ -163,35 +165,88 @@ namespace AnnoMapEditor.MapTemplates
 
         public void CreateTemplate()
         {
-            template = new Serializing.A7tinfo.TemplateElement
+            template = new TemplateElement
             {
-                Element = new Serializing.A7tinfo.Element()
+                Element = new Element()
             };
             IslandChanged?.Invoke();
         }
 
-        public Serializing.A7tinfo.TemplateElement? ToTemplate()
+        public TemplateElement? ToTemplate()
         {
+            TemplateElement templateElement = new TemplateElement();
+
             if (template?.Element is null)
-                return template;
+                return templateElement;
 
-            template.ElementType = ElementType;
-            template.Element.Position = new int[] { Position.X, Position.Y };
-            template.Element.Size = Size.ElementValue;
-            if (IsPool)
+            if (this.ElementType != 0)
             {
-                template.Element.Config = new()
-                {
-                    Type = Type.ElementValue != 0 ? new() { id = Type.ElementValue } : null
-                };
-                template.Element.RandomIslandConfig = null;
-                template.Element.MapFilePath = null;
+                templateElement.ElementType = this.ElementType;
             }
-            else
-            {
 
+            //Create a fully new templateElement for export, so unwanted values are clean
+            templateElement.Element = new Element();
+            switch (this.ElementType)
+            {
+                //Starting spot
+                case 2:
+                    templateElement.Element.Position = new int[] { this.Position.X, this.Position.Y };
+                    break;
+                //Pool island
+                case 1:
+                    templateElement.Element.Position = new int[] { this.Position.X, this.Position.Y };
+                    templateElement.Element.Size = this.Size.ElementValue;
+                    templateElement.Element.Difficulty = new Difficulty();
+                    templateElement.Element.Config = new Config()
+                    {
+                        Type = new() { id = this.Type.ElementValue != 0 ? this.Type.ElementValue : null },
+                        Difficulty = new()
+                    };
+                    break;
+                //Fixed island
+                default:
+                    //Fixed island without MapPath is impossible
+                    if (MapPath == null)
+                        return null;
+
+                    templateElement.Element.Position = new int[] { this.Position.X, this.Position.Y };
+                    templateElement.Element.MapFilePath = MapPath;
+                    templateElement.Element.Rotation90 = (byte)this.Rotation;
+
+                    if(Label is not null)
+                    {
+                        templateElement.Element.IslandLabel = Label;
+                    }
+
+                    if(template?.Element?.FertilityGuids is not null)
+                    {
+                        templateElement.Element.FertilityGuids = new int[template.Element.FertilityGuids.Length];
+                        Array.Copy(this.template.Element.FertilityGuids, templateElement.Element.FertilityGuids, template.Element.FertilityGuids.Length);
+                    }
+                    else
+                    {
+                        templateElement.Element.FertilityGuids = new int[0];
+                    }
+
+                    templateElement.Element.RandomizeFertilities = template?.Element?.RandomizeFertilities;
+                    templateElement.Element.MineSlotMapping = new List<Tuple<long, int>>( 
+                        template?.Element?.MineSlotMapping?.Select(
+                            x => new Tuple<long, int>(x.Item1, x.Item2)
+                        ) ?? Enumerable.Empty<Tuple<long, int>>()
+                    );
+
+                    templateElement.Element.RandomIslandConfig = new RandomIslandConfig()
+                    {
+                        value = new Config()
+                        {
+                            Type = new() { id = this.Type.ElementValue != 0 ? this.Type.ElementValue : null },
+                            Difficulty = new() { id = template?.Element?.RandomIslandConfig?.value?.Difficulty?.id }
+                        }
+                    };
+                    break;
             }
-            return template;
+
+            return templateElement;
         }
 
         public async Task UpdateExternalDataAsync()
