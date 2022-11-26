@@ -35,18 +35,8 @@ namespace AnnoMapEditor.MapTemplates.Serializing
                 try
                 {
                     var Version = VersionDetector.GetCompressionVersion(fileStream);
-
-                    IFileDBDocument? doc = null;
-                    if (Version == FileDBDocumentVersion.Version1)
-                    {
-                        var parser = new DocumentParser<FileDBDocument_V1>();
-                        doc = parser.LoadFileDBDocument(fileStream);
-                    }
-                    else if (Version == FileDBDocumentVersion.Version2)
-                    {
-                        var parser = new DocumentParser<FileDBDocument_V2>();
-                        doc = parser.LoadFileDBDocument(fileStream);
-                    }
+                    var parser = new DocumentParser(Version);
+                    IFileDBDocument? doc = parser.LoadFileDBDocument(fileStream);
 
                     return doc;
                 }

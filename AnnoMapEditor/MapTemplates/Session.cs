@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-
+using Anno_FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.MapTemplates.Serializing;
 
 namespace AnnoMapEditor.MapTemplates
@@ -19,7 +19,7 @@ namespace AnnoMapEditor.MapTemplates
         public Rect2 PlayableArea { get; private set; }
         public Region Region { get; set; }
 
-        private Serializing.A7tinfo.MapTemplateDocument template;
+        private MapTemplateDocument template;
 
         public event NotifyCollectionChangedEventHandler? IslandCollectionChanged;
         public event EventHandler<SessionResizeEventArgs>? MapSizeConfigChanged;
@@ -31,7 +31,7 @@ namespace AnnoMapEditor.MapTemplates
         {
             Size = new Vector2(0, 0);
             _islands = new List<Island>();
-            template = new Serializing.A7tinfo.MapTemplateDocument();
+            template = new MapTemplateDocument();
         }
 
         private static Region DetectRegionFromPath(string filePath)
@@ -52,7 +52,7 @@ namespace AnnoMapEditor.MapTemplates
 
         public static async Task<Session?> FromA7tinfoAsync(Stream? stream, string internalPath)
         {
-            var doc = await Serializer.ReadAsync<Serializing.A7tinfo.MapTemplateDocument>(stream);
+            var doc = await Serializer.ReadAsync<MapTemplateDocument>(stream);
             if (doc is null)
                 return null;
 
@@ -61,7 +61,7 @@ namespace AnnoMapEditor.MapTemplates
 
         public static async Task<Session?> FromXmlAsync(string filePath)
         {
-            var doc = await Serializer.ReadFromXmlAsync<Serializing.A7tinfo.MapTemplateDocument>(File.OpenRead(filePath));
+            var doc = await Serializer.ReadFromXmlAsync<MapTemplateDocument>(File.OpenRead(filePath));
             if (doc is null)
                 return null;
 
@@ -70,14 +70,14 @@ namespace AnnoMapEditor.MapTemplates
 
         public static async Task<Session?> FromXmlAsync(Stream? stream, string internalPath)
         {
-            var doc = await Serializer.ReadFromXmlAsync<Serializing.A7tinfo.MapTemplateDocument>(stream);
+            var doc = await Serializer.ReadFromXmlAsync<MapTemplateDocument>(stream);
             if (doc is null)
                 return null;
 
             return await FromTemplateDocument(doc, DetectRegionFromPath(internalPath));
         }
 
-        public static async Task<Session?> FromTemplateDocument(Serializing.A7tinfo.MapTemplateDocument document, Region region)
+        public static async Task<Session?> FromTemplateDocument(MapTemplateDocument document, Region region)
         {
             var islands = from element in document.MapTemplate?.TemplateElement
                           where element?.Element is not null
@@ -113,9 +113,9 @@ namespace AnnoMapEditor.MapTemplates
 
             List<Island> startingSpots = Island.CreateNewStartingSpots(playableSize, margin, region);
 
-            Serializing.A7tinfo.MapTemplateDocument createdTemplateDoc = new Serializing.A7tinfo.MapTemplateDocument()
+            MapTemplateDocument createdTemplateDoc = new MapTemplateDocument()
             {
-                MapTemplate = new Serializing.A7tinfo.MapTemplate()
+                MapTemplate = new MapTemplate()
                 {
                     Size = new int[] { mapSize, mapSize },
                     PlayableArea = new int[] { margin, margin, playableSize + margin, playableSize + margin },
@@ -189,15 +189,15 @@ namespace AnnoMapEditor.MapTemplates
                 await island.InitAsync(Region);
         }
 
-        public Serializing.A7tinfo.MapTemplateDocumentExport? ToTemplate()
+        public MapTemplateDocument? ToTemplate()
         {
-            if (template.MapTemplate is null)
+            if (template.MapTemplate?.Size is null || template.MapTemplate?.PlayableArea is null)
                 return null;
 
-            return new Serializing.A7tinfo.MapTemplateDocumentExport()
-            {
-                MapTemplate = new Serializing.A7tinfo.MapTemplateExport(template.MapTemplate, Islands.Select(x => x.ToTemplate()).Where(x => x is not null)!)
-            };
+            template.MapTemplate.TemplateElement = new List<TemplateElement>(Islands.Select(x => x.ToTemplate()).Where(x => x is not null)!);
+            template.MapTemplate.ElementCount = template.MapTemplate.TemplateElement.Count;
+
+            return template;
         }
 
         public async Task SaveToXmlAsync(string filePath)

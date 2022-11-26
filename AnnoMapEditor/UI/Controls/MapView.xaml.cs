@@ -272,7 +272,7 @@ namespace AnnoMapEditor.UI.Controls
                 CreateAddIsland(island.Size, island.Type);
             }
 
-            island.Position = ensured.FlipYItem(session.Size.Y, island.SizeInTiles);
+            island.Position = ensured.FlipYItem(session.Size.Y, island.IsStartingSpot ? MapObject.MAP_PIN_SIZE : island.SizeInTiles);
             mapObject.SetPosition(ensured);
             mapObject.IsMarkedForDeletion = !island.IsNew && !ensured.Within(mapArea);
         }
