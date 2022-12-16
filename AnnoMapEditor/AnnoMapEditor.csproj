@@ -49,8 +49,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Anno_FileDBModels">
-      <HintPath>MapTemplates\Serializing\Anno_FileDBModels.dll</HintPath>
+    <Reference Include="Anno.FileDBModels">
+      <HintPath>MapTemplates\Serializing\Anno.FileDBModels.dll</HintPath>
     </Reference>
     <Reference Include="FileDBReader">
       <HintPath>MapTemplates\Serializing\FileDBReader.dll</HintPath>
