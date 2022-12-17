@@ -85,7 +85,7 @@ namespace AnnoMapEditor.MapTemplates
 
         public Vector2 Clamp(Rect2 area)
         {
-            return new Vector2(Math.Clamp(X, area.X, area.Max.X), Math.Clamp(Y, area.Y, area.Max.Y));
+            return new Vector2(Math.Clamp(X, area.X, area.Max.X - Tile.X), Math.Clamp(Y, area.Y, area.Max.Y - Tile.Y));
         }
 
         public Vector2 Clamp(Vector2 min, Vector2 max)
@@ -115,7 +115,7 @@ namespace AnnoMapEditor.MapTemplates
     {
         public Vector2 Position;
         public Vector2 Size;
-        public Vector2 Max => Position + Size - Vector2.Tile;
+        public Vector2 Max => Position + Size;
 
         public int X => Position.X;
         public int Y => Position.Y;
