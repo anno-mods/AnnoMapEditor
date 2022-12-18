@@ -28,8 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Anno_FileDBModels">
-      <HintPath>..\AnnoMapEditor\MapTemplates\Serializing\Anno_FileDBModels.dll</HintPath>
+    <Reference Include="Anno.FileDBModels">
+      <HintPath>..\AnnoMapEditor\MapTemplates\Serializing\Anno.FileDBModels.dll</HintPath>
     </Reference>
   </ItemGroup>
 

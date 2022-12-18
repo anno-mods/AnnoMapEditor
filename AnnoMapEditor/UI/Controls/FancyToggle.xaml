@@ -26,6 +26,7 @@
         <TextBlock 
             Style="{StaticResource DefaultLabelStyle}"
             Padding="0"
+            VerticalAlignment="Center"
             Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:FancyToggle}}, Path=Label, UpdateSourceTrigger=PropertyChanged}"/>
         <CheckBox
             Name="Box"

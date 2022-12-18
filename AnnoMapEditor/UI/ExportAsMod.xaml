@@ -18,6 +18,11 @@
     <Grid Background="{StaticResource DialogBrush}">
         <Grid Margin="8" MaxWidth="400" VerticalAlignment="Center">
             <StackPanel>
+                <StackPanel.Resources>
+                    <controls:BoolToVisibility x:Key="BoolToVisibility" OnTrue="Visible" OnFalse="Collapsed"/>
+                    <controls:BoolToVisibility x:Key="InvertedBoolToVisibility" OnTrue="Collapsed" OnFalse="Visible"/>
+                </StackPanel.Resources>
+                
                 <TextBlock Style="{StaticResource HeaderLabelStyle}" Text="Save as playable mod"/>
                 <TextBlock Style="{StaticResource MutedLabelStyle}">
                     <Run>Generate a mod replacing the selected map type.</Run>
@@ -52,19 +57,30 @@
                 <emoji:TextBlock Grid.Row="1" Grid.Column="1" 
                                  Text="{Binding ModExistsWarning, UpdateSourceTrigger=PropertyChanged}" 
                                  HorizontalAlignment="Right" />
-                <TextBlock Style="{StaticResource MutedLabelStyle}">
-                    <Run>Select the following map type in Sandbox mode:</Run>
-                </TextBlock>
-                <Grid Width="300" Margin="4,6,4,4">
-                    <Image Source="../Assets/maptype.png" />
-                    <TextBlock FontFamily="Lucida Bright"
+                
+                <!-- Informational Messages -->
+                <StackPanel Visibility="{Binding InfoMapTypeSelection, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Style="{StaticResource MutedLabelStyle}">
+                        <Run>Select the following map type in Sandbox mode:</Run>
+                    </TextBlock>
+                    <Grid Width="300" Margin="4,6,4,4">
+                        <Image Source="../Assets/maptype.png" />
+                        <TextBlock FontFamily="Lucida Bright"
                                Text="{Binding ResultingModName, UpdateSourceTrigger=PropertyChanged}"
                                VerticalAlignment="Center"
                                Foreground="#4F300F"
                                FontSize="10px"
                                FontWeight="Bold"
                                HorizontalAlignment="Center" Margin="150,0,0,0" />
-                </Grid>
+                    </Grid>
+                </StackPanel>
+                <TextBlock Style="{StaticResource MutedLabelStyle}" TextWrapping="Wrap" 
+                           Visibility="{Binding InfoMapTypeSelection, Mode=OneWay, Converter={StaticResource InvertedBoolToVisibility}}">
+                    <Run>The map mod will automatically apply to the selected region.</Run>
+                    <LineBreak/>
+                    <Run>Please make sure that only one Map Mod per non-moderate Region is active.</Run>
+                </TextBlock>
+
                 <Grid Margin="0,16,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />

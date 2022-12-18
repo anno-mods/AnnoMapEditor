@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Anno_FileDBModels.Anno1800.MapTemplate;
+using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.MapTemplates.Serializing;
 
 namespace AnnoMapEditor.MapTemplates
@@ -146,26 +146,27 @@ namespace AnnoMapEditor.MapTemplates
             return session;
         }
 
-        public void ResizeSession(int mapSize, int playableSize)
+        public void ResizeSession(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
         {
-            int margin = (mapSize - playableSize) / 2;
-
             Vector2 oldMapSize = new Vector2(Size);
             Size = new Vector2(mapSize, mapSize);
 
             Vector2 oldPlayableSize = new Vector2(PlayableArea.Width, PlayableArea.Height);
-            PlayableArea = new Rect2(new int[] { margin, margin, playableSize + margin, playableSize + margin });
+            PlayableArea = new Rect2(new int[] { playableAreaMargins.x1, playableAreaMargins.y1, playableAreaMargins.x2, playableAreaMargins.y2 });
 
             MapSizeConfigChanged?.Invoke(this, new SessionResizeEventArgs(oldMapSize, oldPlayableSize));
         }
 
-        public void ResizeAndCommitSession(int mapSize, int playableSize)
+        public void ResizeAndCommitSession(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
         {
-            int margin = (mapSize - playableSize) / 2;
-
             //Commit means write to template
             template.MapTemplate.Size = new int[] { mapSize, mapSize };
-            template.MapTemplate.PlayableArea = new int[] { margin, margin, playableSize + margin, playableSize + margin };
+            template.MapTemplate.PlayableArea = new int[] { 
+                playableAreaMargins.x1, 
+                playableAreaMargins.y1, 
+                playableAreaMargins.x2, 
+                playableAreaMargins.y2 
+            };
 
             Vector2 oldMapSize = new Vector2(Size);
             Size = new Vector2(template.MapTemplate.Size);
@@ -189,13 +190,18 @@ namespace AnnoMapEditor.MapTemplates
                 await island.InitAsync(Region);
         }
 
-        public MapTemplateDocument? ToTemplate()
+        public MapTemplateDocument? ToTemplate(bool writeInitialArea = false)
         {
             if (template.MapTemplate?.Size is null || template.MapTemplate?.PlayableArea is null)
                 return null;
 
             template.MapTemplate.TemplateElement = new List<TemplateElement>(Islands.Select(x => x.ToTemplate()).Where(x => x is not null)!);
             template.MapTemplate.ElementCount = template.MapTemplate.TemplateElement.Count;
+
+            if (Region.HasMapExtension && writeInitialArea)
+                template.MapTemplate.InitialPlayableArea = template.MapTemplate.PlayableArea;
+            else
+                template.MapTemplate.InitialPlayableArea = null;
 
             return template;
         }
@@ -211,7 +217,7 @@ namespace AnnoMapEditor.MapTemplates
             await Serializer.WriteToXmlAsync(export, file);
         }
 
-        public async Task SaveAsync(string filePath)
+        public async Task SaveAsync(string filePath, bool writeInitialArea)
         {
             var export = ToTemplate();
             if (export is null)

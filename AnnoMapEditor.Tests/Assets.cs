@@ -26,7 +26,7 @@ namespace AnnoMapEditor.Tests
             using Stream assetsXml = File.OpenRead("./TestData/assets.xml");
             Data = new(MapType.GetAllTypes().Select(x =>
             {
-                Stream patch = new MemoryStream(Encoding.Unicode.GetBytes(Mods.Mod.CreateAssetsModOps(MapType.Archipelago, "mods/[Map] test/test.a7t")));
+                Stream patch = new MemoryStream(Encoding.Unicode.GetBytes(Mods.Mod.CreateAssetsModOps(Region.Moderate, MapType.Archipelago, "mods/[Map] test/test.a7t")));
                 return new KeyValuePair<MapType, XDocument>(x, XDocument.Load(XmlTest.Patch(assetsXml, patch)!));
             }));
         }

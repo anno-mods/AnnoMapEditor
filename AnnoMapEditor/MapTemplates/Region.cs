@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,39 +12,85 @@ namespace AnnoMapEditor.MapTemplates
         #region Region enums
         //Technically, Cape Trelawney is in Moderate Region but has ambientName "Moderate_01_day_night_st",
         //but we don't allow Mod exports for that anyways
-        public static readonly Region Moderate = new("Moderate", "Moderate", "Moderate_01_day_night", 
+        public static readonly Region Moderate = new("Moderate", "Moderate", "Moderate_01_day_night", allowModding:true, "moderate",
+            new[] { "ll", "lm", "ls", "ml", "mm", "ms", "sl", "sm", "ss" },
+            new[] { "01", "02" },
+            usesAllSizeIndices:false, hasMapExtension:false,
             new()
             {
                 [IslandSize.Small] = new Pool("data/sessions/islands/pool/moderate/moderate_s_{0}/moderate_s_{0}.a7m", 12),
                 [IslandSize.Medium] = new Pool("data/sessions/islands/pool/moderate/moderate_m_{0}/moderate_m_{0}.a7m", 9),
-                [IslandSize.Large] = new Pool("data/sessions/islands/pool/moderate/moderate_l_{0}/moderate_l_{0}.a7m", 14)
+                [IslandSize.Large] = new Pool(
+                    new FilePathRange[]
+                    {
+                        new FilePathRange("data/sessions/islands/pool/moderate/moderate_l_{0}/moderate_l_{0}.a7m", 1, 14),
+                        new FilePathRange("data/sessions/islands/pool/moderate/community_island/community_island.a7m", 1, 1)
+                    })
             });
-        public static readonly Region NewWorld = new("NewWorld", "New World", "south_america_caribic_01",
+
+        public static readonly Region NewWorld = new("NewWorld", "New World", "south_america_caribic_01", allowModding: true, "colony01", 
+            new[] { "s", "m", "l"},
+            new[] { "01", "02", "03" },
+            usesAllSizeIndices: true, hasMapExtension: true,
             new()
             {
-                [IslandSize.Small] = new Pool("data/sessions/islands/pool/colony01/colony01_s_{0}/colony01_s_{0}.a7m", 4),
-                [IslandSize.Medium] = new Pool("data/sessions/islands/pool/colony01/colony01_m_{0}/colony01_m_{0}.a7m", 6),
-                [IslandSize.Large] = new Pool("data/sessions/islands/pool/colony01/colony01_l_{0}/colony01_l_{0}.a7m", 5)
+                [IslandSize.Small] = new Pool(
+                    new FilePathRange[]
+                    {
+                        new FilePathRange("data/sessions/islands/pool/colony01/colony01_s_{0}/colony01_s_{0}.a7m", 1, 4),
+                        new FilePathRange("data/dlc12/sessions/islands/pool/colony01/colony01_s_{0}/colony01_s_{0}.a7m", 5, 3)
+                    }),
+                [IslandSize.Medium] = new Pool(
+                    new FilePathRange[]
+                    {
+                        new FilePathRange("data/sessions/islands/pool/colony01/colony01_m_{0}/colony01_m_{0}.a7m", 1, 6),
+                        new FilePathRange("data/dlc12/sessions/islands/pool/colony01/colony01_m_{0}/colony01_m_{0}.a7m", 7, 3)
+                    }),
+                [IslandSize.Large] = new Pool(
+                    new FilePathRange[]
+                    {
+                        new FilePathRange("data/sessions/islands/pool/colony01/colony01_l_{0}/colony01_l_{0}.a7m", 1, 5),
+                        new FilePathRange("data/dlc12/sessions/islands/pool/colony01/colony01_l_{0}/colony01_l_{0}.a7m", 6, 3),
+
+                    })
             });
-        public static readonly Region Arctic = new("Arctic", "Arctic", "DLC03_01",
+
+        //poolFolderName is manually selected, the game files don't have a special one for the arctic as it only has one map
+        public static readonly Region Arctic = new("Arctic", "Arctic", "DLC03_01", allowModding: false, poolFolderName:"colony03",
+            new[] { "sp" },
+            new[] { "" },
+            usesAllSizeIndices: true, hasMapExtension: false,
             new()
             {
                 [IslandSize.Small] = new Pool("data/dlc03/sessions/islands/pool/colony03_a01_{0}/colony03_a01_{0}.a7m", 8),
                 [IslandSize.Medium] = new Pool("data/dlc03/sessions/islands/pool/colony03_a02_{0}/colony03_a02_{0}.a7m", 4),
                 [IslandSize.Large] = new Pool("data/dlc03/sessions/islands/pool/moderate/moderate_l_{0}/moderate_l_{0}.a7m", 14)
             });
-        public static readonly Region Enbesa = new("Enbesa", "Enbesa", "Colony_02",
+
+        public static readonly Region Enbesa = new("Enbesa", "Enbesa", "Colony_02", allowModding: false, "land_of_lions",
+            new[] { "01" },
+            new[] { "", "mp" },
+            usesAllSizeIndices: true, hasMapExtension: false,
             new()
             {
                 [IslandSize.Small] = new Pool("data/dlc06/sessions/islands/pool/colony02_s_{0}/colony02_s_{0}.a7m", new int[] { 1, 2, 3, 5 }),
                 [IslandSize.Medium] = new Pool("data/dlc06/sessions/islands/pool/colony02_m_{0}/colony02_m_{0}.a7m", new int[] { 2, 4, 5, 9 }),
                 [IslandSize.Large] = new Pool("data/dlc06/sessions/islands/pool/colony02_l_{0}/colony02_l_{0}.a7m", new int[] { 1, 3, 5, 6 })
             });
+
         public static readonly Region[] All = new Region[] { Moderate, NewWorld, Arctic, Enbesa };
         #endregion
 
         public string Name { get; init; }
         public string AmbientName { get; init; }
+        public bool AllowModding { get; init; }
+
+        public string PoolFolderName { get; init; }
+        public IReadOnlyCollection<string> MapSizes { get; init; }
+        public IReadOnlyCollection<string> MapSizeIndices { get; init; }
+
+        public bool UsesAllSizeIndices { get; init; }
+        public bool HasMapExtension { get; init; }
 
         private static readonly Random rnd = new((int)DateTime.Now.Ticks);
 
@@ -52,43 +99,130 @@ namespace AnnoMapEditor.MapTemplates
         #region Pool Islands
         public struct Pool
         {
-            public string filePath;
-            public int size;
-            public int[]? ids;
+            public FilePathRange[] paths { get; init; }
+            public int size
+            {
+                get
+                {
+                    int sum = 0;
+                    foreach(var path in paths)
+                    {
+                        sum += path.size;
+                    }
+                    return sum;
+                }
+            }
+
+            public string GetPath(int i)
+            {
+                int rangeIdx = 0;
+                FilePathRange range = paths[rangeIdx];
+                int skipped = 0;
+                while(skipped + range.size <= i)
+                {
+                    skipped += range.size;
+                    range = paths[++rangeIdx];
+                }
+
+                return range.GetPath(i - skipped);
+            }
 
             public Pool(string filePath, int size)
             {
-                this.filePath = filePath;
-                this.size = size;
-                ids = null;
+                this.paths = new FilePathRange[]
+                {
+                    new FilePathRange(filePath, 1, size)
+                };
             }
 
             public Pool(string filePath, int[] ids)
             {
+                this.paths = new FilePathRange[]
+                {
+                    new FilePathRange(filePath, ids)
+                };
+            }
+
+            public Pool(FilePathRange[] paths)
+            {
+                this.paths = paths;
+            }
+        }
+
+        public struct FilePathRange
+        {
+            public string filePath;
+            public int size;
+            public int[] ids;
+
+            public string GetPath(int i)
+            {
+                return string.Format(filePath, string.Format("{0:00}", ids[i]));
+            }
+
+            public FilePathRange(string filePath, int start, int count)
+            {
                 this.filePath = filePath;
-                size = ids.Length;
+                this.size = count;
+                this.ids = Enumerable.Range(start, count).ToArray();
+            }
+
+            public FilePathRange(string filePath, int[] ids)
+            {
+                this.filePath = filePath;
+                this.size = ids.Length;
                 this.ids = ids;
             }
         }
         public Dictionary<IslandSize, Pool> PoolIslands { get; private init; }
         #endregion
 
-        private Region(string type, string name, string ambientName, Dictionary<IslandSize, Pool> poolIslands)
+        private Region(string type, string name, string ambientName, bool allowModding, string poolFolderName, 
+            string[] mapSizes, string[] sizeIndices, bool usesAllSizeIndices, bool hasMapExtension, Dictionary<IslandSize, Pool> poolIslands)
         {
             value = type;
             Name = name;
             AmbientName = ambientName;
+            AllowModding = allowModding;
+
+            PoolFolderName = poolFolderName;
+            MapSizes = new ReadOnlyCollection<string>(mapSizes);
+            MapSizeIndices = new ReadOnlyCollection<string>(sizeIndices);
+
+            UsesAllSizeIndices = usesAllSizeIndices;
+            HasMapExtension = hasMapExtension;
+
             PoolIslands = poolIslands;
         }
 
         public string GetRandomIslandPath(IslandSize size)
         {
             int index = rnd.Next(1, PoolIslands[size].size);
-            var ids = PoolIslands[size].ids;
-            if (ids is not null)
-                index = ids[index];
 
-            return string.Format(PoolIslands[size].filePath, string.Format("{0:00}", index));
+            string path = PoolIslands[size].GetPath(index);
+            return path;
+        }
+
+        public IEnumerable<string> GetAllSizeCombinations()
+        {
+            if (UsesAllSizeIndices)
+            {
+                foreach (string size in MapSizes)
+                {
+                    foreach (string subsize in MapSizeIndices)
+                    {
+                        string result = size + (string.IsNullOrEmpty(size) || string.IsNullOrEmpty(subsize) ? "" : "_") + subsize;
+                        yield return result;
+                    }
+                }
+            }
+            else
+            {
+                foreach (string size in MapSizes)
+                {
+                    yield return size;
+                }
+            }
         }
 
         public override string ToString() => value;

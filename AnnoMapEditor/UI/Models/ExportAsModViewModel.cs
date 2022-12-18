@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -20,6 +21,17 @@ namespace AnnoMapEditor.UI.Models
             set
             {
                 _session = value;
+                if(_session is not null)
+                {
+                    AllowedMapTypes = Mods.MapType.MapTypesForRegion[_session.Region];
+                    SelectedMapType = AllowedMapTypes.First();
+                }
+                else
+                {
+                    AllowedMapTypes = Enumerable.Empty<Mods.MapType>();
+                    SelectedMapType = null;
+                }
+                InfoMapTypeSelection = _session is not null && _session.Region == MapTemplates.Region.Moderate;
                 CheckExistingMod();
             }
         }
@@ -42,6 +54,13 @@ namespace AnnoMapEditor.UI.Models
         public bool CanExport => true;
         public string ModExistsWarning { get; private set; } = string.Empty;
 
+        public bool InfoMapTypeSelection
+        {
+            get => _infoMapTypeSelection;
+            set => SetProperty(ref _infoMapTypeSelection, value);
+        }
+        private bool _infoMapTypeSelection = true;
+
         public string ModID
         {
             get => _modID;
@@ -49,7 +68,7 @@ namespace AnnoMapEditor.UI.Models
         }
         private string _modID = string.Empty;
 
-        public Mods.MapType SelectedMapType
+        public Mods.MapType? SelectedMapType
         {
             get => _mapType;
             set
@@ -58,14 +77,14 @@ namespace AnnoMapEditor.UI.Models
                 CheckExistingMod();
             }
         }
-        private Mods.MapType _mapType = Mods.MapType.Archipelago;
+        private Mods.MapType? _mapType = null;
 
         public IEnumerable<Mods.MapType> AllowedMapTypes
         {
             get => _allowedMapTypes;
             set => SetProperty(ref _allowedMapTypes, value);
         }
-        private IEnumerable<Mods.MapType> _allowedMapTypes = Mods.MapType.GetOldWorldTypes();
+        private IEnumerable<Mods.MapType> _allowedMapTypes = Enumerable.Empty<Mods.MapType>();
 
         public ExportAsModViewModel()
         {
