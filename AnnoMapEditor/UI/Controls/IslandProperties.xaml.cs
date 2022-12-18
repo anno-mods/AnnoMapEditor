@@ -67,7 +67,7 @@ namespace AnnoMapEditor.UI.Controls
             island.IsStarter = IsStarterCheckBox.IsChecked;
         }
 
-        private async void OnTypeSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnTypeSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DataContext is Island island && TypeComboBox.SelectedItem is UserIslandType type)
             {
@@ -76,10 +76,8 @@ namespace AnnoMapEditor.UI.Controls
                     island.Size = type.Size;
                     if (type.Size == IslandSize.Small || !island.Type.IsSameWithoutOil(type.Type))
                         island.Type = type.Type;
-                    island.MapPath = null;
-
-                    // triggers reselection from pool
-                    await island.UpdateAsync();
+                    
+                    island.RandomizeMap();
                 }
             }
         }

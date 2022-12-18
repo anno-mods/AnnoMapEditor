@@ -56,7 +56,7 @@ namespace AnnoMapEditor.MapTemplates
             if (doc is null)
                 return null;
 
-            return await FromTemplateDocument(doc, DetectRegionFromPath(internalPath));
+            return FromTemplateDocument(doc, DetectRegionFromPath(internalPath));
         }
 
         public static async Task<Session?> FromXmlAsync(string filePath)
@@ -65,7 +65,7 @@ namespace AnnoMapEditor.MapTemplates
             if (doc is null)
                 return null;
 
-            return await FromTemplateDocument(doc, DetectRegionFromPath(filePath));
+            return FromTemplateDocument(doc, DetectRegionFromPath(filePath));
         }
 
         public static async Task<Session?> FromXmlAsync(Stream? stream, string internalPath)
@@ -74,10 +74,10 @@ namespace AnnoMapEditor.MapTemplates
             if (doc is null)
                 return null;
 
-            return await FromTemplateDocument(doc, DetectRegionFromPath(internalPath));
+            return FromTemplateDocument(doc, DetectRegionFromPath(internalPath));
         }
 
-        public static async Task<Session?> FromTemplateDocument(MapTemplateDocument document, Region region)
+        public static Session? FromTemplateDocument(MapTemplateDocument document, Region region)
         {
             var islands = from element in document.MapTemplate?.TemplateElement
                           where element?.Element is not null
@@ -85,7 +85,7 @@ namespace AnnoMapEditor.MapTemplates
             Session session = new()
             {
                 Region = region,
-                _islands = new List<Island>(await Task.WhenAll(islands)),
+                _islands = islands.ToList(),
                 Size = new Vector2(document.MapTemplate?.Size),
                 PlayableArea = new Rect2(document.MapTemplate?.PlayableArea),
                 template = document
@@ -177,16 +177,16 @@ namespace AnnoMapEditor.MapTemplates
             MapSizeConfigCommitted?.Invoke(this, new EventArgs());
         }
 
-        public async Task UpdateExternalDataAsync()
+        public void UpdateExternalData()
         {
             foreach (var island in Islands)
-                await island.UpdateExternalDataAsync();
+                island.UpdateExternalData();
         }
 
-        public async Task UpdateAsync()
+        public void Update()
         {
             foreach (var island in Islands)
-                await island.InitAsync(Region);
+                island.Init(Region);
         }
 
         public MapTemplateDocument? ToTemplate()
@@ -229,7 +229,7 @@ namespace AnnoMapEditor.MapTemplates
         {
             island.CreateTemplate();
             _islands.Add(island);
-            Task.Run(async () => await island.InitAsync(Region));
+            island.Init(Region);
             IslandCollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
