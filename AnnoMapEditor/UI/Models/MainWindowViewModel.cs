@@ -60,7 +60,7 @@ namespace AnnoMapEditor.UI.Models
                 if (value != _session)
                 {
                     SetProperty(ref _session, value, new string[] { nameof(CanExport) });
-                    SelectedIsland = null;
+                    SelectedElement = null;
 
                     if(SessionProperties is not null) 
                         SessionProperties.SelectedRegionChanged -= SelectedRegionChanged;
@@ -81,12 +81,12 @@ namespace AnnoMapEditor.UI.Models
         public SessionPropertiesViewModel? SessionProperties { get; private set; }
         public SessionChecker? SessionChecker { get; private set; }
 
-        public Island? SelectedIsland
+        public MapElement? SelectedElement
         {
-            get => _selectedIsland;
-            set => SetProperty(ref _selectedIsland, value);
+            get => _selectedElement;
+            set => SetProperty(ref _selectedElement, value);
         }
-        private Island? _selectedIsland;
+        private MapElement? _selectedElement;
 
         public string? SessionFilePath
         {

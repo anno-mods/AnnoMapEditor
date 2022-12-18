@@ -20,7 +20,7 @@
         </Grid.Resources>
         <Grid x:Name="mainContent" IsEnabled="{Binding ElementName=exportDialog, Path=Visibility, Converter={StaticResource FalseOnVisible}}">
             <controls:MapView Grid.Column="0"
-                              SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedElement="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedElement, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               DataContext="{Binding Session, Mode=OneWay}" />
             <StackPanel Grid.Column="0"
                         VerticalAlignment="Top"
@@ -59,7 +59,7 @@
             <controls:IslandProperties Grid.Column="0"
                                        HorizontalAlignment="Right"
                                        Margin="16,8"
-                                       DataContext="{Binding SelectedIsland, UpdateSourceTrigger=PropertyChanged}" />
+                                       DataContext="{Binding SelectedElement, UpdateSourceTrigger=PropertyChanged}" />
             <!-- bottom -->
             <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="8,0,0,0">
                 <emoji:TextBlock Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"

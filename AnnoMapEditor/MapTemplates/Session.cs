@@ -12,8 +12,8 @@ namespace AnnoMapEditor.MapTemplates
 {
     public class Session
     {
-        public IReadOnlyList<Island> Islands => _islands;
-        private List<Island> _islands;
+        public IReadOnlyList<MapElement> Elements => _elements;
+        private List<MapElement> _elements;
 
         public Vector2 Size { get; private set; }
         public Rect2 PlayableArea { get; private set; }
@@ -21,7 +21,7 @@ namespace AnnoMapEditor.MapTemplates
 
         private MapTemplateDocument template;
 
-        public event NotifyCollectionChangedEventHandler? IslandCollectionChanged;
+        public event NotifyCollectionChangedEventHandler? ElementCollectionChanged;
         public event EventHandler<SessionResizeEventArgs>? MapSizeConfigChanged;
         public event EventHandler? MapSizeConfigCommitted;
 
@@ -30,7 +30,7 @@ namespace AnnoMapEditor.MapTemplates
         public Session()
         {
             Size = new Vector2(0, 0);
-            _islands = new List<Island>();
+            _elements = new List<MapElement>();
             template = new MapTemplateDocument();
         }
 
@@ -85,7 +85,7 @@ namespace AnnoMapEditor.MapTemplates
             Session session = new()
             {
                 Region = region,
-                _islands = new List<Island>(await Task.WhenAll(islands)),
+                _elements = new List<MapElement>(await Task.WhenAll(islands)),
                 Size = new Vector2(document.MapTemplate?.Size),
                 PlayableArea = new Rect2(document.MapTemplate?.PlayableArea),
                 template = document
@@ -97,8 +97,8 @@ namespace AnnoMapEditor.MapTemplates
 
             // number starting positions
             int counter = 0;
-            foreach (var island in session.Islands)
-                if (island.ElementType == 2)
+            foreach (var element in session.Elements)
+                if (element is Island island)
                     island.Counter = counter++;
 
             if (session.Size.X == 0)
@@ -110,8 +110,6 @@ namespace AnnoMapEditor.MapTemplates
         public static Session? FromNewMapDimensions(int mapSize, int playableSize, Region region)
         {
             int margin = (mapSize - playableSize) / 2;
-
-            List<Island> startingSpots = Island.CreateNewStartingSpots(playableSize, margin, region);
 
             MapTemplateDocument createdTemplateDoc = new MapTemplateDocument()
             {
@@ -126,19 +124,13 @@ namespace AnnoMapEditor.MapTemplates
             Session session = new()
             {
                 Region = region,
-                _islands = new List<Island>(),
                 Size = new Vector2(createdTemplateDoc.MapTemplate.Size),
                 PlayableArea = new Rect2(createdTemplateDoc.MapTemplate.PlayableArea),
                 template = createdTemplateDoc
             };
 
-
-            int startingSpotCounter = 0;
-            foreach (Island startingSpot in startingSpots)
-            {
-                startingSpot.Counter = startingSpotCounter++;
-                session.AddIsland(startingSpot);
-            }
+            foreach (MapElement startingSpot in StartingSpot.CreateStartingSpots(playableSize, margin))
+                session.AddElement(startingSpot);
 
             if (session.Size.X == 0)
                 return null;
@@ -180,13 +172,15 @@ namespace AnnoMapEditor.MapTemplates
 
         public async Task UpdateExternalDataAsync()
         {
-            foreach (var island in Islands)
-                await island.UpdateExternalDataAsync();
+            foreach (var element in Elements)
+                if (element is Island island)
+                    await island.UpdateExternalDataAsync();
         }
 
         public async Task UpdateAsync()
         {
-            foreach (var island in Islands)
+            foreach (var element in Elements)
+                if (element is Island island)
                 await island.InitAsync(Region);
         }
 
@@ -195,7 +189,7 @@ namespace AnnoMapEditor.MapTemplates
             if (template.MapTemplate?.Size is null || template.MapTemplate?.PlayableArea is null)
                 return null;
 
-            template.MapTemplate.TemplateElement = new List<TemplateElement>(Islands.Select(x => x.ToTemplate()).Where(x => x is not null)!);
+            template.MapTemplate.TemplateElement = new List<TemplateElement>(Elements.Select(x => x.ToTemplate()).Where(x => x is not null)!);
             template.MapTemplate.ElementCount = template.MapTemplate.TemplateElement.Count;
 
             if (Region.HasMapExtension && writeInitialArea)
@@ -231,18 +225,23 @@ namespace AnnoMapEditor.MapTemplates
             await Serializer.WriteAsync(export, file);
         }
 
-        public void AddIsland(Island island)
+        public void AddElement(MapElement mapElement)
         {
-            island.CreateTemplate();
-            _islands.Add(island);
-            Task.Run(async () => await island.InitAsync(Region));
-            IslandCollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            _elements.Add(mapElement);
+
+            if (mapElement is Island island)
+            {
+                island.CreateTemplate();
+                Task.Run(async () => await island.InitAsync(Region));
+            }
+
+            ElementCollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        public void RemoveIsland(Island island)
+        public void RemoveElement(MapElement element)
         {
-            _islands.Remove(island);
-            IslandCollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            _elements.Remove(element);
+            ElementCollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         public class SessionResizeEventArgs : EventArgs

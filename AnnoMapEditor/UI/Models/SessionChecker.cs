@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.MapTemplates;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,10 +22,10 @@ namespace AnnoMapEditor.UI.Models
         public SessionChecker(Session session)
         {
             _session = session;
-            _session.IslandCollectionChanged += Session_OnIslandCollectionChanged;
+            _session.ElementCollectionChanged += Session_OnIslandCollectionChanged;
 
-            foreach (var island in session.Islands)
-                island.IslandChanged += Island_IslandChanged;
+            foreach (var element in session.Elements)
+                element.PropertyChanged += Element_PropertyChanged;
 
             Check();
         }
@@ -34,7 +35,7 @@ namespace AnnoMapEditor.UI.Models
             Check();
         }
 
-        private void Island_IslandChanged()
+        private void Element_PropertyChanged(object? sender, PropertyChangedEventArgs args)
         {
             Check();
         }
@@ -52,16 +53,20 @@ namespace AnnoMapEditor.UI.Models
             int thirdPartyCount = 0;
             int pirateCount = 0;
 
-            foreach (var island in session.Islands)
+            foreach (var element in session.Elements)
             {
-                if (island.Type == IslandType.ThirdParty)
-                    thirdPartyCount++;
-                else if (island.Type == IslandType.PirateIsland)
-                    pirateCount++;
-                if (!island.IsPool || island.ElementType == 2)
-                    continue;
+                if (element is Island island)
+                {
+                    if (island.Type == IslandType.ThirdParty)
+                        thirdPartyCount++;
+                    else if (island.Type == IslandType.PirateIsland)
+                        pirateCount++;
 
-                pools[island.Size.ElementValue ?? 0]++;
+                    if (!island.IsPool)
+                        continue;
+
+                    pools[island.Size.ElementValue ?? 0]++;
+                }
             }
 
             
