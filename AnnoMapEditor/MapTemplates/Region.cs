@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AnnoMapEditor.MapTemplates
 {
-    public struct Region
+    public partial struct Region
     {
         #region Region enums
         //Technically, Cape Trelawney is in Moderate Region but has ambientName "Moderate_01_day_night_st",
@@ -96,86 +95,8 @@ namespace AnnoMapEditor.MapTemplates
 
         private readonly string value;
 
-        #region Pool Islands
-        public struct Pool
-        {
-            public FilePathRange[] paths { get; init; }
-            public int size
-            {
-                get
-                {
-                    int sum = 0;
-                    foreach(var path in paths)
-                    {
-                        sum += path.size;
-                    }
-                    return sum;
-                }
-            }
-
-            public string GetPath(int i)
-            {
-                int rangeIdx = 0;
-                FilePathRange range = paths[rangeIdx];
-                int skipped = 0;
-                while(skipped + range.size <= i)
-                {
-                    skipped += range.size;
-                    range = paths[++rangeIdx];
-                }
-
-                return range.GetPath(i - skipped);
-            }
-
-            public Pool(string filePath, int size)
-            {
-                this.paths = new FilePathRange[]
-                {
-                    new FilePathRange(filePath, 1, size)
-                };
-            }
-
-            public Pool(string filePath, int[] ids)
-            {
-                this.paths = new FilePathRange[]
-                {
-                    new FilePathRange(filePath, ids)
-                };
-            }
-
-            public Pool(FilePathRange[] paths)
-            {
-                this.paths = paths;
-            }
-        }
-
-        public struct FilePathRange
-        {
-            public string filePath;
-            public int size;
-            public int[] ids;
-
-            public string GetPath(int i)
-            {
-                return string.Format(filePath, string.Format("{0:00}", ids[i]));
-            }
-
-            public FilePathRange(string filePath, int start, int count)
-            {
-                this.filePath = filePath;
-                this.size = count;
-                this.ids = Enumerable.Range(start, count).ToArray();
-            }
-
-            public FilePathRange(string filePath, int[] ids)
-            {
-                this.filePath = filePath;
-                this.size = ids.Length;
-                this.ids = ids;
-            }
-        }
         public Dictionary<IslandSize, Pool> PoolIslands { get; private init; }
-        #endregion
+
 
         private Region(string type, string name, string ambientName, bool allowModding, string poolFolderName, 
             string[] mapSizes, string[] sizeIndices, bool usesAllSizeIndices, bool hasMapExtension, Dictionary<IslandSize, Pool> poolIslands)
