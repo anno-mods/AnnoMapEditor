@@ -106,6 +106,24 @@ namespace AnnoMapEditor.UI.Controls
                 UpdateIslandProperties(_island);
         }
 
+        private async void OnRotateClockwise(object sender, RoutedEventArgs args)
+        {
+            if (DataContext is Island island)
+            {
+                island.Rotation = island.Rotation + 1 % 4;
+                await island.UpdateExternalDataAsync();
+            }
+        }
+
+        private async void OnRotateCounterClockwise(object sender, RoutedEventArgs args)
+        {
+            if (DataContext is Island island)
+            {
+                island.Rotation = island.Rotation - 1 % 4;
+                await island.UpdateExternalDataAsync();
+            }
+        }
+
         private void UpdateIslandProperties(Island island)
         {
             Header.Text = island.ElementType == 2 ? "Start" : "Island";
