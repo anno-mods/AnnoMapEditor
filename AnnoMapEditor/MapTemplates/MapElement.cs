@@ -9,7 +9,7 @@ namespace AnnoMapEditor.MapTemplates
 {
     public abstract class MapElement : ObservableBase
     {
-        private Vector2 _position = new Vector2(0, 0);
+        private Vector2 _position = Vector2.Zero;
         public Vector2 Position 
         { 
             get => _position; 
