@@ -72,6 +72,7 @@ namespace AnnoMapEditor.MapTemplates
         public static readonly Region[] All = new Region[] { Moderate, NewWorld, Arctic, Enbesa };
         #endregion
 
+
         public string Name { get; init; }
         public string AmbientName { get; init; }
         public bool AllowModding { get; init; }
@@ -87,7 +88,7 @@ namespace AnnoMapEditor.MapTemplates
 
         private readonly string value;
 
-        public Dictionary<IslandSize, IslandMapPool> PoolIslands { get; private init; }
+        public Dictionary<IslandSize, IslandMapPool> IslandMapPools { get; private init; }
 
 
         private Region(string type, string name, string ambientName, bool allowModding, string poolFolderName, 
@@ -105,7 +106,7 @@ namespace AnnoMapEditor.MapTemplates
             UsesAllSizeIndices = usesAllSizeIndices;
             HasMapExtension = hasMapExtension;
 
-            PoolIslands = poolIslands;
+            IslandMapPools = poolIslands;
         }
 
         public IEnumerable<string> GetAllSizeCombinations()
