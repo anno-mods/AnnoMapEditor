@@ -8,6 +8,7 @@ using System.Windows;
 using System.Linq;
 using AnnoMapEditor.MapTemplates.Serializing.A7te;
 using AnnoMapEditor.MapTemplates.Serializing.A7t;
+using System.Collections.Generic;
 
 /*
  * Modloader doesn't support a7t because they are loaded as .rda archive.
@@ -29,6 +30,8 @@ namespace AnnoMapEditor.Mods
 
         public MapType MapType { get; set; }
 
+        public const string AME_POOL_PATH = @"data\ame\maps\pool";
+
         public Mod(Session session)
         {
             this.session = session;
@@ -40,10 +43,7 @@ namespace AnnoMapEditor.Mods
             if (session is null)
                 return false;
 
-            if (session.Region != Region.Moderate)
-                return false;
-
-            return true;
+            return session.Region.AllowModding;
         }
 
         public async Task<bool> Save(string modPath, string modName, string? modID)
@@ -52,12 +52,13 @@ namespace AnnoMapEditor.Mods
 
             try
             {
-                string? mapTypeFileName = MapType.ToName();
+                string? mapTypeFileName = MapType.ToFileName();
                 string? mapTypeGuid = MapType.ToGuid();
+
                 if (mapTypeFileName is null || mapTypeGuid is null)
                     throw new Exception("invalid MapType");
 
-                if(session.Region != Region.Moderate)
+                if(!session.Region.AllowModding)
                 {
                     throw new Exception("not supported map region");
                 }
@@ -66,17 +67,19 @@ namespace AnnoMapEditor.Mods
                 Directory.CreateDirectory(modPath);
                 await WriteMetaJson(modPath, modName, modID);
 
-                await WriteLanguageXml(modPath, modName, mapTypeGuid);
+                //Only write Language XML for OW Maps, as only they need naming in a menu
+                if(!string.IsNullOrEmpty(mapTypeGuid))
+                    await WriteLanguageXml(modPath, modName, mapTypeGuid);
 
-                string mapFilePath = $@"data\ame\maps\pool\moderate\{mapTypeFileName}";
-                await WriteAssetsXml(modPath, fullModName, mapFilePath, MapType);
-
-                string[] sizes = new[] { "ll", "lm", "ls", "ml", "mm", "ms", "sl", "sm", "ss" };
+                string mapFilePath = Path.Combine(AME_POOL_PATH, session.Region.PoolFolderName, mapTypeFileName);
+                await WriteAssetsXml(modPath, fullModName, mapFilePath, session.Region, MapType);
 
                 //Create first entry with custom a7t and a7te
+                List<string> sizes = session.Region.GetAllSizeCombinations().ToList();
                 string size = sizes[0];
+
                 string basePath = Path.Combine(modPath, $"{mapFilePath}");
-                await session.SaveAsync(basePath + $"_{size}.a7tinfo");
+                await session.SaveAsync(basePath + $"_{size}.a7tinfo", false);
 
                 //a7t Creation
                 string a7tPath = basePath + $"_{size}.a7t";
@@ -86,14 +89,29 @@ namespace AnnoMapEditor.Mods
                 string a7tePath = basePath + $"_{size}.a7te";
                 await Task.Run(() => new A7teExporter(session.Size.X).ExportA7te(a7tePath));
 
+
+                if (session.Region.HasMapExtension)
+                {
+                    await session.SaveAsync(basePath + $"_{size}_enlarged.a7tinfo", true);
+                    File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}_enlarged.a7t");
+                    File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}_enlarged.a7te");
+                }
+
                 //copy a7t and a7te to remaining entries
-                for (int i = 1; i<sizes.Length; i++)
+                for (int i = 1; i<sizes.Count; i++)
                 {
                     size = sizes[i];
 
-                    await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_{size}.a7tinfo"));
+                    await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_{size}.a7tinfo"), false);
                     File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}.a7t");
                     File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}.a7te");
+
+                    if (session.Region.HasMapExtension)
+                    {
+                        await session.SaveAsync(basePath + $"_{size}_enlarged.a7tinfo", true);
+                        File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}_enlarged.a7t");
+                        File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}_enlarged.a7te");
+                    }
                 }
             }
             catch (UnauthorizedAccessException)
@@ -169,7 +187,7 @@ namespace AnnoMapEditor.Mods
             }
         }
 
-        private async Task WriteAssetsXml(string modPath, string fullModName, string mapFilePath, MapType mapType)
+        private async Task WriteAssetsXml(string modPath, string fullModName, string mapFilePath, Region region, MapType mapType)
         {
             string assetsXmlPath = Path.Combine(modPath, @"data\config\export\main\asset\assets.xml");
             string? assetsXmlDir = Path.GetDirectoryName(assetsXmlPath);
@@ -178,31 +196,81 @@ namespace AnnoMapEditor.Mods
 
             string fullMapPath = Path.Combine("mods", fullModName, mapFilePath).Replace("\\", "/");
 
-            string content = CreateAssetsModOps(mapType, fullMapPath);
+            string content = CreateAssetsModOps(region, mapType, fullMapPath);
 
             using StreamWriter writer = new(File.Create(assetsXmlPath));
             await writer.WriteAsync(content);
         }
 
-        public static string CreateAssetsModOps(MapType mapType, string fullMapPath)
+        public static string CreateAssetsModOps(Region region, MapType mapType, string fullMapPath)
         {
-            string[] sizes = new[] { "ll", "lm", "ls", "ml", "mm", "ms", "sl", "sm", "ss" };
+            IEnumerable<string> sizes = region.MapSizes;
             // some maps have updates sizes, but make sure to only replace one
-            string[] subSizes = new[] { "_01", "_02" };
+            IEnumerable<string> subSizes = region.MapSizeIndices;
+
+            string MakeXPath(string mapTypeName, string size, string subsize)
+            {
+                if (string.IsNullOrEmpty(subsize))
+                    return $"../Standard/Name='{mapTypeName}{size}'";
+                else
+                    return $"../Standard/Name='{mapTypeName}{size}_{subsize}'";
+            }
             
             string content = "<ModOps>\n";
 
-            foreach (var size in sizes)
+            if (region.UsesAllSizeIndices)
             {
-                var xpaths = subSizes.Select(x => $"../Standard/Name='{mapType.ToName()}_{size}{x}'");
-
-                content +=
-                $"  <ModOp Type=\"replace\" Path=\"//MapTemplate[{string.Join(" or ", xpaths)}][last()]/TemplateFilename\">\n" +
-                $"    <TemplateFilename>{fullMapPath}_{size}.a7t</TemplateFilename>\n" +
-                $"  </ModOp>\n";
+                //Single ModOp for all Sub-Sizes
+                foreach (var size in sizes)
+                {
+                    foreach(var subsize in subSizes)
+                    {
+                        content += CreateModOp(
+                            new string[] { MakeXPath(mapType.ToName(), size, subsize) },
+                            fullMapPath,
+                            $"{size}_{subsize}",
+                            region.HasMapExtension);
+                    }
+                }
             }
+            else
+            {
+                //XPath OR
+                foreach (var size in sizes)
+                {
+                    var xpaths = subSizes.Select(x => MakeXPath(mapType.ToName(), size, x));
+
+                    content += CreateModOp(xpaths, fullMapPath, size, region.HasMapExtension);
+                }
+            }
+
+            
             content += "</ModOps>\n";
             return content;
+        }
+
+        private static string CreateModOp(IEnumerable<string> xPaths, string basePath, string size, bool extension)
+        {
+            string result = CreateModOpSingle(xPaths, basePath, size, false);
+            if (extension)
+            {
+                result += CreateModOpSingle(xPaths, basePath, size, true);
+            }
+            return result;
+        }
+
+        private static string CreateModOpSingle(IEnumerable<string> xPaths, string basePath, string size, bool extension)
+        {
+            const string TEMPLATE = "TemplateFilename";
+            const string ENLARGED_TEMPLATE = "EnlargedTemplateFilename";
+
+            string target = extension ? ENLARGED_TEMPLATE : TEMPLATE;
+
+            string result = $"  <ModOp Type=\"replace\" Path=\"//MapTemplate[{string.Join(" or ", xPaths)}][last()]/{target}\">\n" +
+                            $"    <{target}>{basePath}_{size}{(extension ? "_enlarged" : "")}.a7t</{target}>\n" + 
+                            $"  </ModOp>\n";
+
+            return result;
         }
 
         private static string MakeSafeName(string unsafeName) => new Regex(@"\W").Replace(unsafeName, "_").ToLower();

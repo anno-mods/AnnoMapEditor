@@ -190,13 +190,18 @@ namespace AnnoMapEditor.MapTemplates
                 await island.InitAsync(Region);
         }
 
-        public MapTemplateDocument? ToTemplate()
+        public MapTemplateDocument? ToTemplate(bool writeInitialArea = false)
         {
             if (template.MapTemplate?.Size is null || template.MapTemplate?.PlayableArea is null)
                 return null;
 
             template.MapTemplate.TemplateElement = new List<TemplateElement>(Islands.Select(x => x.ToTemplate()).Where(x => x is not null)!);
             template.MapTemplate.ElementCount = template.MapTemplate.TemplateElement.Count;
+
+            if (Region.HasMapExtension && writeInitialArea)
+                template.MapTemplate.InitialPlayableArea = template.MapTemplate.PlayableArea;
+            else
+                template.MapTemplate.InitialPlayableArea = null;
 
             return template;
         }
@@ -212,7 +217,7 @@ namespace AnnoMapEditor.MapTemplates
             await Serializer.WriteToXmlAsync(export, file);
         }
 
-        public async Task SaveAsync(string filePath)
+        public async Task SaveAsync(string filePath, bool writeInitialArea)
         {
             var export = ToTemplate();
             if (export is null)

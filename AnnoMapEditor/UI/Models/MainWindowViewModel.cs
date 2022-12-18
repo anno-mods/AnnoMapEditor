@@ -186,7 +186,7 @@ namespace AnnoMapEditor.UI.Models
             SessionFilePath = Path.GetFileName(filePath);
 
             if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
-                await Session.SaveAsync(filePath);
+                await Session.SaveAsync(filePath, false);
             else
                 await Session.SaveToXmlAsync(filePath);
         }
