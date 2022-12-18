@@ -76,17 +76,17 @@ namespace AnnoMapEditor.UI.Models
                 pools[0] -= pirateCount - 1;
             }
             
-            if (pools[0] > session.Region.PoolIslands[IslandSize.Small].size)
+            if (pools[0] > session.Region.PoolIslands[IslandSize.Small].Size)
             {
-                Status = $"⚠ Too many small pool islands.\nOnly the first {session.Region.PoolIslands[IslandSize.Small].size} islands will be loaded.\nThird party and pirate islands\nare considered small pool islands if deactivated.";
+                Status = $"⚠ Too many small pool islands.\nOnly the first {session.Region.PoolIslands[IslandSize.Small].Size} islands will be loaded.\nThird party and pirate islands\nare considered small pool islands if deactivated.";
             }
-            else if (pools[1] > session.Region.PoolIslands[IslandSize.Medium].size)
+            else if (pools[1] > session.Region.PoolIslands[IslandSize.Medium].Size)
             {
-                Status = $"⚠ Too many medium pool islands.\nOnly the first {session.Region.PoolIslands[IslandSize.Medium].size} islands will be loaded.";
+                Status = $"⚠ Too many medium pool islands.\nOnly the first {session.Region.PoolIslands[IslandSize.Medium].Size} islands will be loaded.";
             }
-            else if (pools[2] > session.Region.PoolIslands[IslandSize.Large].size)
+            else if (pools[2] > session.Region.PoolIslands[IslandSize.Large].Size)
             {
-                Status = $"⚠ Too many large pool islands.\nOnly the first {session.Region.PoolIslands[IslandSize.Large].size} islands will be loaded.";
+                Status = $"⚠ Too many large pool islands.\nOnly the first {session.Region.PoolIslands[IslandSize.Large].Size} islands will be loaded.";
             }
             else if (pools[0] < 0)
             {

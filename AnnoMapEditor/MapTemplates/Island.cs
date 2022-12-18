@@ -287,7 +287,7 @@ namespace AnnoMapEditor.MapTemplates
 
             if (mapPath == null)
             {
-                mapPath = region.GetRandomIslandPath(Size);
+                mapPath = region.PoolIslands[Size].GetRandomIslandPath(); // TODO: Refactor to use IslandMap
                 Rotation = rnd.Next(0, 3);
             }
 
