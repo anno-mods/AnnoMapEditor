@@ -129,8 +129,8 @@ namespace AnnoMapEditor.MapTemplates
             var element = templateElement.Element;
             Vector2 position = new(element?.Position);
             IslandSize islandSize = new IslandSize(element?.Size);
-            string mapFilePath = element?.MapFilePath?.ToString()!;
-            IslandMap islandMap = region.IslandMapPools[islandSize].GetFromPath(mapFilePath);
+            string? mapFilePath = element?.MapFilePath?.ToString();
+            IslandMap? islandMap = mapFilePath != null ? region.IslandMapPools[islandSize].GetFromPath(mapFilePath!) : null;
 
             var island = new Island(region, position)
             {
