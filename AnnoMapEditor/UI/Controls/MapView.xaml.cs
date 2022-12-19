@@ -81,12 +81,11 @@ namespace AnnoMapEditor.UI.Controls
             UpdateIslands(DataContext as Session);
         }
 
-        private async void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (DataContext is not Session session)
                 return;
 
-            await session.UpdateExternalDataAsync();
             UpdateIslands(session);
         }
 
@@ -194,7 +193,7 @@ namespace AnnoMapEditor.UI.Controls
                 Action<int, int> move = (x, y) =>
                 {
                     island.Position = session.Size + new Vector2(x, y);
-                    var islandCanvasPos = island.Position.FlipYItem(session.Size.Y, island.SizeInTiles);
+                    var islandCanvasPos = island.Position.FlipYItem(session.Size.Y, island.Size.InTiles);
                     addIsland.SetPosition(islandCanvasPos);
                 };
 
@@ -247,7 +246,7 @@ namespace AnnoMapEditor.UI.Controls
         {
             if (session is null || mapObject.DataContext is not MapElement element) return;
 
-            var mapArea = new Rect2(session.Size - element.MapSizeInTiles + Vector2.Tile);
+            var mapArea = new Rect2(session.Size - element.SizeInTiles + Vector2.Tile);
 
             var ensured = position.Clamp(mapArea);
             Island? island = element as Island;
@@ -267,7 +266,7 @@ namespace AnnoMapEditor.UI.Controls
                 }
             }
 
-            element.Position = ensured.FlipYItem(session.Size.Y, element.MapSizeInTiles);
+            element.Position = ensured.FlipYItem(session.Size.Y, element.SizeInTiles);
             mapObject.SetPosition(ensured);
             mapObject.IsMarkedForDeletion = !ensured.Within(mapArea) && (island == null || !island.IsNew);
         }
@@ -337,8 +336,8 @@ namespace AnnoMapEditor.UI.Controls
                     }
                     else
                     {
-                        var islandCanvasPos = island.Position.FlipYItem(oldSize!.Y, island.SizeInTiles);
-                        var mapArea = new Rect2(session.Size - island.SizeInTiles + Vector2.Tile);
+                        var islandCanvasPos = island.Position.FlipYItem(oldSize!.Y, island.Size.InTiles);
+                        var mapArea = new Rect2(session.Size - island.Size.InTiles + Vector2.Tile);
 
                         mapObject.IsMarkedForDeletion = !islandCanvasPos.Within(mapArea);
                     }
@@ -393,7 +392,7 @@ namespace AnnoMapEditor.UI.Controls
                     else
                     {
                         Vector2 canvasLocation = mapObject.GetPosition();
-                        island.Position = canvasLocation.FlipYItem(session.Size.Y, island.SizeInTiles);
+                        island.Position = canvasLocation.FlipYItem(session.Size.Y, island.Size.InTiles);
                     }
                 }
             }

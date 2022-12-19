@@ -95,12 +95,6 @@ namespace AnnoMapEditor.MapTemplates
             if (session.template.MapTemplate is not null)
                 session.template.MapTemplate.TemplateElement = null;
 
-            // number starting positions
-            int counter = 0;
-            foreach (var element in session.Elements)
-                if (element is Island island)
-                    island.Counter = counter++;
-
             if (session.Size.X == 0)
                 return null;
 
@@ -170,18 +164,12 @@ namespace AnnoMapEditor.MapTemplates
             MapSizeConfigCommitted?.Invoke(this, new EventArgs());
         }
 
-        public async Task UpdateExternalDataAsync()
+        public void SetRegion(Region region)
         {
+            Region = region;
             foreach (var element in Elements)
                 if (element is Island island)
-                    await island.UpdateExternalDataAsync();
-        }
-
-        public async Task UpdateAsync()
-        {
-            foreach (var element in Elements)
-                if (element is Island island)
-                await island.InitAsync(Region);
+                    island.SetRegion(region);
         }
 
         public MapTemplateDocument? ToTemplate(bool writeInitialArea = false)
@@ -232,7 +220,7 @@ namespace AnnoMapEditor.MapTemplates
             if (mapElement is Island island)
             {
                 island.CreateTemplate();
-                Task.Run(async () => await island.InitAsync(Region));
+                island.Init();
             }
 
             ElementCollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));

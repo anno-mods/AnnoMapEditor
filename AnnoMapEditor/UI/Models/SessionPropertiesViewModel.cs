@@ -30,7 +30,7 @@ namespace AnnoMapEditor.UI.Models
                 {
                     _selectedRegion = value;
                     _session.Region = value;
-                    _ = _session.UpdateAsync();
+                    _session.SetRegion(value);
                     OnSelectedRegionChanged();
                 }
             }

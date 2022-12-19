@@ -84,8 +84,6 @@ namespace AnnoMapEditor.MapTemplates
         public bool UsesAllSizeIndices { get; init; }
         public bool HasMapExtension { get; init; }
 
-        private static readonly Random rnd = new((int)DateTime.Now.Ticks);
-
         private readonly string value;
 
         public Dictionary<IslandSize, IslandMapPool> IslandMapPools { get; private init; }

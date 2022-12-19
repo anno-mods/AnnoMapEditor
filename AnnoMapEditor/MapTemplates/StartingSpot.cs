@@ -12,12 +12,13 @@ namespace AnnoMapEditor.MapTemplates
     {
         public readonly int Index;
 
+        public override int SizeInTiles => MapObject.MAP_PIN_SIZE;
+
 
         public StartingSpot(int index, int x, int y)
         {
             Index = index;
             Position = new Vector2(x, y);
-            MapSizeInTiles = MapObject.MAP_PIN_SIZE;
         }
 
 

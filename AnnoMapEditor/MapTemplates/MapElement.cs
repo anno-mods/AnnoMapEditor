@@ -23,18 +23,9 @@ namespace AnnoMapEditor.MapTemplates
             } 
         }
 
-        private int _mapSizeInTiles = 0;
-        public int MapSizeInTiles 
+        public abstract int SizeInTiles 
         {
-            get => _mapSizeInTiles;
-            protected set 
-            {
-                if (value != _mapSizeInTiles)
-                {
-                    _mapSizeInTiles = value;
-                    OnPropertyChanged();
-                }
-            }
+            get;
         }
 
         private int _rotation = 0;

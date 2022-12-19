@@ -190,9 +190,9 @@ namespace AnnoMapEditor.UI.Controls
 
         private void UpdateIsland(Island island)
         {
-            Width = island.SizeInTiles;
-            Height = island.SizeInTiles;
-            this.SetPosition(island.Position.FlipYItem(session.Size.Y, island.SizeInTiles));
+            Width = island.Size.InTiles;
+            Height = island.Size.InTiles;
+            this.SetPosition(island.Position.FlipYItem(session.Size.Y, island.Size.InTiles));
             Panel.SetZIndex(this, ZIndex[island.Type]);
 
             Image? image;
@@ -219,23 +219,22 @@ namespace AnnoMapEditor.UI.Controls
 
                 if (png is not null)
                 {
-                    image.Width = island.MapSizeInTiles;
-                    image.Height = island.MapSizeInTiles;
+                    image.Width = island.SizeInTiles;
+                    image.Height = island.SizeInTiles;
                     image.RenderTransform = new RotateTransform(island.Rotation * -90);
                     image.RenderTransformOrigin = new Point(0.5, 0.5);
                     image.Source = png;
                     canvas.Children.Add(image);
-                    image.SetPosition(new Vector2(0, island.SizeInTiles - island.MapSizeInTiles));
+                    image.SetPosition(new Vector2(0, island.Size.InTiles - island.SizeInTiles));
                 }
             }
-
 
             borderRectangle = new()
             {
                 Fill = MapObjectBackgrounds[island.Type.ToString()],
                 StrokeThickness = Vector2.Tile.Y,
-                Width = island.SizeInTiles,
-                Height = island.SizeInTiles
+                Width = island.Size.InTiles,
+                Height = island.Size.InTiles
             };
             UpdateSelectionBorder();
             canvas.Children.Add(borderRectangle);
@@ -248,7 +247,7 @@ namespace AnnoMapEditor.UI.Controls
                 Fill = White,
             };
 
-            circle.SetPosition(Vector2.Zero.FlipYItem(island.SizeInTiles, CIRCLE_DIAMETER));
+            circle.SetPosition(Vector2.Zero.FlipYItem(island.Size.InTiles, CIRCLE_DIAMETER));
             canvas.Children.Add(circle);
 
             if (!string.IsNullOrEmpty(island.Label))

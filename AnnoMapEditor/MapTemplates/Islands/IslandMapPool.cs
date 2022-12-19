@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.MapTemplates.Islands;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AnnoMapEditor.MapTemplates
 {
@@ -19,10 +20,16 @@ namespace AnnoMapEditor.MapTemplates
         }
 
 
-        public string GetRandomIslandPath()
+        public IslandMap GetRandomIslandMap()
         {
             int index = Random.Shared.Next(_islandMaps.Count);
-            return _islandMaps[index].FilePath;
+            return _islandMaps[index];
+        }
+
+        public IslandMap GetFromPath(string mapFilePath)
+        {
+            return _islandMaps.FirstOrDefault(m => m.FilePath == mapFilePath)
+                ?? throw new NullReferenceException($"Could not find map '{mapFilePath}'.");
         }
     }
 }

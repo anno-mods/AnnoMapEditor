@@ -10,19 +10,19 @@ namespace AnnoMapEditor.MapTemplates.Serializing
 {
     internal static class IslandReader
     {
-        public static async Task<int> ReadTileInSizeFromFileAsync(string mapPath)
+        public static async Task<int?> ReadTileInSizeFromFileAsync(string mapPath)
         {
             if (Settings.Instance.DataArchive?.IsValid != true)
-                return 0;
+                return null;
 
             using Stream? fs = Settings.Instance.DataArchive.OpenRead(mapPath + @"info");
             if (fs is null)
-                return 0;
+                return null;
 
             var doc = await ReadFileDBAsync(fs);
 
             if (doc?.Roots.FirstOrDefault(x => x.Name == "MapSize" && x.NodeType == FileDBNodeType.Attrib) is not Attrib mapSize)
-                return 0;
+                return null;
 
             int sizeInTiles = BitConverter.ToInt32(new ReadOnlySpan<byte>(mapSize.Content, 0, 4));
             return sizeInTiles;

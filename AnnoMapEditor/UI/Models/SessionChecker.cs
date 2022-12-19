@@ -62,9 +62,6 @@ namespace AnnoMapEditor.UI.Models
                     else if (island.Type == IslandType.PirateIsland)
                         pirateCount++;
 
-                    if (!island.IsPool)
-                        continue;
-
                     pools[island.Size.ElementValue ?? 0]++;
                 }
             }
