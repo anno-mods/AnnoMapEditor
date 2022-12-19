@@ -195,38 +195,16 @@ namespace AnnoMapEditor.UI.Controls
             this.SetPosition(island.Position.FlipYItem(session.Size.Y, island.Size.InTiles));
             Panel.SetZIndex(this, ZIndex[island.Type]);
 
-            Image? image;
-            if (island.ImageFile != null)
+            if (island.IslandMap?.MapImage != null)
             {
-                image = new();
-                BitmapImage? png = new();
-                try
-                {
-                    using Stream? stream = Settings.Instance.DataArchive?.OpenRead(island.ImageFile);
-                    if (stream is not null)
-                    {
-                        png.BeginInit();
-                        png.StreamSource = stream;
-                        png.CacheOption = BitmapCacheOption.OnLoad;
-                        png.EndInit();
-                        png.Freeze();
-                    }
-                }
-                catch
-                {
-                    png = null;
-                }
-
-                if (png is not null)
-                {
-                    image.Width = island.SizeInTiles;
-                    image.Height = island.SizeInTiles;
-                    image.RenderTransform = new RotateTransform(island.Rotation * -90);
-                    image.RenderTransformOrigin = new Point(0.5, 0.5);
-                    image.Source = png;
-                    canvas.Children.Add(image);
-                    image.SetPosition(new Vector2(0, island.Size.InTiles - island.SizeInTiles));
-                }
+                Image? image = new();
+                image.Width = island.SizeInTiles;
+                image.Height = island.SizeInTiles;
+                image.RenderTransform = new RotateTransform(island.Rotation * -90);
+                image.RenderTransformOrigin = new Point(0.5, 0.5);
+                image.Source = island.IslandMap?.MapImage;
+                canvas.Children.Add(image);
+                image.SetPosition(new Vector2(0, island.Size.InTiles - island.SizeInTiles));
             }
 
             borderRectangle = new()

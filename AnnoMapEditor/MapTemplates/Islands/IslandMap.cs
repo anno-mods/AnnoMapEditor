@@ -15,14 +15,18 @@ namespace AnnoMapEditor.MapTemplates.Islands
 
         public readonly int? SizeInTiles;
 
-        public readonly BitmapImage? MapImage;
+        private BitmapImage? _mapImage;
+        public BitmapImage? MapImage
+        {
+            get => _mapImage ?? TryLoadMapImage();
+        }
 
 
         public IslandMap(string filePath, int? sizeInSiles)
         {
             FilePath = filePath;
             SizeInTiles = sizeInSiles;
-            MapImage = LoadMapImage(filePath);
+            TryLoadMapImage();
         }
 
 
@@ -43,34 +47,36 @@ namespace AnnoMapEditor.MapTemplates.Islands
         }
 
 
-        private static BitmapImage? LoadMapImage(string mapFilePath)
+        private BitmapImage? TryLoadMapImage()
         {
             // determine the mapimage's path
             string mapImagePath = Path.Combine(
-               Path.GetDirectoryName(mapFilePath)!,
+               Path.GetDirectoryName(FilePath)!,
                "_gamedata",
-               Path.GetFileNameWithoutExtension(mapFilePath),
+               Path.GetFileNameWithoutExtension(FilePath),
                "mapimage.png"
             );
 
             try {
                 using Stream? stream = Settings.Instance.DataArchive.OpenRead(mapImagePath);
-               
-                if (stream == null)
-                    return null;
 
-                BitmapImage png = new();
-                png.BeginInit();
-                png.StreamSource = stream;
-                png.CacheOption = BitmapCacheOption.OnLoad;
-                png.EndInit();
-                png.Freeze();
-                return png;
-                    
+                if (stream != null)
+                {
+                    BitmapImage png = new();
+                    png.BeginInit();
+                    png.StreamSource = stream;
+                    png.CacheOption = BitmapCacheOption.OnLoad;
+                    png.EndInit();
+                    png.Freeze();
+
+                    return _mapImage = png;
+                }
+                else
+                    return null;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Could not load map image for '{mapFilePath}'.", ex);
+                throw new Exception($"Could not load map image for '{FilePath}'.", ex);
             }
         }
     }

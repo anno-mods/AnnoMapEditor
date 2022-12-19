@@ -60,19 +60,6 @@ namespace AnnoMapEditor.MapTemplates
             }
         }
         public string? Label { get; set; }
-        private string? _imageFile;
-        public string? ImageFile
-        {
-            get => _imageFile;
-            set
-            {
-                if (value != _imageFile)
-                {
-                    _imageFile = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
         #endregion
         private IslandMap? _islandMap = null;
         public IslandMap? IslandMap
@@ -270,15 +257,6 @@ namespace AnnoMapEditor.MapTemplates
             OnPropertyChanged();
         }
 
-        public void UpdateExternalDataAsync()
-        {
-            if (_imageFile == null)
-            {
-                string activeMapImagePath = Path.Combine(Path.GetDirectoryName(_islandMap.FilePath) ?? "", "_gamedata", Path.GetFileNameWithoutExtension(_islandMap.FilePath), "mapimage.png");
-                _imageFile = activeMapImagePath;
-            }
-        }
-
         public void SetRegion(Region region)
         {
             _region = region;
@@ -290,7 +268,6 @@ namespace AnnoMapEditor.MapTemplates
             if (_islandMap == null)
                 RandomizeIslandMap();
 
-            UpdateExternalDataAsync();
 //            string? mapPath = _islandMap.FilePath;
 //            if (mapPath is not null && SpecialIslands.CachedSizes.ContainsKey(mapPath))
 //                SizeInTiles = SpecialIslands.CachedSizes[mapPath];

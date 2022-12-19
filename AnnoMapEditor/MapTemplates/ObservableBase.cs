@@ -7,15 +7,7 @@ namespace AnnoMapEditor.MapTemplates
     public class ObservableBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) {
-            try
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            } catch (Exception ex)
-            {
-
-            }
-        }
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         protected void SetProperty<T>(ref T property, T value, string[]? dependingPropertyNames = null, [CallerMemberName] string propertyName = "")
         {
             if (property is null && value is null)
