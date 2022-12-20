@@ -107,7 +107,7 @@ namespace AnnoMapEditor.MapTemplates
             Position = position;
         }
 
-        public async Task<Island> CloneAsync()
+        public Island Clone()
         {
             var island = new Island(_region, Position)
             {
@@ -124,7 +124,7 @@ namespace AnnoMapEditor.MapTemplates
             return island;
         }
 
-        public static async Task<Island> FromSerialized(TemplateElement templateElement, Region region)
+        public static Island FromSerialized(TemplateElement templateElement, Region region)
         {
             var element = templateElement.Element;
             Vector2 position = new(element?.Position);

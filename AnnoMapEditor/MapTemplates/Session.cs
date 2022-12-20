@@ -17,7 +17,7 @@ namespace AnnoMapEditor.MapTemplates
 
         public Vector2 Size { get; private set; }
         public Rect2 PlayableArea { get; private set; }
-        public Region Region { get; set; }
+        public Region Region { get; private set; }
 
         private MapTemplateDocument template;
 
@@ -56,7 +56,7 @@ namespace AnnoMapEditor.MapTemplates
             if (doc is null)
                 return null;
 
-            return await FromTemplateDocument(doc, DetectRegionFromPath(internalPath));
+            return FromTemplateDocument(doc, DetectRegionFromPath(internalPath));
         }
 
         public static async Task<Session?> FromXmlAsync(string filePath)
@@ -65,7 +65,7 @@ namespace AnnoMapEditor.MapTemplates
             if (doc is null)
                 return null;
 
-            return await FromTemplateDocument(doc, DetectRegionFromPath(filePath));
+            return FromTemplateDocument(doc, DetectRegionFromPath(filePath));
         }
 
         public static async Task<Session?> FromXmlAsync(Stream? stream, string internalPath)
@@ -74,10 +74,10 @@ namespace AnnoMapEditor.MapTemplates
             if (doc is null)
                 return null;
 
-            return await FromTemplateDocument(doc, DetectRegionFromPath(internalPath));
+            return FromTemplateDocument(doc, DetectRegionFromPath(internalPath));
         }
 
-        public static async Task<Session?> FromTemplateDocument(MapTemplateDocument document, Region region)
+        public static Session? FromTemplateDocument(MapTemplateDocument document, Region region)
         {
             var islands = from element in document.MapTemplate?.TemplateElement
                           where element?.Element is not null
@@ -85,7 +85,7 @@ namespace AnnoMapEditor.MapTemplates
             Session session = new()
             {
                 Region = region,
-                _elements = new List<MapElement>(await Task.WhenAll(islands)),
+                _elements = new List<MapElement>(islands),
                 Size = new Vector2(document.MapTemplate?.Size),
                 PlayableArea = new Rect2(document.MapTemplate?.PlayableArea),
                 template = document

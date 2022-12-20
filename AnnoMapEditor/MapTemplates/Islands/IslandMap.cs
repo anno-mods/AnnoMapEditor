@@ -31,7 +31,7 @@ namespace AnnoMapEditor.MapTemplates.Islands
 
 
         public static IEnumerable<IslandMap> FromFilePathTemplate(string filePathTemplate, int count)
-            => FromFilePathTemplate(filePathTemplate, Enumerable.Range(0, count).ToArray());
+            => FromFilePathTemplate(filePathTemplate, Enumerable.Range(1, count).ToArray());
 
         public static IEnumerable<IslandMap> FromFilePathTemplate(string filePathTemplate, int start, int count)
             => FromFilePathTemplate(filePathTemplate, Enumerable.Range(start, count).ToArray());

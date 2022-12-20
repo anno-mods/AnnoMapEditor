@@ -29,7 +29,6 @@ namespace AnnoMapEditor.UI.Models
                 if (value != _selectedRegion)
                 {
                     _selectedRegion = value;
-                    _session.Region = value;
                     _session.SetRegion(value);
                     OnSelectedRegionChanged();
                 }
