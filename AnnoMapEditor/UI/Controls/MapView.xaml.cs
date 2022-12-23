@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.UI.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,20 +13,6 @@ using System.Windows.Shapes;
 
 namespace AnnoMapEditor.UI.Controls
 {
-    public static class CanvasExtensions
-    {
-        public static void SetPosition(this UIElement that, Vector2 position)
-        {
-            Canvas.SetLeft(that, position.X);
-            Canvas.SetTop(that, position.Y);
-        }
-
-        public static Vector2 GetPosition(this UIElement that)
-        {
-            return new Vector2((int)Canvas.GetLeft(that), (int)Canvas.GetTop(that));
-        }
-    }
-
     public partial class MapView : UserControl
     {
         private Session? session { get; set; }
