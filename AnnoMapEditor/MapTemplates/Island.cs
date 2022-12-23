@@ -44,7 +44,7 @@ namespace AnnoMapEditor.MapTemplates
             }
         }
         private IslandSize _size = IslandSize.Small;
-        public int SizeInTiles => (IsPool || MapSizeInTiles == 0) ? Size.InTiles : MapSizeInTiles;
+        public int SizeInTiles => (IsPool || MapSizeInTiles == 0) ? Size.DefaultSizeInTiles : MapSizeInTiles;
         public IslandType Type { get; set; } = IslandType.Normal;
         public bool Hide { get; set; } = false;
         public string? ImageFile { get; set; }
@@ -109,12 +109,13 @@ namespace AnnoMapEditor.MapTemplates
         public static async Task<Island> FromSerialized(TemplateElement templateElement, Region region)
         {
             var element = templateElement.Element;
+
             var island = new Island(region)
             {
                 ElementType = templateElement.ElementType ?? 0,
                 Position = new Vector2(element?.Position),
-                Size = new IslandSize(element?.Size),
-                Type = new IslandType(element?.RandomIslandConfig?.value?.Type?.id ?? element?.Config?.Type?.id),
+                Size = IslandSize.FromElementValue(element?.Size),
+                Type = IslandType.FromElementValue(element?.RandomIslandConfig?.value?.Type?.id ?? element?.Config?.Type?.id ?? 0),
                 Rotation = Math.Clamp((int?)element?.Rotation90 ?? 0, 0, 3),
                 MapPath = element?.MapFilePath?.ToString(),
                 Label = element?.IslandLabel?.ToString(),
@@ -300,9 +301,9 @@ namespace AnnoMapEditor.MapTemplates
                 //if (mapPath.Contains("_dst_"))
                 //    Hide = true;
                 // else
-                if (mapPath.Contains("_l_") && Size.IsDefault)
+                if (mapPath.Contains("_l_"))
                     Size = IslandSize.Large;
-                else if (mapPath.Contains("_m_") && Size.IsDefault)
+                else if (mapPath.Contains("_m_"))
                     Size = IslandSize.Medium;
             }
 

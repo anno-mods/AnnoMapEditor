@@ -3,70 +3,50 @@ using System.Linq;
 
 namespace AnnoMapEditor.MapTemplates
 {
-    public struct IslandType
+    public class IslandType
     {
-        private static readonly string[] RandomIDs = new[]
+        public static readonly IslandType Normal       = new("Normal", 0);
+        public static readonly IslandType Starter      = new("Starter", 1);
+        public static readonly IslandType Decoration   = new("Decoration", 2);
+        public static readonly IslandType ThirdParty   = new("ThirdParty", 3);
+        public static readonly IslandType PirateIsland = new("PirateIsland", 4);
+        public static readonly IslandType Cliff        = new("Cliff", 5);
+
+
+        public readonly string Name;
+
+        public readonly short ElementValue;
+
+        public bool IsNormalOrStarter => this == Starter || this == Normal;
+
+        public bool IsSameWithoutOil(IslandType that) => IsNormalOrStarter && that.IsNormalOrStarter;
+
+
+        private IslandType(string name, short elementValue)
         {
-            "Normal",
-            "Starter",
-            "Decoration",
-            "ThirdParty",
-            "PirateIsland",
-            "Cliff",
-            "Normal" // clamp
-        };
-        
-        public static readonly IslandType Normal = new("Normal");
-        public static readonly IslandType Starter = new("Starter");
-        public static readonly IslandType ThirdParty = new("ThirdParty");
-        public static readonly IslandType Decoration = new("Decoration");
-        public static readonly IslandType PirateIsland = new("PirateIsland");
-        public static readonly IslandType Cliff = new("Cliff");
-
-        private readonly string value;
-        public readonly short ElementValue { get; }
-
-        public bool IsNormalOrStarter => value == nameof(Starter) || value == nameof(Normal);
-        public bool IsSameWithoutOil(IslandType that) => IsNormalOrStarter && that.IsNormalOrStarter || value == that.value;
-
-        public IslandType(string? type)
-        {
-            ElementValue = (short?)RandomIDs.IndexOf((x) => x == type) ?? 0;
-            if (type == "Starter" || type == "ThirdParty" || type == "Decoration")
-            {
-                value = type;
-                return;
-            }
-            if (type == "PirateIsland" || type == "Pirate")
-            {
-                value = "PirateIsland";
-                return;
-            }
-            if (type == "Cliff")
-            {
-                value = "Cliff";
-                return;
-            }
-
-            value = "Normal";
+            ElementValue = elementValue;
+            Name = name;
         }
 
-        public IslandType(short? type)
+        public static IslandType FromElementValue(short elementValue)
         {
-            ElementValue = type ?? 0;
-            if (type is null)
+            return elementValue switch
             {
-                value = "Normal";
-                return;
-            }
-
-            value = RandomIDs[Math.Clamp((int)type, 0, RandomIDs.Length - 1)];
+                0 => Normal,
+                1 => Starter,
+                2 => Decoration,
+                3 => ThirdParty,
+                4 => PirateIsland,
+                5 => Cliff,
+                _ => throw new ArgumentException($"{elementValue} is not a valid element value for IslandType.")
+            };
         }
 
-        public override string ToString() => value;
 
-        public override bool Equals(object? obj) => obj is IslandType other && value.Equals(other.value);
-        public override int GetHashCode() => value.GetHashCode();
+        public override string ToString() => Name;
+
+        public override bool Equals(object? obj) => obj is IslandType other && Name.Equals(other.Name);
+        public override int GetHashCode() => Name.GetHashCode();
 
         public static bool operator !=(IslandType a, IslandType b) => !a.Equals(b);
         public static bool operator ==(IslandType a, IslandType b) => a.Equals(b);

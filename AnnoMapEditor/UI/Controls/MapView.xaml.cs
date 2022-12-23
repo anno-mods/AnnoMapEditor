@@ -177,9 +177,9 @@ namespace AnnoMapEditor.UI.Controls
                 IslandSize size = island.Size;
                 IslandType type = island.Type;
 
-                int islandLength = IslandSize.Small.InTiles * 2 + 10 +
-                        IslandSize.Medium.InTiles + 25 +
-                        IslandSize.Large.InTiles + 25;
+                int islandLength = IslandSize.Small.DefaultSizeInTiles * 2 + 10 +
+                        IslandSize.Medium.DefaultSizeInTiles + 25 +
+                        IslandSize.Large.DefaultSizeInTiles + 25;
                 int offset = Math.Max(250, (session.Size.Y - islandLength) / 2);
 
                 Action<int, int> move = (x, y) =>
@@ -191,16 +191,16 @@ namespace AnnoMapEditor.UI.Controls
 
                 // pirate & 3rd party
                 if (size == IslandSize.Small && type == IslandType.PirateIsland)
-                    move(20, -offset - IslandSize.Small.InTiles);
+                    move(20, -offset - IslandSize.Small.DefaultSizeInTiles);
                 else if (size == IslandSize.Small && type == IslandType.ThirdParty)
-                    move(40 + IslandSize.Small.InTiles, -offset - 10 - IslandSize.Small.InTiles * 2);
+                    move(40 + IslandSize.Small.DefaultSizeInTiles, -offset - 10 - IslandSize.Small.DefaultSizeInTiles * 2);
                 // player islands
                 else if (size == IslandSize.Small && type == IslandType.Normal)
-                    move(20, -offset - 10 - IslandSize.Small.InTiles * 2);
+                    move(20, -offset - 10 - IslandSize.Small.DefaultSizeInTiles * 2);
                 else if (size == IslandSize.Large && type == IslandType.Normal)
-                    move(20, -offset - 35 - IslandSize.Small.InTiles * 2 - IslandSize.Large.InTiles);
+                    move(20, -offset - 35 - IslandSize.Small.DefaultSizeInTiles * 2 - IslandSize.Large.DefaultSizeInTiles);
                 else if (size == IslandSize.Medium && type == IslandType.Normal)
-                    move(20, -offset - 60 - IslandSize.Small.InTiles * 2 - IslandSize.Medium.InTiles - IslandSize.Large.InTiles);
+                    move(20, -offset - 60 - IslandSize.Small.DefaultSizeInTiles * 2 - IslandSize.Medium.DefaultSizeInTiles - IslandSize.Large.DefaultSizeInTiles);
             }
         }
 

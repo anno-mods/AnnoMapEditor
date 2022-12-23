@@ -2,68 +2,45 @@
 
 namespace AnnoMapEditor.MapTemplates
 {
-    public struct IslandSize
+    public class IslandSize
     {
-        public static readonly IslandSize Small = new("Small");
-        public static readonly IslandSize Medium = new("Medium");
-        public static readonly IslandSize Large = new("Large");
+        public static readonly IslandSize Default = new("Default", null, 192);
+        public static readonly IslandSize Small   = new("Small",   0,    192);
+        public static readonly IslandSize Medium  = new("Medium",  1,    320);
+        public static readonly IslandSize Large   = new("Large",   2,    384);
 
-        private readonly string value;
 
-        public short? ElementValue { get; set; }
+        public readonly string Name;
 
-        public int InTiles { get; private init; }
-        public bool IsDefault { get; private init; }
+        public readonly short? ElementValue;
 
-        public IslandSize(string? size)
+        public readonly int DefaultSizeInTiles;
+
+
+        private IslandSize(string name, short? elementValue, int defaultSizeInTiles)
         {
-            if (size == "Medium" || size == "Large")
-            {
-                value = size;
-                InTiles = size == "Medium" ? 320 : 384;
-                IsDefault = false;
-                ElementValue = size == "Medium" ? (short)1 : (short)2;
-                return;
-            }
-
-            value = "Small";
-            InTiles = 192;
-            IsDefault = size != "Small";
-            ElementValue = 0;
+            Name = name;
+            ElementValue = elementValue;
+            DefaultSizeInTiles = defaultSizeInTiles;
         }
 
-        public IslandSize(short? size)
+        public static IslandSize FromElementValue(short? elementValue)
         {
-            ElementValue = size;
-            switch (size)
+            return elementValue switch
             {
-                default:
-                    IsDefault = true;
-                    value = "Small";
-                    InTiles = 192;
-                    break;
-                case 0:
-                    IsDefault = false;
-                    value = "Small";
-                    InTiles = 192;
-                    break;
-                case 1:
-                    IsDefault = false;
-                    value = "Medium";
-                    InTiles = 320;
-                    break;
-                case 2:
-                    IsDefault = false;
-                    value = "Large";
-                    InTiles = 384;
-                    break;
-            }
+                null => Default,
+                0 => Small,
+                1 => Medium,
+                2 => Large,
+                _ => throw new ArgumentException($"{elementValue} is not a valid element value for IslandSize.")
+            };
         }
 
-        public override string ToString() => value;
 
-        public override bool Equals(object? obj) => obj is IslandSize other && value.Equals(other.value);
-        public override int GetHashCode() => value.GetHashCode();
+        public override string ToString() => Name;
+
+        public override bool Equals(object? obj) => obj is IslandSize other && Name.Equals(other.Name);
+        public override int GetHashCode() => Name.GetHashCode();
 
         public static bool operator !=(IslandSize a, IslandSize b) => !a.Equals(b);
         public static bool operator ==(IslandSize a, IslandSize b) => a.Equals(b);

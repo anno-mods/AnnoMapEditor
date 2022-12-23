@@ -39,8 +39,8 @@ namespace AnnoMapEditor.Tests
                 await Serializer.WriteToXmlAsync(template!, outStream);
 
                 //Uncomment for debugging:
-                //string content = System.Text.Encoding.UTF8.GetString(outStream.ToArray());
-                //outStream.Seek(0, SeekOrigin.Begin);
+                string content = System.Text.Encoding.UTF8.GetString(outStream.ToArray());
+                outStream.Seek(0, SeekOrigin.Begin);
 
                 Assert.True(StreamComparer.AreEqual(inputXml, outStream));
             }
