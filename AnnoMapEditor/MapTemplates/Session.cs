@@ -111,7 +111,7 @@ namespace AnnoMapEditor.MapTemplates
         {
             int margin = (mapSize - playableSize) / 2;
 
-            List<Island> startingSpots = Island.CreateNewStartingSpots(playableSize, margin, region);
+            List<Island> startingSpots = Island.CreateNewStartingSpots(mapSize, margin, region);
 
             MapTemplateDocument createdTemplateDoc = new MapTemplateDocument()
             {

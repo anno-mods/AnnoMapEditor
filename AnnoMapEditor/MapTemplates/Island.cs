@@ -137,16 +137,17 @@ namespace AnnoMapEditor.MapTemplates
             return island;
         }
 
-        public static List<Island> CreateNewStartingSpots(int playableSize, int margin, Region region)
+        public static List<Island> CreateNewStartingSpots(int mapSize, int margin, Region region)
         {
-            const int SPACING = 64;
+            const int SPACING = 32;
+            int halfSize = mapSize / 2;
 
             List<Island> starts = new List<Island>()
             {
-                CreateStartingSpot(region, margin + SPACING, playableSize + margin - SPACING),
-                CreateStartingSpot(region, margin + SPACING, playableSize + margin - 2*SPACING),
-                CreateStartingSpot(region, margin + 2*SPACING, playableSize + margin - SPACING),
-                CreateStartingSpot(region, margin + 2*SPACING, playableSize + margin - 2*SPACING),
+                CreateStartingSpot(region, halfSize + SPACING, halfSize + SPACING),
+                CreateStartingSpot(region, halfSize + SPACING, halfSize - SPACING),
+                CreateStartingSpot(region, halfSize - SPACING, halfSize - SPACING),
+                CreateStartingSpot(region, halfSize - SPACING, halfSize + SPACING),
             };
 
             return starts;
@@ -186,15 +187,19 @@ namespace AnnoMapEditor.MapTemplates
 
             //Create a fully new templateElement for export, so unwanted values are clean
             templateElement.Element = new Element();
+
+            // The editor's coordinate system's axis are flipped compared to Anno1800. Thus we must
+            // flip X and Y when serializing.
+            templateElement.Element.Position = new int[] { this.Position.Y, this.Position.X };
+
             switch (this.ElementType)
             {
                 //Starting spot
                 case 2:
-                    templateElement.Element.Position = new int[] { this.Position.X, this.Position.Y };
                     break;
+
                 //Pool island
                 case 1:
-                    templateElement.Element.Position = new int[] { this.Position.X, this.Position.Y };
                     templateElement.Element.Size = this.Size.ElementValue;
                     templateElement.Element.Difficulty = new Difficulty();
                     templateElement.Element.Config = new Config()
@@ -209,7 +214,6 @@ namespace AnnoMapEditor.MapTemplates
                     if (MapPath == null)
                         return null;
 
-                    templateElement.Element.Position = new int[] { this.Position.X, this.Position.Y };
                     templateElement.Element.MapFilePath = MapPath;
                     templateElement.Element.Rotation90 = (byte)this.Rotation;
 
