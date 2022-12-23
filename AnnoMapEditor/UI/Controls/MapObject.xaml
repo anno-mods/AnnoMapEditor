@@ -4,15 +4,24 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
+    xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
     mc:Ignorable="d"
     d:DesignHeight="192" d:DesignWidth="192"
     Width="1"
     Height="1">
+
+    <UserControl.Resources>
+        <converters:NegateDoubleConverter x:Key="negateDoubleConverter" />
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
+
         <Canvas Name="canvas" Grid.Column="0" />
+
         <Border Name="titleBackground" Grid.Column="0"
                 CornerRadius="10"
                 Padding="4,0,4,0"
@@ -20,20 +29,21 @@
                 VerticalAlignment="Center" HorizontalAlignment="Center"
                 RenderTransformOrigin=".5,.5">
             <Border.RenderTransform>
-                <RotateTransform Angle="45" />
+                <RotateTransform Angle="{Binding Source={x:Static local:MapView.MAP_ROTATION_ANGLE}, Converter={StaticResource negateDoubleConverter}}" />
             </Border.RenderTransform>
             <TextBlock Foreground="White"  Name="title" FontSize="50" TextAlignment="Center" />
         </Border>
+        
         <Border Name="startPosition"
                 Grid.Column="0"
-                Width="64"
-                Height="64"
-                CornerRadius="32,32,32,0"
+                Width="{Binding Source={x:Static local:MapObject.MAP_PIN_SIZE}}"
+                Height="{Binding Source={x:Static local:MapObject.MAP_PIN_SIZE}}"
+                CornerRadius="{Binding Source={x:Static local:MapObject.MAP_PIN_BORDER}}"
                 Background="#ffff00"
                 VerticalAlignment="Center" HorizontalAlignment="Center">
             <TextBlock Foreground="Black" Name="startNumber" FontSize="50" TextAlignment="Center" RenderTransformOrigin=".5,.5">
                 <TextBlock.RenderTransform>
-                    <RotateTransform Angle="45" />
+                    <RotateTransform Angle="{Binding Source={x:Static local:MapView.MAP_ROTATION_ANGLE}, Converter={StaticResource negateDoubleConverter}}" />
                 </TextBlock.RenderTransform>
             </TextBlock>
         </Border>
