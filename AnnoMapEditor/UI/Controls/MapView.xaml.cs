@@ -15,6 +15,9 @@ namespace AnnoMapEditor.UI.Controls
 {
     public partial class MapView : UserControl
     {
+        public static readonly double MAP_ROTATION_ANGLE = -135;
+
+
         private Session? session { get; set; }
         private Rectangle? mapRect { get; set; }
         private Rectangle? playableRect { get; set; }
@@ -259,7 +262,7 @@ namespace AnnoMapEditor.UI.Controls
                 CreateAddIsland(island.Size, island.Type);
             }
 
-            island.Position = ensured.FlipYItem(session.Size.Y, island.IsStartingSpot ? MapObject.MAP_PIN_SIZE : island.SizeInTiles);
+            island.Position = ensured;
             mapObject.SetPosition(ensured);
             mapObject.IsMarkedForDeletion = !island.IsNew && !ensured.Within(mapArea);
         }
@@ -329,7 +332,7 @@ namespace AnnoMapEditor.UI.Controls
                     }
                     else
                     {
-                        var islandCanvasPos = island.Position.FlipYItem(oldSize!.Y, island.SizeInTiles);
+                        var islandCanvasPos = island.Position;
                         var mapArea = new Rect2(session.Size - island.SizeInTiles + Vector2.Tile);
 
                         mapObject.IsMarkedForDeletion = !islandCanvasPos.Within(mapArea);
@@ -385,7 +388,7 @@ namespace AnnoMapEditor.UI.Controls
                     else
                     {
                         Vector2 canvasLocation = mapObject.GetPosition();
-                        island.Position = canvasLocation.FlipYItem(session.Size.Y, island.SizeInTiles);
+                        island.Position = canvasLocation;
                     }
                 }
             }

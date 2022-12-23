@@ -48,7 +48,8 @@ namespace AnnoMapEditor.UI.Controls
         readonly Session session;
         readonly MapView container;
 
-        public const int MAP_PIN_SIZE = 64;
+        public static readonly int MAP_PIN_SIZE = 64;
+        public static readonly CornerRadius MAP_PIN_BORDER = new(0, MAP_PIN_SIZE / 2, MAP_PIN_SIZE / 2, MAP_PIN_SIZE / 2);
 
         public Vector2 MouseOffset;
 
@@ -166,7 +167,7 @@ namespace AnnoMapEditor.UI.Controls
             {
                 Width = MAP_PIN_SIZE;
                 Height = MAP_PIN_SIZE;
-                this.SetPosition((island.Position).FlipYItem(session.Size.Y, MAP_PIN_SIZE));
+                this.SetPosition(island.Position);
                 Panel.SetZIndex(this, 100);
 
                 // TODO the order of AIs is odd, may be incorrect?
@@ -187,7 +188,7 @@ namespace AnnoMapEditor.UI.Controls
             {
                 Width = island.SizeInTiles;
                 Height = island.SizeInTiles;
-                this.SetPosition(island.Position.FlipYItem(session.Size.Y, island.SizeInTiles));
+                this.SetPosition(island.Position);
                 Panel.SetZIndex(this, ZIndex[island.Type]);
 
                 Image? image;
@@ -243,7 +244,7 @@ namespace AnnoMapEditor.UI.Controls
                     Fill = White,
                 };
 
-                circle.SetPosition(Vector2.Zero.FlipYItem(island.SizeInTiles, CIRCLE_DIAMETER));
+                circle.SetPosition(Vector2.Zero);
                 canvas.Children.Add(circle);
 
                 if (!string.IsNullOrEmpty(island.Label))
