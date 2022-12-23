@@ -25,12 +25,29 @@
                    Margin="0,0,0,4" />
         <StackPanel Name="IslandProps"
                     Margin="0">
+            <!-- Island Type -->
             <ComboBox Name="TypeComboBox"
                       Margin="0"/>
+            <!-- Toggle Oil -->
             <local:FancyToggle
                 x:Name="IsStarterCheckBox"
                 OffText="No oil"
                 OnText="With oil"/>
+            <!-- Rotation -->
+            <TextBlock
+                   Style="{StaticResource DefaultLabelStyle}"
+                   HorizontalAlignment="Left"
+                   Margin="0,0,0,4">
+                Rotation
+            </TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <Button Click="OnRotateCounterClockwise" HorizontalAlignment="Left">
+                    ⭮
+                </Button>
+                <Button Click="OnRotateClockwise" HorizontalAlignment="Left">
+                    ⭯
+                </Button>
+            </StackPanel>
         </StackPanel>
     </StackPanel>
 </UserControl>
