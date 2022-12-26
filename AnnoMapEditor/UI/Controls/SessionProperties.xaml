@@ -198,7 +198,7 @@
                 </Grid>
                 <!-- Margin OK Info-->
                 <emoji:TextBlock Text="&#x26a0; PlayableArea not centered! Going back to centered mode will reset offsets."
-                                 MaxWidth="200"
+                                 MaxWidth="180"
                                  Grid.ColumnSpan="2"
                                  TextWrapping="Wrap"
                                  HorizontalAlignment="Left"
