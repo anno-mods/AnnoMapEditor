@@ -93,27 +93,6 @@
 
                 <!-- Margin/Playable Area -->
                 <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.ColumnSpan="2" Margin="2,2,0,0" HorizontalAlignment="Left">
-                    <!-- Margin Offset Warning -->
-                    <emoji:TextBlock Text="&#x26a0;" FontSize="14" VerticalAlignment="Center" Margin="0,-4" Padding="0,0,0,4"
-                                     Visibility="{Binding NonCenteredMarginWarning, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
-                        <emoji:TextBlock.ToolTip>
-                            <TextBlock>
-                                The Margin mode is set to centered, but the current margin configuration is NOT centered!
-                                <LineBreak/>
-                                Editing the Margin now will remove the currently set Offsets.
-                            </TextBlock>
-                        </emoji:TextBlock.ToolTip>
-                    </emoji:TextBlock>
-                    
-                    <!-- Margin OK Info-->
-                    <emoji:TextBlock Text="&#x2714;" FontSize="14" VerticalAlignment="Center" Margin="0,-4" Padding="0,0,0,4"
-                                     Visibility="{Binding NonCenteredMarginWarning, Mode=OneWay, Converter={StaticResource BoolToVisibilityInverted}}">
-                        <emoji:TextBlock.ToolTip>
-                            <TextBlock>
-                                The Margin mode is either set to custom, or is set to centered, and there is no offset.
-                            </TextBlock>
-                        </emoji:TextBlock.ToolTip>
-                    </emoji:TextBlock>
                     
                     <!-- Margin Mode Toggle -->
                     <local:FancyToggle Label="Margin Mode:" OffText="Centered" OnText="Custom" 
@@ -125,7 +104,7 @@
 
 
                 <!-- Margin OK Info-->
-                <emoji:TextBlock Text="&#x26a0; Margin not centered! Going back to centered mode will reset your margins."
+                <emoji:TextBlock Text="&#x26a0; PlayableArea not centered! Going back to centered mode will reset offsets."
                                  MaxWidth="200"
                                  Grid.ColumnSpan="2"
                                  TextWrapping="Wrap"
