@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.UI.Models;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -32,6 +33,14 @@ namespace AnnoMapEditor.UI.Controls
             if (DataContext is Models.SessionPropertiesViewModel viewModel)
             {
                 viewModel.DragInProgress = true;
+            }
+        }
+
+        private void FancyToggle_ValueChanged(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is Models.SessionPropertiesViewModel viewModel && viewModel.IsMarginNonCentered)
+            {
+                viewModel.Center();
             }
         }
     }

@@ -52,6 +52,7 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
 
                     <!-- Playable Area -->
                     <RowDefinition Height="auto" />
@@ -116,27 +117,44 @@
                     
                     <!-- Margin Mode Toggle -->
                     <local:FancyToggle Label="Margin Mode:" OffText="Centered" OnText="Custom" 
-                                       IsChecked="{Binding MarginMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                       IsChecked="{Binding MarginMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                       ValueChanged="FancyToggle_ValueChanged"/>
+
+                    
                 </StackPanel>
 
 
-                <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Margin="2,2,2,0" Text="Playable Area:" />
-                <TextBlock Grid.Row="4" Grid.Column="1" Style="{StaticResource DefaultLabelStyle}" Margin="2,2,2,0" >
+                <!-- Margin OK Info-->
+                <emoji:TextBlock Text="&#x26a0; Margin not centered! Going back to centered mode will reset your margins."
+                                 MaxWidth="200"
+                                 Grid.ColumnSpan="2"
+                                 TextWrapping="Wrap"
+                                 HorizontalAlignment="Left"
+                                 Style="{StaticResource DefaultLabelStyle}"
+                                 Margin="2,0,2,2"
+                                 Grid.Row="4"
+                                 Visibility="{Binding NonCenteredMarginWarning, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibility}}">
+                </emoji:TextBlock>
+
+
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Margin="2,2,2,0" Text="Playable Area:" />
+                <TextBlock Grid.Row="5" Grid.Column="1" Style="{StaticResource DefaultLabelStyle}" Margin="2,2,2,0" >
                                 <Run Text="{Binding PlayableSize, Mode=OneWay}"/>
                                 <Run Text="x"/>
                                 <Run Text="{Binding PlayableSize, Mode=OneWay}"/>
                 </TextBlock>
 
                 <!-- Avg Margin -->
-                <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Margin="2,0,2,2" Text="Average Margin:" 
+                <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Margin="2,0,2,2" Text="Average Margin:" 
                            Visibility="{Binding MarginMode, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"/>
-                <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Margin="2,0,2,2" Text="Margin:" 
+                <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Margin="2,0,2,2" Text="Margin:" 
                            Visibility="{Binding MarginMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityInverted}}"/>
-                <TextBlock Grid.Row="5" Grid.Column="1" Style="{StaticResource DefaultLabelStyle}" Margin="2,0,2,2">
+                <TextBlock Grid.Row="6" Grid.Column="1" Style="{StaticResource DefaultLabelStyle}" Margin="2,0,2,2">
                                 <Run Text="{Binding AverageMargin, Mode=OneWay}"/>
                 </TextBlock>
 
-                <Grid Grid.Row="6" Grid.ColumnSpan="2">
+                <Grid Grid.Row="7" Grid.ColumnSpan="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -154,7 +172,7 @@
                 </Grid>
                 
                 <!-- Offsets -->
-                <Grid Grid.Row="7" Grid.ColumnSpan="2" Visibility="{Binding MarginMode, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
+                <Grid Grid.Row="8" Grid.ColumnSpan="2" Visibility="{Binding MarginMode, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="*"/>

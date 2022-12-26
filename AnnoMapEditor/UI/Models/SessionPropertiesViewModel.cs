@@ -163,10 +163,10 @@ namespace AnnoMapEditor.UI.Models
         public bool NonCenteredMarginWarning
         {
             //For a warning when not all Margins are equal, but we are in MarginMode Centered
-            get => MarginMode == false && IsMarginNonCentered;
+            get => IsMarginNonCentered;
         }
 
-        private bool IsMarginNonCentered
+        public bool IsMarginNonCentered
         {
             get => OffsetY != 0 || OffsetX != 0;
         }
@@ -176,7 +176,7 @@ namespace AnnoMapEditor.UI.Models
             get => Math.Clamp(_offsetY, MinOffset, MaxOffset);
             set
             {
-                SetProperty(ref _offsetY, value);
+                SetProperty(ref _offsetY, value, new string[] { nameof(NonCenteredMarginWarning) });
                 ResizeSessionValues();
             }
         }
@@ -187,7 +187,7 @@ namespace AnnoMapEditor.UI.Models
             get => Math.Clamp(_offsetX, MinOffset, MaxOffset);
             set
             {
-                SetProperty(ref _offsetX, value);
+                SetProperty(ref _offsetX, value, new string[] { nameof(NonCenteredMarginWarning)});
                 ResizeSessionValues();
             }
         }
@@ -255,6 +255,12 @@ namespace AnnoMapEditor.UI.Models
         private void HandleSessionSizeCommitted(object? sender, EventArgs _)
         {
             UpdateMapSizeText();
+        }
+
+        public void Center()
+        { 
+            OffsetX= 0;
+            OffsetY=0;
         }
     }
 }
