@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AnnoMapEditor.MapTemplates
@@ -12,6 +13,8 @@ namespace AnnoMapEditor.MapTemplates
         public static readonly IslandType PirateIsland = new("PirateIsland", 4);
         public static readonly IslandType Cliff        = new("Cliff", 5);
 
+        public static readonly IEnumerable<IslandType> All = new[] { Normal, Starter, Decoration, ThirdParty, PirateIsland, Cliff };
+
 
         public readonly string Name;
 
@@ -19,7 +22,7 @@ namespace AnnoMapEditor.MapTemplates
 
         public bool IsNormalOrStarter => this == Starter || this == Normal;
 
-        public bool IsSameWithoutOil(IslandType that) => IsNormalOrStarter && that.IsNormalOrStarter;
+        public bool IsSameWithoutOil(IslandType that) => ElementValue == that.ElementValue;
 
 
         private IslandType(string name, short elementValue)
@@ -30,16 +33,15 @@ namespace AnnoMapEditor.MapTemplates
 
         public static IslandType FromElementValue(short elementValue)
         {
-            return elementValue switch
+            IslandType? type = All.FirstOrDefault(t => t.ElementValue == elementValue);
+
+            if (type is null)
             {
-                0 => Normal,
-                1 => Starter,
-                2 => Decoration,
-                3 => ThirdParty,
-                4 => PirateIsland,
-                5 => Cliff,
-                _ => throw new ArgumentException($"{elementValue} is not a valid element value for IslandType.")
-            };
+                Log.Warn($"{elementValue} is not a valid element value for {nameof(IslandSize)}. Defaulting to {nameof(Normal)}/{Normal.ElementValue}.");
+                type = Normal;
+            }
+
+            return type;
         }
 
 

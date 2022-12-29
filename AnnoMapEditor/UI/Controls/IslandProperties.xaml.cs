@@ -126,8 +126,8 @@ namespace AnnoMapEditor.UI.Controls
 
         private void UpdateIslandProperties(Island island)
         {
-            Header.Text = island.ElementType == 2 ? "Start" : "Island";
-            IslandProps.Visibility = island.ElementType == 2 ? Visibility.Collapsed : Visibility.Visible;
+            Header.Text = island.IsStarter ? "Start" : "Island";
+            IslandProps.Visibility = island.IsStarter ? Visibility.Collapsed : Visibility.Visible;
 
             IsStarterCheckBox.IsChecked = island.IsStarter;
             IsStarterCheckBox.IsEnabled = !island.IsNew && (island.Type == IslandType.Starter || island.Type == IslandType.Normal) && island.Size != IslandSize.Small;

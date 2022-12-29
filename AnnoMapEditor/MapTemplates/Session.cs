@@ -98,7 +98,7 @@ namespace AnnoMapEditor.MapTemplates
             // number starting positions
             int counter = 0;
             foreach (var island in session.Islands)
-                if (island.ElementType == 2)
+                if (island.IsStarter)
                     island.Counter = counter++;
 
             if (session.Size.X == 0)

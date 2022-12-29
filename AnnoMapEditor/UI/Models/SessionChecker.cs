@@ -58,7 +58,7 @@ namespace AnnoMapEditor.UI.Models
                     thirdPartyCount++;
                 else if (island.Type == IslandType.PirateIsland)
                     pirateCount++;
-                if (!island.IsPool || island.ElementType == 2)
+                if (!island.IsPool || island.IsStarter)
                     continue;
 
                 pools[island.Size.ElementValue ?? 0]++;

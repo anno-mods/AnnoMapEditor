@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AnnoMapEditor.MapTemplates
 {
     public class IslandSize
     {
-        public static readonly IslandSize Default = new("Default", null, 192);
+        public static readonly IslandSize Default = new("Small",   null, 192);
         public static readonly IslandSize Small   = new("Small",   0,    192);
         public static readonly IslandSize Medium  = new("Medium",  1,    320);
         public static readonly IslandSize Large   = new("Large",   2,    384);
+
+        public static readonly IEnumerable<IslandSize> All = new[] { Default, Small, Medium, Large };
 
 
         public readonly string Name;
@@ -26,14 +30,15 @@ namespace AnnoMapEditor.MapTemplates
 
         public static IslandSize FromElementValue(short? elementValue)
         {
-            return elementValue switch
+            IslandSize? size = All.FirstOrDefault(t => t.ElementValue == elementValue);
+
+            if (size is null)
             {
-                null => Default,
-                0 => Small,
-                1 => Medium,
-                2 => Large,
-                _ => throw new ArgumentException($"{elementValue} is not a valid element value for IslandSize.")
-            };
+                Log.Warn($"{elementValue} is not a valid element value for {nameof(IslandSize)}. Defaulting to {nameof(Default)}/{Default.ElementValue}.");
+                size = Default;
+            }
+
+            return size;
         }
 
 
