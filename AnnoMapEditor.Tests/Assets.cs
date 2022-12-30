@@ -24,7 +24,7 @@ namespace AnnoMapEditor.Tests
         public PatchedAssetsFixture()
         {
             using Stream assetsXml = File.OpenRead("./TestData/assets.xml");
-            Data = new(MapType.GetAllTypes().Select(x =>
+            Data = new(MapType.All.Select(x =>
             {
                 Stream patch = new MemoryStream(Encoding.Unicode.GetBytes(Mods.Mod.CreateAssetsModOps(Region.Moderate, MapType.Archipelago, "mods/[Map] test/test.a7t")));
                 return new KeyValuePair<MapType, XDocument>(x, XDocument.Load(XmlTest.Patch(assetsXml, patch)!));
@@ -40,8 +40,7 @@ namespace AnnoMapEditor.Tests
     {
         public IEnumerator<object[]> GetEnumerator()
         {
-            var types = MapType.GetAllTypes();
-            foreach (var type in types)
+            foreach (var type in MapType.All)
                 yield return new object[] { type };
         }
 
