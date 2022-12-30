@@ -1,6 +1,5 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.MapTemplates.Serializing;
-using AnnoMapEditor.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -292,7 +291,7 @@ namespace AnnoMapEditor.MapTemplates
 
             if (mapPath == null)
             {
-                mapPath = region.GetRandomIslandPath(Size);
+                mapPath = Pool.GetRandomIslandPath(region, Size);
                 Rotation = rnd.Next(0, 3);
             }
 
