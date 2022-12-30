@@ -163,7 +163,7 @@ namespace AnnoMapEditor.UI.Controls
 
             canvas.Children.Clear();
 
-            if (island.ElementType == 2)
+            if (island.IsStarter)
             {
                 Width = MAP_PIN_SIZE;
                 Height = MAP_PIN_SIZE;

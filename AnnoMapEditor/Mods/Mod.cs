@@ -53,7 +53,7 @@ namespace AnnoMapEditor.Mods
             try
             {
                 string? mapTypeFileName = MapType.ToFileName();
-                string? mapTypeGuid = MapType.ToGuid();
+                string? mapTypeGuid = MapType.Guid;
 
                 if (mapTypeFileName is null || mapTypeGuid is null)
                     throw new Exception("invalid MapType");

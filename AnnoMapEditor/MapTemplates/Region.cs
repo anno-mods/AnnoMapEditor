@@ -197,6 +197,10 @@ namespace AnnoMapEditor.MapTemplates
 
         public string GetRandomIslandPath(IslandSize size)
         {
+            // use a random Small island for IslandSize.Default
+            if (size == IslandSize.Default)
+                size = IslandSize.Small;
+
             int index = rnd.Next(1, PoolIslands[size].size);
 
             string path = PoolIslands[size].GetPath(index);

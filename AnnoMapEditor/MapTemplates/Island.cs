@@ -24,7 +24,7 @@ namespace AnnoMapEditor.MapTemplates
     public class Island : ObservableBase
     {
         #region template data
-        public int ElementType { get; set; } = 0;
+        public MapElementType ElementType { get; set; } = MapElementType.PoolIsland;
         public Vector2 Position { get; set; } = new Vector2(0, 0);
         public IslandSize Size
         {
@@ -44,7 +44,7 @@ namespace AnnoMapEditor.MapTemplates
             }
         }
         private IslandSize _size = IslandSize.Small;
-        public int SizeInTiles => (IsPool || MapSizeInTiles == 0) ? Size.InTiles : MapSizeInTiles;
+        public int SizeInTiles => (IsPool || MapSizeInTiles == 0) ? Size.DefaultSizeInTiles : MapSizeInTiles;
         public IslandType Type { get; set; } = IslandType.Normal;
         public bool Hide { get; set; } = false;
         public string? ImageFile { get; set; }
@@ -55,8 +55,8 @@ namespace AnnoMapEditor.MapTemplates
         #endregion
 
         public string? AssumedMapPath { get; private set; }
-        public bool IsPool => ElementType != 2 && string.IsNullOrEmpty(MapPath);
-        public bool IsStartingSpot => ElementType == 2;
+        public bool IsPool => !IsStartingSpot && string.IsNullOrEmpty(MapPath);
+        public bool IsStartingSpot => ElementType == MapElementType.StartingSpot;
         public bool IsNew => template is null;
 
         // TODO create view model of islands
@@ -109,12 +109,13 @@ namespace AnnoMapEditor.MapTemplates
         public static async Task<Island> FromSerialized(TemplateElement templateElement, Region region)
         {
             var element = templateElement.Element;
+
             var island = new Island(region)
             {
-                ElementType = templateElement.ElementType ?? 0,
+                ElementType = (MapElementType) (templateElement.ElementType ?? 0),
                 Position = new Vector2(element?.Position),
-                Size = new IslandSize(element?.Size),
-                Type = new IslandType(element?.RandomIslandConfig?.value?.Type?.id ?? element?.Config?.Type?.id),
+                Size = IslandSize.FromElementValue(element?.Size),
+                Type = IslandType.FromElementValue(element?.RandomIslandConfig?.value?.Type?.id ?? element?.Config?.Type?.id ?? 0),
                 Rotation = Math.Clamp((int?)element?.Rotation90 ?? 0, 0, 3),
                 MapPath = element?.MapFilePath?.ToString(),
                 Label = element?.IslandLabel?.ToString(),
@@ -129,7 +130,7 @@ namespace AnnoMapEditor.MapTemplates
         {
             var island = new Island(Region.Moderate)
             {
-                ElementType = 1,
+                ElementType = MapElementType.PoolIsland,
                 Position = position,
                 Size = size,
                 Type = type
@@ -159,7 +160,7 @@ namespace AnnoMapEditor.MapTemplates
         {
             return new Island(region)
             {
-                ElementType = 2,
+                ElementType = MapElementType.StartingSpot,
                 Position = new Vector2(x, y)
             };
         }
@@ -180,9 +181,9 @@ namespace AnnoMapEditor.MapTemplates
             if (template?.Element is null)
                 return templateElement;
 
-            if (this.ElementType != 0)
+            if (ElementType != MapElementType.FixedIsland)
             {
-                templateElement.ElementType = this.ElementType;
+                templateElement.ElementType = (short) ElementType;
             }
 
             //Create a fully new templateElement for export, so unwanted values are clean
@@ -192,14 +193,14 @@ namespace AnnoMapEditor.MapTemplates
             // flip X and Y when serializing.
             templateElement.Element.Position = new int[] { this.Position.Y, this.Position.X };
 
-            switch (this.ElementType)
+            switch (ElementType)
             {
                 //Starting spot
-                case 2:
+                case MapElementType.StartingSpot:
                     break;
 
                 //Pool island
-                case 1:
+                case MapElementType.PoolIsland:
                     templateElement.Element.Size = this.Size.ElementValue;
                     templateElement.Element.Difficulty = new Difficulty();
                     templateElement.Element.Config = new Config()
@@ -279,7 +280,7 @@ namespace AnnoMapEditor.MapTemplates
 
         public async Task InitAsync(Region region)
         {
-            if (ElementType == 2)
+            if (IsStartingSpot)
             {
                 MapSizeInTiles = Vector2.Tile.X;
                 return;
@@ -295,14 +296,11 @@ namespace AnnoMapEditor.MapTemplates
                 Rotation = rnd.Next(0, 3);
             }
 
-            if (mapPath != null)
+            if (mapPath != null && Size == IslandSize.Default)
             {
-                //if (mapPath.Contains("_dst_"))
-                //    Hide = true;
-                // else
-                if (mapPath.Contains("_l_") && Size.IsDefault)
+                if (mapPath.Contains("_l_"))
                     Size = IslandSize.Large;
-                else if (mapPath.Contains("_m_") && Size.IsDefault)
+                else if (mapPath.Contains("_m_"))
                     Size = IslandSize.Medium;
             }
 

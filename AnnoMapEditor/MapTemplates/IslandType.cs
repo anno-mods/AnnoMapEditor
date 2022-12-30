@@ -1,72 +1,54 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AnnoMapEditor.MapTemplates
 {
-    public struct IslandType
+    public class IslandType
     {
-        private static readonly string[] RandomIDs = new[]
+        public static readonly IslandType Normal       = new("Normal", 0);
+        public static readonly IslandType Starter      = new("Starter", 1);
+        public static readonly IslandType Decoration   = new("Decoration", 2);
+        public static readonly IslandType ThirdParty   = new("ThirdParty", 3);
+        public static readonly IslandType PirateIsland = new("PirateIsland", 4);
+        public static readonly IslandType Cliff        = new("Cliff", 5);
+
+        public static readonly IEnumerable<IslandType> All = new[] { Normal, Starter, Decoration, ThirdParty, PirateIsland, Cliff };
+
+
+        public readonly string Name;
+
+        public readonly short ElementValue;
+
+        public bool IsNormalOrStarter => this == Starter || this == Normal;
+
+        public bool IsSameWithoutOil(IslandType that) => ElementValue == that.ElementValue;
+
+
+        private IslandType(string name, short elementValue)
         {
-            "Normal",
-            "Starter",
-            "Decoration",
-            "ThirdParty",
-            "PirateIsland",
-            "Cliff",
-            "Normal" // clamp
-        };
-        
-        public static readonly IslandType Normal = new("Normal");
-        public static readonly IslandType Starter = new("Starter");
-        public static readonly IslandType ThirdParty = new("ThirdParty");
-        public static readonly IslandType Decoration = new("Decoration");
-        public static readonly IslandType PirateIsland = new("PirateIsland");
-        public static readonly IslandType Cliff = new("Cliff");
-
-        private readonly string value;
-        public readonly short ElementValue { get; }
-
-        public bool IsNormalOrStarter => value == nameof(Starter) || value == nameof(Normal);
-        public bool IsSameWithoutOil(IslandType that) => IsNormalOrStarter && that.IsNormalOrStarter || value == that.value;
-
-        public IslandType(string? type)
-        {
-            ElementValue = (short?)RandomIDs.IndexOf((x) => x == type) ?? 0;
-            if (type == "Starter" || type == "ThirdParty" || type == "Decoration")
-            {
-                value = type;
-                return;
-            }
-            if (type == "PirateIsland" || type == "Pirate")
-            {
-                value = "PirateIsland";
-                return;
-            }
-            if (type == "Cliff")
-            {
-                value = "Cliff";
-                return;
-            }
-
-            value = "Normal";
+            ElementValue = elementValue;
+            Name = name;
         }
 
-        public IslandType(short? type)
+        public static IslandType FromElementValue(short elementValue)
         {
-            ElementValue = type ?? 0;
+            IslandType? type = All.FirstOrDefault(t => t.ElementValue == elementValue);
+
             if (type is null)
             {
-                value = "Normal";
-                return;
+                Log.Warn($"{elementValue} is not a valid element value for {nameof(IslandSize)}. Defaulting to {nameof(Normal)}/{Normal.ElementValue}.");
+                type = Normal;
             }
 
-            value = RandomIDs[Math.Clamp((int)type, 0, RandomIDs.Length - 1)];
+            return type;
         }
 
-        public override string ToString() => value;
 
-        public override bool Equals(object? obj) => obj is IslandType other && value.Equals(other.value);
-        public override int GetHashCode() => value.GetHashCode();
+        public override string ToString() => Name;
+
+        public override bool Equals(object? obj) => obj is IslandType other && Name.Equals(other.Name);
+        public override int GetHashCode() => Name.GetHashCode();
 
         public static bool operator !=(IslandType a, IslandType b) => !a.Equals(b);
         public static bool operator ==(IslandType a, IslandType b) => a.Equals(b);
