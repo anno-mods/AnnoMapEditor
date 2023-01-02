@@ -1,5 +1,6 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.MapTemplates.Serializing;
+using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,7 +46,6 @@ namespace AnnoMapEditor.MapTemplates
         private IslandSize _size = IslandSize.Small;
         public int SizeInTiles => (IsPool || MapSizeInTiles == 0) ? Size.DefaultSizeInTiles : MapSizeInTiles;
         public IslandType Type { get; set; } = IslandType.Normal;
-        public bool Hide { get; set; } = false;
         public string? ImageFile { get; set; }
         public int Rotation { get; set; } = 0;
         public string? MapPath { get; set; }

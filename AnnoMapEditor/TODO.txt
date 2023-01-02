@@ -1,3 +1,0 @@
-﻿[ ] Split MapObject.xaml(.cs) into separate controls for StartingSpot, FixedIsland and IslandPool.
-[ ] Split Island.cs into separate classes for StartingSpot, FixedIsland and IslandPool.
-[ ] Pause UI until RDAs are loaded

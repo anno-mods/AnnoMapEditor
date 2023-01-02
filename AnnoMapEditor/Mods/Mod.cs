@@ -9,6 +9,7 @@ using System.Linq;
 using AnnoMapEditor.MapTemplates.Serializing.A7te;
 using AnnoMapEditor.MapTemplates.Serializing.A7t;
 using System.Collections.Generic;
+using AnnoMapEditor.Utilities;
 
 /*
  * Modloader doesn't support a7t because they are loaded as .rda archive.
@@ -63,7 +64,7 @@ namespace AnnoMapEditor.Mods
                     throw new Exception("not supported map region");
                 }
 
-                Utils.TryDeleteDirectory(modPath);
+                FileUtils.TryDeleteDirectory(modPath);
                 Directory.CreateDirectory(modPath);
                 await WriteMetaJson(modPath, modName, modID);
 

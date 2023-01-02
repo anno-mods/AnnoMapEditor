@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.MapTemplates.Serializing;
+using AnnoMapEditor.Utilities;
 
 namespace AnnoMapEditor.MapTemplates
 {

@@ -1,10 +1,8 @@
 ﻿using AnnoMapEditor.MapTemplates;
-using AnnoMapEditor.UI.Utilities;
+using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -131,8 +129,7 @@ namespace AnnoMapEditor.UI.Controls
             //sessionCanvas.Scale = new Vector3(scale, scale, 1);
 
             // add session islands
-            var islands = session.Islands.Where(x => !x.Hide);
-            foreach (var island in islands)
+            foreach (var island in session.Islands)
             {
                 var obj = new MapObject(session, this)
                 {

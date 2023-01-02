@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace AnnoMapEditor.UI.Utilities
+namespace AnnoMapEditor.Utilities
 {
     public static class CanvasExtensions
     {

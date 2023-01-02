@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace AnnoMapEditor
+namespace AnnoMapEditor.Utilities
 {
     public class Settings : INotifyPropertyChanged
     {
