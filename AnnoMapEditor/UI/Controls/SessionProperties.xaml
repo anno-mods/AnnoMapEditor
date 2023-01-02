@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
              xmlns:models="clr-namespace:AnnoMapEditor.UI.Models"
+             xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
              xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
              d:DataContext="{d:DesignInstance Type=models:SessionPropertiesViewModel}"
              mc:Ignorable="d" 
@@ -14,9 +15,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles.xaml" />
                 <ResourceDictionary>
-                    <local:ObjectToVisibility x:Key="CollapsedOnNull" />
-                    <local:BoolToVisibility x:Key="BoolToVisibility" OnTrue="Visible" OnFalse="Collapsed"/>
-                    <local:BoolToVisibility x:Key="BoolToVisibilityInverted" OnTrue="Collapsed" OnFalse="Visible"/>
+                    <converters:ObjectToVisibility x:Key="CollapsedOnNull" />
+                    <converters:BoolToVisibility x:Key="BoolToVisibility" OnTrue="Visible" OnFalse="Collapsed"/>
+                    <converters:BoolToVisibility x:Key="BoolToVisibilityInverted" OnTrue="Collapsed" OnFalse="Visible"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

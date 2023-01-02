@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AnnoMapEditor.UI"
         xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
+        xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
         xmlns:models="clr-namespace:AnnoMapEditor.UI.Models.MainWindow"
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
         d:DataContext="{d:DesignInstance Type=models:MainWindowViewModel}"
@@ -16,7 +17,7 @@
     </Window.Resources>
     <Grid VerticalAlignment="Stretch">
         <Grid.Resources>
-            <controls:VisibilityToBool x:Key="FalseOnVisible" OnVisible="False" />
+            <converters:VisibilityToBool x:Key="FalseOnVisible" OnVisible="False" />
         </Grid.Resources>
         <Grid x:Name="mainContent" IsEnabled="{Binding ElementName=exportDialog, Path=Visibility, Converter={StaticResource FalseOnVisible}}">
             <controls:MapView Grid.Column="0"

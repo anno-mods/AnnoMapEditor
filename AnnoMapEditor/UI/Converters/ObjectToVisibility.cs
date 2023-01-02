@@ -3,10 +3,10 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace AnnoMapEditor.UI.Controls
+namespace AnnoMapEditor.UI.Converters
 {
     [ValueConversion(typeof(bool), typeof(Visibility))]
-    internal sealed class ObjectToVisibility : IValueConverter
+    public class ObjectToVisibility : IValueConverter
     {
         public Visibility OnNull { get; set; }
 

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
+             xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="30" d:DesignWidth="120">
     <UserControl.Resources>
@@ -12,8 +13,8 @@
                 <ResourceDictionary Source="../Styles.xaml" />
                 <ResourceDictionary>
                     <!-- use Hide to make ensure parent of on/off text doesn't change size -->
-                    <local:BoolToVisibility x:Key="VisibleOnTrue" OnTrue="Visible" OnFalse="Hidden" />
-                    <local:BoolToVisibility x:Key="VisibleOnFalse" OnTrue="Hidden" OnFalse="Visible" />
+                    <converters:BoolToVisibility x:Key="VisibleOnTrue" OnTrue="Visible" OnFalse="Hidden" />
+                    <converters:BoolToVisibility x:Key="VisibleOnFalse" OnTrue="Hidden" OnFalse="Visible" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
