@@ -43,11 +43,5 @@ namespace AnnoMapEditor.MapTemplates
 
 
         public override string ToString() => Name;
-
-        public override bool Equals(object? obj) => obj is IslandSize other && Name.Equals(other.Name);
-        public override int GetHashCode() => Name.GetHashCode();
-
-        public static bool operator !=(IslandSize a, IslandSize b) => !a.Equals(b);
-        public static bool operator ==(IslandSize a, IslandSize b) => a.Equals(b);
     }
 }

@@ -114,7 +114,7 @@ namespace AnnoMapEditor.MapTemplates
                 ElementType = (MapElementType) (templateElement.ElementType ?? 0),
                 Position = new Vector2(element?.Position),
                 Size = IslandSize.FromElementValue(element?.Size),
-                Type = IslandType.FromElementValue(element?.RandomIslandConfig?.value?.Type?.id ?? element?.Config?.Type?.id ?? 0),
+                Type = IslandType.FromElementValue(element?.RandomIslandConfig?.value?.Type?.id ?? element?.Config?.Type?.id),
                 Rotation = Math.Clamp((int?)element?.Rotation90 ?? 0, 0, 3),
                 MapPath = element?.MapFilePath?.ToString(),
                 Label = element?.IslandLabel?.ToString(),
