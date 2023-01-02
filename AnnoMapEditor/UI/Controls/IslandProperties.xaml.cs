@@ -68,7 +68,7 @@ namespace AnnoMapEditor.UI.Controls
             island.IsStarter = IsStarterCheckBox.IsChecked;
         }
 
-        private async void OnTypeSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnTypeSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DataContext is Island island && TypeComboBox.SelectedItem is UserIslandType type)
             {
@@ -80,7 +80,7 @@ namespace AnnoMapEditor.UI.Controls
                     island.MapPath = null;
 
                     // triggers reselection from pool
-                    await island.InitAsync();
+                    island.Init();
                 }
             }
         }
@@ -107,21 +107,21 @@ namespace AnnoMapEditor.UI.Controls
                 UpdateIslandProperties(_island);
         }
 
-        private async void OnRotateClockwise(object sender, RoutedEventArgs args)
+        private void OnRotateClockwise(object sender, RoutedEventArgs args)
         {
             if (DataContext is Island island)
             {
                 island.Rotation = island.Rotation + 1 % 4;
-                await island.UpdateExternalDataAsync();
+                island.UpdateExternalData();
             }
         }
 
-        private async void OnRotateCounterClockwise(object sender, RoutedEventArgs args)
+        private void OnRotateCounterClockwise(object sender, RoutedEventArgs args)
         {
             if (DataContext is Island island)
             {
                 island.Rotation = island.Rotation - 1 % 4;
-                await island.UpdateExternalDataAsync();
+                island.UpdateExternalData();
             }
         }
 

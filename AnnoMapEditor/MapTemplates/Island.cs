@@ -141,7 +141,7 @@ namespace AnnoMapEditor.MapTemplates
         }
 
 
-        public static async Task<Island> FromSerialized(TemplateElement templateElement, Region region)
+        public static Island FromSerialized(TemplateElement templateElement, Region region)
         {
             var element = templateElement.Element;
 
@@ -157,7 +157,7 @@ namespace AnnoMapEditor.MapTemplates
                 _template = templateElement
             };
 
-            await island.InitAsync();
+            island.Init();
             return island;
         }
 
@@ -249,13 +249,13 @@ namespace AnnoMapEditor.MapTemplates
             return templateElement;
         }
 
-        public async Task UpdateExternalDataAsync()
+        public void UpdateExternalData()
         {
             if (AssumedMapPath is null)
                 return;
 
             // fallback to read out map file
-            int sizeInTiles = await IslandReader.ReadTileInSizeFromFileAsync(AssumedMapPath);
+            int sizeInTiles = IslandReader.ReadTileInSizeFromFile(AssumedMapPath);
             if (sizeInTiles != 0)
                 MapSizeInTiles = sizeInTiles;
 
@@ -266,7 +266,7 @@ namespace AnnoMapEditor.MapTemplates
             }
         }
 
-        public async Task InitAsync()
+        public void Init()
         {
             if (IsStartingSpot)
             {
@@ -293,7 +293,7 @@ namespace AnnoMapEditor.MapTemplates
             }
 
             AssumedMapPath = mapPath;
-            await UpdateExternalDataAsync();
+            UpdateExternalData();
         }
     }
 }

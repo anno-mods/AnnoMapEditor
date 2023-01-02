@@ -69,12 +69,12 @@ namespace AnnoMapEditor.UI.Controls
             UpdateIslands(DataContext as Session);
         }
 
-        private async void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (DataContext is not Session session)
                 return;
 
-            await session.UpdateExternalDataAsync();
+            session.UpdateExternalData();
             UpdateIslands(session);
         }
 
