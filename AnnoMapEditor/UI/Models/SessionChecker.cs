@@ -18,7 +18,7 @@ namespace AnnoMapEditor.UI.Models
         public SessionChecker(Session session)
         {
             _session = session;
-            _session.IslandCollectionChanged += Session_OnIslandCollectionChanged;
+            _session.Islands.CollectionChanged += Session_OnIslandCollectionChanged;
 
             foreach (var island in session.Islands)
                 island.PropertyChanged += Island_PropertyChanged;
