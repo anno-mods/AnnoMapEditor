@@ -10,7 +10,7 @@ namespace AnnoMapEditor.Utilities
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         
-        protected void SetProperty<T>(ref T property, T value, string[]? dependingPropertyNames = null, [CallerMemberName] string propertyName = "")
+        protected void SetProperty<T>(ref T property, T value, string[]? dependendProperties = null, [CallerMemberName] string propertyName = "")
         {
             if (property is null && value is null)
                 return;
@@ -19,8 +19,8 @@ namespace AnnoMapEditor.Utilities
             {
                 property = value;
                 OnPropertyChanged(propertyName);
-                if (dependingPropertyNames is not null)
-                    foreach (var name in dependingPropertyNames)
+                if (dependendProperties is not null)
+                    foreach (var name in dependendProperties)
                         OnPropertyChanged(name);
             }
         }

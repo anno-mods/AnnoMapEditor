@@ -156,7 +156,13 @@ namespace AnnoMapEditor.UI.Controls
 
             MapObject mapObject = new MapObject(session, this)
             {
-                DataContext = Island.Create(size, type, session.Size + new Vector2(Vector2.Zero))
+                DataContext = new Island(Region.Moderate)
+                {
+                    ElementType = MapElementType.PoolIsland,
+                    Position = session.Size + new Vector2(Vector2.Zero),
+                    Size = size,
+                    Type = type
+                }
             };
 
             AddIslands.Add(mapObject);

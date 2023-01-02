@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Shapes;
 using System.Windows.Media.Imaging;
 using AnnoMapEditor.Utilities;
+using System.ComponentModel;
 
 namespace AnnoMapEditor.UI.Controls
 {
@@ -82,11 +83,11 @@ namespace AnnoMapEditor.UI.Controls
             if (DataContext is Island island)
             {
                 this.island = island;
-                island.IslandChanged += Island_IslandChanged;
+                island.PropertyChanged += Island_PropertyChanged;
             }
         }
 
-        private void Island_IslandChanged()
+        private void Island_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             // island updates may come from background threads, make sure to update in UI
             if (Dispatcher.CheckAccess())
@@ -147,11 +148,11 @@ namespace AnnoMapEditor.UI.Controls
         private void MapObject_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (this.island is not null)
-                this.island.IslandChanged -= Island_IslandChanged;
+                this.island.PropertyChanged -= Island_PropertyChanged;
             if (DataContext is Island island)
             {
                 this.island = island;
-                island.IslandChanged += Island_IslandChanged;
+                island.PropertyChanged += Island_PropertyChanged;
             }
             Update();
         }

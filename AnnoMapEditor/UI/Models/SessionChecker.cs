@@ -1,10 +1,6 @@
 ﻿using AnnoMapEditor.MapTemplates;
 using AnnoMapEditor.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace AnnoMapEditor.UI.Models
 {
@@ -25,7 +21,7 @@ namespace AnnoMapEditor.UI.Models
             _session.IslandCollectionChanged += Session_OnIslandCollectionChanged;
 
             foreach (var island in session.Islands)
-                island.IslandChanged += Island_IslandChanged;
+                island.PropertyChanged += Island_PropertyChanged;
 
             Check();
         }
@@ -35,7 +31,7 @@ namespace AnnoMapEditor.UI.Models
             Check();
         }
 
-        private void Island_IslandChanged()
+        private void Island_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             Check();
         }

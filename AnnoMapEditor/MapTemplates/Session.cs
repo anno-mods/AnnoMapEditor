@@ -112,7 +112,7 @@ namespace AnnoMapEditor.MapTemplates
         {
             int margin = (mapSize - playableSize) / 2;
 
-            List<Island> startingSpots = Island.CreateNewStartingSpots(mapSize, margin, region);
+            List<Island> startingSpots = CreateNewStartingSpots(mapSize, region);
 
             MapTemplateDocument createdTemplateDoc = new MapTemplateDocument()
             {
@@ -145,6 +145,38 @@ namespace AnnoMapEditor.MapTemplates
                 return null;
 
             return session;
+        }
+
+        public static List<Island> CreateNewStartingSpots(int mapSize, Region region)
+        {
+            const int SPACING = 32;
+            int halfSize = mapSize / 2;
+
+            List<Island> starts = new List<Island>()
+            {
+                new(region)
+                {
+                    ElementType = MapElementType.StartingSpot,
+                    Position = new(halfSize + SPACING, halfSize + SPACING)
+                },
+                new(region)
+                {
+                    ElementType = MapElementType.StartingSpot,
+                    Position = new(halfSize + SPACING, halfSize - SPACING) 
+                },
+                new(region)
+                {
+                    ElementType = MapElementType.StartingSpot,
+                    Position = new(halfSize - SPACING, halfSize - SPACING) 
+                },
+                new(region)
+                {
+                    ElementType = MapElementType.StartingSpot,
+                    Position = new(halfSize - SPACING, halfSize + SPACING) 
+                }
+            };
+
+            return starts;
         }
 
         public void ResizeSession(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
@@ -188,7 +220,7 @@ namespace AnnoMapEditor.MapTemplates
         public async Task UpdateAsync()
         {
             foreach (var island in Islands)
-                await island.InitAsync(Region);
+                await island.InitAsync();
         }
 
         public MapTemplateDocument? ToTemplate(bool writeInitialArea = false)
@@ -236,7 +268,7 @@ namespace AnnoMapEditor.MapTemplates
         {
             island.CreateTemplate();
             _islands.Add(island);
-            Task.Run(async () => await island.InitAsync(Region));
+            Task.Run(async () => await island.InitAsync());
             IslandCollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 

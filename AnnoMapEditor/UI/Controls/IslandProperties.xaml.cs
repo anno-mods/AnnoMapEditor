@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -88,7 +89,7 @@ namespace AnnoMapEditor.UI.Controls
         {
             if (_island is not null)
             {
-                _island.IslandChanged -= Island_IslandChanged;
+                _island.PropertyChanged -= Island_PropertyChanged;
                 _island = null;
             }
 
@@ -96,11 +97,11 @@ namespace AnnoMapEditor.UI.Controls
             {
                 UpdateIslandProperties(island);
                 _island = island;
-                _island.IslandChanged += Island_IslandChanged;
+                _island.PropertyChanged += Island_PropertyChanged;
             }
         }
 
-        private void Island_IslandChanged()
+        private void Island_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (_island != null)
                 UpdateIslandProperties(_island);
