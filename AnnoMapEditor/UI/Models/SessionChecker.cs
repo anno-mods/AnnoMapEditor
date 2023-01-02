@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace AnnoMapEditor.UI.Models
 {
-    public class SessionChecker : ViewModelBase
+    public class SessionChecker : ObservableBase
     {
         public string Status
         {
             get => _status;
-            set => SetProperty<string>(ref _status, value);
+            set => SetProperty(ref _status, value);
         }
         private string _status = "";
 

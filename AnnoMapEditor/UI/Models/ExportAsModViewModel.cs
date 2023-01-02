@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AnnoMapEditor.UI.Models
 {
-    public class ExportAsModViewModel : ViewModelBase
+    public class ExportAsModViewModel : ObservableBase
     {
         enum ModStatus
         {

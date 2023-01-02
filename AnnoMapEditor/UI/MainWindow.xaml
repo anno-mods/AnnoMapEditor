@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AnnoMapEditor.UI"
         xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
-        xmlns:models="clr-namespace:AnnoMapEditor.UI.Models"
+        xmlns:models="clr-namespace:AnnoMapEditor.UI.Models.MainWindow"
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
         d:DataContext="{d:DesignInstance Type=models:MainWindowViewModel}"
         mc:Ignorable="d"
