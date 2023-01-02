@@ -232,7 +232,7 @@ namespace AnnoMapEditor.UI.Controls
             if (mapObject.IsMarkedForDeletion)
             {
                 sessionCanvas.Children.Remove(mapObject);
-                session.RemoveIsland(island);
+                session.Islands.Remove(island);
                 SelectedIsland = null;
             }
         }
@@ -260,7 +260,7 @@ namespace AnnoMapEditor.UI.Controls
             if (island.IsNew && position.Within(mapArea))
             {
                 // convert add island to real island when entering session area
-                session.AddIsland(island);
+                session.Islands.Add(island);
                 AddIslands?.Remove(mapObject);
                 CreateAddIsland(island.Size, island.Type);
             }
@@ -372,7 +372,7 @@ namespace AnnoMapEditor.UI.Controls
             foreach((MapObject mapObjectToDelete, Island islandToDelete) in toDelete)
             {
                 sessionCanvas.Children.Remove(mapObjectToDelete);
-                session.RemoveIsland(islandToDelete);
+                session.Islands.Remove(islandToDelete);
             }
         }
 

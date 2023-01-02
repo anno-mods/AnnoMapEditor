@@ -1,5 +1,6 @@
 ﻿using AnnoMapEditor.MapTemplates;
 using AnnoMapEditor.Utilities;
+using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace AnnoMapEditor.UI.Models
@@ -18,7 +19,7 @@ namespace AnnoMapEditor.UI.Models
         public SessionChecker(Session session)
         {
             _session = session;
-            _session.IslandCollectionChanged += Session_OnIslandCollectionChanged;
+            _session.Islands.CollectionChanged += Session_OnIslandCollectionChanged;
 
             foreach (var island in session.Islands)
                 island.PropertyChanged += Island_PropertyChanged;
@@ -26,7 +27,7 @@ namespace AnnoMapEditor.UI.Models
             Check();
         }
 
-        private void Session_OnIslandCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Session_OnIslandCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             Check();
         }

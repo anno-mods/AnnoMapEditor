@@ -266,11 +266,6 @@ namespace AnnoMapEditor.MapTemplates
             }
         }
 
-        public async Task UpdateAsync()
-        {
-            await InitAsync();
-        }
-
         public async Task InitAsync()
         {
             if (IsStartingSpot)

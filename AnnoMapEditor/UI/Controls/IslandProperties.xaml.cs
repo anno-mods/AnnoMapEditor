@@ -80,7 +80,7 @@ namespace AnnoMapEditor.UI.Controls
                     island.MapPath = null;
 
                     // triggers reselection from pool
-                    await island.UpdateAsync();
+                    await island.InitAsync();
                 }
             }
         }
