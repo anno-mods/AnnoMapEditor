@@ -1,56 +1,18 @@
 ﻿using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace AnnoMapEditor.UI.Models
+namespace AnnoMapEditor.UI.Models.MainWindow
 {
-    public class DataPathStatus
-    {
-        public string Status { get; set; } = string.Empty;
-        public string? ToolTip { get; set; }
-        public Visibility AutoDetect { get; set; } = Visibility.Collapsed;
-        public Visibility Configure { get; set; } = Visibility.Visible;
-        public string ConfigureText { get; set; } = string.Empty;
-    }
-
-    public class ExportStatus
-    {
-        public bool CanExportAsMod { get; set; }
-        public string ExportAsModText { get; set; } = "";
-    }
-
-    public class MapGroup
-    {
-        public string Name;
-        public List<MapInfo> Maps;
-
-        public MapGroup(string name, IEnumerable<string> mapFiles, Regex regex)
-        {
-            Name = name;
-            Maps = mapFiles.Select(x => new MapInfo()
-            {
-                Name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(
-                    string.Join(' ', regex.Match(x).Groups.Values.Skip(1).Select(y => y.Value)).Replace("_", " ")),
-                FileName = x
-            }).ToList();
-        }
-    }
-
-    public class MapInfo
-    {
-        public string? Name;
-        public string? FileName;
-    }
-
-    public class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : ObservableBase
     {
         public Session? Session
         {

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,7 +6,7 @@ namespace AnnoMapEditor.MapTemplates
 {
     public class IslandType
     {
-        public static readonly IslandType Normal       = new("Normal", 0);
+        public static readonly IslandType Normal       = new("Normal", null);
         public static readonly IslandType Starter      = new("Starter", 1);
         public static readonly IslandType Decoration   = new("Decoration", 2);
         public static readonly IslandType ThirdParty   = new("ThirdParty", 3);
@@ -18,20 +18,20 @@ namespace AnnoMapEditor.MapTemplates
 
         public readonly string Name;
 
-        public readonly short ElementValue;
+        public readonly short? ElementValue;
 
         public bool IsNormalOrStarter => this == Starter || this == Normal;
 
         public bool IsSameWithoutOil(IslandType that) => ElementValue == that.ElementValue;
 
 
-        private IslandType(string name, short elementValue)
+        private IslandType(string name, short? elementValue)
         {
             ElementValue = elementValue;
             Name = name;
         }
 
-        public static IslandType FromElementValue(short elementValue)
+        public static IslandType FromElementValue(short? elementValue)
         {
             IslandType? type = All.FirstOrDefault(t => t.ElementValue == elementValue);
 
@@ -46,11 +46,5 @@ namespace AnnoMapEditor.MapTemplates
 
 
         public override string ToString() => Name;
-
-        public override bool Equals(object? obj) => obj is IslandType other && Name.Equals(other.Name);
-        public override int GetHashCode() => Name.GetHashCode();
-
-        public static bool operator !=(IslandType a, IslandType b) => !a.Equals(b);
-        public static bool operator ==(IslandType a, IslandType b) => a.Equals(b);
     }
 }

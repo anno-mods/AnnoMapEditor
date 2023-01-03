@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 
-namespace AnnoMapEditor
+namespace AnnoMapEditor.Utilities
 {
     internal class Log
     {

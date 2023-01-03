@@ -1,13 +1,16 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace AnnoMapEditor.MapTemplates
+namespace AnnoMapEditor.Utilities
 {
     public class ObservableBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
-        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        protected void SetProperty<T>(ref T property, T value, string[]? dependingPropertyNames = null, [CallerMemberName] string propertyName = "")
+        
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        
+        protected void SetProperty<T>(ref T property, T value, string[]? dependendProperties = null, [CallerMemberName] string propertyName = "")
         {
             if (property is null && value is null)
                 return;
@@ -16,8 +19,8 @@ namespace AnnoMapEditor.MapTemplates
             {
                 property = value;
                 OnPropertyChanged(propertyName);
-                if (dependingPropertyNames is not null)
-                    foreach (var name in dependingPropertyNames)
+                if (dependendProperties is not null)
+                    foreach (var name in dependendProperties)
                         OnPropertyChanged(name);
             }
         }

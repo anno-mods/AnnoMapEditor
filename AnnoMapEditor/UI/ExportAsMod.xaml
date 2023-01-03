@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:AnnoMapEditor.UI"
       xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
+      xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
       xmlns:models="clr-namespace:AnnoMapEditor.UI.Models"
       xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
       d:DataContext="{d:DesignInstance Type=models:ExportAsModViewModel}"
@@ -19,8 +20,8 @@
         <Grid Margin="8" MaxWidth="400" VerticalAlignment="Center">
             <StackPanel>
                 <StackPanel.Resources>
-                    <controls:BoolToVisibility x:Key="BoolToVisibility" OnTrue="Visible" OnFalse="Collapsed"/>
-                    <controls:BoolToVisibility x:Key="InvertedBoolToVisibility" OnTrue="Collapsed" OnFalse="Visible"/>
+                    <converters:BoolToVisibility x:Key="BoolToVisibility" OnTrue="Visible" OnFalse="Collapsed"/>
+                    <converters:BoolToVisibility x:Key="InvertedBoolToVisibility" OnTrue="Collapsed" OnFalse="Visible"/>
                 </StackPanel.Resources>
                 
                 <TextBlock Style="{StaticResource HeaderLabelStyle}" Text="Save as playable mod"/>

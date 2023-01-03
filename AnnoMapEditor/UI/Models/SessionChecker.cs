@@ -1,18 +1,16 @@
 ﻿using AnnoMapEditor.MapTemplates;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AnnoMapEditor.Utilities;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace AnnoMapEditor.UI.Models
 {
-    public class SessionChecker : ViewModelBase
+    public class SessionChecker : ObservableBase
     {
         public string Status
         {
             get => _status;
-            set => SetProperty<string>(ref _status, value);
+            set => SetProperty(ref _status, value);
         }
         private string _status = "";
 
@@ -21,20 +19,20 @@ namespace AnnoMapEditor.UI.Models
         public SessionChecker(Session session)
         {
             _session = session;
-            _session.IslandCollectionChanged += Session_OnIslandCollectionChanged;
+            _session.Islands.CollectionChanged += Session_OnIslandCollectionChanged;
 
             foreach (var island in session.Islands)
-                island.IslandChanged += Island_IslandChanged;
+                island.PropertyChanged += Island_PropertyChanged;
 
             Check();
         }
 
-        private void Session_OnIslandCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Session_OnIslandCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             Check();
         }
 
-        private void Island_IslandChanged()
+        private void Island_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             Check();
         }

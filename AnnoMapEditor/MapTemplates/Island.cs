@@ -1,5 +1,6 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.MapTemplates.Serializing;
+using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,9 +23,20 @@ namespace AnnoMapEditor.MapTemplates
 
     public class Island : ObservableBase
     {
-        #region template data
-        public MapElementType ElementType { get; set; } = MapElementType.PoolIsland;
-        public Vector2 Position { get; set; } = new Vector2(0, 0);
+        public MapElementType ElementType
+        { 
+            get => _elementType;
+            set => SetProperty(ref _elementType, value);
+        }
+        private MapElementType _elementType = MapElementType.PoolIsland;
+
+        public Vector2 Position 
+        { 
+            get => _position;
+            set => SetProperty(ref _position, value);
+        }
+        private Vector2 _position = Vector2.Zero;
+
         public IslandSize Size
         {
             get => _size;
@@ -32,7 +44,6 @@ namespace AnnoMapEditor.MapTemplates
             {
                 if (value != _size)
                 {
-                    IslandChanged?.Invoke();
                     OnPropertyChanged(nameof(Size));
                     OnPropertyChanged(nameof(IsStarter));
                 }
@@ -43,20 +54,61 @@ namespace AnnoMapEditor.MapTemplates
             }
         }
         private IslandSize _size = IslandSize.Small;
-        public int SizeInTiles => (IsPool || MapSizeInTiles == 0) ? Size.DefaultSizeInTiles : MapSizeInTiles;
-        public IslandType Type { get; set; } = IslandType.Normal;
-        public bool Hide { get; set; } = false;
-        public string? ImageFile { get; set; }
-        public int Rotation { get; set; } = 0;
-        public string? MapPath { get; set; }
-        public int MapSizeInTiles { get; private set; }
-        public string? Label { get; set; }
-        #endregion
 
-        public string? AssumedMapPath { get; private set; }
+        public int SizeInTiles => (IsPool || MapSizeInTiles == 0) ? Size.DefaultSizeInTiles : MapSizeInTiles;
+
+        public IslandType Type 
+        {
+            get => _type;
+            set => SetProperty(ref _type, value, dependendProperties: new[] { nameof(IsStarter) });
+        }
+        private IslandType _type = IslandType.Normal;
+
+        public string? ImageFile 
+        { 
+            get => _imageFile;
+            set => SetProperty(ref _imageFile, value);
+        }
+        private string? _imageFile;
+
+        public int Rotation 
+        { 
+            get => _rotation;
+            set => SetProperty(ref _rotation, value);
+        } 
+        private int _rotation = 0;
+
+        public string? MapPath 
+        { 
+            get => _mapPath;
+            set => SetProperty(ref _mapPath, value);
+        }
+        private string? _mapPath;
+
+        public int MapSizeInTiles 
+        {
+            get => _mapSizeInTiles;
+            private set => SetProperty(ref _mapSizeInTiles, value);
+        }
+        private int _mapSizeInTiles;
+
+        public string? Label 
+        { 
+            get => _label;
+            set => SetProperty(ref _label, value); 
+        }
+        private string? _label;
+
+        public string? AssumedMapPath
+        { 
+            get => _assumedMapPath;
+            private set => SetProperty(ref _assumedMapPath, value); 
+        }
+        private string? _assumedMapPath;
+
         public bool IsPool => !IsStartingSpot && string.IsNullOrEmpty(MapPath);
         public bool IsStartingSpot => ElementType == MapElementType.StartingSpot;
-        public bool IsNew => template is null;
+        public bool IsNew => _template is null;
 
         // TODO create view model of islands
         public bool IsStarter
@@ -67,45 +119,29 @@ namespace AnnoMapEditor.MapTemplates
                 if (value != IsStarter)
                 {
                     Type = value ? IslandType.Starter : IslandType.Normal;
-                    IslandChanged?.Invoke();
                 }
             }
         }
 
-        private static readonly Random rnd = new((int)DateTime.Now.Ticks);
+        public TemplateElement? Template
+        {
+            get => _template;
+            set => SetProperty(ref _template, value, dependendProperties: new[] { nameof(IsNew) });
+        }
+        private TemplateElement? _template;
 
-        private TemplateElement? template;
+        private Region _region { get; }
 
-        private Region Region { get; }
         public int Counter { get; set; }
 
-        public delegate void IslandChangedHandler();
-        public event IslandChangedHandler? IslandChanged;
 
-        private Island(Region region)
+        public Island(Region region)
         {
-            Region = region;
+            _region = region;
         }
 
-        public async Task<Island> CloneAsync()
-        {
-            var island = new Island(Region)
-            {
-                ElementType = ElementType,
-                Position = Position,
-                Size = Size,
-                Type = Type,
-                Rotation = Rotation,
-                MapPath = MapPath,
-                Label = Label,
-                template = template
-            };
 
-            await island.InitAsync(Region);
-            return island;
-        }
-
-        public static async Task<Island> FromSerialized(TemplateElement templateElement, Region region)
+        public static Island FromSerialized(TemplateElement templateElement, Region region)
         {
             var element = templateElement.Element;
 
@@ -114,70 +150,30 @@ namespace AnnoMapEditor.MapTemplates
                 ElementType = (MapElementType) (templateElement.ElementType ?? 0),
                 Position = new Vector2(element?.Position),
                 Size = IslandSize.FromElementValue(element?.Size),
-                Type = IslandType.FromElementValue(element?.RandomIslandConfig?.value?.Type?.id ?? element?.Config?.Type?.id ?? 0),
+                Type = IslandType.FromElementValue(element?.RandomIslandConfig?.value?.Type?.id ?? element?.Config?.Type?.id),
                 Rotation = Math.Clamp((int?)element?.Rotation90 ?? 0, 0, 3),
                 MapPath = element?.MapFilePath?.ToString(),
                 Label = element?.IslandLabel?.ToString(),
-                template = templateElement
+                _template = templateElement
             };
 
-            await island.InitAsync(region);
+            island.Init();
             return island;
-        }
-
-        public static Island Create(IslandSize size, IslandType type, Vector2 position)
-        {
-            var island = new Island(Region.Moderate)
-            {
-                ElementType = MapElementType.PoolIsland,
-                Position = position,
-                Size = size,
-                Type = type
-            };
-            return island;
-        }
-
-        public static List<Island> CreateNewStartingSpots(int mapSize, int margin, Region region)
-        {
-            const int SPACING = 32;
-            int halfSize = mapSize / 2;
-
-            List<Island> starts = new List<Island>()
-            {
-                CreateStartingSpot(region, halfSize + SPACING, halfSize + SPACING),
-                CreateStartingSpot(region, halfSize + SPACING, halfSize - SPACING),
-                CreateStartingSpot(region, halfSize - SPACING, halfSize - SPACING),
-                CreateStartingSpot(region, halfSize - SPACING, halfSize + SPACING),
-            };
-
-            return starts;
-
-
-        }
-
-        private static Island CreateStartingSpot(Region region, int x, int y)
-        {
-            return new Island(region)
-            {
-                ElementType = MapElementType.StartingSpot,
-                Position = new Vector2(x, y)
-            };
         }
 
         public void CreateTemplate()
         {
-            template = new TemplateElement
+            Template = new TemplateElement
             {
                 Element = new Element()
             };
-            IslandChanged?.Invoke();
         }
 
         public TemplateElement? ToTemplate()
         {
             TemplateElement templateElement = new TemplateElement();
 
-            if (template?.Element is null)
+            if (_template?.Element is null)
                 return templateElement;
 
             if (ElementType != MapElementType.FixedIsland)
@@ -222,19 +218,19 @@ namespace AnnoMapEditor.MapTemplates
                         templateElement.Element.IslandLabel = Label;
                     }
 
-                    if(template?.Element?.FertilityGuids is not null)
+                    if(_template?.Element?.FertilityGuids is not null)
                     {
-                        templateElement.Element.FertilityGuids = new int[template.Element.FertilityGuids.Length];
-                        Array.Copy(this.template.Element.FertilityGuids, templateElement.Element.FertilityGuids, template.Element.FertilityGuids.Length);
+                        templateElement.Element.FertilityGuids = new int[_template.Element.FertilityGuids.Length];
+                        Array.Copy(this._template.Element.FertilityGuids, templateElement.Element.FertilityGuids, _template.Element.FertilityGuids.Length);
                     }
                     else
                     {
                         templateElement.Element.FertilityGuids = new int[0];
                     }
 
-                    templateElement.Element.RandomizeFertilities = template?.Element?.RandomizeFertilities;
+                    templateElement.Element.RandomizeFertilities = _template?.Element?.RandomizeFertilities;
                     templateElement.Element.MineSlotMapping = new List<Tuple<long, int>>( 
-                        template?.Element?.MineSlotMapping?.Select(
+                        _template?.Element?.MineSlotMapping?.Select(
                             x => new Tuple<long, int>(x.Item1, x.Item2)
                         ) ?? Enumerable.Empty<Tuple<long, int>>()
                     );
@@ -244,7 +240,7 @@ namespace AnnoMapEditor.MapTemplates
                         value = new Config()
                         {
                             Type = new() { id = this.Type.ElementValue != 0 ? this.Type.ElementValue : null },
-                            Difficulty = new() { id = template?.Element?.RandomIslandConfig?.value?.Difficulty?.id }
+                            Difficulty = new() { id = _template?.Element?.RandomIslandConfig?.value?.Difficulty?.id }
                         }
                     };
                     break;
@@ -253,13 +249,13 @@ namespace AnnoMapEditor.MapTemplates
             return templateElement;
         }
 
-        public async Task UpdateExternalDataAsync()
+        public void UpdateExternalData()
         {
             if (AssumedMapPath is null)
                 return;
 
             // fallback to read out map file
-            int sizeInTiles = await IslandReader.ReadTileInSizeFromFileAsync(AssumedMapPath);
+            int sizeInTiles = IslandReader.ReadTileInSizeFromFile(AssumedMapPath);
             if (sizeInTiles != 0)
                 MapSizeInTiles = sizeInTiles;
 
@@ -268,16 +264,9 @@ namespace AnnoMapEditor.MapTemplates
                 string activeMapImagePath = Path.Combine(Path.GetDirectoryName(AssumedMapPath) ?? "", "_gamedata", Path.GetFileNameWithoutExtension(AssumedMapPath), "mapimage.png");
                 ImageFile = activeMapImagePath;
             }
-            IslandChanged?.Invoke();
         }
 
-        public async Task UpdateAsync()
-        {
-            await InitAsync(Region);
-            IslandChanged?.Invoke();
-        }
-
-        public async Task InitAsync(Region region)
+        public void Init()
         {
             if (IsStartingSpot)
             {
@@ -291,8 +280,8 @@ namespace AnnoMapEditor.MapTemplates
 
             if (mapPath == null)
             {
-                mapPath = Pool.GetRandomIslandPath(region, Size);
-                Rotation = rnd.Next(0, 3);
+                mapPath = Pool.GetRandomIslandPath(_region, Size);
+                Rotation = Random.Shared.Next(0, 3);
             }
 
             if (mapPath != null && Size == IslandSize.Default)
@@ -304,7 +293,7 @@ namespace AnnoMapEditor.MapTemplates
             }
 
             AssumedMapPath = mapPath;
-            await UpdateExternalDataAsync();
+            UpdateExternalData();
         }
     }
 }

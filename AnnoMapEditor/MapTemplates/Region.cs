@@ -85,6 +85,18 @@ namespace AnnoMapEditor.MapTemplates
             }
         }
 
+        public static Region DetectFromPath(string filePath)
+        {
+            if (filePath.Contains("colony01"))
+                return NewWorld;
+            else if (filePath.Contains("dlc03") || filePath.Contains("colony_03"))
+                return Arctic;
+            else if (filePath.Contains("dlc06") || filePath.Contains("colony02"))
+                return Enbesa;
+            return Moderate;
+        }
+
+
         public override string ToString() => value;
 
         public override bool Equals(object? obj) => obj is Region other && value.Equals(other.value);

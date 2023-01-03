@@ -1,14 +1,10 @@
 ﻿using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.Utilities;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AnnoMapEditor.UI.Models
 {
-    public class SessionPropertiesViewModel : ViewModelBase
+    public class SessionPropertiesViewModel : ObservableBase
     {
         internal Session _session;
 
@@ -30,7 +26,7 @@ namespace AnnoMapEditor.UI.Models
                 {
                     _selectedRegion = value;
                     _session.Region = value;
-                    _ = _session.UpdateAsync();
+                    _session.Update();
                     OnSelectedRegionChanged();
                 }
             }

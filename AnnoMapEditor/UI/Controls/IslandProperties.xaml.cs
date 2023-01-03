@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -67,7 +68,7 @@ namespace AnnoMapEditor.UI.Controls
             island.IsStarter = IsStarterCheckBox.IsChecked;
         }
 
-        private async void OnTypeSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnTypeSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DataContext is Island island && TypeComboBox.SelectedItem is UserIslandType type)
             {
@@ -79,7 +80,7 @@ namespace AnnoMapEditor.UI.Controls
                     island.MapPath = null;
 
                     // triggers reselection from pool
-                    await island.UpdateAsync();
+                    island.Init();
                 }
             }
         }
@@ -88,7 +89,7 @@ namespace AnnoMapEditor.UI.Controls
         {
             if (_island is not null)
             {
-                _island.IslandChanged -= Island_IslandChanged;
+                _island.PropertyChanged -= Island_PropertyChanged;
                 _island = null;
             }
 
@@ -96,31 +97,31 @@ namespace AnnoMapEditor.UI.Controls
             {
                 UpdateIslandProperties(island);
                 _island = island;
-                _island.IslandChanged += Island_IslandChanged;
+                _island.PropertyChanged += Island_PropertyChanged;
             }
         }
 
-        private void Island_IslandChanged()
+        private void Island_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (_island != null)
                 UpdateIslandProperties(_island);
         }
 
-        private async void OnRotateClockwise(object sender, RoutedEventArgs args)
+        private void OnRotateClockwise(object sender, RoutedEventArgs args)
         {
             if (DataContext is Island island)
             {
                 island.Rotation = island.Rotation + 1 % 4;
-                await island.UpdateExternalDataAsync();
+                island.UpdateExternalData();
             }
         }
 
-        private async void OnRotateCounterClockwise(object sender, RoutedEventArgs args)
+        private void OnRotateCounterClockwise(object sender, RoutedEventArgs args)
         {
             if (DataContext is Island island)
             {
                 island.Rotation = island.Rotation - 1 % 4;
-                await island.UpdateExternalDataAsync();
+                island.UpdateExternalData();
             }
         }
 

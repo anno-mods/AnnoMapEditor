@@ -6,6 +6,8 @@ using System.IO;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using AnnoMapEditor.Utilities;
+using AnnoMapEditor.UI.Models.MainWindow;
 
 namespace AnnoMapEditor.UI
 {

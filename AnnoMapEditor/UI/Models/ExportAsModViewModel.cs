@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using AnnoMapEditor.Utilities;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace AnnoMapEditor.UI.Models
 {
-    public class ExportAsModViewModel : ViewModelBase
+    public class ExportAsModViewModel : ObservableBase
     {
         enum ModStatus
         {

@@ -1,29 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AnnoMapEditor
+namespace AnnoMapEditor.Utilities
 {
-    public static class Extensions
-    {
-        public static int IndexOf<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate)
-        {
-            var index = 0;
-            foreach (var item in source)
-            {
-                if (predicate.Invoke(item))
-                    return index;
-                index++;
-            }
-
-            return -1;
-        }
-    }
-
-    internal class Utils
+    internal class FileUtils
     {
         /// <summary>
         /// Delete directory, fallback to delete files only.

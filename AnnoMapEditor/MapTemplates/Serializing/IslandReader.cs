@@ -1,16 +1,16 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 using FileDBSerializing;
+using AnnoMapEditor.Utilities;
 
 namespace AnnoMapEditor.MapTemplates.Serializing
 {
     internal static class IslandReader
     {
-        public static async Task<int> ReadTileInSizeFromFileAsync(string mapPath)
+        public static int ReadTileInSizeFromFile(string mapPath)
         {
             if (Settings.Instance.DataArchive?.IsValid != true)
                 return 0;
@@ -19,7 +19,7 @@ namespace AnnoMapEditor.MapTemplates.Serializing
             if (fs is null)
                 return 0;
 
-            var doc = await ReadFileDBAsync(fs);
+            var doc = ReadFileDB(fs);
 
             if (doc?.Roots.FirstOrDefault(x => x.Name == "MapSize" && x.NodeType == FileDBNodeType.Attrib) is not Attrib mapSize)
                 return 0;
@@ -28,24 +28,21 @@ namespace AnnoMapEditor.MapTemplates.Serializing
             return sizeInTiles;
         }
 
-        private static async Task<IFileDBDocument?> ReadFileDBAsync(Stream fileStream)
+        private static IFileDBDocument? ReadFileDB(Stream fileStream)
         {
-            return await Task.Run(() =>
+            try
             {
-                try
-                {
-                    var Version = VersionDetector.GetCompressionVersion(fileStream);
-                    var parser = new DocumentParser(Version);
-                    IFileDBDocument? doc = parser.LoadFileDBDocument(fileStream);
+                var Version = VersionDetector.GetCompressionVersion(fileStream);
+                var parser = new DocumentParser(Version);
+                IFileDBDocument? doc = parser.LoadFileDBDocument(fileStream);
 
-                    return doc;
-                }
-                catch
-                {
-                    // TODO error log
-                    return null;
-                }
-            });
+                return doc;
+            }
+            catch
+            {
+                // TODO error log
+                return null;
+            }
         }
     }
 }
