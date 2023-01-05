@@ -4,7 +4,7 @@ using AnnoMapEditor.Utilities;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
-namespace AnnoMapEditor.UI.Models
+namespace AnnoMapEditor.UI.Windows.Main
 {
     public class SessionChecker : ObservableBase
     {

@@ -3,7 +3,7 @@ using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System;
 
-namespace AnnoMapEditor.UI.Models
+namespace AnnoMapEditor.UI.Controls
 {
     public class SessionPropertiesViewModel : ObservableBase
     {

@@ -2,6 +2,7 @@
 using AnnoMapEditor.MapTemplates;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Models;
+using AnnoMapEditor.UI.Controls;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace AnnoMapEditor.UI.Models.MainWindow
+namespace AnnoMapEditor.UI.Windows.Main
 {
     public class MainWindowViewModel : ObservableBase
     {

@@ -1,20 +1,19 @@
-﻿<UserControl x:Class="AnnoMapEditor.UI.ExportAsMod"
+﻿<UserControl x:Class="AnnoMapEditor.UI.Windows.ExportAsMod.ExportAsModWindow"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:AnnoMapEditor.UI"
+      xmlns:local="clr-namespace:AnnoMapEditor.UI.Windows.ExportAsMod"
       xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
       xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
-      xmlns:models="clr-namespace:AnnoMapEditor.UI.Models"
       xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
-      d:DataContext="{d:DesignInstance Type=models:ExportAsModViewModel}"
+      d:DataContext="{d:DesignInstance Type=local:ExportAsModViewModel}"
       mc:Ignorable="d" 
       d:DesignHeight="500" d:DesignWidth="450"
       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
       Background="{StaticResource BackgroundBrush}">
     <UserControl.Resources>
-        <ResourceDictionary Source="Styles.xaml" />
+        <ResourceDictionary Source="../../Resources/Styles.xaml" />
     </UserControl.Resources>
     <Grid Background="{StaticResource DialogBrush}">
         <Grid Margin="8" MaxWidth="400" VerticalAlignment="Center">

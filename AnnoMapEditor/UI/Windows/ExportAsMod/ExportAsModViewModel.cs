@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AnnoMapEditor.UI.Models
+namespace AnnoMapEditor.UI.Windows.ExportAsMod
 {
     public class ExportAsModViewModel : ObservableBase
     {
@@ -52,9 +52,9 @@ namespace AnnoMapEditor.UI.Models
         private string _modName = string.Empty;
 
         public string ResultingModName { get; private set; } = string.Empty;
+
         public string ResultingFullModName { get; private set; } = string.Empty;
 
-        public bool CanExport => true;
         public string ModExistsWarning { get; private set; } = string.Empty;
 
         public bool InfoMapTypeSelection

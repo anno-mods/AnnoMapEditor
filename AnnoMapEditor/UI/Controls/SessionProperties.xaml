@@ -4,16 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
-             xmlns:models="clr-namespace:AnnoMapEditor.UI.Models"
              xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
              xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
-             d:DataContext="{d:DesignInstance Type=models:SessionPropertiesViewModel}"
+             d:DataContext="{d:DesignInstance Type=local:SessionPropertiesViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="300">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Styles.xaml" />
+                <ResourceDictionary Source="../Resources/Styles.xaml" />
                 <ResourceDictionary>
                     <converters:ObjectToVisibility x:Key="CollapsedOnNull" />
                     <converters:BoolToVisibility x:Key="BoolToVisibility" OnTrue="Visible" OnFalse="Collapsed"/>

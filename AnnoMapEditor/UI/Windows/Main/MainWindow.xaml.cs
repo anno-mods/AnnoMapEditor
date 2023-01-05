@@ -1,5 +1,4 @@
-﻿using AnnoMapEditor.UI.Models;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,9 +6,8 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using AnnoMapEditor.Utilities;
-using AnnoMapEditor.UI.Models.MainWindow;
 
-namespace AnnoMapEditor.UI
+namespace AnnoMapEditor.UI.Windows.Main
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

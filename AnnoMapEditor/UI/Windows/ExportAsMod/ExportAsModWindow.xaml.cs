@@ -1,21 +1,22 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
-using AnnoMapEditor.UI.Models;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace AnnoMapEditor.UI
+namespace AnnoMapEditor.UI.Windows.ExportAsMod
 {
-    public partial class ExportAsMod : UserControl
+    public partial class ExportAsModWindow : UserControl
     {
         public ExportAsModViewModel ViewModel { get; init; } = new();
 
-        public ExportAsMod()
+
+        public ExportAsModWindow()
         {
             InitializeComponent();
             Visibility = Visibility.Collapsed;
             DataContext = ViewModel;
         }
+
 
         public void Show(Session session)
         {

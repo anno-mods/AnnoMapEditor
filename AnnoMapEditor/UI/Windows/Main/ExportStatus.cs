@@ -1,4 +1,4 @@
-﻿namespace AnnoMapEditor.UI.Models
+﻿namespace AnnoMapEditor.UI.Windows.Main
 {
     public class ExportStatus
     {

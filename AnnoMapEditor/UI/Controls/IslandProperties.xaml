@@ -12,7 +12,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Styles.xaml" />
+                <ResourceDictionary Source="../Resources/Styles.xaml" />
                 <ResourceDictionary>
                     <converters:ObjectToVisibility x:Key="CollapsedOnNull" />
                 </ResourceDictionary>
