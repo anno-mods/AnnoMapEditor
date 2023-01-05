@@ -60,7 +60,7 @@ namespace AnnoMapEditor.MapTemplates.Serializing
                     FileDBDocumentDeserializer<T> deserializer = new(new FileDBSerializerOptions() { IgnoreMissingProperties = true });
                     return deserializer.GetObjectStructureFromFileDBDocument(doc);
                 }
-                catch(System.Exception ex)
+                catch
                 {
                     return null;
                 }

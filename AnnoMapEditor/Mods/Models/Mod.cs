@@ -31,7 +31,7 @@ namespace AnnoMapEditor.Mods.Models
         public const string AME_POOL_PATH = @"data\ame\maps\pool";
 
 
-        private Session _session;
+        private readonly Session _session;
 
         public MapType MapType { get; set; }
 
@@ -76,7 +76,7 @@ namespace AnnoMapEditor.Mods.Models
                 string size = sizes[0];
 
                 string basePath = Path.Combine(modPath, $"{mapFilePath}");
-                await _session.SaveAsync(basePath + $"_{size}.a7tinfo", false);
+                await _session.SaveAsync(basePath + $"_{size}.a7tinfo");
 
                 //a7t Creation
                 string a7tPath = basePath + $"_{size}.a7t";
@@ -89,7 +89,7 @@ namespace AnnoMapEditor.Mods.Models
 
                 if (_session.Region.HasMapExtension)
                 {
-                    await _session.SaveAsync(basePath + $"_{size}_enlarged.a7tinfo", true);
+                    await _session.SaveAsync(basePath + $"_{size}_enlarged.a7tinfo");
                     File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}_enlarged.a7t");
                     File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}_enlarged.a7te");
                 }
@@ -99,13 +99,13 @@ namespace AnnoMapEditor.Mods.Models
                 {
                     size = sizes[i];
 
-                    await _session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_{size}.a7tinfo"), false);
+                    await _session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_{size}.a7tinfo"));
                     File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}.a7t");
                     File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}.a7te");
 
                     if (_session.Region.HasMapExtension)
                     {
-                        await _session.SaveAsync(basePath + $"_{size}_enlarged.a7tinfo", true);
+                        await _session.SaveAsync(basePath + $"_{size}_enlarged.a7tinfo");
                         File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}_enlarged.a7t");
                         File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}_enlarged.a7te");
                     }
@@ -125,9 +125,18 @@ namespace AnnoMapEditor.Mods.Models
             return true;
         }
 
-        private async Task WriteMetaJson(string modPath, string modName, string? modID)
+
+        public static bool CanSave(Session? session)
         {
-            Modinfo? modinfo = null;
+            if (session is null)
+                return false;
+
+            return session.Region.AllowModding;
+        }
+
+        private static async Task WriteMetaJson(string modPath, string modName, string? modID)
+        {
+            Modinfo? modinfo;
 
             string modinfoPath = Path.Combine(modPath, "modinfo.json");
             //if (File.Exists(modinfoPath))
@@ -161,7 +170,7 @@ namespace AnnoMapEditor.Mods.Models
             await writer.WriteAsync(JsonConvert.SerializeObject(modinfo, Newtonsoft.Json.Formatting.Indented));
         }
 
-        private async Task WriteLanguageXml(string modPath, string name, string guid)
+        private static async Task WriteLanguageXml(string modPath, string name, string guid)
         {
             string[] languages = new string[] { "chinese", "english", "french", "german", "italian", "japanese", "korean", "polish", "russian", "spanish", "taiwanese" };
 
@@ -184,7 +193,7 @@ namespace AnnoMapEditor.Mods.Models
             }
         }
 
-        private async Task WriteAssetsXml(string modPath, string fullModName, string mapFilePath, Region region, MapType mapType)
+        private static async Task WriteAssetsXml(string modPath, string fullModName, string mapFilePath, Region region, MapType mapType)
         {
             string assetsXmlPath = Path.Combine(modPath, @"data\config\export\main\asset\assets.xml");
             string? assetsXmlDir = Path.GetDirectoryName(assetsXmlPath);
@@ -199,22 +208,13 @@ namespace AnnoMapEditor.Mods.Models
             await writer.WriteAsync(content);
         }
 
-
-        public static bool CanSave(Session? session)
-        {
-            if (session is null)
-                return false;
-
-            return session.Region.AllowModding;
-        }
-
         public static string CreateAssetsModOps(Region region, MapType mapType, string fullMapPath)
         {
             IEnumerable<string> sizes = region.MapSizes;
             // some maps have updates sizes, but make sure to only replace one
             IEnumerable<string> subSizes = region.MapSizeIndices;
 
-            string MakeXPath(string mapTypeName, string size, string subsize)
+            static string MakeXPath(string mapTypeName, string size, string subsize)
             {
                 if (string.IsNullOrEmpty(subsize))
                     return $"../Standard/Name='{mapTypeName}{size}'";

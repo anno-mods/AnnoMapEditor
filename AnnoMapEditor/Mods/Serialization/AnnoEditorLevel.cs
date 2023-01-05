@@ -40,7 +40,7 @@ namespace AnnoMapEditor.Mods.Serialization
 
             for (int cntColumn = 0; cntColumn < chunkCount; cntColumn++)
             {
-                List<string> column = new List<string>();
+                List<string> column = new();
 
                 for (int cntChunk = 0; cntChunk < chunkCount; cntChunk++)
                 {

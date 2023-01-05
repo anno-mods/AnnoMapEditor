@@ -150,7 +150,7 @@ namespace AnnoMapEditor.UI.Models.MainWindow
             SessionFilePath = Path.GetFileName(filePath);
 
             if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
-                await Session.SaveAsync(filePath, false);
+                await Session.SaveAsync(filePath);
             else
                 await Session.SaveToXmlAsync(filePath);
         }

@@ -18,7 +18,7 @@ namespace AnnoMapEditor.DataArchives
             if (adjustedPath is null)
                 return Default;
 
-            IDataArchive archive = Default;
+            IDataArchive archive;
             if (File.Exists(Path.Combine(adjustedPath, "maindata/data0.rda")))
                 archive = new RdaDataArchive(adjustedPath);
             else

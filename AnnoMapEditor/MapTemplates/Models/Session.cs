@@ -136,9 +136,9 @@ namespace AnnoMapEditor.MapTemplates.Models
         {
             int margin = (mapSize - playableSize) / 2;
 
-            MapTemplateDocument createdTemplateDoc = new MapTemplateDocument()
+            MapTemplateDocument createdTemplateDoc = new()
             {
-                MapTemplate = new MapTemplate()
+                MapTemplate = new()
                 {
                     Size = new int[] { mapSize, mapSize },
                     PlayableArea = new int[] { margin, margin, playableSize + margin, playableSize + margin },
@@ -172,7 +172,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             const int SPACING = 32;
             int halfSize = mapSize / 2;
 
-            List<Island> starts = new List<Island>()
+            List<Island> starts = new()
             {
                 new(region)
                 {
@@ -201,11 +201,11 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public void ResizeSession(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
         {
-            Vector2 oldMapSize = new Vector2(Size);
-            Size = new Vector2(mapSize, mapSize);
+            Vector2 oldMapSize = new(Size);
+            Size = new(mapSize, mapSize);
 
-            Vector2 oldPlayableSize = new Vector2(PlayableArea.Width, PlayableArea.Height);
-            PlayableArea = new Rect2(new int[] { playableAreaMargins.x1, playableAreaMargins.y1, playableAreaMargins.x2, playableAreaMargins.y2 });
+            Vector2 oldPlayableSize = new(PlayableArea.Width, PlayableArea.Height);
+            PlayableArea = new(new int[] { playableAreaMargins.x1, playableAreaMargins.y1, playableAreaMargins.x2, playableAreaMargins.y2 });
 
             MapSizeConfigChanged?.Invoke(this, new SessionResizeEventArgs(oldMapSize, oldPlayableSize));
         }
@@ -221,11 +221,11 @@ namespace AnnoMapEditor.MapTemplates.Models
                 playableAreaMargins.y2 
             };
 
-            Vector2 oldMapSize = new Vector2(Size);
-            Size = new Vector2(_template.MapTemplate.Size);
+            Vector2 oldMapSize = new(Size);
+            Size = new(_template.MapTemplate.Size);
 
-            Vector2 oldPlayableSize = new Vector2(PlayableArea.Width, PlayableArea.Height);
-            PlayableArea = new Rect2(_template.MapTemplate.PlayableArea);
+            Vector2 oldPlayableSize = new(PlayableArea.Width, PlayableArea.Height);
+            PlayableArea = new(_template.MapTemplate.PlayableArea);
 
             MapSizeConfigChanged?.Invoke(this, new SessionResizeEventArgs(oldMapSize, oldPlayableSize));
             MapSizeConfigCommitted?.Invoke(this, new EventArgs());
@@ -270,7 +270,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             await Serializer.WriteToXmlAsync(export, file);
         }
 
-        public async Task SaveAsync(string filePath, bool writeInitialArea)
+        public async Task SaveAsync(string filePath)
         {
             var export = ToTemplate();
             if (export is null)

@@ -16,17 +16,16 @@ namespace AnnoMapEditor.Mods.Serialization
 
         public void ExportA7te(string a7tePath)
         {
-            AnnoEditorLevel a7te = new AnnoEditorLevel(MapSize);
+            AnnoEditorLevel a7te = new(MapSize);
 
-            XmlSerializer a7teSerializer = new XmlSerializer(typeof(AnnoEditorLevel));
-            XmlWriterSettings xmlSettings = new XmlWriterSettings() { Indent = true, IndentChars = "  ", OmitXmlDeclaration = true, Async = true };
-            XmlSerializerNamespaces noNamespaces = new XmlSerializerNamespaces(new XmlQualifiedName[] { XmlQualifiedName.Empty });
+            XmlSerializer a7teSerializer = new(typeof(AnnoEditorLevel));
+            XmlWriterSettings xmlSettings = new() { Indent = true, IndentChars = "  ", OmitXmlDeclaration = true, Async = true };
+            XmlSerializerNamespaces noNamespaces = new(new XmlQualifiedName[] { XmlQualifiedName.Empty });
 
-            using (StreamWriter streamWriter = new StreamWriter(a7tePath, false, Encoding.UTF8))
-            using (XmlWriter xmlWriter = XmlWriter.Create(streamWriter, xmlSettings))
-            {
-                a7teSerializer.Serialize(xmlWriter, a7te, noNamespaces);
-            }
+            using StreamWriter streamWriter = new(a7tePath, false, Encoding.UTF8);
+            using XmlWriter xmlWriter = XmlWriter.Create(streamWriter, xmlSettings);
+
+            a7teSerializer.Serialize(xmlWriter, a7te, noNamespaces);
         }
     }
 }

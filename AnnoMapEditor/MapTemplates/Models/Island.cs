@@ -10,7 +10,7 @@ namespace AnnoMapEditor.MapTemplates
 {
     static class SpecialIslands
     {
-        public static readonly Dictionary<string, int> CachedSizes = new Dictionary<string, int>()
+        public static readonly Dictionary<string, int> CachedSizes = new()
         {
             ["data/dlc01/sessions/islands/pool/moderate_c_01/moderate_c_01.a7m"] = 768,
             ["data/dlc01/sessions/islands/pool/moderate_3rdparty06_01/moderate_3rdparty06_01.a7m"] = 128,
@@ -171,7 +171,7 @@ namespace AnnoMapEditor.MapTemplates
 
         public TemplateElement? ToTemplate()
         {
-            TemplateElement templateElement = new TemplateElement();
+            TemplateElement templateElement = new();
 
             if (_template?.Element is null)
                 return templateElement;
@@ -182,7 +182,7 @@ namespace AnnoMapEditor.MapTemplates
             }
 
             //Create a fully new templateElement for export, so unwanted values are clean
-            templateElement.Element = new Element();
+            templateElement.Element = new();
 
             // The editor's coordinate system's axis are flipped compared to Anno1800. Thus we must
             // flip X and Y when serializing.
@@ -223,7 +223,7 @@ namespace AnnoMapEditor.MapTemplates
                 }
                 else
                 {
-                    templateElement.Element.FertilityGuids = new int[0];
+                    templateElement.Element.FertilityGuids = Array.Empty<int>();
                 }
 
                 templateElement.Element.RandomizeFertilities = _template?.Element?.RandomizeFertilities;

@@ -7,7 +7,7 @@ namespace AnnoMapEditor.Tests.Utils
         public static string? GetValueFromPath(this XElement node, string path)
         {
             XElement? currentNode = node;
-            Queue<string> parts = new Queue<string>(path.Split('/'));
+            Queue<string> parts = new(path.Split('/'));
 
             while (parts.Any() && currentNode is not null)
             {
