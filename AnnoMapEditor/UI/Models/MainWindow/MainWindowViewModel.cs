@@ -257,7 +257,7 @@ namespace AnnoMapEditor.UI.Models.MainWindow
             using var assetStream = Settings.DataArchive.OpenRead("data/config/export/main/asset/assets.xml");
             XmlDocument doc = new XmlDocument();
             doc.Load(assetStream);
-            var nodes = doc.SelectNodes("//Asset[Template='MapTemplate']/Values/MapTemplate[IsUsedByMapGenerator='1']/TemplateFilename");
+            var nodes = doc.SelectNodes("//Asset[Template='MapTemplate']/Values/MapTemplate[TemplateRegion]/*[self::TemplateFilename or self::EnlargedTemplateFilename]");
             stopwatch.Stop();
             double i = stopwatch.Elapsed.TotalMilliseconds;
             return nodes?.Cast<XmlNode>().Select(x => Path.ChangeExtension(x.InnerText, "a7tinfo"));
