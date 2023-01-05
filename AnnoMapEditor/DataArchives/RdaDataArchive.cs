@@ -5,19 +5,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using AnnoMapEditor.Utilities;
+using AnnoRDA;
+using AnnoRDA.Builder;
 using Microsoft.Extensions.FileSystemGlobbing;
 using RDAExplorer;
 
 namespace AnnoMapEditor.DataArchives
 {
-    public class RdaDataArchive : IDataArchive, IDisposable
+    public class RdaDataArchive : IDataArchive
     {
         public string Path { get; }
         public bool IsValid { get; } = true;
 
-        private RDAReader[]? readers;
-
-        Dictionary<string, RDAFile> allFiles { get; } = new();
+        private FileSystem fileSystem;
 
         public RdaDataArchive(string folderPath)
         {
@@ -28,92 +28,22 @@ namespace AnnoMapEditor.DataArchives
         {
             await Task.Run(() => 
             {
-                // let's skip a few to speed up the loading: 0, 1, 2, 3, 4, 7, 8, 9
-                var archives = Directory.
-                    GetFiles(System.IO.Path.Combine(Path, "maindata"), "*.rda")
-                    // filter some rda we don't use for sure
-                    .Where(x => System.IO.Path.GetFileName(x).StartsWith("data") && 
-                        !x.EndsWith("data0.rda") && !x.EndsWith("data1.rda") && !x.EndsWith("data2.rda") && !x.EndsWith("data3.rda") && 
-                        !x.EndsWith("data4.rda") && !x.EndsWith("data7.rda") && !x.EndsWith("data8.rda") && !x.EndsWith("data9.rda"))
-                    // load highest numbers last to overwrite lower numbers
-                    .OrderBy(x => int.TryParse(System.IO.Path.GetFileNameWithoutExtension(x)["data".Length..], out int result) ? result : 0);
-                readers = archives.Select(x =>
-                {
-                    try
-                    {
-                        var reader = new RDAReader
-                        {
-                            FileName = x
-                        };
-                        reader.ReadRDAFile();
-                        foreach (var file in reader.rdaFolder.GetAllFiles())
-                            if (file.FileName.EndsWith(".a7tinfo") || file.FileName.EndsWith(".png") || file.FileName.EndsWith(".a7minfo") ||
-                                file.FileName.EndsWith(".a7t") || file.FileName.EndsWith(".a7te"))
-                                allFiles[file.FileName] = file;
-                        return reader;
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Exception($"error loading RDAs from {x}", e);
-                        return null;
-                    }
-                }).Where(x => x is not null).Select(x => x!).ToArray();
-
-                if (readers.Length == 0)
-                {
-                    Log.Warn($"No .rda files found at {System.IO.Path.Combine(Path, "maindata")}");
-                    MessageBox.Show($"Something went wrong opening the RDA files.\n\nDo you have another Editor or the RDAExplorer open by any chance?\n\nLog file: {Log.LogFilePath}", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                }
+                fileSystem = FileSystemBuilder.Create()
+                .FromPath(System.IO.Path.Combine(Path, "maindata"))
+                .WithDefaultSorting()
+                .Build();
             });
         }
 
         public Stream? OpenRead(string filePath)
         {
-            if (!IsValid || readers is null)
-            {
-                Log.Warn($"archive not ready: {filePath}");
-                return null;
-            }
-            Stream? stream = null;
-
-            if (!allFiles.TryGetValue(filePath.Replace('\\', '/'), out RDAFile? file) || file is null)
-            {
-                Log.Warn($"not found in archive: {filePath}");
-                return null;
-            }
-
-            try
-            {
-                stream = new MemoryStream(file.GetData());
-            }
-            catch (Exception e)
-            {
-                Log.Exception($"error reading archive: {filePath}", e);
-            }
-            return stream;
+            filePath = filePath.Replace("\\", "/");
+            return fileSystem.OpenRead(filePath);
         }
 
         public IEnumerable<string> Find(string pattern)
         {
-            if (!IsValid || readers is null)
-                return Array.Empty<string>();
-
-            Matcher matcher = new();
-            matcher.AddIncludePatterns(new string[] { pattern });
-
-            PatternMatchingResult result = matcher.Match(allFiles.Keys);
-
-            return result.Files.Select(x => x.Path);
-        }
-
-        public void Dispose()
-        {
-            if (readers is not null)
-            {
-                foreach (var reader in readers)
-                    reader.Dispose();
-            }
-            GC.SuppressFinalize(this);
+            return fileSystem.Root.MatchFiles(pattern).Select(x => x.Name);
         }
     }
 }
