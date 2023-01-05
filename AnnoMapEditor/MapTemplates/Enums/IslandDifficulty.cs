@@ -1,0 +1,58 @@
+﻿using AnnoMapEditor.Utilities;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace AnnoMapEditor.MapTemplates
+{
+    public class IslandDifficulty
+    {
+        public static readonly IslandDifficulty Normal = new("Normal", 0);
+        public static readonly IslandDifficulty Hard   = new("Hard",   1);
+
+        public static readonly IEnumerable<IslandDifficulty> All = new[] { Normal, Hard };
+
+
+        public string Name { get; init; }
+
+        public short ElementValue { get; init; }
+
+
+        private IslandDifficulty(string name, short elementValue)
+        {
+            Name = name;
+            ElementValue = elementValue;
+        }
+
+
+        public static IslandDifficulty FromName(string name)
+        {
+            IslandDifficulty? difficulty = All.FirstOrDefault(d => d.Name == name);
+
+            if (difficulty is null)
+            {
+                Log.Warn($"{name} is not a valid name for {nameof(IslandDifficulty)}. Defaulting to {nameof(Normal)}.");
+                difficulty = Normal;
+            }
+
+            return difficulty;
+        }
+
+        public static IslandDifficulty FromElementValue(short? elementValue)
+        {
+            IslandDifficulty? difficulty = All.FirstOrDefault(d => d.ElementValue == elementValue);
+
+            if (difficulty is null)
+            {
+                Log.Warn($"{elementValue} is not a valid element value for {nameof(IslandDifficulty)}. Defaulting to {nameof(Normal)}.");
+                difficulty = Normal;
+            }
+
+            return difficulty;
+        }
+
+
+
+
+        public override string ToString() => Name;
+    }
+}
