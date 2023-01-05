@@ -31,6 +31,7 @@ namespace AnnoMapEditor.DataArchives
                 fileSystem = FileSystemBuilder.Create()
                 .FromPath(System.IO.Path.Combine(Path, "maindata"))
                 .WithDefaultSorting()
+                .AddWhitelisted("*.a7tinfo", "*.png", "*.a7minfo", "*.a7t", "*.a7te", "assets.xml")
                 .Build();
             });
         }
