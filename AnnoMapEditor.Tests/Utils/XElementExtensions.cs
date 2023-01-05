@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
-namespace AnnoMapEditor.MapTemplates.Serializing
+namespace AnnoMapEditor.Tests.Utils
 {
     public static class XElementExtensions
     {

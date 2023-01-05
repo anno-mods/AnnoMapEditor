@@ -1,4 +1,4 @@
-using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Tests.Utils;
 

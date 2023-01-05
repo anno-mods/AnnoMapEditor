@@ -47,7 +47,7 @@ namespace AnnoMapEditor.MapTemplates.Serializing
                     xmlDocument.Load(stream);
 
                     // convert to bytes
-                    XmlDocument? interpreterDocument = GetEmbeddedXmlDocument("AnnoMapEditor.MapTemplates.Serializing.A7tinfo.a7tinfo.xml");
+                    XmlDocument? interpreterDocument = GetEmbeddedXmlDocument("AnnoMapEditor.Mods.Serialization.a7tinfo.xml");
                     if (interpreterDocument is null)
                         return null;
                     XmlDocument xmlWithBytes = new XmlExporter().Export(xmlDocument, new(interpreterDocument));
@@ -101,7 +101,7 @@ namespace AnnoMapEditor.MapTemplates.Serializing
                     XmlDocument xmlWithBytes = converter.ToXml(doc);
 
                     // interpret bytes
-                    XmlDocument? interpreterDocument = GetEmbeddedXmlDocument("AnnoMapEditor.MapTemplates.Serializing.A7tinfo.a7tinfo.xml");
+                    XmlDocument? interpreterDocument = GetEmbeddedXmlDocument("AnnoMapEditor.Mods.Serialization.a7tinfo.xml");
                     if (interpreterDocument is null)
                         return;
                     XmlDocument xmlDocument = new XmlInterpreter().Interpret(xmlWithBytes, new(interpreterDocument));

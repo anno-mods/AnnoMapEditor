@@ -9,7 +9,7 @@ using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Utilities;
 
-namespace AnnoMapEditor.MapTemplates
+namespace AnnoMapEditor.MapTemplates.Models
 {
     public class Session : ObservableBase
     {

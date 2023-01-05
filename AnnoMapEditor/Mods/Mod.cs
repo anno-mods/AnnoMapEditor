@@ -6,10 +6,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Linq;
-using AnnoMapEditor.MapTemplates.Serializing.A7te;
-using AnnoMapEditor.MapTemplates.Serializing.A7t;
+using AnnoMapEditor.Mods.Serialization;
 using System.Collections.Generic;
 using AnnoMapEditor.Utilities;
+using AnnoMapEditor.MapTemplates.Models;
 
 /*
  * Modloader doesn't support a7t because they are loaded as .rda archive.

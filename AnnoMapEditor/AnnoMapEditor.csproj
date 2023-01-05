@@ -29,13 +29,12 @@
   </Target>
   <ItemGroup>
     <None Remove="Assets\maptype.png" />
-    <None Remove="MapTemplates\Serializing\A7tinfo\a7tinfo.xml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\app.ico" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MapTemplates\Serializing\A7tinfo\a7tinfo.xml">
+    <EmbeddedResource Include="Mods\Serialization\a7tinfo.xml">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
@@ -50,10 +49,10 @@
 
   <ItemGroup>
     <Reference Include="Anno.FileDBModels">
-      <HintPath>MapTemplates\Serializing\Anno.FileDBModels.dll</HintPath>
+      <HintPath>Assets\Anno.FileDBModels.dll</HintPath>
     </Reference>
     <Reference Include="FileDBReader">
-      <HintPath>MapTemplates\Serializing\FileDBReader.dll</HintPath>
+      <HintPath>Assets\FileDBReader.dll</HintPath>
     </Reference>
     <Reference Include="FileDBSerializer">
       <HintPath>External\FileDBSerializer.dll</HintPath>

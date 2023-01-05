@@ -1,4 +1,5 @@
-﻿using AnnoMapEditor.Utilities;
+﻿using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace AnnoMapEditor.UI.Models
             Inactive
         }
 
-        public MapTemplates.Session? Session
+        public Session? Session
         { 
             get => _session;
             set
@@ -35,7 +36,7 @@ namespace AnnoMapEditor.UI.Models
                 CheckExistingMod();
             }
         }
-        MapTemplates.Session? _session;
+        Session? _session;
 
         public string ModName
         {

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace AnnoMapEditor.MapTemplates
 {
@@ -147,7 +146,7 @@ namespace AnnoMapEditor.MapTemplates
 
             var island = new Island(region)
             {
-                ElementType = (MapElementType) (templateElement.ElementType ?? 0),
+                ElementType = MapElementType.FromElementValue(templateElement.ElementType),
                 Position = new Vector2(element?.Position),
                 Size = IslandSize.FromElementValue(element?.Size),
                 Type = IslandType.FromElementValue(element?.RandomIslandConfig?.value?.Type?.id ?? element?.Config?.Type?.id),
@@ -178,7 +177,7 @@ namespace AnnoMapEditor.MapTemplates
 
             if (ElementType != MapElementType.FixedIsland)
             {
-                templateElement.ElementType = (short) ElementType;
+                templateElement.ElementType = ElementType.ElementValue;
             }
 
             //Create a fully new templateElement for export, so unwanted values are clean
@@ -188,62 +187,59 @@ namespace AnnoMapEditor.MapTemplates
             // flip X and Y when serializing.
             templateElement.Element.Position = new int[] { this.Position.Y, this.Position.X };
 
-            switch (ElementType)
+            if (ElementType == MapElementType.StartingSpot)
             {
-                //Starting spot
-                case MapElementType.StartingSpot:
-                    break;
+                // no-op
+            }
+            else if (ElementType == MapElementType.PoolIsland)
+            {
+                templateElement.Element.Size = this.Size.ElementValue;
+                templateElement.Element.Difficulty = new Difficulty();
+                templateElement.Element.Config = new Config()
+                {
+                    Type = new() { id = this.Type.ElementValue != 0 ? this.Type.ElementValue : null },
+                    Difficulty = new()
+                };
+            }
+            else if (ElementType == MapElementType.FixedIsland)
+            {
+                //Fixed island without MapPath is impossible
+                if (MapPath == null)
+                    return null;
 
-                //Pool island
-                case MapElementType.PoolIsland:
-                    templateElement.Element.Size = this.Size.ElementValue;
-                    templateElement.Element.Difficulty = new Difficulty();
-                    templateElement.Element.Config = new Config()
+                templateElement.Element.MapFilePath = MapPath;
+                templateElement.Element.Rotation90 = (byte)this.Rotation;
+
+                if (Label is not null)
+                {
+                    templateElement.Element.IslandLabel = Label;
+                }
+
+                if (_template?.Element?.FertilityGuids is not null)
+                {
+                    templateElement.Element.FertilityGuids = new int[_template.Element.FertilityGuids.Length];
+                    Array.Copy(this._template.Element.FertilityGuids, templateElement.Element.FertilityGuids, _template.Element.FertilityGuids.Length);
+                }
+                else
+                {
+                    templateElement.Element.FertilityGuids = new int[0];
+                }
+
+                templateElement.Element.RandomizeFertilities = _template?.Element?.RandomizeFertilities;
+                templateElement.Element.MineSlotMapping = new List<Tuple<long, int>>(
+                    _template?.Element?.MineSlotMapping?.Select(
+                        x => new Tuple<long, int>(x.Item1, x.Item2)
+                    ) ?? Enumerable.Empty<Tuple<long, int>>()
+                );
+
+                templateElement.Element.RandomIslandConfig = new RandomIslandConfig()
+                {
+                    value = new Config()
                     {
                         Type = new() { id = this.Type.ElementValue != 0 ? this.Type.ElementValue : null },
-                        Difficulty = new()
-                    };
-                    break;
-                //Fixed island
-                default:
-                    //Fixed island without MapPath is impossible
-                    if (MapPath == null)
-                        return null;
-
-                    templateElement.Element.MapFilePath = MapPath;
-                    templateElement.Element.Rotation90 = (byte)this.Rotation;
-
-                    if(Label is not null)
-                    {
-                        templateElement.Element.IslandLabel = Label;
+                        Difficulty = new() { id = _template?.Element?.RandomIslandConfig?.value?.Difficulty?.id }
                     }
-
-                    if(_template?.Element?.FertilityGuids is not null)
-                    {
-                        templateElement.Element.FertilityGuids = new int[_template.Element.FertilityGuids.Length];
-                        Array.Copy(this._template.Element.FertilityGuids, templateElement.Element.FertilityGuids, _template.Element.FertilityGuids.Length);
-                    }
-                    else
-                    {
-                        templateElement.Element.FertilityGuids = new int[0];
-                    }
-
-                    templateElement.Element.RandomizeFertilities = _template?.Element?.RandomizeFertilities;
-                    templateElement.Element.MineSlotMapping = new List<Tuple<long, int>>( 
-                        _template?.Element?.MineSlotMapping?.Select(
-                            x => new Tuple<long, int>(x.Item1, x.Item2)
-                        ) ?? Enumerable.Empty<Tuple<long, int>>()
-                    );
-
-                    templateElement.Element.RandomIslandConfig = new RandomIslandConfig()
-                    {
-                        value = new Config()
-                        {
-                            Type = new() { id = this.Type.ElementValue != 0 ? this.Type.ElementValue : null },
-                            Difficulty = new() { id = _template?.Element?.RandomIslandConfig?.value?.Difficulty?.id }
-                        }
-                    };
-                    break;
+                };
             }
 
             return templateElement;

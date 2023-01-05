@@ -1,4 +1,5 @@
 ﻿using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared;
+using AnnoMapEditor.MapTemplates;
 using FileDBSerializing;
 using FileDBSerializing.ObjectSerializer;
 using RDAExplorer;
@@ -6,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace AnnoMapEditor.MapTemplates.Serializing.A7t
+namespace AnnoMapEditor.Mods.Serialization
 {
     public class A7tExporter
     {

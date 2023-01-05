@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace AnnoMapEditor.MapTemplates.Serializing.A7te
+namespace AnnoMapEditor.Mods.Serialization
 {
     [Serializable, XmlRoot("AnnoEditorLevel")]
     public class AnnoEditorLevel
