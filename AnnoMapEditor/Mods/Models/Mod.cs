@@ -1,15 +1,16 @@
 ﻿using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.Mods.Enums;
+using AnnoMapEditor.Mods.Serialization;
+using AnnoMapEditor.Utilities;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Linq;
-using AnnoMapEditor.Mods.Serialization;
-using System.Collections.Generic;
-using AnnoMapEditor.Utilities;
-using AnnoMapEditor.MapTemplates.Models;
 
 /*
  * Modloader doesn't support a7t because they are loaded as .rda archive.
@@ -23,29 +24,24 @@ using AnnoMapEditor.MapTemplates.Models;
  * corners_ll_01, snowflake_ll_01 are unused. do they work?
  */
 
-namespace AnnoMapEditor.Mods
+namespace AnnoMapEditor.Mods.Models
 {
     internal class Mod
     {
-        private Session session;
+        public const string AME_POOL_PATH = @"data\ame\maps\pool";
+
+
+        private Session _session;
 
         public MapType MapType { get; set; }
 
-        public const string AME_POOL_PATH = @"data\ame\maps\pool";
 
         public Mod(Session session)
         {
-            this.session = session;
+            this._session = session;
             MapType = MapType.Archipelago;
         }
 
-        public static bool CanSave(Session? session)
-        {
-            if (session is null)
-                return false;
-
-            return session.Region.AllowModding;
-        }
 
         public async Task<bool> Save(string modPath, string modName, string? modID)
         {
@@ -59,7 +55,7 @@ namespace AnnoMapEditor.Mods
                 if (mapTypeFileName is null || mapTypeGuid is null)
                     throw new Exception("invalid MapType");
 
-                if(!session.Region.AllowModding)
+                if(!_session.Region.AllowModding)
                 {
                     throw new Exception("not supported map region");
                 }
@@ -72,28 +68,28 @@ namespace AnnoMapEditor.Mods
                 if(!string.IsNullOrEmpty(mapTypeGuid))
                     await WriteLanguageXml(modPath, modName, mapTypeGuid);
 
-                string mapFilePath = Path.Combine(AME_POOL_PATH, session.Region.PoolFolderName, mapTypeFileName);
-                await WriteAssetsXml(modPath, fullModName, mapFilePath, session.Region, MapType);
+                string mapFilePath = Path.Combine(AME_POOL_PATH, _session.Region.PoolFolderName, mapTypeFileName);
+                await WriteAssetsXml(modPath, fullModName, mapFilePath, _session.Region, MapType);
 
                 //Create first entry with custom a7t and a7te
-                List<string> sizes = session.Region.GetAllSizeCombinations().ToList();
+                List<string> sizes = _session.Region.GetAllSizeCombinations().ToList();
                 string size = sizes[0];
 
                 string basePath = Path.Combine(modPath, $"{mapFilePath}");
-                await session.SaveAsync(basePath + $"_{size}.a7tinfo", false);
+                await _session.SaveAsync(basePath + $"_{size}.a7tinfo", false);
 
                 //a7t Creation
                 string a7tPath = basePath + $"_{size}.a7t";
-                await Task.Run(() => new A7tExporter(session.Size.X, session.PlayableArea.Width, session.Region).ExportA7T(a7tPath));
+                await Task.Run(() => new A7tExporter(_session.Size.X, _session.PlayableArea.Width, _session.Region).ExportA7T(a7tPath));
 
                 //a7te Creation
                 string a7tePath = basePath + $"_{size}.a7te";
-                await Task.Run(() => new A7teExporter(session.Size.X).ExportA7te(a7tePath));
+                await Task.Run(() => new A7teExporter(_session.Size.X).ExportA7te(a7tePath));
 
 
-                if (session.Region.HasMapExtension)
+                if (_session.Region.HasMapExtension)
                 {
-                    await session.SaveAsync(basePath + $"_{size}_enlarged.a7tinfo", true);
+                    await _session.SaveAsync(basePath + $"_{size}_enlarged.a7tinfo", true);
                     File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}_enlarged.a7t");
                     File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}_enlarged.a7te");
                 }
@@ -103,13 +99,13 @@ namespace AnnoMapEditor.Mods
                 {
                     size = sizes[i];
 
-                    await session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_{size}.a7tinfo"), false);
+                    await _session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_{size}.a7tinfo"), false);
                     File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}.a7t");
                     File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}.a7te");
 
-                    if (session.Region.HasMapExtension)
+                    if (_session.Region.HasMapExtension)
                     {
-                        await session.SaveAsync(basePath + $"_{size}_enlarged.a7tinfo", true);
+                        await _session.SaveAsync(basePath + $"_{size}_enlarged.a7tinfo", true);
                         File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}_enlarged.a7t");
                         File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}_enlarged.a7te");
                     }
@@ -201,6 +197,15 @@ namespace AnnoMapEditor.Mods
 
             using StreamWriter writer = new(File.Create(assetsXmlPath));
             await writer.WriteAsync(content);
+        }
+
+
+        public static bool CanSave(Session? session)
+        {
+            if (session is null)
+                return false;
+
+            return session.Region.AllowModding;
         }
 
         public static string CreateAssetsModOps(Region region, MapType mapType, string fullMapPath)

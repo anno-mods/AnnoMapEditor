@@ -11,23 +11,27 @@ namespace AnnoMapEditor.Mods.Serialization
 {
     public class A7tExporter
     {
+        private readonly int _mapSize;
+
+        private readonly int _playableArea;
+
+        private readonly Region _mapRegion;
+
+
         public A7tExporter(int mapSize, int playableArea, Region mapRegion)
         {
-            MapSize = mapSize;
-            PlayableArea = playableArea;
-            MapRegion = mapRegion;
+            _mapSize = mapSize;
+            _playableArea = playableArea;
+            _mapRegion = mapRegion;
         }
 
-        private int MapSize { get; }
-        private int PlayableArea { get; }
-        private Region MapRegion { get; }
 
         public void ExportA7T(string a7tPath)
         {
             using (MemoryStream nestedDataStream = new MemoryStream())
             {
                 //Create actual a7t File
-                Gamedata gameDataItem = new Gamedata(MapSize, PlayableArea, MapRegion.AmbientName, true);
+                Gamedata gameDataItem = new Gamedata(_mapSize, _playableArea, _mapRegion.AmbientName, true);
 
                 FileDBDocumentSerializer serializer = new FileDBDocumentSerializer(new() { Version = FileDBDocumentVersion.Version1 });
                 IFileDBDocument generatedFileDB = serializer.WriteObjectStructureToFileDBDocument(gameDataItem);

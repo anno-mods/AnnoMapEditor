@@ -28,6 +28,7 @@ namespace AnnoMapEditor.MapTemplates
             DefaultSizeInTiles = defaultSizeInTiles;
         }
 
+
         public static IslandSize FromElementValue(short? elementValue)
         {
             IslandSize? size = All.FirstOrDefault(t => t.ElementValue == elementValue);

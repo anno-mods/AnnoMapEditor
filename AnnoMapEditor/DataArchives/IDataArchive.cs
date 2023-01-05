@@ -7,10 +7,14 @@ namespace AnnoMapEditor.DataArchives
     public interface IDataArchive
     {
         bool IsValid { get; }
+
         string Path { get; }
 
+
         Stream? OpenRead(string filePath);
+
         IEnumerable<string> Find(string pattern);
+
         Task LoadAsync();
     }
 }

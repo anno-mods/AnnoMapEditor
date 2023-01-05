@@ -1,6 +1,6 @@
 using AnnoMapEditor.MapTemplates;
-using AnnoMapEditor.MapTemplates.Serializing;
-using AnnoMapEditor.Mods;
+using AnnoMapEditor.Mods.Enums;
+using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.Tests.Utils;
 using System.Text;
 using System.Xml.Linq;
@@ -26,7 +26,7 @@ namespace AnnoMapEditor.Tests
             using Stream assetsXml = File.OpenRead("./TestData/assets.xml");
             Data = new(MapType.All.Select(x =>
             {
-                Stream patch = new MemoryStream(Encoding.Unicode.GetBytes(Mods.Mod.CreateAssetsModOps(Region.Moderate, MapType.Archipelago, "mods/[Map] test/test.a7t")));
+                Stream patch = new MemoryStream(Encoding.Unicode.GetBytes(Mod.CreateAssetsModOps(Region.Moderate, MapType.Archipelago, "mods/[Map] test/test.a7t")));
                 return new KeyValuePair<MapType, XDocument>(x, XDocument.Load(XmlTest.Patch(assetsXml, patch)!));
             }));
         }

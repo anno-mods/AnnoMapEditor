@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AnnoMapEditor.Mods.Models;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
@@ -7,6 +8,17 @@ namespace AnnoMapEditor.Mods.Serialization
     [Serializable, XmlRoot("AnnoEditorLevel")]
     public class AnnoEditorLevel
     {
+        public int FileVersion { get; set; }
+
+        public XZSize Dimensions { get; set; }
+
+        public XZSize ChunkSize { get; set; }
+
+        [XmlArrayItem("Column", NestingLevel = 0)]
+        [XmlArrayItem("Chunk", NestingLevel = 1)]
+        public List<List<string>> Chunks { get; set; }
+
+
         /// <summary>
         /// Parameterless Constructor needed for XMLSerializer
         /// </summary>
@@ -39,34 +51,5 @@ namespace AnnoMapEditor.Mods.Serialization
             }
         }
 
-        public int FileVersion { get; set; }
-        public XZSize Dimensions { get; set; }
-        public XZSize ChunkSize { get; set; }
-
-        [XmlArrayItem("Column", NestingLevel = 0)]
-        [XmlArrayItem("Chunk", NestingLevel = 1)]
-        public List<List<string>> Chunks { get; set; }
-
-    }
-
-    public class XZSize
-    {
-        /// <summary>
-        /// Parameterless Constructor needed for XMLSerializer
-        /// </summary>
-        private XZSize()
-        {
-
-        }
-
-        public XZSize(int x, int z)
-        {
-            X = x;
-            Z = z;
-        }
-
-        public int X { get; set; }
-
-        public int Z { get; set; }
     }
 }

@@ -7,6 +7,7 @@ namespace AnnoMapEditor.DataArchives
     {
         public static readonly IDataArchive Default = new InvalidDataArchive("");
 
+
         public static async Task<IDataArchive> OpenAsync(string? folderPath)
         {
             if (folderPath is null)

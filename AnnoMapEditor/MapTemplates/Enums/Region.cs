@@ -1,56 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace AnnoMapEditor.MapTemplates
 {
-    public partial struct Region
+    public class Region
     {
-        #region Region enums
         //Technically, Cape Trelawney is in Moderate Region but has ambientName "Moderate_01_day_night_st",
         //but we don't allow Mod exports for that anyways
-        public static readonly Region Moderate = new("Moderate", "Moderate", "Moderate_01_day_night", allowModding:true, "moderate",
+        public static readonly Region Moderate = new("Moderate", "Moderate_01_day_night", allowModding:true, "moderate",
             new[] { "ll", "lm", "ls", "ml", "mm", "ms", "sl", "sm", "ss" },
             new[] { "01", "02" },
             usesAllSizeIndices:false, hasMapExtension:false);
 
-        public static readonly Region NewWorld = new("NewWorld", "New World", "south_america_caribic_01", allowModding: true, "colony01", 
+        public static readonly Region NewWorld = new("New World", "south_america_caribic_01", allowModding: true, "colony01", 
             new[] { "s", "m", "l"},
             new[] { "01", "02", "03" },
             usesAllSizeIndices: true, hasMapExtension: true);
 
         //poolFolderName is manually selected, the game files don't have a special one for the arctic as it only has one map
-        public static readonly Region Arctic = new("Arctic", "Arctic", "DLC03_01", allowModding: false, poolFolderName:"colony03",
+        public static readonly Region Arctic = new("Arctic", "DLC03_01", allowModding: false, poolFolderName:"colony03",
             new[] { "sp" },
             new[] { "" },
             usesAllSizeIndices: true, hasMapExtension: false);
 
-        public static readonly Region Enbesa = new("Enbesa", "Enbesa", "Colony_02", allowModding: false, "land_of_lions",
+        public static readonly Region Enbesa = new("Enbesa", "Colony_02", allowModding: false, "land_of_lions",
             new[] { "01" },
             new[] { "", "mp" },
             usesAllSizeIndices: true, hasMapExtension: false);
 
         public static readonly Region[] All = new Region[] { Moderate, NewWorld, Arctic, Enbesa };
-        #endregion
+
 
         public string Name { get; init; }
+
         public string AmbientName { get; init; }
+
         public bool AllowModding { get; init; }
 
         public string PoolFolderName { get; init; }
+
         public IReadOnlyCollection<string> MapSizes { get; init; }
+
         public IReadOnlyCollection<string> MapSizeIndices { get; init; }
 
         public bool UsesAllSizeIndices { get; init; }
+
         public bool HasMapExtension { get; init; }
 
-        private readonly string value;
 
-
-        private Region(string type, string name, string ambientName, bool allowModding, string poolFolderName, 
+        private Region(string name, string ambientName, bool allowModding, string poolFolderName, 
             string[] mapSizes, string[] sizeIndices, bool usesAllSizeIndices, bool hasMapExtension)
         {
-            value = type;
             Name = name;
             AmbientName = ambientName;
             AllowModding = allowModding;
@@ -97,12 +97,6 @@ namespace AnnoMapEditor.MapTemplates
         }
 
 
-        public override string ToString() => value;
-
-        public override bool Equals(object? obj) => obj is Region other && value.Equals(other.value);
-        public override int GetHashCode() => value.GetHashCode();
-
-        public static bool operator !=(Region a, Region b) => !a.Equals(b);
-        public static bool operator ==(Region a, Region b) => a.Equals(b);
+        public override string ToString() => Name;
     }
 }

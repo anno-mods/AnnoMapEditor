@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Anno.FileDBModels.Anno1800.MapTemplate;
+using AnnoMapEditor.MapTemplates.Serializing;
+using AnnoMapEditor.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Anno.FileDBModels.Anno1800.MapTemplate;
-using AnnoMapEditor.MapTemplates.Serializing;
-using AnnoMapEditor.Utilities;
 
 namespace AnnoMapEditor.MapTemplates.Models
 {

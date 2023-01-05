@@ -1,4 +1,6 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.Mods.Enums;
+using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.IO;
@@ -24,12 +26,12 @@ namespace AnnoMapEditor.UI.Models
                 _session = value;
                 if(_session is not null)
                 {
-                    AllowedMapTypes = Mods.MapType.MapTypesForRegion[_session.Region];
+                    AllowedMapTypes = MapType.MapTypesForRegion[_session.Region];
                     SelectedMapType = AllowedMapTypes.First();
                 }
                 else
                 {
-                    AllowedMapTypes = Enumerable.Empty<Mods.MapType>();
+                    AllowedMapTypes = Enumerable.Empty<MapType>();
                     SelectedMapType = null;
                 }
                 InfoMapTypeSelection = _session is not null && _session.Region == MapTemplates.Region.Moderate;
@@ -69,7 +71,7 @@ namespace AnnoMapEditor.UI.Models
         }
         private string _modID = string.Empty;
 
-        public Mods.MapType? SelectedMapType
+        public MapType? SelectedMapType
         {
             get => _mapType;
             set
@@ -78,14 +80,14 @@ namespace AnnoMapEditor.UI.Models
                 CheckExistingMod();
             }
         }
-        private Mods.MapType? _mapType = null;
+        private MapType? _mapType = null;
 
-        public IEnumerable<Mods.MapType> AllowedMapTypes
+        public IEnumerable<MapType> AllowedMapTypes
         {
             get => _allowedMapTypes;
             set => SetProperty(ref _allowedMapTypes, value);
         }
-        private IEnumerable<Mods.MapType> _allowedMapTypes = Enumerable.Empty<Mods.MapType>();
+        private IEnumerable<MapType> _allowedMapTypes = Enumerable.Empty<MapType>();
 
         public ExportAsModViewModel()
         {
@@ -136,7 +138,7 @@ namespace AnnoMapEditor.UI.Models
                 return false;
             }
 
-            Mods.Mod mod = new(Session)
+            Mod mod = new(Session)
             {
                 MapType = SelectedMapType
             };

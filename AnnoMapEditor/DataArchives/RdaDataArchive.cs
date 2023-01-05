@@ -1,29 +1,32 @@
-﻿using System;
+﻿using AnnoMapEditor.Utilities;
+using Microsoft.Extensions.FileSystemGlobbing;
+using RDAExplorer;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using AnnoMapEditor.Utilities;
-using Microsoft.Extensions.FileSystemGlobbing;
-using RDAExplorer;
 
 namespace AnnoMapEditor.DataArchives
 {
     public class RdaDataArchive : IDataArchive, IDisposable
     {
         public string Path { get; }
+
         public bool IsValid { get; } = true;
 
-        private RDAReader[]? readers;
+        private RDAReader[]? _readers;
 
-        Dictionary<string, RDAFile> allFiles { get; } = new();
+        private readonly Dictionary<string, RDAFile> _allFiles = new();
+
 
         public RdaDataArchive(string folderPath)
         {
             Path = folderPath;
         }
         
+
         public async Task LoadAsync()
         {
             await Task.Run(() => 
@@ -37,7 +40,7 @@ namespace AnnoMapEditor.DataArchives
                         !x.EndsWith("data4.rda") && !x.EndsWith("data7.rda") && !x.EndsWith("data8.rda") && !x.EndsWith("data9.rda"))
                     // load highest numbers last to overwrite lower numbers
                     .OrderBy(x => int.TryParse(System.IO.Path.GetFileNameWithoutExtension(x)["data".Length..], out int result) ? result : 0);
-                readers = archives.Select(x =>
+                _readers = archives.Select(x =>
                 {
                     try
                     {
@@ -49,7 +52,7 @@ namespace AnnoMapEditor.DataArchives
                         foreach (var file in reader.rdaFolder.GetAllFiles())
                             if (file.FileName.EndsWith(".a7tinfo") || file.FileName.EndsWith(".png") || file.FileName.EndsWith(".a7minfo") ||
                                 file.FileName.EndsWith(".a7t") || file.FileName.EndsWith(".a7te"))
-                                allFiles[file.FileName] = file;
+                                _allFiles[file.FileName] = file;
                         return reader;
                     }
                     catch (Exception e)
@@ -59,7 +62,7 @@ namespace AnnoMapEditor.DataArchives
                     }
                 }).Where(x => x is not null).Select(x => x!).ToArray();
 
-                if (readers.Length == 0)
+                if (_readers.Length == 0)
                 {
                     Log.Warn($"No .rda files found at {System.IO.Path.Combine(Path, "maindata")}");
                     MessageBox.Show($"Something went wrong opening the RDA files.\n\nDo you have another Editor or the RDAExplorer open by any chance?\n\nLog file: {Log.LogFilePath}", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
@@ -69,14 +72,14 @@ namespace AnnoMapEditor.DataArchives
 
         public Stream? OpenRead(string filePath)
         {
-            if (!IsValid || readers is null)
+            if (!IsValid || _readers is null)
             {
                 Log.Warn($"archive not ready: {filePath}");
                 return null;
             }
             Stream? stream = null;
 
-            if (!allFiles.TryGetValue(filePath.Replace('\\', '/'), out RDAFile? file) || file is null)
+            if (!_allFiles.TryGetValue(filePath.Replace('\\', '/'), out RDAFile? file) || file is null)
             {
                 Log.Warn($"not found in archive: {filePath}");
                 return null;
@@ -95,22 +98,22 @@ namespace AnnoMapEditor.DataArchives
 
         public IEnumerable<string> Find(string pattern)
         {
-            if (!IsValid || readers is null)
+            if (!IsValid || _readers is null)
                 return Array.Empty<string>();
 
             Matcher matcher = new();
             matcher.AddIncludePatterns(new string[] { pattern });
 
-            PatternMatchingResult result = matcher.Match(allFiles.Keys);
+            PatternMatchingResult result = matcher.Match(_allFiles.Keys);
 
             return result.Files.Select(x => x.Path);
         }
 
         public void Dispose()
         {
-            if (readers is not null)
+            if (_readers is not null)
             {
-                foreach (var reader in readers)
+                foreach (var reader in _readers)
                     reader.Dispose();
             }
             GC.SuppressFinalize(this);

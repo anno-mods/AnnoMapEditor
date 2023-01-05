@@ -3,7 +3,7 @@ using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AnnoMapEditor.Mods
+namespace AnnoMapEditor.Mods.Enums
 {
     public class MapType
     {
@@ -49,16 +49,19 @@ namespace AnnoMapEditor.Mods
         }
 
         public override string ToString() => Name;
+
         public string ToName() => AssetName + AssetNameSeparator;
+
         public string ToFileName() => FileNamePart ?? AssetName;
 
-        public static MapType? FromString(string name)
+
+        public static MapType? FromName(string name)
         {
             MapType? type = All.FirstOrDefault(t => t.Name == name);
 
             if (type is null)
             {
-                Log.Warn($"{name} is not a valid name value for {nameof(MapType)}. Defaulting to null.");
+                Log.Warn($"{name} is not a valid name for {nameof(MapType)}. Defaulting to null.");
             }
 
             return type;

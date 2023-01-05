@@ -22,6 +22,8 @@ namespace AnnoMapEditor.MapTemplates
 
     public class Island : ObservableBase
     {
+        private readonly Region _region;
+
         public MapElementType ElementType
         { 
             get => _elementType;
@@ -53,8 +55,6 @@ namespace AnnoMapEditor.MapTemplates
             }
         }
         private IslandSize _size = IslandSize.Small;
-
-        public int SizeInTiles => (IsPool || MapSizeInTiles == 0) ? Size.DefaultSizeInTiles : MapSizeInTiles;
 
         public IslandType Type 
         {
@@ -105,11 +105,21 @@ namespace AnnoMapEditor.MapTemplates
         }
         private string? _assumedMapPath;
 
+        public TemplateElement? Template
+        {
+            get => _template;
+            set => SetProperty(ref _template, value, dependendProperties: new[] { nameof(IsNew) });
+        }
+        private TemplateElement? _template;
+
         public bool IsPool => !IsStartingSpot && string.IsNullOrEmpty(MapPath);
+
         public bool IsStartingSpot => ElementType == MapElementType.StartingSpot;
+
         public bool IsNew => _template is null;
 
-        // TODO create view model of islands
+        public int SizeInTiles => (IsPool || MapSizeInTiles == 0) ? Size.DefaultSizeInTiles : MapSizeInTiles;
+
         public bool IsStarter
         { 
             get => Type == IslandType.Starter;
@@ -121,15 +131,6 @@ namespace AnnoMapEditor.MapTemplates
                 }
             }
         }
-
-        public TemplateElement? Template
-        {
-            get => _template;
-            set => SetProperty(ref _template, value, dependendProperties: new[] { nameof(IsNew) });
-        }
-        private TemplateElement? _template;
-
-        private Region _region { get; }
 
         public int Counter { get; set; }
 

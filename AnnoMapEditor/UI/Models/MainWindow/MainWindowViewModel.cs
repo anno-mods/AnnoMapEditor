@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.MapTemplates;
 using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
@@ -167,7 +168,7 @@ namespace AnnoMapEditor.UI.Models.MainWindow
             }
             else if (Settings.IsValidDataPath)
             {
-                bool supportedFormat = Mods.Mod.CanSave(Session);
+                bool supportedFormat = Mod.CanSave(Session);
                 bool archiveReady = Settings.DataArchive is RdaDataArchive;
 
                 ExportStatus = new ExportStatus()
