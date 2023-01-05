@@ -49,16 +49,16 @@
 
   <ItemGroup>
     <Reference Include="Anno.FileDBModels">
-      <HintPath>Assets\Anno.FileDBModels.dll</HintPath>
+      <HintPath>Libs\Anno.FileDBModels.dll</HintPath>
     </Reference>
     <Reference Include="FileDBReader">
-      <HintPath>Assets\FileDBReader.dll</HintPath>
+      <HintPath>Libs\FileDBReader.dll</HintPath>
     </Reference>
     <Reference Include="FileDBSerializer">
-      <HintPath>External\FileDBSerializer.dll</HintPath>
+      <HintPath>Libs\FileDBSerializer.dll</HintPath>
     </Reference>
     <Reference Include="RDAExplorer">
-      <HintPath>External\RDAExplorer.dll</HintPath>
+      <HintPath>Libs\RDAExplorer.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -29,7 +29,7 @@
 
   <ItemGroup>
     <Reference Include="Anno.FileDBModels">
-      <HintPath>..\AnnoMapEditor\Assets\Anno.FileDBModels.dll</HintPath>
+      <HintPath>..\AnnoMapEditor\Libs\Anno.FileDBModels.dll</HintPath>
     </Reference>
   </ItemGroup>
 
