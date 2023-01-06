@@ -11,12 +11,15 @@ namespace AnnoMapEditor.DataArchives
     public class FolderDataArchive : IDataArchive
     {
         public string Path { get; }
+
         public bool IsValid { get; } = true;
+
 
         public FolderDataArchive(string folderPath)
         {
             Path = folderPath;
         }
+
 
         public Task LoadAsync()
         {

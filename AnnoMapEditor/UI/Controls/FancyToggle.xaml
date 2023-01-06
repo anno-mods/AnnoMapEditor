@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Styles.xaml" />
+                <ResourceDictionary Source="../Resources/Styles.xaml" />
                 <ResourceDictionary>
                     <!-- use Hide to make ensure parent of on/off text doesn't change size -->
                     <converters:BoolToVisibility x:Key="VisibleOnTrue" OnTrue="Visible" OnFalse="Hidden" />
