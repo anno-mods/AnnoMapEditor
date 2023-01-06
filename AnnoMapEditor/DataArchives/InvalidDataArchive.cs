@@ -11,10 +11,12 @@ namespace AnnoMapEditor.DataArchives
         public Stream? OpenRead(string filePath) => null;
         public string Path { get; }
 
+
         public InvalidDataArchive(string path)
         {
             Path = path;
         }
+
 
         public Task LoadAsync()
         {

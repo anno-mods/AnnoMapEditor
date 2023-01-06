@@ -1,8 +1,8 @@
-﻿using System;
+﻿using RDAExplorer;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using RDAExplorer;
 
 namespace AnnoMapEditor.DataArchives
 {

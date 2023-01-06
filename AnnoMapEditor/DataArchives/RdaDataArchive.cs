@@ -1,4 +1,7 @@
-﻿using System;
+﻿using AnnoMapEditor.Utilities;
+using Microsoft.Extensions.FileSystemGlobbing;
+using RDAExplorer;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,6 +18,7 @@ namespace AnnoMapEditor.DataArchives
     public class RdaDataArchive : IDataArchive
     {
         public string Path { get; }
+
         public bool IsValid { get; } = true;
 
         private FileSystem fileSystem;
@@ -24,6 +28,7 @@ namespace AnnoMapEditor.DataArchives
             Path = folderPath;
         }
         
+
         public async Task LoadAsync()
         {
             await Task.Run(() => 

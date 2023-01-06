@@ -1,10 +1,8 @@
-﻿using System;
+﻿using AnnoMapEditor.Utilities;
+using FileDBSerializing;
+using System;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-
-using FileDBSerializing;
-using AnnoMapEditor.Utilities;
 
 namespace AnnoMapEditor.MapTemplates.Serializing
 {

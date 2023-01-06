@@ -9,6 +9,7 @@ using System.Windows.Shapes;
 using System.Windows.Media.Imaging;
 using AnnoMapEditor.Utilities;
 using System.ComponentModel;
+using AnnoMapEditor.MapTemplates.Models;
 
 namespace AnnoMapEditor.UI.Controls
 {

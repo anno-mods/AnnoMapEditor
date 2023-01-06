@@ -7,6 +7,7 @@ namespace AnnoMapEditor.DataArchives
     {
         public static readonly IDataArchive Default = new InvalidDataArchive("");
 
+
         public static async Task<IDataArchive> OpenAsync(string? folderPath)
         {
             if (folderPath is null)
@@ -17,7 +18,7 @@ namespace AnnoMapEditor.DataArchives
             if (adjustedPath is null)
                 return Default;
 
-            IDataArchive archive = Default;
+            IDataArchive archive;
             if (File.Exists(Path.Combine(adjustedPath, "maindata/data0.rda")))
                 archive = new RdaDataArchive(adjustedPath);
             else

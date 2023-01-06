@@ -29,13 +29,12 @@
   </Target>
   <ItemGroup>
     <None Remove="Assets\maptype.png" />
-    <None Remove="MapTemplates\Serializing\A7tinfo\a7tinfo.xml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\app.ico" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="MapTemplates\Serializing\A7tinfo\a7tinfo.xml">
+    <EmbeddedResource Include="Mods\Serialization\a7tinfo.xml">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
@@ -50,19 +49,19 @@
 
   <ItemGroup>
     <Reference Include="Anno.FileDBModels">
-      <HintPath>MapTemplates\Serializing\Anno.FileDBModels.dll</HintPath>
+      <HintPath>Libs\Anno.FileDBModels.dll</HintPath>
     </Reference>
     <Reference Include="AnnoRDA">
       <HintPath>DataArchives\AnnoRDA.dll</HintPath>
     </Reference>
     <Reference Include="FileDBReader">
-      <HintPath>MapTemplates\Serializing\FileDBReader.dll</HintPath>
+      <HintPath>Libs\FileDBReader.dll</HintPath>
     </Reference>
     <Reference Include="FileDBSerializer">
-      <HintPath>External\FileDBSerializer.dll</HintPath>
+      <HintPath>Libs\FileDBSerializer.dll</HintPath>
     </Reference>
     <Reference Include="RDAExplorer">
-      <HintPath>External\RDAExplorer.dll</HintPath>
+      <HintPath>Libs\RDAExplorer.dll</HintPath>
     </Reference>
   </ItemGroup>
 
@@ -100,31 +99,31 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="UI\Styles\Button.xaml">
+    <Page Update="UI\Resources\Styles\Button.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="UI\Styles\FancyToggle.xaml">
+    <Page Update="UI\Resources\Styles\FancyToggle.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="UI\Styles\ToggleButton.xaml">
+    <Page Update="UI\Resources\Styles\ToggleButton.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="UI\Styles\Label.xaml">
+    <Page Update="UI\Resources\Styles\Label.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="UI\Styles\TextBox.xaml">
+    <Page Update="UI\Resources\Styles\TextBox.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="UI\Styles\ComboBox.xaml">
+    <Page Update="UI\Resources\Styles\ComboBox.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="UI\Styles\DropDownButton.xaml">
+    <Page Update="UI\Resources\Styles\DropDownButton.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
