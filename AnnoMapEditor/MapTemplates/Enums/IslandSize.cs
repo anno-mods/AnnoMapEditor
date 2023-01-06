@@ -14,11 +14,11 @@ namespace AnnoMapEditor.MapTemplates.Enums
         public static readonly IEnumerable<IslandSize> All = new[] { Default, Small, Medium, Large };
 
 
-        public readonly string Name;
+        public string Name { get; init; }
 
-        public readonly short? ElementValue;
+        public short? ElementValue { get; init; }
 
-        public readonly int DefaultSizeInTiles;
+        public int DefaultSizeInTiles { get; init; }
 
 
         private IslandSize(string name, short? elementValue, int defaultSizeInTiles)

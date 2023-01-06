@@ -1,4 +1,3 @@
-using AnnoMapEditor.MapTemplates;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.Mods.Enums;
 using AnnoMapEditor.Mods.Models;

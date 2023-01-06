@@ -26,7 +26,6 @@
                        Stroke="{Binding BorderBrush}"
                        Width="{Binding SizeInTiles}"
                        Height="{Binding SizeInTiles}" />
-            
         </Canvas>
 
         <!-- Label -->

@@ -2,6 +2,7 @@
 using AnnoMapEditor.Utilities;
 using System;
 using System.Windows;
+using System.Windows.Input;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
@@ -13,11 +14,11 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public MapElementControl()
         {
-            DataContextChanged += _DataContextChanged;
+            DataContextChanged += This_DataContextChanged;
         }
 
 
-        private void _DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void This_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (e.OldValue is MapElementViewModel oldViewModel)
                 oldViewModel.Element.PropertyChanged -= Element_PropertyChanged;
@@ -37,6 +38,20 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             {
                 this.SetPosition(_viewModel.Element.Position);
             }
+        }
+
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            _viewModel.IsSelected = true;
+
+            base.OnMouseLeftButtonDown(e);
+        }
+
+        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
+        {
+            _viewModel.IsSelected = false;
+
+            base.OnMouseRightButtonUp(e);
         }
     }
 }

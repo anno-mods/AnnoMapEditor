@@ -1,4 +1,5 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
+using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Utilities;
 using System;
@@ -13,7 +14,7 @@ namespace AnnoMapEditor.MapTemplates.Models
 {
     public class Session : ObservableBase
     {
-        public ObservableCollection<Island> Islands { get; } = new();
+        public ObservableCollection<MapElement> Elements { get; } = new();
 
         public Vector2 Size 
         { 
@@ -49,11 +50,11 @@ namespace AnnoMapEditor.MapTemplates.Models
             _region = region;
             _template = new MapTemplateDocument();
 
-            Islands.CollectionChanged += Islands_CollectionChanged;
+            Elements.CollectionChanged += Elements_CollectionChanged;
         }
 
 
-        private void Islands_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        private void Elements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
             {
@@ -111,20 +112,21 @@ namespace AnnoMapEditor.MapTemplates.Models
                 _template = document
             };
 
-            IEnumerable<Island> islands = from element in document.MapTemplate?.TemplateElement
-                              where element?.Element is not null
-                              select Island.FromSerialized(element, region);
-            session.Islands.AddRange(islands);
+            // TODO: Allow empty templates?
+            int startingSpotCounter = 0;
+            foreach (TemplateElement elementTemplate in document.MapTemplate!.TemplateElement!)
+            {
+                MapElement element = MapElement.FromTemplate(elementTemplate);
+
+                if (element is StartingSpotElement startingSpot)
+                    startingSpot.Index = startingSpotCounter++;
+
+                session.Elements.Add(element);
+            }
 
             // clear links in the original
             if (session._template.MapTemplate is not null)
                 session._template.MapTemplate.TemplateElement = null;
-
-            // number starting positions
-            int counter = 0;
-            foreach (var island in session.Islands)
-                if (island.IsStarter)
-                    island.Counter = counter++;
 
             if (session.Size.X == 0)
                 return null;
@@ -153,13 +155,8 @@ namespace AnnoMapEditor.MapTemplates.Models
                 _template = createdTemplateDoc
             };
 
-            List<Island> startingSpots = CreateNewStartingSpots(mapSize, region);
-            int startingSpotCounter = 0;
-            foreach (Island startingSpot in startingSpots)
-            {
-                startingSpot.Counter = startingSpotCounter++;
-                session.Islands.Add(startingSpot);
-            }
+            // create starting spots in the default location
+            session.Elements.AddRange(CreateNewStartingSpots(mapSize));
 
             if (session.Size.X == 0)
                 return null;
@@ -167,34 +164,34 @@ namespace AnnoMapEditor.MapTemplates.Models
             return session;
         }
 
-        public static List<Island> CreateNewStartingSpots(int mapSize, Region region)
+        public static List<StartingSpotElement> CreateNewStartingSpots(int mapSize)
         {
             const int SPACING = 32;
             int halfSize = mapSize / 2;
 
-            List<Island> starts = new()
+            List<StartingSpotElement> starts = new()
             {
-                new(region)
+                new()
                 {
-                    ElementType = MapElementType.StartingSpot,
                     Position = new(halfSize + SPACING, halfSize + SPACING)
                 },
-                new(region)
+                new()
                 {
-                    ElementType = MapElementType.StartingSpot,
                     Position = new(halfSize + SPACING, halfSize - SPACING) 
                 },
-                new(region)
+                new()
                 {
-                    ElementType = MapElementType.StartingSpot,
                     Position = new(halfSize - SPACING, halfSize - SPACING) 
                 },
-                new(region)
+                new()
                 {
-                    ElementType = MapElementType.StartingSpot,
                     Position = new(halfSize - SPACING, halfSize + SPACING) 
                 }
             };
+
+            // assign indices
+            for (int i = 0; i < starts.Count; ++i)
+                starts[i].Index = i;
 
             return starts;
         }
@@ -233,14 +230,14 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public void UpdateExternalData()
         {
-            foreach (var island in Islands)
-                island.UpdateExternalData();
+// TODO:      foreach (var island in Elements)
+//                island.UpdateExternalData();
         }
 
         public void Update()
         {
-            foreach (var island in Islands)
-                island.Init();
+// TODO:      foreach (var island in Elements)
+//                island.Init();
         }
 
         public MapTemplateDocument? ToTemplate(bool writeInitialArea = false)
@@ -248,7 +245,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             if (_template.MapTemplate?.Size is null || _template.MapTemplate?.PlayableArea is null)
                 return null;
 
-            _template.MapTemplate.TemplateElement = new List<TemplateElement>(Islands.Select(x => x.ToTemplate()).Where(x => x is not null)!);
+            _template.MapTemplate.TemplateElement = new List<TemplateElement>(Elements.Select(x => x.ToTemplate()).Where(x => x is not null)!);
             _template.MapTemplate.ElementCount = _template.MapTemplate.TemplateElement.Count;
 
             if (Region.HasMapExtension && writeInitialArea)

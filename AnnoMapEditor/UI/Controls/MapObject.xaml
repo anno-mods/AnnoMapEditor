@@ -34,20 +34,6 @@
             <TextBlock Foreground="White"  Name="title" FontSize="50" TextAlignment="Center" />
         </Border>
         
-        <Border Name="startPosition"
-                Grid.Column="0"
-                Width="{Binding Source={x:Static local:MapObject.MAP_PIN_SIZE}}"
-                Height="{Binding Source={x:Static local:MapObject.MAP_PIN_SIZE}}"
-                CornerRadius="{Binding Source={x:Static local:MapObject.MAP_PIN_BORDER}}"
-                Background="#ffff00"
-                VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Foreground="Black" Name="startNumber" FontSize="50" TextAlignment="Center" RenderTransformOrigin=".5,.5">
-                <TextBlock.RenderTransform>
-                    <RotateTransform Angle="{Binding Source={x:Static local:MapView.MAP_ROTATION_ANGLE}, Converter={StaticResource negateDoubleConverter}}" />
-                </TextBlock.RenderTransform>
-            </TextBlock>
-        </Border>
-
         <Grid
             x:Name="crossOut"
             Visibility="Collapsed">
