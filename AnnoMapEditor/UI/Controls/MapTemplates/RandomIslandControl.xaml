@@ -1,0 +1,70 @@
+﻿<local:MapElementControl x:Class="AnnoMapEditor.UI.Controls.MapTemplates.RandomIslandControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls.MapTemplates"
+             xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
+             xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=local:RandomIslandViewModel}"
+             d:DesignWidth="{Binding SizeInTiles}"
+             d:DesignHeight="{Binding SizeInTiles}"
+             Width="{Binding SizeInTiles}"
+             Height="{Binding SizeInTiles}">
+
+    <local:MapElementControl.Resources>
+        <converters:NegateDoubleConverter x:Key="negateDoubleConverter" />
+        <converters:BoolToVisibility x:Key="boolToVisibilityConverter" />
+    </local:MapElementControl.Resources>
+
+    <Grid>
+
+        <Canvas>
+            <!-- Background -->
+            <Rectangle Fill="{Binding BackgroundBrush}"
+                       Stroke="{Binding BorderBrush}"
+                       Width="{Binding SizeInTiles}"
+                       Height="{Binding SizeInTiles}" />
+            
+        </Canvas>
+
+        <!-- Label -->
+        <Border Grid.Column="0"
+                CornerRadius="10"
+                Padding="4,0,4,0"
+                Background="#80000000"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                RenderTransformOrigin=".5,.5">
+            <Border.RenderTransform>
+                <RotateTransform Angle="{Binding Source={x:Static controls:MapView.MAP_ROTATION_ANGLE}, Converter={StaticResource negateDoubleConverter}}" />
+            </Border.RenderTransform>
+            <TextBlock Foreground="White"
+                       FontSize="50"
+                       TextAlignment="Center"
+                       Text="{Binding Label}"/>
+        </Border>
+
+        <!-- Cross Out -->
+        <Grid
+            x:Name="crossOut"
+            Visibility="{Binding IsOutOfBounds, Converter={StaticResource boolToVisibilityConverter}}">
+            <Line
+                X1="0"
+                Y1="0"
+                X2="{Binding ElementName=crossOut, Path=ActualHeight}"
+                Y2="{Binding ElementName=crossOut, Path=ActualHeight}" 
+                Stroke="#BA0024"
+                StrokeThickness="8"/>
+            <Line
+                X1="0"
+                Y1="{Binding ElementName=crossOut, Path=ActualHeight}"
+                X2="{Binding ElementName=crossOut, Path=ActualWidth}"
+                Y2="0"
+                Stroke="#BA0024"
+                StrokeThickness="8" />
+        </Grid>
+
+    </Grid>
+</local:MapElementControl>
