@@ -45,7 +45,7 @@ namespace AnnoMapEditor.DataArchives
 
         public IEnumerable<string> Find(string pattern)
         {
-            return _fileSystem.Root.MatchFiles(pattern).Select(x => x.Name);
+            return _fileSystem.FindFiles(pattern);
         }
     }
 }

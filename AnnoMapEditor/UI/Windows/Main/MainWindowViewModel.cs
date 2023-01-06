@@ -221,7 +221,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 };
 
                 //load from assets instead.
-                var mapTemplates = LoadMapsFromAssets();
+                var mapTemplates = Settings.DataArchive.Find("*.a7tinfo");
 
                 Maps = new()
                 {
