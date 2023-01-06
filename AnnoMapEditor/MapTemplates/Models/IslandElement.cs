@@ -9,7 +9,12 @@ namespace AnnoMapEditor.MapTemplates.Models
         public string? Label
         { 
             get => _label;
-            set => SetProperty(ref _label, value);
+            set {
+                if (value == "")
+                    value = null;
+
+                SetProperty(ref _label, value);
+            }
         }
         private string? _label;
 

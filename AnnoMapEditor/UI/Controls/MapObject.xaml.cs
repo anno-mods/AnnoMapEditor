@@ -73,7 +73,7 @@ namespace AnnoMapEditor.UI.Controls
 
             this.container = container;
             DataContextChanged += MapObject_DataContextChanged;
-            this.container.SelectedIslandChanged += Container_SelectedIslandChanged;
+//            this.container.SelectedIslandChanged += Container_SelectedIslandChanged;
             MouseOffset = Vector2.Zero;
 
             if (DataContext is Island island)
@@ -92,12 +92,6 @@ namespace AnnoMapEditor.UI.Controls
                 Dispatcher.Invoke(() => Update());
         }
 
-        private void Container_SelectedIslandChanged(object sender, MapView.SelectedIslandChangedEventArgs e)
-        {
-            isSelected = e.Island == DataContext;
-            UpdateSelectionBorder();
-        }
-
         private void UpdateSelectionBorder()
         {
             if (borderRectangle is not null && island is not null)
@@ -109,7 +103,7 @@ namespace AnnoMapEditor.UI.Controls
             if (DataContext is not Island island)
                 return;
 
-            container.SelectedIsland = island;
+//            container.SelectedIsland = island;
             MouseOffset = new(Mouse.GetPosition(this));
             e.Handled = true;
             base.OnMouseLeftButtonDown(e);

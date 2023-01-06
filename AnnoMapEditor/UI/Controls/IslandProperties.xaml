@@ -5,10 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
              xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
-             xmlns:maptemplates="clr-namespace:AnnoMapEditor.MapTemplates"
-             d:DataContext="{d:DesignInstance Type=maptemplates:Island}"
+             xmlns:maptemplates="clr-namespace:AnnoMapEditor.UI.Controls.MapTemplates"
+             d:DataContext="{d:DesignInstance Type=maptemplates:RandomIslandViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="300">
+             d:DesignWidth="300"
+             d:DesignHeight="450">
+    
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -19,36 +21,31 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
+    
     <StackPanel Visibility="{Binding Converter={StaticResource CollapsedOnNull}, UpdateSourceTrigger=PropertyChanged}">
         <TextBlock Name="Header"
                    Style="{StaticResource HeaderLabelStyle}"
                    HorizontalAlignment="Right"
-                   Margin="0,0,0,4" />
+                   Margin="0,0,0,4" 
+                   Text="Island"/>
         <StackPanel Name="IslandProps"
-                    Margin="0">
-            <!-- Island Type -->
-            <ComboBox Name="TypeComboBox"
-                      Margin="0"/>
-            <!-- Toggle Oil -->
-            <local:FancyToggle
-                x:Name="IsStarterCheckBox"
-                OffText="No oil"
-                OnText="With oil"/>
-            <!-- Rotation -->
-            <TextBlock
-                   Style="{StaticResource DefaultLabelStyle}"
-                   HorizontalAlignment="Left"
-                   Margin="0,0,0,4">
-                Rotation
-            </TextBlock>
-            <StackPanel Orientation="Horizontal">
-                <Button Click="OnRotateCounterClockwise" HorizontalAlignment="Left">
-                    ⭮
-                </Button>
-                <Button Click="OnRotateClockwise" HorizontalAlignment="Left">
-                    ⭯
-                </Button>
-            </StackPanel>
+                    Margin="0"
+                    Width="100">
+
+            <!-- Label -->
+            <TextBox Margin="4"
+                     Text="{Binding RandomIsland.Label, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- IslandType -->
+            <ComboBox Margin="4"
+                      ItemsSource="{Binding IslandTypeItems}"
+                      SelectedItem="{Binding RandomIsland.IslandType}"/>
+
+            <!-- IslandSize -->
+            <ComboBox Margin="4"
+                      ItemsSource="{Binding IslandSizeItems}"
+                      SelectedItem="{Binding RandomIsland.IslandSize}"/>
+            
         </StackPanel>
     </StackPanel>
 </UserControl>

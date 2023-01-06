@@ -4,6 +4,7 @@ using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.UI.Controls;
+using AnnoMapEditor.UI.Controls.MapTemplates;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
@@ -47,12 +48,27 @@ namespace AnnoMapEditor.UI.Windows.Main
         public SessionPropertiesViewModel? SessionProperties { get; private set; }
         public SessionChecker? SessionChecker { get; private set; }
 
-        public Island? SelectedIsland
+        public RandomIslandElement? SelectedIsland
         {
             get => _selectedIsland;
-            set => SetProperty(ref _selectedIsland, value);
+            set
+            {
+                SetProperty(ref _selectedIsland, value);
+
+                if (value == null)
+                    SelectedIslandPropertiesViewModel = null;
+                else
+                    SelectedIslandPropertiesViewModel = new(value);
+            }
         }
-        private Island? _selectedIsland;
+        private RandomIslandElement? _selectedIsland;
+
+        public IslandPropertiesViewModel? SelectedIslandPropertiesViewModel
+        {
+            get => _selectedIslandPropertiesViewModel;
+            set => SetProperty(ref _selectedIslandPropertiesViewModel, value);
+        }
+        private IslandPropertiesViewModel? _selectedIslandPropertiesViewModel;
 
         public string? SessionFilePath
         {

@@ -33,7 +33,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         private readonly Session _session;
 
-        private readonly RandomIslandElement _randomIsland;
+        public RandomIslandElement RandomIsland { get; init; }
 
         public string Label
         {
@@ -63,20 +63,20 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
         private bool _isOutOfBounds;
 
-        public int SizeInTiles => _randomIsland.IslandSize.DefaultSizeInTiles;
+        public int SizeInTiles => RandomIsland.IslandSize.DefaultSizeInTiles;
 
 
         public RandomIslandViewModel(Session session, RandomIslandElement randomIsland)
             : base(randomIsland)
         {
             _session = session;
-            _randomIsland = randomIsland;
+            RandomIsland = randomIsland;
 
             UpdateBackground();
             UpdateLabel();
 
             PropertyChanged += This_PropertyChanged;
-            _randomIsland.PropertyChanged += RandomIsland_PropertyChanged;
+            RandomIsland.PropertyChanged += RandomIsland_PropertyChanged;
         }
 
 
@@ -102,14 +102,14 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         private void UpdateLabel()
         {
             // use the island's label if it has one
-            if (_randomIsland.Label != null)
-                Label = _randomIsland.Label;
+            if (RandomIsland.Label != null)
+                Label = RandomIsland.Label;
 
             else
             {
-                string label = $"Random\n{_randomIsland.IslandType.Name}";
+                string label = $"Random\n{RandomIsland.IslandType.Name}";
 
-                if (_randomIsland.IslandType == IslandType.Starter)
+                if (RandomIsland.IslandType == IslandType.Starter)
                     label += "\nwith Oil";
 
                 Label = label;
@@ -125,15 +125,15 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             }
             else
             {
-                BorderBrush = BorderBrushes[_randomIsland.IslandType.Name];
-                BackgroundBrush = BackgroundBrushes[_randomIsland.IslandType.Name];
+                BorderBrush = BorderBrushes[RandomIsland.IslandType.Name];
+                BackgroundBrush = BackgroundBrushes[RandomIsland.IslandType.Name];
             }
         }
 
         public override void OnDragged(Vector2 newPosition)
         {
             // mark the island if it is out of bounds
-            var mapArea = new Rect2(_session.Size - _randomIsland.IslandSize.DefaultSizeInTiles + Vector2.Tile);
+            var mapArea = new Rect2(_session.Size - RandomIsland.IslandSize.DefaultSizeInTiles + Vector2.Tile);
             IsOutOfBounds = !newPosition.Within(mapArea);
 
             base.OnDragged(newPosition);
