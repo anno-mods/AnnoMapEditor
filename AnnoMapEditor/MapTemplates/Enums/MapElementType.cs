@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace AnnoMapEditor.MapTemplates
+namespace AnnoMapEditor.MapTemplates.Enums
 {
     public class MapElementType
     {

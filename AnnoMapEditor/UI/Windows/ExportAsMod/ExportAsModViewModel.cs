@@ -1,4 +1,5 @@
-﻿using AnnoMapEditor.MapTemplates.Models;
+﻿using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Enums;
 using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.Utilities;
@@ -34,7 +35,7 @@ namespace AnnoMapEditor.UI.Windows.ExportAsMod
                     AllowedMapTypes = Enumerable.Empty<MapType>();
                     SelectedMapType = null;
                 }
-                InfoMapTypeSelection = _session is not null && _session.Region == MapTemplates.Region.Moderate;
+                InfoMapTypeSelection = _session is not null && _session.Region == Region.Moderate;
                 CheckExistingMod();
             }
         }

@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using AnnoMapEditor.Utilities;
 using System.ComponentModel;
 using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.MapTemplates.Enums;
 
 namespace AnnoMapEditor.UI.Controls
 {
@@ -107,7 +108,6 @@ namespace AnnoMapEditor.UI.Controls
         {
             if (borderRectangle is not null && island is not null)
                 borderRectangle.Stroke = MapObjectColors[isSelected ? "Selected" : island.Type.ToString()];
-            startPosition.Background = isSelected ? White : (island?.Counter == 0 ? Yellow : Red);
         }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

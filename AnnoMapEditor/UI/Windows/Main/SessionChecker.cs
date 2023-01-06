@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System.Collections.Specialized;
@@ -20,9 +21,9 @@ namespace AnnoMapEditor.UI.Windows.Main
         public SessionChecker(Session session)
         {
             _session = session;
-            _session.Islands.CollectionChanged += Session_OnIslandCollectionChanged;
+            _session.Elements.CollectionChanged += Session_OnIslandCollectionChanged;
 
-            foreach (var island in session.Islands)
+            foreach (var island in session.Elements)
                 island.PropertyChanged += Island_PropertyChanged;
 
             Check();
@@ -51,16 +52,16 @@ namespace AnnoMapEditor.UI.Windows.Main
             int thirdPartyCount = 0;
             int pirateCount = 0;
 
-            foreach (var island in session.Islands)
+            foreach (var island in session.Elements)
             {
-                if (island.Type == IslandType.ThirdParty)
-                    thirdPartyCount++;
-                else if (island.Type == IslandType.PirateIsland)
-                    pirateCount++;
-                if (!island.IsPool || island.IsStarter)
-                    continue;
-
-                pools[island.Size.ElementValue ?? 0]++;
+// TODO           if (island.Type == IslandType.ThirdParty)
+//                    thirdPartyCount++;
+//                else if (island.Type == IslandType.PirateIsland)
+//                    pirateCount++;
+//                if (!island.IsPool || island.IsStarter)
+//                    continue;
+//
+//                pools[island.Size.ElementValue ?? 0]++;
             }
 
             

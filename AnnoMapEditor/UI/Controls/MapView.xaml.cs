@@ -1,5 +1,7 @@
 ﻿using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.UI.Controls.MapTemplates;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;

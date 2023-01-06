@@ -1,10 +1,12 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
+using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using IslandType = AnnoMapEditor.MapTemplates.Enums.IslandType;
 
 namespace AnnoMapEditor.MapTemplates
 {

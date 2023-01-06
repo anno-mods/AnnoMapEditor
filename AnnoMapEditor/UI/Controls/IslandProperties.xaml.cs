@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.MapTemplates.Enums;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
