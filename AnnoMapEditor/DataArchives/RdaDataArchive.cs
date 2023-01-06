@@ -1,31 +1,24 @@
-﻿using AnnoMapEditor.Utilities;
-using Microsoft.Extensions.FileSystemGlobbing;
-using RDAExplorer;
+﻿using AnnoRDA;
+using AnnoRDA.Builder;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
-using AnnoMapEditor.Utilities;
-using AnnoRDA;
-using AnnoRDA.Builder;
-using Microsoft.Extensions.FileSystemGlobbing;
-using RDAExplorer;
 
 namespace AnnoMapEditor.DataArchives
 {
     public class RdaDataArchive : IDataArchive
     {
         public string Path { get; }
+        public bool IsValid { get; private set; }
 
-        public bool IsValid { get; } = true;
-
-        private FileSystem fileSystem;
+        private FileSystem _fileSystem;
 
         public RdaDataArchive(string folderPath)
         {
             Path = folderPath;
+            IsValid = false;
         }
         
 
@@ -33,23 +26,26 @@ namespace AnnoMapEditor.DataArchives
         {
             await Task.Run(() => 
             {
-                fileSystem = FileSystemBuilder.Create()
+                _fileSystem = FileSystemBuilder.Create()
                 .FromPath(System.IO.Path.Combine(Path, "maindata"))
                 .WithDefaultSorting()
                 .AddWhitelisted("*.a7tinfo", "*.png", "*.a7minfo", "*.a7t", "*.a7te", "assets.xml")
                 .Build();
             });
+            IsValid = true;
         }
 
         public Stream? OpenRead(string filePath)
         {
+            if (!IsValid)
+                throw new InvalidOperationException("The data archive must be loaded before opening files!");
             filePath = filePath.Replace("\\", "/");
-            return fileSystem.OpenRead(filePath);
+            return _fileSystem.OpenRead(filePath);
         }
 
         public IEnumerable<string> Find(string pattern)
         {
-            return fileSystem.Root.MatchFiles(pattern).Select(x => x.Name);
+            return _fileSystem.Root.MatchFiles(pattern).Select(x => x.Name);
         }
     }
 }
