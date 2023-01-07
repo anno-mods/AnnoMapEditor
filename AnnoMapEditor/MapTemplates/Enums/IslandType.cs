@@ -32,6 +32,19 @@ namespace AnnoMapEditor.MapTemplates.Enums
         }
 
 
+        public static IslandType FromName(string name)
+        {
+            IslandType? type = All.FirstOrDefault(d => d.Name == name);
+
+            if (type is null)
+            {
+                Log.Warn($"{name} is not a valid name for {nameof(IslandType)}. Defaulting to {nameof(Normal)}.");
+                type = Normal;
+            }
+
+            return type;
+        }
+
         public static IslandType FromElementValue(short? elementValue)
         {
             IslandType? type = All.FirstOrDefault(t => t.ElementValue == elementValue);
