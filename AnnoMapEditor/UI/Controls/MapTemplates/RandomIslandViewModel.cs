@@ -7,90 +7,29 @@ using System.Windows.Media;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
-    public class RandomIslandViewModel : MapElementViewModel
+    public class RandomIslandViewModel : IslandViewModel
     {
-        static readonly Dictionary<string, SolidColorBrush> BorderBrushes = new()
-        {
-            ["Normal"] = new(Color.FromArgb(255, 8, 172, 137)),
-            ["Starter"] = new(Color.FromArgb(255, 130, 172, 8)),
-            ["ThirdParty"] = new(Color.FromArgb(255, 189, 73, 228)),
-            ["Decoration"] = new(Color.FromArgb(255, 151, 162, 125)),
-            ["PirateIsland"] = new(Color.FromArgb(255, 186, 0, 36)),
-            ["Cliff"] = new(Color.FromArgb(255, 103, 105, 114)),
-            ["Selected"] = new(Color.FromArgb(255, 255, 255, 255))
-        };
-        static readonly Dictionary<string, SolidColorBrush> BackgroundBrushes = new()
-        {
-            ["Normal"] = new(Color.FromArgb(32, 8, 172, 137)),
-            ["Starter"] = new(Color.FromArgb(32, 130, 172, 8)),
-            ["ThirdParty"] = new(Color.FromArgb(32, 189, 73, 228)),
-            ["Decoration"] = new(Color.FromArgb(32, 151, 162, 125)),
-            ["PirateIsland"] = new(Color.FromArgb(32, 186, 0, 36)),
-            ["Cliff"] = new(Color.FromArgb(32, 103, 105, 114)),
-            ["Selected"] = new(Color.FromArgb(32, 255, 255, 255))
-        };
-
-
-        private readonly Session _session;
-
         public RandomIslandElement RandomIsland { get; init; }
 
-        public string Label
-        {
-            get => _label;
-            set => SetProperty(ref _label, value);
-        }
-        private string _label = string.Empty;
+        public override string? Label => _label;
+        private string? _label;
 
-        public SolidColorBrush BackgroundBrush
-        {
-            get => _backgroundBrush;
-            set => SetProperty(ref _backgroundBrush, value);
-        }
-        private SolidColorBrush _backgroundBrush = BackgroundBrushes["Normal"];
-
-        public SolidColorBrush BorderBrush
-        {
-            get => _borderBrush;
-            set => SetProperty(ref _borderBrush, value);
-        }
-        private SolidColorBrush _borderBrush = BorderBrushes["Normal"];
-
-        public bool IsOutOfBounds
-        {
-            get => _isOutOfBounds;
-            set => SetProperty(ref _isOutOfBounds, value);
-        }
-        private bool _isOutOfBounds;
-
-        public int SizeInTiles => RandomIsland.IslandSize.DefaultSizeInTiles;
+        public override int SizeInTiles => RandomIsland.IslandSize.DefaultSizeInTiles;
 
 
         public RandomIslandViewModel(Session session, RandomIslandElement randomIsland)
-            : base(randomIsland)
+            : base(session, randomIsland)
         {
-            _session = session;
             RandomIsland = randomIsland;
 
-            UpdateBackground();
             UpdateLabel();
 
-            PropertyChanged += This_PropertyChanged;
             RandomIsland.PropertyChanged += RandomIsland_PropertyChanged;
         }
 
 
-        private void This_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(IsSelected))
-                UpdateBackground();
-        }
-
         private void RandomIsland_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(IslandElement.IslandType))
-                UpdateBackground();
-
             if (e.PropertyName == nameof(IslandElement.IslandType) || e.PropertyName == nameof(IslandElement.Label))
                 UpdateLabel();
 
@@ -103,7 +42,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         {
             // use the island's label if it has one
             if (RandomIsland.Label != null)
-                Label = RandomIsland.Label;
+                _label = RandomIsland.Label;
 
             else
             {
@@ -112,31 +51,10 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                 if (RandomIsland.IslandType == IslandType.Starter)
                     label += "\nwith Oil";
 
-                Label = label;
+                _label = label;
             }
-        }
 
-        private void UpdateBackground()
-        {
-            if (IsSelected)
-            {
-                BorderBrush = BorderBrushes["Selected"];
-                BackgroundBrush = BackgroundBrushes["Selected"];
-            }
-            else
-            {
-                BorderBrush = BorderBrushes[RandomIsland.IslandType.Name];
-                BackgroundBrush = BackgroundBrushes[RandomIsland.IslandType.Name];
-            }
-        }
-
-        public override void OnDragged(Vector2 newPosition)
-        {
-            // mark the island if it is out of bounds
-            var mapArea = new Rect2(_session.Size - RandomIsland.IslandSize.DefaultSizeInTiles + Vector2.Tile);
-            IsOutOfBounds = !newPosition.Within(mapArea);
-
-            base.OnDragged(newPosition);
+            OnPropertyChanged(nameof(Label));
         }
     }
 }

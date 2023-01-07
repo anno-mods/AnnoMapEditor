@@ -26,7 +26,7 @@ namespace AnnoMapEditor.MapTemplates.Serializing
             return sizeInTiles;
         }
 
-        private static IFileDBDocument? ReadFileDB(Stream fileStream)
+        public static IFileDBDocument? ReadFileDB(Stream fileStream)
         {
             try
             {

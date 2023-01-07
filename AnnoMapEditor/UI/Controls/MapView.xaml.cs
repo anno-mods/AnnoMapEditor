@@ -134,7 +134,12 @@ namespace AnnoMapEditor.UI.Controls
                 else if (element is RandomIslandElement randomIsland)
                 {
                     viewModel = new RandomIslandViewModel(session, randomIsland);
-                    control = new RandomIslandControl();
+                    control = new IslandControl();
+                }
+                else if (element is FixedIslandElement fixedIsland)
+                {
+                    viewModel = new FixedIslandViewModel(session, fixedIsland);
+                    control = new IslandControl();
                 }
                 else
                     throw new NotImplementedException();
@@ -245,9 +250,9 @@ namespace AnnoMapEditor.UI.Controls
             }
 
             // handle removal of islands
-            else if (e.PropertyName == nameof(RandomIslandViewModel.IsOutOfBounds) || e.PropertyName == nameof(DraggingViewModel.IsDragging))
+            else if (e.PropertyName == nameof(IslandViewModel.IsOutOfBounds) || e.PropertyName == nameof(DraggingViewModel.IsDragging))
             {
-                if (sender is RandomIslandViewModel viewModel)
+                if (sender is IslandViewModel viewModel)
                 {
                     if (viewModel.IsOutOfBounds && !viewModel.IsDragging)
                         session.Elements.Remove(viewModel.Element);
@@ -304,14 +309,14 @@ namespace AnnoMapEditor.UI.Controls
             {
                 foreach (var oldItem in e.OldItems)
                 {
-                    if (oldItem is RandomIslandElement randomIsland)
+                    if (oldItem is IslandElement island)
                     {
                         // find the correct control
                         foreach (var child in sessionCanvas.Children)
                         {
-                            if (child is RandomIslandControl control 
-                                && control.DataContext is RandomIslandViewModel viewModel
-                                && viewModel.Element == randomIsland)
+                            if (child is IslandControl control 
+                                && control.DataContext is IslandViewModel viewModel
+                                && viewModel.Element == island)
                             {
                                 viewModel.PropertyChanged -= MapElementViewModel_PropertyChanged;
                                 sessionCanvas.Children.Remove(control);
@@ -327,18 +332,22 @@ namespace AnnoMapEditor.UI.Controls
             {
                 foreach (var newItem in e.NewItems)
                 {
+                    IslandViewModel viewModel;
                     if (newItem is RandomIslandElement randomIsland)
-                    {
-                        RandomIslandViewModel viewModel = new(session, randomIsland);
-                        sessionCanvas.Children.Add(new RandomIslandControl()
-                        {
-                            DataContext = viewModel
-                        });
+                        viewModel = new RandomIslandViewModel(session, randomIsland);
+                    else if (newItem is FixedIslandElement fixedIsland)
+                        viewModel = new FixedIslandViewModel(session, fixedIsland);
+                    else
+                        continue;
 
-                        viewModel.PropertyChanged += MapElementViewModel_PropertyChanged;
-                        viewModel.IsSelected = true;
-                        viewModel.BeginDrag(Vector2.Zero);
-                    }
+                    sessionCanvas.Children.Add(new IslandControl()
+                    {
+                        DataContext = viewModel
+                    });
+
+                    viewModel.PropertyChanged += MapElementViewModel_PropertyChanged;
+                    viewModel.IsSelected = true;
+                    viewModel.BeginDrag(Vector2.Zero);
                 }
             }
         }

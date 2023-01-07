@@ -1,11 +1,11 @@
 ﻿namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
     /// <summary>
-    /// Interaction logic for RandomIslandControl.xaml
+    /// Interaction logic for IslandControl.xaml
     /// </summary>
-    public partial class RandomIslandControl : MapElementControl
+    public partial class IslandControl : MapElementControl
     {
-        public RandomIslandControl()
+        public IslandControl()
         {
             InitializeComponent();
         }
