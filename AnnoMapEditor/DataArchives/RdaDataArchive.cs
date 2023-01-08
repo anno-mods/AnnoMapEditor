@@ -39,7 +39,8 @@ namespace AnnoMapEditor.DataArchives
                         !x.EndsWith("data0.rda") && !x.EndsWith("data1.rda") && !x.EndsWith("data2.rda") && !x.EndsWith("data3.rda") && 
                         !x.EndsWith("data4.rda") && !x.EndsWith("data7.rda") && !x.EndsWith("data8.rda") && !x.EndsWith("data9.rda"))
                     // load highest numbers last to overwrite lower numbers
-                    .OrderBy(x => int.TryParse(System.IO.Path.GetFileNameWithoutExtension(x)["data".Length..], out int result) ? result : 0);
+                    .OrderByDescending(x => int.TryParse(System.IO.Path.GetFileNameWithoutExtension(x)["data".Length..], out int result) ? result : 0);
+
                 _readers = archives.Select(x =>
                 {
                     try
@@ -51,7 +52,7 @@ namespace AnnoMapEditor.DataArchives
                         reader.ReadRDAFile();
                         foreach (var file in reader.rdaFolder.GetAllFiles())
                             if (file.FileName.EndsWith(".a7tinfo") || file.FileName.EndsWith(".png") || file.FileName.EndsWith(".a7minfo") ||
-                                file.FileName.EndsWith(".a7t") || file.FileName.EndsWith(".a7te"))
+                                file.FileName.EndsWith(".a7t") || file.FileName.EndsWith(".a7te") || file.FileName.EndsWith("assets.xml"))
                                 _allFiles[file.FileName] = file;
                         return reader;
                     }

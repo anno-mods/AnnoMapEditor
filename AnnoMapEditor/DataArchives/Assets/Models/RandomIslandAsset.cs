@@ -3,18 +3,17 @@ using AnnoMapEditor.MapTemplates.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
+    [AssetTemplate("RandomIsland")]
     public class RandomIslandAsset : IslandAsset
     {
         public static readonly string TemplateName = "RandomIsland";
 
 
-        public Region IslandRegion { get; init; }
+        public Region? IslandRegion { get; init; }
 
         public IEnumerable<IslandDifficulty> IslandDifficulty { get; init; }
 
@@ -27,9 +26,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
             XElement randomIslandValues = valuesXml.Element(TemplateName)
                 ?? throw new Exception($"XML is not a valid {nameof(RandomIslandAsset)}. It does not have '{TemplateName}' section in its values.");
 
-            string regionStr = randomIslandValues.Element(nameof(IslandRegion))?.Value
-                ?? throw new Exception($"XML is not a valid {nameof(RandomIslandAsset)}. Required attribute '{nameof(IslandRegion)}' not found.");
-            IslandRegion = RegionFromName(regionStr);
+            string? regionStr = randomIslandValues.Element(nameof(IslandRegion))?.Value;
+            if (regionStr != null)
+                IslandRegion = RegionFromName(regionStr);
 
             FilePath = randomIslandValues.Element(nameof(FilePath))?.Value
                 ?? throw new Exception($"XML is not a valid {nameof(RandomIslandAsset)}. Required attribute '{nameof(FilePath)}' not found.");

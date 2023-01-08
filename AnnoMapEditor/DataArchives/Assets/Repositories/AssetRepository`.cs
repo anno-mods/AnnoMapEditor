@@ -4,20 +4,65 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
     public class AssetRepository<T> : AssetRepository, INotifyCollectionChanged, IEnumerable<T>
         where T : StandardAsset
     {
+
         private readonly Dictionary<long, T> _assetsByGuid = new();
 
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
+        public bool IsLoading 
+        { 
+            get => _isLoading;
+            private set => SetProperty(ref _isLoading, value);
+        }
+        private bool _isLoading = true;
 
-        public AssetRepository()
+        private readonly Task _loadingTask;
+
+        private readonly string _templateName;
+
+        private readonly Func<XElement, T> _deserializer;
+
+
+        public AssetRepository(string templateName, Func<XElement, T> deserializer)
         {
+            _templateName = templateName;
+            _deserializer = deserializer;
 
+            _loadingTask = LoadAsync();
+        }
+
+
+        private Task LoadAsync()
+        {
+            return Task.Run(async () =>
+            {
+                IEnumerable<XElement> assetValuesXmls = AssetsXml.Descendants()
+                    .Where(d => d.Name == "Template" && d.Value == _templateName && d.Parent != null)
+                    .Select(d => d.Parent!)
+                    .Select(p => p.Element("Values")!)
+                    .Where(v => v != null);
+
+                foreach (XElement assetValueXml in assetValuesXmls)
+                {
+                    Add(_deserializer(assetValueXml));
+                }
+
+                IsLoading = false;
+            });
+        }
+
+        public async Task AwaitLoading()
+        {
+            await _loadingTask;
         }
 
 
