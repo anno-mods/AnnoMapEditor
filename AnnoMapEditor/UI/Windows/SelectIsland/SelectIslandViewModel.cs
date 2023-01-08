@@ -1,28 +1,111 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
-using AnnoMapEditor.UI.Controls.MapTemplates;
+using AnnoMapEditor.MapTemplates.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Data;
 
 namespace AnnoMapEditor.UI.Windows.SelectIsland
 {
     public class SelectIslandViewModel
     {
-        public ObservableCollection<IslandAsset> Islands { get; } = new(); 
+        public ObservableCollection<IslandAsset> Islands { get; } = new();
+
+        public string? PathFilter 
+        { 
+            get => _pathFilter;
+            set
+            {
+                _pathFilter = value;
+                UpdateFilter();
+            }
+        }
+        private string? _pathFilter;
+
+        public IEnumerable<IslandType?> IslandTypes { get; init; }
+
+        public IslandType? SelectedIslandType 
+        { 
+            get => _selectedIslandType; 
+            set
+            {
+                _selectedIslandType = value;
+                UpdateFilter();
+            }
+        }
+        private IslandType? _selectedIslandType;
+
+        public IEnumerable<IslandDifficulty?> IslandDifficulties { get; init; }
+
+        public IslandDifficulty? SelectedIslandDifficulty
+        {
+            get => _selectedIslandDifficulty;
+            set
+            {
+                _selectedIslandDifficulty = value;
+                UpdateFilter();
+            }
+        }
+        private IslandDifficulty? _selectedIslandDifficulty;
 
 
         public SelectIslandViewModel()
         {
+            List<IslandType?> islandTypes = new();
+            islandTypes.Add(null);
+            islandTypes.AddRange(IslandType.All);
+            IslandTypes = islandTypes;
+
+            List<IslandDifficulty?> islandDifficulities = new();
+            islandDifficulities.Add(null);
+            islandDifficulities.AddRange(IslandDifficulty.All);
+            IslandDifficulties = islandDifficulities;
+
             AssetRepository<RandomIslandAsset> randomIslandRepository = AssetRepository.Get<RandomIslandAsset>();
             randomIslandRepository.CollectionChanged += RandomIslandRepository_CollectionChanged;
             foreach (RandomIslandAsset randomIsland in randomIslandRepository)
                 Islands.Add(randomIsland);
+
+            CollectionView islandsView = (CollectionView)CollectionViewSource.GetDefaultView(Islands);
+            islandsView.Filter = IslandFilter;
         }
+
+
+        private bool IslandFilter(object item)
+        {
+            if (SelectedIslandType != null)
+            {
+                if (item is not RandomIslandAsset randomIsland || !randomIsland.IslandType.Contains(SelectedIslandType))
+                    return false;
+            }
+
+            if (SelectedIslandDifficulty != null)
+            {
+                if (item is not RandomIslandAsset randomIsland || !randomIsland.IslandDifficulty.Contains(SelectedIslandDifficulty))
+                    return false;
+            }
+
+            if (!string.IsNullOrEmpty(_pathFilter))
+            {
+                string filter = _pathFilter.ToLower();
+                if (item is not IslandAsset island)
+                    return false;
+
+                if (!island.FilePath.ToLower().Contains(filter))
+                    return false;
+            }
+
+            return true;
+        }
+
+        private void UpdateFilter()
+        {
+            CollectionViewSource.GetDefaultView(Islands).Refresh();
+        }
+
 
         private void RandomIslandRepository_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {

@@ -52,9 +52,9 @@ namespace AnnoMapEditor.UI.Controls
             BorderBrush = BorderBrushes[islandType.Name];
 
             if (islandType == IslandType.ThirdParty || islandType == IslandType.PirateIsland)
-                Label = islandType.Name;
+                Label = $"Random\n{islandType.Name}";
             else
-                Label = islandSize.Name;
+                Label = $"Random\n{islandSize.Name}";
         }
 
 

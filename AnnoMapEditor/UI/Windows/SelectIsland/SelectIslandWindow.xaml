@@ -4,11 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AnnoMapEditor.UI.Windows.SelectIsland"
+        xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
         mc:Ignorable="d"
         d:DataContext="{d:DesignData Type=local:SelectIslandViewModel}"
         Title="SelectIslandWindow"
         Height="450"
         Width="800">
+   
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -18,20 +20,61 @@
         <!-- filters -->
         <StackPanel Grid.Row="0"
                     Orientation="Horizontal">
-            
+            <TextBox Width="150"
+                     Margin="4"
+                     Text="{Binding PathFilter}"/>
+            <ComboBox Width="150"
+                      Margin="4"
+                      ItemsSource="{Binding IslandTypes}"
+                      SelectedItem="{Binding SelectedIslandType}"/>
+            <ComboBox Width="150"
+                      Margin="4"
+                      ItemsSource="{Binding IslandDifficulties}"
+                      SelectedItem="{Binding SelectedIslandDifficulty}"/>
         </StackPanel>
-        
-        <!-- tiles -->
+
+        <!-- tiles -->      
         <StackPanel Grid.Row="1">
-            <ListBox ItemsSource="{Binding Islands}">
+            <ListBox Name="IslandsList"
+                     ItemsSource="{Binding Islands}"
+                     HorizontalContentAlignment="Stretch"
+                     VerticalContentAlignment="Stretch">
+
+                <!-- Items -->
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{Binding FilePath}"/>
+                        <StackPanel>
+                            <Canvas VerticalAlignment="Bottom">
+                                <Image Source="{Binding Thumbnail}"
+                                       Width="{Binding ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}}"/>
+                            </Canvas>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+
+                <!-- Style -->
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="0" />
+                        <!-- square tiles -->
+                        <Setter Property="Height" Value="{Binding ActualWidth, RelativeSource={RelativeSource Self}}" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+
+                <!-- Tiling -->
+                <ListBox.Style>
+                    <Style TargetType="ListBox">
+                        <Setter Property="ItemsPanel">
+                            <Setter.Value>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="5" Grid.IsSharedSizeScope="True"/>
+                                </ItemsPanelTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.Style>
             </ListBox>
         </StackPanel>
+
     </Grid>
 </Window>

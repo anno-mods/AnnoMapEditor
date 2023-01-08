@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using AnnoMapEditor.Utilities;
+using AnnoMapEditor.UI.Windows.SelectIsland;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
