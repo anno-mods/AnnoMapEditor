@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
-    public class AssetRepository : ObservableBase
+    public abstract class AssetRepository : Repository
     {
         private const string AssetsXmlPath = "data/config/export/main/asset/assets.xml";
 

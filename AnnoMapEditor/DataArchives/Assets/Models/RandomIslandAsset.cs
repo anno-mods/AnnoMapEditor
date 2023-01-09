@@ -3,15 +3,18 @@ using AnnoMapEditor.MapTemplates.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
     [AssetTemplate("RandomIsland")]
-    public class RandomIslandAsset : IslandAsset
+    public class RandomIslandAsset : StandardAsset
     {
         public static readonly string TemplateName = "RandomIsland";
 
+
+        public string FilePath { get; init; }
 
         public Region? IslandRegion { get; init; }
 

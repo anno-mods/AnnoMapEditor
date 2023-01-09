@@ -1,7 +1,5 @@
 ﻿using AnnoMapEditor.DataArchives;
-using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
-using AnnoMapEditor.UI.Windows.SelectIsland;
 using Microsoft.Win32;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -65,13 +63,7 @@ namespace AnnoMapEditor.Utilities
                 IsLoading = false;
                 Application.Current.Dispatcher.Invoke(() => DataArchive = archive);
 
-                var randomIslandRepository = AssetRepository.Get<RandomIslandAsset>();
-                AssetRepository.Get<FertilityAsset>();
-                
-                await randomIslandRepository.AwaitLoading();
-                IslandThumbnailLoader thumbnailLoader = new();
-                foreach (RandomIslandAsset islandAsset in randomIslandRepository)
-                    thumbnailLoader.LoadThumbnail(islandAsset);
+                await IslandRepository.Instance.AwaitLoadingAsync();
             });
         }
 

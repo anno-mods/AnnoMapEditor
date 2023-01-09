@@ -269,6 +269,7 @@ namespace AnnoMapEditor.UI.Controls
                     {
                         SelectIslandViewModel = new(protoViewModel.Island.IslandType);
                         SelectIslandViewModel.IslandSelected += (s, e) => SelectIsland_IslandSelected(s, e, protoViewModel.Island.Position);
+                        SelectIslandViewModel.OverlayClosed += SelectIslandViewModel_OverlayClosed;
                     }
 
                     // otherwise create a random island
@@ -295,6 +296,11 @@ namespace AnnoMapEditor.UI.Controls
                     }
                 }
             }
+        }
+
+        private void SelectIslandViewModel_OverlayClosed(object? sender, Windows.OverlayClosedEventArgs e)
+        {
+            SelectIslandViewModel = null;
         }
 
         private void SelectIsland_IslandSelected(object? sender, IslandSelectedEventArgs e, Vector2 position)

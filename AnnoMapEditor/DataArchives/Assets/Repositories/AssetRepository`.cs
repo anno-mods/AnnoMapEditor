@@ -18,15 +18,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
-        public bool IsLoading 
-        { 
-            get => _isLoading;
-            private set => SetProperty(ref _isLoading, value);
-        }
-        private bool _isLoading = true;
-
-        private readonly Task _loadingTask;
-
         private readonly string _templateName;
 
         private readonly Func<XElement, T> _deserializer;
@@ -37,32 +28,24 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             _templateName = templateName;
             _deserializer = deserializer;
 
-            _loadingTask = LoadAsync();
+            LoadAsync();
         }
 
 
-        private Task LoadAsync()
+        protected override Task DoLoad()
         {
-            return Task.Run(async () =>
+            IEnumerable<XElement> assetValuesXmls = AssetsXml.Descendants()
+                .Where(d => d.Name == "Template" && d.Value == _templateName && d.Parent != null)
+                .Select(d => d.Parent!)
+                .Select(p => p.Element("Values")!)
+                .Where(v => v != null);
+
+            foreach (XElement assetValueXml in assetValuesXmls)
             {
-                IEnumerable<XElement> assetValuesXmls = AssetsXml.Descendants()
-                    .Where(d => d.Name == "Template" && d.Value == _templateName && d.Parent != null)
-                    .Select(d => d.Parent!)
-                    .Select(p => p.Element("Values")!)
-                    .Where(v => v != null);
+                Add(_deserializer(assetValueXml));
+            }
 
-                foreach (XElement assetValueXml in assetValuesXmls)
-                {
-                    Add(_deserializer(assetValueXml));
-                }
-
-                IsLoading = false;
-            });
-        }
-
-        public async Task AwaitLoading()
-        {
-            await _loadingTask;
+            return Task.CompletedTask;
         }
 
 

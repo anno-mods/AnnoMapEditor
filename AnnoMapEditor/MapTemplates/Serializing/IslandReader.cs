@@ -3,6 +3,7 @@ using FileDBSerializing;
 using System;
 using System.IO;
 using System.Linq;
+using System.Windows.Media.Imaging;
 
 namespace AnnoMapEditor.MapTemplates.Serializing
 {
@@ -41,6 +42,25 @@ namespace AnnoMapEditor.MapTemplates.Serializing
                 // TODO error log
                 return null;
             }
+        }
+
+        public static BitmapImage? ReadThumbnail(string filePath)
+        {
+            string thumbnailPath = Path.Combine(
+                Path.GetDirectoryName(filePath)!,
+                "_gamedata",
+                Path.GetFileNameWithoutExtension(filePath),
+                "mapimage.png");
+            using Stream? stream = Settings.Instance.DataArchive?.OpenRead(thumbnailPath)!;
+
+            BitmapImage thumbnail = new();
+            thumbnail.BeginInit();
+            thumbnail.StreamSource = stream;
+            thumbnail.CacheOption = BitmapCacheOption.OnLoad;
+            thumbnail.EndInit();
+            thumbnail.Freeze();
+
+            return thumbnail;
         }
     }
 }

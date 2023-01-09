@@ -6,12 +6,13 @@ namespace AnnoMapEditor.MapTemplates.Enums
 {
     public class IslandSize
     {
-        public static readonly IslandSize Default = new("Small",   null, 192);
-        public static readonly IslandSize Small   = new("Small",   0,    192);
-        public static readonly IslandSize Medium  = new("Medium",  1,    320);
-        public static readonly IslandSize Large   = new("Large",   2,    384);
+        public static readonly IslandSize Default     = new("Small",       null, 192);
+        public static readonly IslandSize Small       = new("Small",       0,    192);
+        public static readonly IslandSize Medium      = new("Medium",      1,    320);
+        public static readonly IslandSize Large       = new("Large",       2,    384);
+        public static readonly IslandSize Continental = new("Continental", 2,    int.MaxValue);
 
-        public static readonly IEnumerable<IslandSize> All = new[] { Default, Small, Medium, Large };
+        public static readonly IEnumerable<IslandSize> All = new[] { Small, Medium, Large, Continental };
 
 
         public string Name { get; init; }

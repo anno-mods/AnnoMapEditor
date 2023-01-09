@@ -3,10 +3,9 @@ using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates.Enums;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace AnnoMapEditor.UI.Windows.SelectIsland
 {
@@ -14,8 +13,10 @@ namespace AnnoMapEditor.UI.Windows.SelectIsland
     {
         public event IslandSelectedEventHandler? IslandSelected;
 
+        public event OverlayClosedEventHandler? OverlayClosed;
 
-        public ObservableCollection<IslandAsset> Islands { get; } = new();
+
+        public IslandRepository Islands { get; } = IslandRepository.Instance;
 
         public string? PathFilter 
         { 
@@ -28,11 +29,24 @@ namespace AnnoMapEditor.UI.Windows.SelectIsland
         }
         private string? _pathFilter;
 
+        public IEnumerable<Region?> Regions { get; init; } = Region.All;
+
+        public Region? SelectedRegion
+        {
+            get => _selectedRegion;
+            set
+            {
+                _selectedRegion = value;
+                UpdateFilter();
+            }
+        }
+        private Region? _selectedRegion;
+
         public IEnumerable<IslandType?> IslandTypes { get; init; } = IslandType.All;
 
-        public IslandType? SelectedIslandType 
-        { 
-            get => _selectedIslandType; 
+        public IslandType? SelectedIslandType
+        {
+            get => _selectedIslandType;
             set
             {
                 _selectedIslandType = value;
@@ -54,6 +68,19 @@ namespace AnnoMapEditor.UI.Windows.SelectIsland
         }
         private IslandDifficulty? _selectedIslandDifficulty;
 
+        public IEnumerable<IslandSize?> IslandSizes { get; init; } = IslandSize.All;
+
+        public IslandSize? SelectedIslandSize
+        {
+            get => _selectedIslandSize;
+            set
+            {
+                _selectedIslandSize = value;
+                UpdateFilter();
+            }
+        }
+        private IslandSize? _selectedIslandSize;
+
         public IslandAsset SelectedIsland 
         {
             get => _selectedIsland;
@@ -70,11 +97,6 @@ namespace AnnoMapEditor.UI.Windows.SelectIsland
             SelectedIslandType = islandType;
             // TODO: IslandSize:  SelectedIslandSize = islandSize;
             
-            AssetRepository<RandomIslandAsset> randomIslandRepository = AssetRepository.Get<RandomIslandAsset>();
-            randomIslandRepository.CollectionChanged += RandomIslandRepository_CollectionChanged;
-            foreach (RandomIslandAsset randomIsland in randomIslandRepository)
-                Islands.Add(randomIsland);
-
             CollectionView islandsView = (CollectionView)CollectionViewSource.GetDefaultView(Islands);
             islandsView.Filter = IslandFilter;
         }
@@ -82,15 +104,27 @@ namespace AnnoMapEditor.UI.Windows.SelectIsland
 
         private bool IslandFilter(object item)
         {
+            if (SelectedRegion != null)
+            {
+                if (item is not IslandAsset island || island.Region != SelectedRegion)
+                    return false;
+            }
+
             if (SelectedIslandType != null)
             {
-                if (item is not RandomIslandAsset randomIsland || !randomIsland.IslandType.Contains(SelectedIslandType))
+                if (item is not IslandAsset island || !island.IslandType.Contains(SelectedIslandType))
                     return false;
             }
 
             if (SelectedIslandDifficulty != null)
             {
-                if (item is not RandomIslandAsset randomIsland || !randomIsland.IslandDifficulty.Contains(SelectedIslandDifficulty))
+                if (item is not IslandAsset island || !island.IslandDifficulty.Contains(SelectedIslandDifficulty))
+                    return false;
+            }
+
+            if (SelectedIslandSize != null)
+            {
+                if (item is not IslandAsset island || !island.IslandSize.Contains(SelectedIslandSize))
                     return false;
             }
 
@@ -112,24 +146,10 @@ namespace AnnoMapEditor.UI.Windows.SelectIsland
             CollectionViewSource.GetDefaultView(Islands).Refresh();
         }
 
-
-        private void RandomIslandRepository_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        public void Cancel_Clicked()
         {
-            if (e.OldItems != null)
-                foreach (var item in e.OldItems)
-                    if (item is IslandAsset island)
-                        App.Current.Dispatcher.Invoke(() =>
-                        {
-                            Islands.Remove(island);
-                        });
-
-            if (e.NewItems != null)
-                foreach (var item in e.NewItems)
-                    if (item is IslandAsset island)
-                        App.Current.Dispatcher.Invoke(() =>
-                        {
-                            Islands.Add(island);
-                        });
+            OverlayClosed?.Invoke(this, new());
         }
+
     }
 }

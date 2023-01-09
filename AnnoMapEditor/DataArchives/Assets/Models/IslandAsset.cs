@@ -1,29 +1,25 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
-using System;
+﻿using AnnoMapEditor.MapTemplates.Enums;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
-using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
-    public class IslandAsset : StandardAsset
+    public class IslandAsset
     {
+        public string DisplayName { get; init; }
+
         public string FilePath { get; init; }
 
-        public BitmapImage? Thumbnail 
-        {
-            get => _thumbnail;
-            set => SetProperty(ref _thumbnail, value);
-        }
-        private BitmapImage? _thumbnail;
+        public BitmapImage Thumbnail { get; init; }
 
+        public Region Region { get; init; }
 
-        public IslandAsset(XElement valuesXml)
-            : base(valuesXml)
-        {
-        }
+        public IEnumerable<IslandDifficulty> IslandDifficulty { get; init; }
+
+        public IEnumerable<IslandSize> IslandSize { get; init; }
+
+        public IEnumerable<IslandType> IslandType { get; init; }
+
+        public int SizeInTiles { get; init; }
     }
 }

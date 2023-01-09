@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+﻿using AnnoMapEditor.Utilities;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
-    public class FixedIslandAsset : IslandAsset
+    public class FixedIslandAsset : ObservableBase
     {
-        public FixedIslandAsset(XElement valuesXml) 
-            : base(valuesXml)
+        public string FilePath { get; init; }
+
+
+        public FixedIslandAsset(string filePath)
         {
+            FilePath = filePath;
         }
     }
 }
