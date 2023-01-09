@@ -12,6 +12,9 @@ namespace AnnoMapEditor.UI.Windows.SelectIsland
 {
     public class SelectIslandViewModel
     {
+        public event IslandSelectedEventHandler? IslandSelected;
+
+
         public ObservableCollection<IslandAsset> Islands { get; } = new();
 
         public string? PathFilter 
@@ -25,7 +28,7 @@ namespace AnnoMapEditor.UI.Windows.SelectIsland
         }
         private string? _pathFilter;
 
-        public IEnumerable<IslandType?> IslandTypes { get; init; }
+        public IEnumerable<IslandType?> IslandTypes { get; init; } = IslandType.All;
 
         public IslandType? SelectedIslandType 
         { 
@@ -38,7 +41,7 @@ namespace AnnoMapEditor.UI.Windows.SelectIsland
         }
         private IslandType? _selectedIslandType;
 
-        public IEnumerable<IslandDifficulty?> IslandDifficulties { get; init; }
+        public IEnumerable<IslandDifficulty?> IslandDifficulties { get; init; } = IslandDifficulty.All;
 
         public IslandDifficulty? SelectedIslandDifficulty
         {
@@ -51,19 +54,22 @@ namespace AnnoMapEditor.UI.Windows.SelectIsland
         }
         private IslandDifficulty? _selectedIslandDifficulty;
 
-
-        public SelectIslandViewModel()
+        public IslandAsset SelectedIsland 
         {
-            List<IslandType?> islandTypes = new();
-            islandTypes.Add(null);
-            islandTypes.AddRange(IslandType.All);
-            IslandTypes = islandTypes;
+            get => _selectedIsland;
+            set {
+                _selectedIsland = value;
+                IslandSelected?.Invoke(this, new(value));
+            }
+        }
+        public IslandAsset _selectedIsland;
 
-            List<IslandDifficulty?> islandDifficulities = new();
-            islandDifficulities.Add(null);
-            islandDifficulities.AddRange(IslandDifficulty.All);
-            IslandDifficulties = islandDifficulities;
 
+        public SelectIslandViewModel(IslandType? islandType = null, IslandSize? islandSize = null)
+        {
+            SelectedIslandType = islandType;
+            // TODO: IslandSize:  SelectedIslandSize = islandSize;
+            
             AssetRepository<RandomIslandAsset> randomIslandRepository = AssetRepository.Get<RandomIslandAsset>();
             randomIslandRepository.CollectionChanged += RandomIslandRepository_CollectionChanged;
             foreach (RandomIslandAsset randomIsland in randomIslandRepository)

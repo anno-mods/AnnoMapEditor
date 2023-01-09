@@ -9,6 +9,9 @@ namespace AnnoMapEditor.UI.Controls
 {
     public abstract class DraggingViewModel : ObservableBase
     {
+        public event DragEndedEventHandler? DragEnded;
+
+
         public bool IsDragging
         {
             get => _isDragging;
@@ -34,6 +37,7 @@ namespace AnnoMapEditor.UI.Controls
         {
             MouseOffset = null;
             IsDragging = false;
+            DragEnded?.Invoke(this, new());
         }
 
         public abstract void OnDragged(Vector2 newPosition);

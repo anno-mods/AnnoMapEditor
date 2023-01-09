@@ -37,6 +37,7 @@
         <StackPanel Grid.Row="1">
             <ListBox Name="IslandsList"
                      ItemsSource="{Binding Islands}"
+                     SelectedItem="{Binding SelectedIsland}"
                      HorizontalContentAlignment="Stretch"
                      VerticalContentAlignment="Stretch">
 

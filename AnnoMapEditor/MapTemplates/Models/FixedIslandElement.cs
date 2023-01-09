@@ -1,4 +1,5 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using System;
 using System.Linq;
 using IslandType = AnnoMapEditor.MapTemplates.Enums.IslandType;
@@ -11,12 +12,12 @@ namespace AnnoMapEditor.MapTemplates.Models
         // TODO: Remove _sourceTemplate alltogether
         private readonly Element? _sourceElement;
 
-        public string MapFilePath 
+        public IslandAsset IslandAsset 
         { 
-            get => _mapFilePath; 
-            set => SetProperty(ref _mapFilePath, value);
+            get => _islandAsset; 
+            set => SetProperty(ref _islandAsset, value);
         }
-        private string _mapFilePath;
+        private IslandAsset _islandAsset;
 
         public byte? Rotation
         {
@@ -26,10 +27,10 @@ namespace AnnoMapEditor.MapTemplates.Models
         private byte? _rotation;
 
 
-        public FixedIslandElement(string mapFilePath, IslandType islandType)
+        public FixedIslandElement(IslandAsset islandAsset, IslandType islandType)
             : base(islandType)
         {
-            _mapFilePath = mapFilePath;
+            _islandAsset = islandAsset;
         }
 
 
@@ -38,17 +39,19 @@ namespace AnnoMapEditor.MapTemplates.Models
         public FixedIslandElement(Element sourceElement)
             : base(sourceElement)
         {
-            _mapFilePath   = sourceElement.MapFilePath
-                ?? throw new ArgumentException($"Missing property '{nameof(Element.MapFilePath)}'.");
-            _rotation      = sourceElement.Rotation90;
-            _sourceElement = sourceElement;
+            throw new NotImplementedException();
+
+//            _islandAsset   = sourceElement.MapFilePath
+//                ?? throw new ArgumentException($"Missing property '{nameof(Element.MapFilePath)}'.");
+//            _rotation      = sourceElement.Rotation90;
+//            _sourceElement = sourceElement;
         }
 
         protected override void ToTemplate(Element resultElement)
         {
             base.ToTemplate(resultElement);
 
-            resultElement.MapFilePath = _mapFilePath;
+            resultElement.MapFilePath = _islandAsset.FilePath;
             resultElement.Rotation90  = Rotation;
 
             // MineSlotMapping must always be set, but might be empty.

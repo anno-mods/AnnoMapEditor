@@ -1,9 +1,6 @@
 ﻿using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
-using AnnoMapEditor.Utilities;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Windows.Media;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
 {

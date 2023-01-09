@@ -49,7 +49,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             if (e.PropertyName == nameof(FixedIslandElement.Rotation))
                 UpdateThumbnailRotation();
 
-            if (e.PropertyName == nameof(FixedIslandElement.MapFilePath))
+            if (e.PropertyName == nameof(FixedIslandElement.IslandAsset))
             {
                 UpdateSizeInTilesAsync();
                 UpdateThumbnailAsync();
@@ -66,7 +66,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         {
             Task.Run(async () =>
             {
-                string infoPath = _fixedIsland.MapFilePath + "info";
+                string infoPath = _fixedIsland.IslandAsset + "info";
                 using Stream? stream = Settings.Instance.DataArchive?.OpenRead(infoPath);
 
                 if (stream != null)
@@ -87,9 +87,9 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             Task.Run(async () =>
             {
                 string thumbnailPath = Path.Combine(
-                    Path.GetDirectoryName(_fixedIsland.MapFilePath)!,
+                    Path.GetDirectoryName(_fixedIsland.IslandAsset.FilePath)!,
                     "_gamedata",
-                    Path.GetFileNameWithoutExtension(_fixedIsland.MapFilePath),
+                    Path.GetFileNameWithoutExtension(_fixedIsland.IslandAsset.FilePath),
                     "mapimage.png");
                 using Stream? stream = Settings.Instance.DataArchive?.OpenRead(thumbnailPath);
 

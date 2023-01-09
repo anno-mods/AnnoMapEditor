@@ -2,6 +2,7 @@
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.UI.Controls.MapTemplates;
+using AnnoMapEditor.UI.Windows.SelectIsland;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,8 @@ namespace AnnoMapEditor.UI.Controls
     public partial class MapView : UserControl
     {
         public static readonly double MAP_ROTATION_ANGLE = -135;
+
+        private SelectIslandWindow? _selectIslandWindow;
 
 
         private Session? session { get; set; }
@@ -153,20 +156,26 @@ namespace AnnoMapEditor.UI.Controls
             AddIslands = new List<AddIslandButton>();
 
             // create add islands
-            CreateAddIsland(IslandSize.Small, IslandType.PirateIsland);
-            CreateAddIsland(IslandSize.Small, IslandType.ThirdParty);
-            CreateAddIsland(IslandSize.Small, IslandType.Normal);
-            CreateAddIsland(IslandSize.Medium, IslandType.Normal);
-            CreateAddIsland(IslandSize.Large, IslandType.Normal);
+            CreateAddIsland(MapElementType.PoolIsland, IslandSize.Small, IslandType.PirateIsland);
+            CreateAddIsland(MapElementType.PoolIsland, IslandSize.Small, IslandType.ThirdParty);
+            CreateAddIsland(MapElementType.PoolIsland, IslandSize.Small, IslandType.Normal);
+            CreateAddIsland(MapElementType.PoolIsland, IslandSize.Medium, IslandType.Normal);
+            CreateAddIsland(MapElementType.PoolIsland, IslandSize.Large, IslandType.Normal);
+
+            CreateAddIsland(MapElementType.FixedIsland, IslandSize.Small, IslandType.PirateIsland);
+            CreateAddIsland(MapElementType.FixedIsland, IslandSize.Small, IslandType.ThirdParty);
+            CreateAddIsland(MapElementType.FixedIsland, IslandSize.Small, IslandType.Normal);
+            CreateAddIsland(MapElementType.FixedIsland, IslandSize.Medium, IslandType.Normal);
+            CreateAddIsland(MapElementType.FixedIsland, IslandSize.Large, IslandType.Normal);
 
             UpdateSize();
         }
 
-        private void CreateAddIsland(IslandSize size, IslandType type)
+        private void CreateAddIsland(MapElementType mapElementType, IslandSize size, IslandType type)
         {
             if (session is null || AddIslands is null) return;
 
-            AddIslandViewModel viewModel = new(type, size);
+            AddIslandViewModel viewModel = new(mapElementType, type, size);
             AddIslandButton button = new()
             {
                 DataContext = viewModel
@@ -213,17 +222,83 @@ namespace AnnoMapEditor.UI.Controls
                         position = new(-offset - 60 - IslandSize.Small.DefaultSizeInTiles * 2 - IslandSize.Medium.DefaultSizeInTiles - IslandSize.Large.DefaultSizeInTiles, 20);
                 }
 
+                if (island.MapElementType == MapElementType.PoolIsland)
+                    position = new(position.Y, position.X);
+
                 addIsland.SetPosition(session.Size + position);
             }
         }
 
         private void IslandAdded(object? sender, IslandAddedEventArgs e)
         {
-            RandomIslandElement randomIsland = new(e.IslandSize, e.IslandType)
+            ProtoIslandViewModel protoViewModel = new(session, e.MapElementType, e.IslandType, e.IslandSize, e.Position);
+            sessionCanvas.Children.Add(new IslandControl()
             {
-                Position = e.Position
+                DataContext = protoViewModel
+            });
+            protoViewModel.DragEnded += ProtoIsland_DragEnded;
+            protoViewModel.IsSelected = true;
+            protoViewModel.BeginDrag(Vector2.Zero);
+        }
+
+        private void ProtoIsland_DragEnded(object? sender, DragEndedEventArgs e)
+        {
+            if (sender is ProtoIslandViewModel protoViewModel)
+            {
+                // if the proto island is within bounds add the new island
+                if (!protoViewModel.IsOutOfBounds)
+                {
+                    // if it is a FixedIsland, let the user select the correct island
+                    if (protoViewModel.MapElementType == MapElementType.FixedIsland)
+                    {
+                        SelectIslandViewModel viewModel = new(protoViewModel.Island.IslandType);
+                        viewModel.IslandSelected += (s, e) => SelectIsland_IslandSelected(s, e, protoViewModel.Island.Position);
+
+                        _selectIslandWindow = new()
+                        {
+                            DataContext = viewModel
+                        };
+                        _selectIslandWindow.Show();
+                    }
+
+                    // otherwise create a random island
+                    else if (protoViewModel.MapElementType == MapElementType.PoolIsland)
+                    {
+                        RandomIslandElement islandElement = new(protoViewModel.IslandSize, protoViewModel.Island.IslandType)
+                        {
+                            Position = protoViewModel.Island.Position
+                        };
+                        session!.Elements.Add(islandElement);
+                    }
+                    else
+                        throw new NotImplementedException();
+                }
+
+                // remove the proto island
+                foreach (var child in sessionCanvas.Children)
+                {
+                    if (child is IslandControl islandControl && islandControl.DataContext == protoViewModel)
+                    {
+                        protoViewModel.DragEnded -= ProtoIsland_DragEnded;
+                        sessionCanvas.Children.Remove(islandControl);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void SelectIsland_IslandSelected(object? sender, IslandSelectedEventArgs e, Vector2 position)
+        {
+            _selectIslandWindow?.Hide();
+            _selectIslandWindow = null;
+
+            // add the new Island
+            // TODO: Select the correct IslandType.
+            FixedIslandElement fixedIslandElement = new(e.IslandAsset, IslandType.Normal)
+            {
+                Position = position
             };
-            session!.Elements.Add(randomIsland);
+            session.Elements.Add(fixedIslandElement);
         }
 
         private void MapElementViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -346,8 +421,8 @@ namespace AnnoMapEditor.UI.Controls
                     });
 
                     viewModel.PropertyChanged += MapElementViewModel_PropertyChanged;
-                    viewModel.IsSelected = true;
-                    viewModel.BeginDrag(Vector2.Zero);
+//                    viewModel.IsSelected = true;
+//                    viewModel.BeginDrag(Vector2.Zero);
                 }
             }
         }

@@ -8,6 +8,7 @@
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
         xmlns:local="clr-namespace:AnnoMapEditor.UI.Windows.Main"
         xmlns:exportAsMod="clr-namespace:AnnoMapEditor.UI.Windows.ExportAsMod"
+        xmlns:selectIsland="clr-namespace:AnnoMapEditor.UI.Windows.SelectIsland"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1000"
@@ -16,9 +17,12 @@
         <ResourceDictionary Source="../../Resources/Styles.xaml" />
     </Window.Resources>
     <Grid VerticalAlignment="Stretch">
+        
         <Grid.Resources>
             <converters:VisibilityToBool x:Key="FalseOnVisible" OnVisible="False" />
         </Grid.Resources>
+        
+        <!-- Main -->
         <Grid x:Name="mainContent" IsEnabled="{Binding ElementName=exportDialog, Path=Visibility, Converter={StaticResource FalseOnVisible}}">
             <controls:MapView
                 x:Name="Map"
@@ -83,6 +87,8 @@
                 <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
             </TextBlock>
         </Grid>
+        
+        <!-- ExportAsMod -->
         <exportAsMod:ExportAsModWindow x:Name="exportDialog" Grid.Column="0" />
     </Grid>
 </Window>

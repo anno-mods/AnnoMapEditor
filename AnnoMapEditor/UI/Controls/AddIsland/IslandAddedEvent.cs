@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 
 namespace AnnoMapEditor.UI.Controls
@@ -8,6 +9,8 @@ namespace AnnoMapEditor.UI.Controls
 
     public class IslandAddedEventArgs
     {
+        public MapElementType MapElementType { get; init; }
+
         public IslandType IslandType { get; init; }
 
         public IslandSize IslandSize { get; init; }
@@ -15,11 +18,12 @@ namespace AnnoMapEditor.UI.Controls
         public Vector2 Position { get; init; }
 
 
-        public IslandAddedEventArgs(IslandType islandType, IslandSize islandSize, Vector2 position)
+        public IslandAddedEventArgs(MapElementType mapElementType, IslandType islandType, IslandSize islandSize, Vector2 position)
         {
+            MapElementType = mapElementType;
             IslandType = islandType;
             IslandSize = islandSize;
-            Position   = position;
+            Position = position;
         }
     }
 }

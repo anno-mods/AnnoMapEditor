@@ -1,6 +1,7 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Windows.Media;
 
@@ -33,6 +34,8 @@ namespace AnnoMapEditor.UI.Controls
         public event IslandAddedEventHandler? IslandAdded;
 
 
+        public MapElementType MapElementType { get; init; }
+
         public IslandType IslandType { get; init; }
 
         public IslandSize IslandSize { get; init; }
@@ -44,17 +47,17 @@ namespace AnnoMapEditor.UI.Controls
         public SolidColorBrush BorderBrush { get; init; }
 
 
-        public AddIslandViewModel(IslandType islandType, IslandSize islandSize)
+        public AddIslandViewModel(MapElementType mapElementType, IslandType islandType, IslandSize islandSize)
         {
+            MapElementType = mapElementType;
             IslandType = islandType;
             IslandSize = islandSize;
             BackgroundBrush = BackgroundBrushes[islandType.Name];
             BorderBrush = BorderBrushes[islandType.Name];
 
-            if (islandType == IslandType.ThirdParty || islandType == IslandType.PirateIsland)
-                Label = $"Random\n{islandType.Name}";
-            else
-                Label = $"Random\n{islandSize.Name}";
+            string prefix = mapElementType == MapElementType.PoolIsland ? "Random" : "Fixed";
+            string suffix = islandType == IslandType.ThirdParty || islandType == IslandType.PirateIsland ? islandType.Name : islandSize.Name;
+             Label = $"{prefix}\n{suffix}";
         }
 
 
@@ -62,7 +65,7 @@ namespace AnnoMapEditor.UI.Controls
         {
             EndDrag();
 
-            IslandAdded?.Invoke(this, new(IslandType, IslandSize, newPosition));
+            IslandAdded?.Invoke(this, new(MapElementType, IslandType, IslandSize, newPosition));
         }
     }
 }
