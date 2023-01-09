@@ -20,6 +20,7 @@
         
         <Grid.Resources>
             <converters:VisibilityToBool x:Key="FalseOnVisible" OnVisible="False" />
+            <converters:BoolToVisibility x:Key="collapseOnFalse" />
         </Grid.Resources>
         
         <!-- Main -->
@@ -28,6 +29,7 @@
                 x:Name="Map"
                 Grid.Column="0"
                 SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                SelectIslandViewModel="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectIslandViewModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 DataContext="{Binding Session, Mode=OneWay}" />
             <StackPanel Grid.Column="0"
                         VerticalAlignment="Top"
@@ -87,8 +89,22 @@
                 <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
             </TextBlock>
         </Grid>
-        
+
         <!-- ExportAsMod -->
         <exportAsMod:ExportAsModWindow x:Name="exportDialog" Grid.Column="0" />
+
+        <!-- Overlays -->
+        <Grid x:Name="Overlay"
+              Panel.ZIndex="1000"
+              Visibility="{Binding ShowOverlay, Converter={StaticResource collapseOnFalse}}">
+            <Grid.Background>
+                <SolidColorBrush Color="Black" />
+            </Grid.Background>
+
+            <!-- SelectIsland -->
+            <selectIsland:SelectIslandOverlay x:Name="selectIsland" 
+                                          DataContext="{Binding SelectIslandViewModel, UpdateSourceTrigger=PropertyChanged}"
+                                          Grid.Column="0" />
+        </Grid>
     </Grid>
 </Window>

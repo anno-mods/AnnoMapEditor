@@ -5,6 +5,7 @@ using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.UI.Controls;
 using AnnoMapEditor.UI.Controls.MapTemplates;
+using AnnoMapEditor.UI.Windows.SelectIsland;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
@@ -69,6 +70,19 @@ namespace AnnoMapEditor.UI.Windows.Main
             set => SetProperty(ref _selectedIslandPropertiesViewModel, value);
         }
         private IslandPropertiesViewModel? _selectedIslandPropertiesViewModel;
+
+        public SelectIslandViewModel? SelectIslandViewModel
+        {
+            get => _selectIslandViewModel;
+            set
+            {
+                SetProperty(ref _selectIslandViewModel, value);
+                OnPropertyChanged(nameof(ShowOverlay));
+            }
+        }
+        private SelectIslandViewModel? _selectIslandViewModel;
+
+        public bool ShowOverlay => SelectIslandViewModel != null;
 
         public string? SessionFilePath
         {

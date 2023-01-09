@@ -19,8 +19,6 @@ namespace AnnoMapEditor.UI.Controls
     {
         public static readonly double MAP_ROTATION_ANGLE = -135;
 
-        private SelectIslandWindow? _selectIslandWindow;
-
 
         private Session? session { get; set; }
         private Rectangle? mapRect { get; set; }
@@ -43,6 +41,24 @@ namespace AnnoMapEditor.UI.Controls
                 if ((RandomIslandElement?)GetValue(SelectedIslandProperty) != value)
                 {
                     SetValue(SelectedIslandProperty, value);
+                }
+            }
+        }
+
+        public static readonly DependencyProperty SelectIslandViewModelProperty =
+             DependencyProperty.Register("SelectIslandViewModel",
+                propertyType: typeof(SelectIslandViewModel),
+                ownerType: typeof(MapView),
+                typeMetadata: new FrameworkPropertyMetadata(defaultValue: null));
+
+        public SelectIslandViewModel? SelectIslandViewModel
+        {
+            get { return (SelectIslandViewModel?)GetValue(SelectIslandViewModelProperty); }
+            set
+            {
+                if ((SelectIslandViewModel?)GetValue(SelectIslandViewModelProperty) != value)
+                {
+                    SetValue(SelectIslandViewModelProperty, value);
                 }
             }
         }
@@ -251,14 +267,8 @@ namespace AnnoMapEditor.UI.Controls
                     // if it is a FixedIsland, let the user select the correct island
                     if (protoViewModel.MapElementType == MapElementType.FixedIsland)
                     {
-                        SelectIslandViewModel viewModel = new(protoViewModel.Island.IslandType);
-                        viewModel.IslandSelected += (s, e) => SelectIsland_IslandSelected(s, e, protoViewModel.Island.Position);
-
-                        _selectIslandWindow = new()
-                        {
-                            DataContext = viewModel
-                        };
-                        _selectIslandWindow.Show();
+                        SelectIslandViewModel = new(protoViewModel.Island.IslandType);
+                        SelectIslandViewModel.IslandSelected += (s, e) => SelectIsland_IslandSelected(s, e, protoViewModel.Island.Position);
                     }
 
                     // otherwise create a random island
@@ -289,8 +299,7 @@ namespace AnnoMapEditor.UI.Controls
 
         private void SelectIsland_IslandSelected(object? sender, IslandSelectedEventArgs e, Vector2 position)
         {
-            _selectIslandWindow?.Hide();
-            _selectIslandWindow = null;
+            SelectIslandViewModel = null;
 
             // add the new Island
             // TODO: Select the correct IslandType.
