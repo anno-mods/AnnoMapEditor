@@ -78,18 +78,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="UI\Controls\IslandProperties\FixedIslandProperties.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="UI\Controls\SessionProperties.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="UI\Controls\IslandProperties.xaml">
+    <Page Update="UI\Controls\IslandProperties\RandomIslandProperties.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="UI\Controls\MapObject.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="UI\Controls\MapView.xaml">

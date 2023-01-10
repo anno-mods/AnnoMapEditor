@@ -1,4 +1,4 @@
-﻿namespace AnnoMapEditor.UI.Controls
+﻿namespace AnnoMapEditor.UI.Controls.AddIsland
 {
     /// <summary>
     /// Interaction logic for AddIslandButton.xaml

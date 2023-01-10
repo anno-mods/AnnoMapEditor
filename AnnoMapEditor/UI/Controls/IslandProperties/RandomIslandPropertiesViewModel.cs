@@ -4,13 +4,12 @@ using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AnnoMapEditor.UI.Controls
+namespace AnnoMapEditor.UI.Controls.IslandProperties
 {
-    public class IslandPropertiesViewModel : ObservableBase
+    public class RandomIslandPropertiesViewModel : ObservableBase
     {
         private static readonly Dictionary<IslandType, List<IslandSize>> _allowedSizesPerType = new()
         {
@@ -20,15 +19,15 @@ namespace AnnoMapEditor.UI.Controls
             [IslandType.PirateIsland] = new() { IslandSize.Small }
         };
 
-
+        
         public RandomIslandElement RandomIsland { get; init; }
-
+        
         public ObservableCollection<IslandType> IslandTypeItems { get; } = new();
 
         public ObservableCollection<IslandSize> IslandSizeItems { get; } = new();
 
 
-        public IslandPropertiesViewModel(RandomIslandElement randomIsland)
+        public RandomIslandPropertiesViewModel(RandomIslandElement randomIsland)
         {
             RandomIsland = randomIsland;
 
@@ -39,7 +38,7 @@ namespace AnnoMapEditor.UI.Controls
         }
 
         
-        private void RandomIsland_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void RandomIsland_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             // only allow valid type/size combinations
             if (e.PropertyName == nameof(RandomIsland.IslandType))

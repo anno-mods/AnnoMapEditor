@@ -12,8 +12,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public override int SizeInTiles => _fixedIsland.IslandAsset.SizeInTiles;
 
         public override BitmapImage? Thumbnail => _fixedIsland.IslandAsset.Thumbnail;
-
-        public override int? ThumbnailRotation => _thumbnailRotation;
+        
+        public override int ThumbnailRotation => _thumbnailRotation ?? 0;
         private int? _thumbnailRotation;
 
 
@@ -38,7 +38,13 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         private void UpdateThumbnailRotation()
         {
-            _thumbnailRotation = _fixedIsland.Rotation * 90;
+            // 0 -> 90
+            // 1 -> 360
+            // 2 -> 270
+            // 3 -> 180
+
+            _thumbnailRotation = (_fixedIsland.Rotation - 1) * -90;
+
             OnPropertyChanged(nameof(ThumbnailRotation));
         }
     }

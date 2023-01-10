@@ -1,10 +1,9 @@
 ﻿using AnnoMapEditor.DataArchives;
-using AnnoMapEditor.MapTemplates;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.UI.Controls;
-using AnnoMapEditor.UI.Controls.MapTemplates;
+using AnnoMapEditor.UI.Controls.IslandProperties;
 using AnnoMapEditor.UI.Windows.SelectIsland;
 using AnnoMapEditor.Utilities;
 using System;
@@ -49,7 +48,7 @@ namespace AnnoMapEditor.UI.Windows.Main
         public SessionPropertiesViewModel? SessionProperties { get; private set; }
         public SessionChecker? SessionChecker { get; private set; }
 
-        public RandomIslandElement? SelectedIsland
+        public IslandElement? SelectedIsland
         {
             get => _selectedIsland;
             set
@@ -57,19 +56,37 @@ namespace AnnoMapEditor.UI.Windows.Main
                 SetProperty(ref _selectedIsland, value);
 
                 if (value == null)
-                    SelectedIslandPropertiesViewModel = null;
-                else
-                    SelectedIslandPropertiesViewModel = new(value);
+                {
+                    SelectedRandomIslandPropertiesViewModel = null;
+                    SelectedFixedIslandPropertiesViewModel = null;
+                }
+                else if (value is RandomIslandElement randomIsland)
+                {
+                    SelectedRandomIslandPropertiesViewModel = new(randomIsland);
+                    SelectedFixedIslandPropertiesViewModel = null;
+                }
+                else if (value is FixedIslandElement fixedIsland)
+                {
+                    SelectedRandomIslandPropertiesViewModel = null;
+                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland);
+                }
             }
         }
-        private RandomIslandElement? _selectedIsland;
+        private IslandElement? _selectedIsland;
 
-        public IslandPropertiesViewModel? SelectedIslandPropertiesViewModel
+        public RandomIslandPropertiesViewModel? SelectedRandomIslandPropertiesViewModel
         {
-            get => _selectedIslandPropertiesViewModel;
-            set => SetProperty(ref _selectedIslandPropertiesViewModel, value);
+            get => _selectedRandomIslandPropertiesViewModel;
+            set => SetProperty(ref _selectedRandomIslandPropertiesViewModel, value);
         }
-        private IslandPropertiesViewModel? _selectedIslandPropertiesViewModel;
+        private RandomIslandPropertiesViewModel? _selectedRandomIslandPropertiesViewModel;
+
+        public FixedIslandPropertiesViewModel? SelectedFixedIslandPropertiesViewModel
+        {
+            get => _selectedFixedIslandPropertiesViewModel;
+            set => SetProperty(ref _selectedFixedIslandPropertiesViewModel, value);
+        }
+        private FixedIslandPropertiesViewModel? _selectedFixedIslandPropertiesViewModel;
 
         public SelectIslandViewModel? SelectIslandViewModel
         {

@@ -1,10 +1,10 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Models;
-using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.UI.Controls.MapTemplates;
 using AnnoMapEditor.Utilities;
 using System.Windows.Media.Imaging;
 
-namespace AnnoMapEditor.UI.Controls.MapTemplates
+namespace AnnoMapEditor.UI.Controls.AddIsland
 {
     public class ProtoIslandViewModel : IslandViewModel
     {
@@ -12,14 +12,14 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         private string _label;
 
         public MapElementType MapElementType { get; init; }
-
+        
         public IslandSize IslandSize { get; init; }
 
         public override int SizeInTiles => IslandSize.DefaultSizeInTiles;
 
         public override BitmapImage? Thumbnail => null;
 
-        public override int? ThumbnailRotation => null;
+        public override int ThumbnailRotation => 0;
 
 
         public ProtoIslandViewModel(Session session, MapElementType elementType, IslandType islandType, IslandSize islandSize, Vector2 position)

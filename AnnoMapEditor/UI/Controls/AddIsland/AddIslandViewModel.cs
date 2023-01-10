@@ -1,11 +1,9 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Models;
-using AnnoMapEditor.MapTemplates.Enums;
-using AnnoMapEditor.MapTemplates.Models;
+﻿using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.Windows.Media;
 
-namespace AnnoMapEditor.UI.Controls
+namespace AnnoMapEditor.UI.Controls.AddIsland
 {
     public class AddIslandViewModel : DraggingViewModel
     {

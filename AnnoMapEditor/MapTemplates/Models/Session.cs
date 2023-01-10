@@ -5,7 +5,6 @@ using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,27 +48,8 @@ namespace AnnoMapEditor.MapTemplates.Models
         {
             _region = region;
             _template = new MapTemplateDocument();
-
-            Elements.CollectionChanged += Elements_CollectionChanged;
         }
 
-
-        private void Elements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.NewItems != null)
-            {
-                foreach (object newIsland in e.NewItems)
-                {
-                    if (newIsland is Island island)
-                    {
-                        if (island.IsNew)
-                            island.CreateTemplate();
-
-                        island.Init();
-                    }
-                }
-            }
-        }
 
         public static async Task<Session?> FromA7tinfoAsync(string filePath)
         {
@@ -226,18 +206,6 @@ namespace AnnoMapEditor.MapTemplates.Models
 
             MapSizeConfigChanged?.Invoke(this, new SessionResizeEventArgs(oldMapSize, oldPlayableSize));
             MapSizeConfigCommitted?.Invoke(this, new EventArgs());
-        }
-
-        public void UpdateExternalData()
-        {
-// TODO:      foreach (var island in Elements)
-//                island.UpdateExternalData();
-        }
-
-        public void Update()
-        {
-// TODO:      foreach (var island in Elements)
-//                island.Init();
         }
 
         public MapTemplateDocument? ToTemplate(bool writeInitialArea = false)

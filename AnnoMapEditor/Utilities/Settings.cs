@@ -60,10 +60,10 @@ namespace AnnoMapEditor.Utilities
 
             Task.Run(async () => {
                 var archive = await DataArchives.DataArchive.OpenAsync(path);
-                IsLoading = false;
                 Application.Current.Dispatcher.Invoke(() => DataArchive = archive);
-
                 await IslandRepository.Instance.AwaitLoadingAsync();
+
+                IsLoading = false;
             });
         }
 

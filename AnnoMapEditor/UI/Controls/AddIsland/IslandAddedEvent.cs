@@ -1,8 +1,7 @@
 ﻿using AnnoMapEditor.MapTemplates.Enums;
-using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 
-namespace AnnoMapEditor.UI.Controls
+namespace AnnoMapEditor.UI.Controls.AddIsland
 {
     public delegate void IslandAddedEventHandler(object? sender, IslandAddedEventArgs e);
 
@@ -12,7 +11,7 @@ namespace AnnoMapEditor.UI.Controls
         public MapElementType MapElementType { get; init; }
 
         public IslandType IslandType { get; init; }
-
+        
         public IslandSize IslandSize { get; init; }
 
         public Vector2 Position { get; init; }

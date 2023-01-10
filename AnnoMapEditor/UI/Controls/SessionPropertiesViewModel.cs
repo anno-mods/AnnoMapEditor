@@ -27,7 +27,6 @@ namespace AnnoMapEditor.UI.Controls
                 {
                     _selectedRegion = value;
                     _session.Region = value;
-                    _session.Update();
                     OnSelectedRegionChanged();
                 }
             }

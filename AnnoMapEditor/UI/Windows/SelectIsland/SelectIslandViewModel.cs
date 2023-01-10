@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Data;
-using System.Windows.Input;
 
 namespace AnnoMapEditor.UI.Windows.SelectIsland
 {
@@ -92,10 +91,11 @@ namespace AnnoMapEditor.UI.Windows.SelectIsland
         public IslandAsset _selectedIsland;
 
 
-        public SelectIslandViewModel(IslandType? islandType = null, IslandSize? islandSize = null)
+        public SelectIslandViewModel(Region? region = null, IslandType? islandType = null, IslandSize? islandSize = null)
         {
+            SelectedRegion = region;
             SelectedIslandType = islandType;
-            // TODO: IslandSize:  SelectedIslandSize = islandSize;
+            SelectedIslandSize = islandSize;
             
             CollectionView islandsView = (CollectionView)CollectionViewSource.GetDefaultView(Islands);
             islandsView.Filter = IslandFilter;
