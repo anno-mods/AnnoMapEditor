@@ -7,6 +7,8 @@ namespace AnnoMapEditor.Mods.Enums
 {
     public class MapType
     {
+        private static readonly Logger<MapType> _logger = new();
+
         //Old World
         public static readonly MapType Archipelago = new("Archipelago", guid: "17079", assetName: "moderate_archipel");
         public static readonly MapType Atoll       = new("Atoll",       guid: "17080", assetName: "moderate_atoll");
@@ -61,7 +63,7 @@ namespace AnnoMapEditor.Mods.Enums
 
             if (type is null)
             {
-                Log.Warn($"{name} is not a valid name for {nameof(MapType)}. Defaulting to null.");
+                _logger.LogWarning($"{name} is not a valid name for {nameof(MapType)}. Defaulting to null.");
             }
 
             return type;

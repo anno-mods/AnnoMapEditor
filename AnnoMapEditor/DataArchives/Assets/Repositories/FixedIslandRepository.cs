@@ -1,5 +1,4 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
-using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections;
@@ -13,6 +12,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
     public class FixedIslandRepository : Repository, INotifyCollectionChanged, IEnumerable<FixedIslandAsset>
     {
+        private static readonly Logger<FixedIslandRepository> _logger = new();
+
         public static FixedIslandRepository Instance = new();
 
         private readonly List<FixedIslandAsset> _islands = new();
@@ -28,12 +29,16 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         protected override Task DoLoad()
         {
+            _logger.LogInformation($"Begin loading fixed islands.");
+
             foreach (string mapFilePath in Settings.Instance.DataArchive.Find("**.a7m"))
             {
                 FixedIslandAsset fixedIsland = new(mapFilePath);
 
                 Add(fixedIsland);
             }
+
+            _logger.LogInformation($"Finished loading fixed islands. Loaded {_islands.Count} islands.");
 
             return Task.CompletedTask;
         }
@@ -43,6 +48,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         {
             _islands.Add(fixedIsland);
             CollectionChanged?.Invoke(this, new(NotifyCollectionChangedAction.Add, fixedIsland));
+            _logger.LogInformation($"Added '{fixedIsland.FilePath}'.");
         }
 
         public FixedIslandAsset GetByFilePath(string filePath)

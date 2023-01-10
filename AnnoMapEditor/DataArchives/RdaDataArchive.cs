@@ -12,6 +12,8 @@ namespace AnnoMapEditor.DataArchives
 {
     public class RdaDataArchive : IDataArchive, IDisposable
     {
+        private static readonly Logger<RdaDataArchive> _logger = new();
+
         public string Path { get; }
 
         public bool IsValid { get; } = true;
@@ -31,6 +33,8 @@ namespace AnnoMapEditor.DataArchives
         {
             await Task.Run(() => 
             {
+                _logger.LogInformation($"Discovering RDA archives at '{Path}'.");
+
                 // let's skip a few to speed up the loading: 0, 1, 2, 3, 4, 7, 8, 9
                 var archives = Directory.
                     GetFiles(System.IO.Path.Combine(Path, "maindata"), "*.rda")
@@ -58,14 +62,16 @@ namespace AnnoMapEditor.DataArchives
                     }
                     catch (Exception e)
                     {
-                        Log.Exception($"error loading RDAs from {x}", e);
+                        _logger.LogError($"error loading RDAs from {x}", e);
                         return null;
                     }
                 }).Where(x => x is not null).Select(x => x!).ToArray();
 
+                _logger.LogInformation($"Loaded {_readers.Length} RDAs.");
+
                 if (_readers.Length == 0)
                 {
-                    Log.Warn($"No .rda files found at {System.IO.Path.Combine(Path, "maindata")}");
+                    _logger.LogWarning($"No .rda files found at {System.IO.Path.Combine(Path, "maindata")}");
                     MessageBox.Show($"Something went wrong opening the RDA files.\n\nDo you have another Editor or the RDAExplorer open by any chance?\n\nLog file: {Log.LogFilePath}", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 }
             });
@@ -75,14 +81,14 @@ namespace AnnoMapEditor.DataArchives
         {
             if (!IsValid || _readers is null)
             {
-                Log.Warn($"archive not ready: {filePath}");
+                _logger.LogWarning($"archive not ready: {filePath}");
                 return null;
             }
             Stream? stream = null;
 
             if (!_allFiles.TryGetValue(filePath.Replace('\\', '/'), out RDAFile? file) || file is null)
             {
-                Log.Warn($"not found in archive: {filePath}");
+                _logger.LogWarning($"not found in archive: {filePath}");
                 return null;
             }
 
@@ -92,7 +98,7 @@ namespace AnnoMapEditor.DataArchives
             }
             catch (Exception e)
             {
-                Log.Exception($"error reading archive: {filePath}", e);
+                _logger.LogError($"error reading archive: {filePath}", e);
             }
             return stream;
         }

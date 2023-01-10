@@ -12,6 +12,8 @@ namespace AnnoMapEditor.UI.Windows.ExportAsMod
 {
     public class ExportAsModViewModel : ObservableBase
     {
+        private static readonly Logger<ExportAsModViewModel> _logger = new();
+
         enum ModStatus
         {
             NotFound,
@@ -135,7 +137,7 @@ namespace AnnoMapEditor.UI.Windows.ExportAsMod
 
             if (!Directory.Exists(modsFolderPath) || Session is null)
             {
-                Log.Warn("mods/ path or session not set. This shouldn't have happened.");
+                _logger.LogWarning("mods/ path or session not set. This shouldn't have happened.");
                 return false;
             }
 

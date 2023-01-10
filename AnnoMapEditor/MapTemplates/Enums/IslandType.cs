@@ -6,6 +6,8 @@ namespace AnnoMapEditor.MapTemplates.Enums
 {
     public class IslandType
     {
+        private static readonly Logger<IslandType> _logger = new();
+
         public static readonly IslandType Normal       = new("Normal",       null);
         public static readonly IslandType Starter      = new("Starter",      1);
         public static readonly IslandType Decoration   = new("Decoration",   2);
@@ -38,7 +40,7 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
             if (type is null)
             {
-                Log.Warn($"{name} is not a valid name for {nameof(IslandType)}. Defaulting to {nameof(Normal)}.");
+                _logger.LogWarning($"{name} is not a valid name for {nameof(IslandType)}. Defaulting to {nameof(Normal)}.");
                 type = Normal;
             }
 
@@ -51,7 +53,7 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
             if (type is null)
             {
-                Log.Warn($"{elementValue} is not a valid element value for {nameof(IslandType)}. Defaulting to {nameof(Normal)}/{Normal.ElementValue}.");
+                _logger.LogWarning($"{elementValue} is not a valid element value for {nameof(IslandType)}. Defaulting to {nameof(Normal)}/{Normal.ElementValue}.");
                 type = Normal;
             }
 

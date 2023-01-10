@@ -6,6 +6,8 @@ namespace AnnoMapEditor.MapTemplates.Enums
 {
     public class IslandDifficulty
     {
+        private static readonly Logger<IslandDifficulty> _logger = new();
+
         public static readonly IslandDifficulty Normal = new("Normal", 0);
         public static readonly IslandDifficulty Hard   = new("Hard",   1);
 
@@ -30,7 +32,7 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
             if (difficulty is null)
             {
-                Log.Warn($"{name} is not a valid name for {nameof(IslandDifficulty)}. Defaulting to {nameof(Normal)}.");
+                _logger.LogWarning($"{name} is not a valid name for {nameof(IslandDifficulty)}. Defaulting to {nameof(Normal)}.");
                 difficulty = Normal;
             }
 
@@ -43,7 +45,7 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
             if (difficulty is null)
             {
-                Log.Warn($"{elementValue} is not a valid element value for {nameof(IslandDifficulty)}. Defaulting to {nameof(Normal)}.");
+                _logger.LogWarning($"{elementValue} is not a valid element value for {nameof(IslandDifficulty)}. Defaulting to {nameof(Normal)}.");
                 difficulty = Normal;
             }
 

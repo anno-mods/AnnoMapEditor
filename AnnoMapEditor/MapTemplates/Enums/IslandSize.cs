@@ -6,6 +6,8 @@ namespace AnnoMapEditor.MapTemplates.Enums
 {
     public class IslandSize
     {
+        private static readonly Logger<IslandSize> _logger = new();
+
         public static readonly IslandSize Default     = new("Small",       null, 192);
         public static readonly IslandSize Small       = new("Small",       0,    192);
         public static readonly IslandSize Medium      = new("Medium",      1,    320);
@@ -36,7 +38,7 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
             if (size is null)
             {
-                Log.Warn($"{elementValue} is not a valid element value for {nameof(IslandSize)}. Defaulting to {nameof(Default)}/{Default.ElementValue}.");
+                _logger.LogWarning($"{elementValue} is not a valid element value for {nameof(IslandSize)}. Defaulting to {nameof(Default)}/{Default.ElementValue}.");
                 size = Default;
             }
 

@@ -1,13 +1,14 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Serializing;
+using AnnoMapEditor.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
@@ -30,6 +31,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
     /// </summary>
     public class IslandRepository : Repository, IEnumerable<IslandAsset>, INotifyCollectionChanged
     {
+        private static readonly Logger<IslandRepository> _logger = new();
+
         public static IslandRepository Instance = new();
 
 
@@ -40,6 +43,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         private IslandRepository()
         {
+            var logger = new Logger<IslandRepository>();
+
             LoadAsync();
         }
 
@@ -50,22 +55,36 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             {
                 _byFilePath.Add(island.FilePath, island);
                 CollectionChanged?.Invoke(this, new(NotifyCollectionChangedAction.Add, island));
+                _logger.LogInformation($"Added '{island.FilePath}'.");
             }
             else
                 throw new Exception();
         }
 
+        public bool TryGetByFilePath(string mapFilePath, [NotNullWhen(false)] out IslandAsset islandAsset)
+#pragma warning disable CS8762 // Parameter must have a non-null value when exiting in some condition.
+            => _byFilePath.TryGetValue(mapFilePath, out islandAsset);
+#pragma warning restore CS8762 // Parameter must have a non-null value when exiting in some condition.
+
         protected override async Task DoLoad()
         {
-            // wait for both the random and fixed island repositories to be loaded
-            AssetRepository<RandomIslandAsset> randomIslandRepository = AssetRepository.Get<RandomIslandAsset>();
-            FixedIslandRepository fixedIslandRepository = FixedIslandRepository.Instance;
+            _logger.LogInformation($"Begin loading islands.");
+            _logger.LogInformation($"Waiting for random and fixed islands to be loaded.");
 
+            // wait for both the random and fixed island repositories to be loaded
+            // TODO: BUG In theory both randomIslandRepositoryand fixedIslandRepository should be
+            //       able to initialize at the same time. However, there occurs a deadlock when
+            //       doing so.
+            AssetRepository<RandomIslandAsset> randomIslandRepository = AssetRepository.Get<RandomIslandAsset>();
             await randomIslandRepository.AwaitLoadingAsync();
+
+            FixedIslandRepository fixedIslandRepository = FixedIslandRepository.Instance;
             await fixedIslandRepository.AwaitLoadingAsync();
 
             Dictionary<string, RandomIslandAsset> randomByFilePath = randomIslandRepository
                 .ToDictionary(r => r.FilePath, r => r);
+
+            _logger.LogInformation($"Begin processing islands.");
 
             // merge random and fixed islands
             foreach (FixedIslandAsset fixedIsland in fixedIslandRepository)
@@ -85,11 +104,23 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     Thumbnail = thumbnail,
                     Region = randomIsland?.IslandRegion ?? Region.DetectFromPath(filePath),
                     IslandDifficulty = randomIsland?.IslandDifficulty ?? new[] { IslandDifficulty.Normal },
-                    IslandType = randomIsland?.IslandType ?? new[] { IslandType.Normal },
+                    IslandType = randomIsland?.IslandType ?? new[] { DetectIslandTypeFromPath(filePath) },
                     IslandSize = new[] { islandSize },
                     SizeInTiles = sizeInTiles,
                 });
             }
+
+            _logger.LogInformation($"Processed {fixedIslandRepository.Count()} islands.");
+        }
+
+
+        public static IslandType DetectIslandTypeFromPath(string filePath)
+        {
+            if (filePath.Contains("_d_"))
+                return IslandType.Decoration;
+
+            else
+                return IslandType.Normal;
         }
 
 

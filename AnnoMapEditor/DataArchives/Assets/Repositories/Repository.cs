@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.Utilities;
+using System;
 using System.Threading.Tasks;
 
 namespace AnnoMapEditor.DataArchives.Assets.Repositories
@@ -7,12 +8,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
     {
         private Task? _loadingTask;
 
-        public bool IsLoading
+        public bool IsLoaded
         {
             get => _isLoading;
             private set => SetProperty(ref _isLoading, value);
         }
-        private bool _isLoading;
+        private bool _isLoading = false;
 
 
         public Repository()
@@ -22,10 +23,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         protected Task LoadAsync()
         {
-            IsLoading = true;
             _loadingTask = Task.Run(async () => {
                 await DoLoad();
-                IsLoading = false;
+                IsLoaded = true;
             });
             return _loadingTask;
         }
@@ -36,6 +36,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         {
             if (_loadingTask != null)
                 await _loadingTask;
+            else
+                throw new Exception($"LoadAsync has not been called.");
         }
     }
 }
