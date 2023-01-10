@@ -1,6 +1,7 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
+using AnnoMapEditor.Utilities;
 using System;
 using System.Linq;
 using IslandType = AnnoMapEditor.MapTemplates.Enums.IslandType;
@@ -40,9 +41,14 @@ namespace AnnoMapEditor.MapTemplates.Models
         public FixedIslandElement(Element sourceElement)
             : base(sourceElement)
         {
-            string mapFilePath   = sourceElement.MapFilePath
+            string mapFilePath = sourceElement.MapFilePath
                 ?? throw new ArgumentException($"Missing property '{nameof(Element.MapFilePath)}'.");
-            if (!IslandRepository.Instance.TryGetByFilePath(mapFilePath, out var islandAsset))
+            IslandRepository islandRepository = Settings.Instance.IslandRepository
+                ?? throw new Exception($"No {nameof(IslandRepository)} could be found.");
+            if (!islandRepository.IsLoaded)
+                throw new Exception($"The {nameof(IslandRepository)} has not been loaded.");
+
+            if (!islandRepository.TryGetByFilePath(mapFilePath, out var islandAsset))
                 throw new NullReferenceException($"Unknown island '{mapFilePath}'.");
 
             _islandAsset   = islandAsset;

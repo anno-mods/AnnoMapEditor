@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Repositories
@@ -16,19 +17,23 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
     {
         private static readonly Logger<AssetRepository<T>> _logger = new();
 
-        private readonly Dictionary<long, T> _assetsByGuid = new();
-
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
+
+        private readonly Dictionary<long, T> _assetsByGuid = new();
 
         private readonly string _templateName;
 
         private readonly Func<XElement, T> _deserializer;
 
+        private readonly XDocument _assetsXml;
 
-        public AssetRepository(string templateName, Func<XElement, T> deserializer)
+
+        public AssetRepository(string templateName, Func<XElement, T> deserializer, XDocument assetsXml)
         {
             _templateName = templateName;
             _deserializer = deserializer;
+            _assetsXml = assetsXml;
 
             LoadAsync();
         }
@@ -38,7 +43,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         {
             _logger.LogInformation($"Begin loading AssetRepository<{typeof(T).Name}>.");
 
-            IEnumerable<XElement> assetValuesXmls = AssetsXml.Descendants()
+            IEnumerable<XElement> assetValuesXmls = _assetsXml.Descendants()
                 .Where(d => d.Name == "Template" && d.Value == _templateName && d.Parent != null)
                 .Select(d => d.Parent!)
                 .Select(p => p.Element("Values")!)

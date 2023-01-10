@@ -13,42 +13,24 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
     {
         private const string AssetsXmlPath = "data/config/export/main/asset/assets.xml";
 
-        private static Dictionary<Type, AssetRepository> _repositories = new();
 
-        protected static XDocument AssetsXml
-        {
-            get;
-            private set;
-        }
-
-        static AssetRepository() 
-        {
-            // TODO: This must happen after the RDADataArchive has been initialized.
-            using Stream assetsXmlStream = Settings.Instance.DataArchive.OpenRead(AssetsXmlPath);
-            AssetsXml = XDocument.Load(assetsXmlStream);
-        }
-
-
-        public static AssetRepository<T> Get<T>()
+        public static AssetRepository<T> Create<T>(IDataArchive dataArchive)
             where T : StandardAsset
         {
-            lock (_repositories)
-            {
-                if (!_repositories.TryGetValue(typeof(T), out AssetRepository? result))
-                {
-                    AssetTemplateAttribute assetTemplateAttribute = typeof(T).GetCustomAttribute<AssetTemplateAttribute>()
-                        ?? throw new Exception($"Cannot create {nameof(AssetRepository<T>)}, because {typeof(T)} lacks the {nameof(AssetTemplateAttribute)}.");
+            // load assets.xml
+            // TODO: only do this once per IDataArchive
+            using Stream assetsXmlStream = dataArchive.OpenRead(AssetsXmlPath)
+                ?? throw new Exception($"Could not locate assets.xml.");
+            XDocument assetsXml = XDocument.Load(assetsXmlStream);
 
-                    ConstructorInfo deserializerConstructor = typeof(T).GetConstructor(new[] { typeof(XElement) })
-                        ?? throw new Exception($"Cannot create {nameof(AssetRepository<T>)}, because {typeof(T)} lacks a deserialization constructor.");
-                    Func<XElement, T> deserializer = (x) => (T)deserializerConstructor.Invoke(new[] { x });
+            AssetTemplateAttribute assetTemplateAttribute = typeof(T).GetCustomAttribute<AssetTemplateAttribute>()
+                ?? throw new Exception($"Cannot create {nameof(AssetRepository<T>)}, because {typeof(T)} lacks the {nameof(AssetTemplateAttribute)}.");
 
-                    result = new AssetRepository<T>(assetTemplateAttribute.TemplateName, deserializer);
-                    _repositories.Add(typeof(T), result);
-                }
+            ConstructorInfo deserializerConstructor = typeof(T).GetConstructor(new[] { typeof(XElement) })
+                ?? throw new Exception($"Cannot create {nameof(AssetRepository<T>)}, because {typeof(T)} lacks a deserialization constructor.");
+            Func<XElement, T> deserializer = (x) => (T)deserializerConstructor.Invoke(new[] { x });
 
-                return (AssetRepository<T>)result;
-            }
+            return new AssetRepository<T>(assetTemplateAttribute.TemplateName, deserializer, assetsXml);
         }
     }
 }

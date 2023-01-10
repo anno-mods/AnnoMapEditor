@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.Utilities;
+using System.Windows.Media.Imaging;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
@@ -6,10 +7,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
     {
         public string FilePath { get; init; }
 
+        public int SizeInTiles { get; init; }
 
-        public FixedIslandAsset(string filePath)
-        {
-            FilePath = filePath;
-        }
+        public BitmapImage Thumbnail { get; init; }
     }
 }

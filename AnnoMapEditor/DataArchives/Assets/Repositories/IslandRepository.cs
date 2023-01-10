@@ -33,17 +33,20 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
     {
         private static readonly Logger<IslandRepository> _logger = new();
 
-        public static IslandRepository Instance = new();
-
 
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         private readonly Dictionary<string, IslandAsset> _byFilePath = new();
 
+        private readonly FixedIslandRepository _fixedIslandRepository;
 
-        private IslandRepository()
+        private readonly AssetRepository<RandomIslandAsset> _randomIslandRepository;
+
+
+        public IslandRepository(FixedIslandRepository fixedIslandRepository, AssetRepository<RandomIslandAsset> randomIslandRepository)
         {
-            var logger = new Logger<IslandRepository>();
+            _fixedIslandRepository = fixedIslandRepository;
+            _randomIslandRepository = randomIslandRepository;
 
             LoadAsync();
         }
@@ -75,42 +78,36 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             // TODO: BUG In theory both randomIslandRepositoryand fixedIslandRepository should be
             //       able to initialize at the same time. However, there occurs a deadlock when
             //       doing so.
-            AssetRepository<RandomIslandAsset> randomIslandRepository = AssetRepository.Get<RandomIslandAsset>();
-            await randomIslandRepository.AwaitLoadingAsync();
+            await _randomIslandRepository.AwaitLoadingAsync();
+            await _fixedIslandRepository.AwaitLoadingAsync();
 
-            FixedIslandRepository fixedIslandRepository = FixedIslandRepository.Instance;
-            await fixedIslandRepository.AwaitLoadingAsync();
-
-            Dictionary<string, RandomIslandAsset> randomByFilePath = randomIslandRepository
+            Dictionary<string, RandomIslandAsset> randomByFilePath = _randomIslandRepository
                 .ToDictionary(r => r.FilePath, r => r);
 
             _logger.LogInformation($"Begin processing islands.");
 
             // merge random and fixed islands
-            foreach (FixedIslandAsset fixedIsland in fixedIslandRepository)
+            foreach (FixedIslandAsset fixedIsland in _fixedIslandRepository)
             {
                 string filePath = fixedIsland.FilePath;
                 randomByFilePath.TryGetValue(filePath, out RandomIslandAsset? randomIsland);
 
-                BitmapImage thumbnail = IslandReader.ReadThumbnail(filePath)!;
-         
-                int sizeInTiles = IslandReader.ReadTileInSizeFromFile(filePath)!;
-                IslandSize islandSize = IslandSize.All.FirstOrDefault(s => sizeInTiles <= s.DefaultSizeInTiles)!;
+                IslandSize islandSize = IslandSize.All.FirstOrDefault(s => fixedIsland.SizeInTiles <= s.DefaultSizeInTiles)!;
                 
                 Add(new()
                 {
                     FilePath = filePath,
                     DisplayName = randomIsland?.Name ?? Path.GetFileNameWithoutExtension(filePath),
-                    Thumbnail = thumbnail,
+                    Thumbnail = fixedIsland.Thumbnail,
                     Region = randomIsland?.IslandRegion ?? Region.DetectFromPath(filePath),
                     IslandDifficulty = randomIsland?.IslandDifficulty ?? new[] { IslandDifficulty.Normal },
                     IslandType = randomIsland?.IslandType ?? new[] { DetectIslandTypeFromPath(filePath) },
                     IslandSize = new[] { islandSize },
-                    SizeInTiles = sizeInTiles,
+                    SizeInTiles = fixedIsland.SizeInTiles,
                 });
             }
 
-            _logger.LogInformation($"Processed {fixedIslandRepository.Count()} islands.");
+            _logger.LogInformation($"Processed {_fixedIslandRepository.Count()} islands.");
         }
 
 

@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace AnnoMapEditor.UI.Windows.SelectIsland
         public event OverlayClosedEventHandler? OverlayClosed;
 
 
-        public IslandRepository Islands { get; } = IslandRepository.Instance;
+        public IslandRepository Islands { get; } = Settings.Instance.IslandRepository!;
 
         public string? PathFilter 
         { 

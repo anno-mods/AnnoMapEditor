@@ -1,6 +1,8 @@
 ﻿using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using Microsoft.Win32;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -8,7 +10,7 @@ using System.Windows;
 
 namespace AnnoMapEditor.Utilities
 {
-    public class Settings : INotifyPropertyChanged
+    public class Settings : ObservableBase
     {
         public static Settings Instance { get; } = new();
 
@@ -24,6 +26,14 @@ namespace AnnoMapEditor.Utilities
             }
         }
         private IDataArchive _dataArchive = DataArchives.DataArchive.Default;
+
+        public IslandRepository? IslandRepository
+        {
+            get => _islandRepository;
+            private set => SetProperty(ref _islandRepository, value);
+        }
+        private IslandRepository? _islandRepository;  
+
 
         public string? DataPath 
         {
@@ -41,8 +51,19 @@ namespace AnnoMapEditor.Utilities
             }
         }
 
-        public bool IsValidDataPath => _dataArchive?.IsValid ?? false;
-        public bool IsLoading { get; private set; }
+        public bool IsValidDataPath
+        {
+            get => _isValidDataPath;
+            private set => SetProperty(ref _isValidDataPath, value);
+        }
+        private bool _isValidDataPath = false;
+
+        public bool IsLoading 
+        { 
+            get => _isLoading; 
+            private set => SetProperty(ref _isLoading, value); 
+        }
+        private bool _isLoading;
 
         public Settings()
         {
@@ -60,10 +81,40 @@ namespace AnnoMapEditor.Utilities
 
             Task.Run(async () => {
                 var archive = await DataArchives.DataArchive.OpenAsync(path);
-                Application.Current.Dispatcher.Invoke(() => DataArchive = archive);
-                await IslandRepository.Instance.AwaitLoadingAsync();
 
-                IsLoading = false;
+                try
+                {
+                    AssetRepository<RandomIslandAsset> randomIslandRepository = AssetRepository.Create<RandomIslandAsset>(archive);
+                    await randomIslandRepository.AwaitLoadingAsync();
+
+                    FixedIslandRepository fixedIslandRepository = new(archive);
+                    await fixedIslandRepository.AwaitLoadingAsync();
+
+                    IslandRepository islandRepository = new(fixedIslandRepository, randomIslandRepository);
+                    await islandRepository.AwaitLoadingAsync();
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        DataArchive = archive;
+                        IslandRepository = islandRepository;
+                        IsValidDataPath = true;
+                    });
+
+                }
+                catch (Exception ex)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        IsValidDataPath = false;
+                    });
+                }
+                finally
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        IsLoading = false;
+                    });
+                }
             });
         }
 
@@ -73,15 +124,5 @@ namespace AnnoMapEditor.Utilities
             using RegistryKey? key = Registry.LocalMachine.OpenSubKey(installDirKey);
             return key?.GetValue("InstallDir") as string;
         }
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged = delegate { };
-        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        protected void SetProperty<T>(ref T property, T value, [CallerMemberName] string propertyName = "")
-        {
-            property = value;
-            OnPropertyChanged(propertyName);
-        }
-        #endregion
     }
 }

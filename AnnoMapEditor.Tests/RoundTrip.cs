@@ -15,8 +15,6 @@ namespace AnnoMapEditor.Tests
         [InlineData("./TestData/scenario_02_colony_01.xml")]
         public async Task XmlToA7tinfoToXml(string filePath)
         {
-            await IslandRepository.Instance.AwaitLoadingAsync();
-
             using Stream inputXml = File.OpenRead(filePath);
             Session? session = await Session.FromXmlAsync(inputXml, filePath);
 
