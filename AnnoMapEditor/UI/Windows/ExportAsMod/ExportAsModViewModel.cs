@@ -99,7 +99,7 @@ namespace AnnoMapEditor.UI.Windows.ExportAsMod
 
         private void Settings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Settings.DataPath))
+            if (e.PropertyName == nameof(Settings.IsLoading))
                 CheckExistingMod();
         }
 
