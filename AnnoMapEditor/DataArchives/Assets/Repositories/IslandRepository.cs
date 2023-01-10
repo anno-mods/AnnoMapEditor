@@ -107,7 +107,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 });
             }
 
-            _logger.LogInformation($"Processed {_fixedIslandRepository.Count()} islands.");
+            _logger.LogInformation($"Finished loading {_fixedIslandRepository.Count()} islands.");
         }
 
 

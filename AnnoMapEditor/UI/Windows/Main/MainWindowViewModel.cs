@@ -142,15 +142,8 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName)
-            {
-                case "IsValidDataPath":
-                    UpdateStatusAndMenus();
-                    break;
-                case "DataArchive":
-                    UpdateStatusAndMenus();
-                    break;
-            }
+            if (e.PropertyName == nameof(Settings.IsLoading))
+                UpdateStatusAndMenus();
         }
 
         private void SelectedRegionChanged(object? sender, EventArgs _)
