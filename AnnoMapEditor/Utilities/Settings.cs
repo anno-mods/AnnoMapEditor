@@ -65,6 +65,9 @@ namespace AnnoMapEditor.Utilities
         }
         private bool _isLoading;
 
+        private Task? _loadingTask;
+
+
         public Settings()
         {
             DataPath = UserSettings.Default.DataPath;
@@ -75,11 +78,12 @@ namespace AnnoMapEditor.Utilities
             }
         }
 
+
         public void LoadDataPath(string? path)
         {
             IsLoading = true;
 
-            Task.Run(async () => {
+            _loadingTask = Task.Run(async () => {
                 var archive = await DataArchives.DataArchive.OpenAsync(path);
 
                 try
@@ -93,7 +97,7 @@ namespace AnnoMapEditor.Utilities
                     IslandRepository islandRepository = new(fixedIslandRepository, randomIslandRepository);
                     await islandRepository.AwaitLoadingAsync();
 
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Dispatch(() =>
                     {
                         DataArchive = archive;
                         IslandRepository = islandRepository;
@@ -103,14 +107,14 @@ namespace AnnoMapEditor.Utilities
                 }
                 catch (Exception ex)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Dispatch(() =>
                     {
                         IsValidDataPath = false;
                     });
                 }
                 finally
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Dispatch(() =>
                     {
                         IsLoading = false;
                     });
@@ -118,11 +122,28 @@ namespace AnnoMapEditor.Utilities
             });
         }
 
+        private void Dispatch(Action action)
+        {
+            if (Application.Current?.Dispatcher != null)
+                Application.Current.Dispatcher.Invoke(action);
+
+            else
+                action();
+        }
+
         public static string? GetInstallDirFromRegistry()
         {
             string installDirKey = @"SOFTWARE\WOW6432Node\Ubisoft\Anno 1800";
             using RegistryKey? key = Registry.LocalMachine.OpenSubKey(installDirKey);
             return key?.GetValue("InstallDir") as string;
+        }
+
+        public async Task AwaitLoadingAsync()
+        {
+            if (_loadingTask != null)
+                await _loadingTask;
+            else
+                throw new Exception($"LoadAsync has not been called.");
         }
     }
 }

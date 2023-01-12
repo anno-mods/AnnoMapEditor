@@ -1,7 +1,7 @@
-using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Tests.Utils;
+using AnnoMapEditor.Utilities;
 
 namespace AnnoMapEditor.Tests
 {
@@ -15,6 +15,8 @@ namespace AnnoMapEditor.Tests
         [InlineData("./TestData/scenario_02_colony_01.xml")]
         public async Task XmlToA7tinfoToXml(string filePath)
         {
+            await Settings.Instance.AwaitLoadingAsync();
+
             using Stream inputXml = File.OpenRead(filePath);
             Session? session = await Session.FromXmlAsync(inputXml, filePath);
 
@@ -40,8 +42,8 @@ namespace AnnoMapEditor.Tests
                 await Serializer.WriteToXmlAsync(template!, outStream);
 
                 //Uncomment for debugging:
-                string content = System.Text.Encoding.UTF8.GetString(outStream.ToArray());
-                outStream.Seek(0, SeekOrigin.Begin);
+                //string content = System.Text.Encoding.UTF8.GetString(outStream.ToArray());
+                //outStream.Seek(0, SeekOrigin.Begin);
 
                 Assert.True(StreamComparer.AreEqual(inputXml, outStream));
             }
