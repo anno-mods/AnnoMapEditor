@@ -1,0 +1,72 @@
+﻿<UserControl x:Class="AnnoMapEditor.UI.Controls.MapTemplates.ValidationResultList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls.MapTemplates"
+             xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type=local:SessionCheckerViewModel}">
+    <ListBox ItemsSource="{Binding Results}"
+             HorizontalAlignment="Left"
+             BorderThickness="0"
+             Background="Transparent">
+
+        <ListBox.Resources>
+            <converters:BoolToVisibility x:Key="VisibleOnTrue" OnTrue="Visible" OnFalse="Collapsed" />
+        </ListBox.Resources>
+        
+        <ListBox.ItemTemplate>
+            <DataTemplate>
+                <Grid Background="Red"
+                                  Width="260"
+                                  Margin="0,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Visibility="{Binding IsWarning, Converter={StaticResource VisibleOnTrue}}"
+                               Grid.Column="0"
+                               Grid.Row="0" 
+                               Grid.RowSpan="2"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               FontSize="16"
+                               Foreground="White"
+                               Text="⚠"
+                               ToolTip="Warning" 
+                                           FontWeight="Bold" />
+                    <TextBlock Visibility="{Binding IsError, Converter={StaticResource VisibleOnTrue}}"
+                               Grid.Column="0"
+                               Grid.Row="0" 
+                               Grid.RowSpan="2"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               FontSize="30"
+                               Foreground="White"
+                               Text="⨯"
+                               ToolTip="Error" />
+                    <TextBlock Grid.Column="1"
+                                           Grid.Row="0"
+                                           Text="{Binding Title}"
+                                           Margin="2"
+                                           Foreground="White"
+                                           FontWeight="Bold" />
+                    <TextBlock Grid.Column="1"
+                                           Grid.Row="1"
+                                           Text="{Binding Message}"
+                                           Margin="2"
+                                           Foreground="White"
+                                           TextWrapping="Wrap"/>
+                </Grid>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</UserControl>

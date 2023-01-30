@@ -1,11 +1,12 @@
 ﻿using AnnoMapEditor.Utilities;
-using System;
 using System.Linq;
 
-namespace AnnoMapEditor.MapTemplates
+namespace AnnoMapEditor.MapTemplates.Enums
 {
     public class MapElementType
     {
+        private static readonly Logger<MapElementType> _logger = new();
+
         public static readonly MapElementType FixedIsland  = new(null);
         public static readonly MapElementType PoolIsland   = new(1);
         public static readonly MapElementType StartingSpot = new(2);
@@ -28,7 +29,7 @@ namespace AnnoMapEditor.MapTemplates
 
             if (mapElementType is null)
             {
-                Log.Warn($"{elementValue} is not a valid element value for {nameof(MapElementType)}. Defaulting to {nameof(FixedIsland)}.");
+                _logger.LogWarning($"{elementValue} is not a valid element value for {nameof(MapElementType)}. Defaulting to {nameof(FixedIsland)}.");
                 mapElementType = FixedIsland;
             }
 

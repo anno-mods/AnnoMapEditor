@@ -1,5 +1,8 @@
 ﻿using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.DataArchives.Assets.Repositories;
 using Microsoft.Win32;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -7,7 +10,7 @@ using System.Windows;
 
 namespace AnnoMapEditor.Utilities
 {
-    public class Settings : INotifyPropertyChanged
+    public class Settings : ObservableBase
     {
         public static Settings Instance { get; } = new();
 
@@ -23,6 +26,14 @@ namespace AnnoMapEditor.Utilities
             }
         }
         private IDataArchive _dataArchive = DataArchives.DataArchive.Default;
+
+        public IslandRepository? IslandRepository
+        {
+            get => _islandRepository;
+            private set => SetProperty(ref _islandRepository, value);
+        }
+        private IslandRepository? _islandRepository;  
+
 
         public string? DataPath 
         {
@@ -40,8 +51,22 @@ namespace AnnoMapEditor.Utilities
             }
         }
 
-        public bool IsValidDataPath => _dataArchive?.IsValid ?? false;
-        public bool IsLoading { get; private set; }
+        public bool IsValidDataPath
+        {
+            get => _isValidDataPath;
+            private set => SetProperty(ref _isValidDataPath, value);
+        }
+        private bool _isValidDataPath = false;
+
+        public bool IsLoading 
+        { 
+            get => _isLoading; 
+            private set => SetProperty(ref _isLoading, value); 
+        }
+        private bool _isLoading;
+
+        private Task? _loadingTask;
+
 
         public Settings()
         {
@@ -53,15 +78,58 @@ namespace AnnoMapEditor.Utilities
             }
         }
 
+
         public void LoadDataPath(string? path)
         {
             IsLoading = true;
 
-            Task.Run(async () => {
+            _loadingTask = Task.Run(async () => {
                 var archive = await DataArchives.DataArchive.OpenAsync(path);
-                IsLoading = false;
-                Application.Current.Dispatcher.Invoke(() => DataArchive = archive);
+
+                try
+                {
+                    AssetRepository assetRepository = new(archive);
+                    assetRepository.RegisterAssetModel<RandomIslandAsset>();
+                    await assetRepository.LoadAsync();
+
+                    FixedIslandRepository fixedIslandRepository = new(archive);
+                    await fixedIslandRepository.AwaitLoadingAsync();
+
+                    IslandRepository islandRepository = new(fixedIslandRepository, assetRepository);
+                    await islandRepository.AwaitLoadingAsync();
+
+                    Dispatch(() =>
+                    {
+                        DataArchive = archive;
+                        IslandRepository = islandRepository;
+                        IsValidDataPath = true;
+                    });
+
+                }
+                catch (Exception ex)
+                {
+                    Dispatch(() =>
+                    {
+                        IsValidDataPath = false;
+                    });
+                }
+                finally
+                {
+                    Dispatch(() =>
+                    {
+                        IsLoading = false;
+                    });
+                }
             });
+        }
+
+        private void Dispatch(Action action)
+        {
+            if (Application.Current?.Dispatcher != null)
+                Application.Current.Dispatcher.Invoke(action);
+
+            else
+                action();
         }
 
         public static string? GetInstallDirFromRegistry()
@@ -71,14 +139,12 @@ namespace AnnoMapEditor.Utilities
             return key?.GetValue("InstallDir") as string;
         }
 
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged = delegate { };
-        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        protected void SetProperty<T>(ref T property, T value, [CallerMemberName] string propertyName = "")
+        public async Task AwaitLoadingAsync()
         {
-            property = value;
-            OnPropertyChanged(propertyName);
+            if (_loadingTask != null)
+                await _loadingTask;
+            else
+                throw new Exception($"LoadAsync has not been called.");
         }
-        #endregion
     }
 }

@@ -12,9 +12,11 @@
       d:DesignHeight="500" d:DesignWidth="450"
       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
       Background="{StaticResource BackgroundBrush}">
+    
     <UserControl.Resources>
         <ResourceDictionary Source="../../Resources/Styles.xaml" />
     </UserControl.Resources>
+    
     <Grid Background="{StaticResource DialogBrush}">
         <Grid Margin="8" MaxWidth="400" VerticalAlignment="Center">
             <StackPanel>

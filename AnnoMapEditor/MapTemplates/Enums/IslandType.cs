@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AnnoMapEditor.MapTemplates
+namespace AnnoMapEditor.MapTemplates.Enums
 {
     public class IslandType
     {
+        private static readonly Logger<IslandType> _logger = new();
+
         public static readonly IslandType Normal       = new("Normal",       null);
         public static readonly IslandType Starter      = new("Starter",      1);
         public static readonly IslandType Decoration   = new("Decoration",   2);
@@ -32,13 +34,26 @@ namespace AnnoMapEditor.MapTemplates
         }
 
 
+        public static IslandType FromName(string name)
+        {
+            IslandType? type = All.FirstOrDefault(d => d.Name == name);
+
+            if (type is null)
+            {
+                _logger.LogWarning($"{name} is not a valid name for {nameof(IslandType)}. Defaulting to {nameof(Normal)}.");
+                type = Normal;
+            }
+
+            return type;
+        }
+
         public static IslandType FromElementValue(short? elementValue)
         {
             IslandType? type = All.FirstOrDefault(t => t.ElementValue == elementValue);
 
             if (type is null)
             {
-                Log.Warn($"{elementValue} is not a valid element value for {nameof(IslandType)}. Defaulting to {nameof(Normal)}/{Normal.ElementValue}.");
+                _logger.LogWarning($"{elementValue} is not a valid element value for {nameof(IslandType)}. Defaulting to {nameof(Normal)}/{Normal.ElementValue}.");
                 type = Normal;
             }
 

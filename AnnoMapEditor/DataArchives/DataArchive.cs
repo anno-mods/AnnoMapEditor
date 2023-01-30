@@ -20,11 +20,14 @@ namespace AnnoMapEditor.DataArchives
 
             IDataArchive archive;
             if (File.Exists(Path.Combine(adjustedPath, "maindata/data0.rda")))
-                archive = new RdaDataArchive(adjustedPath);
+            {
+                RdaDataArchive rdaArchive = new RdaDataArchive(adjustedPath);
+                await rdaArchive.AwaitLoadingAsync();
+                archive = rdaArchive;
+            }
             else
                 archive = new FolderDataArchive(adjustedPath);
 
-            await archive.LoadAsync();
             return archive;
         }
 

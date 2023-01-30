@@ -1,8 +1,11 @@
 ﻿using AnnoMapEditor.DataArchives;
-using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.UI.Controls;
+using AnnoMapEditor.UI.Controls.IslandProperties;
+using AnnoMapEditor.UI.Controls.MapTemplates;
+using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
@@ -24,7 +27,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             {
                 if (value != _session)
                 {
-                    SetProperty(ref _session, value, new string[] { nameof(CanExport) });
+                    SetProperty(ref _session, value);
                     SelectedIsland = null;
 
                     if(SessionProperties is not null) 
@@ -42,16 +45,61 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
         }
         private Session? _session;
-        public bool CanExport => _session is not null;
         public SessionPropertiesViewModel? SessionProperties { get; private set; }
-        public SessionChecker? SessionChecker { get; private set; }
+        public SessionCheckerViewModel? SessionChecker { get; private set; }
 
-        public Island? SelectedIsland
+        public IslandElement? SelectedIsland
         {
             get => _selectedIsland;
-            set => SetProperty(ref _selectedIsland, value);
+            set
+            {
+                SetProperty(ref _selectedIsland, value);
+
+                if (value == null)
+                {
+                    SelectedRandomIslandPropertiesViewModel = null;
+                    SelectedFixedIslandPropertiesViewModel = null;
+                }
+                else if (value is RandomIslandElement randomIsland)
+                {
+                    SelectedRandomIslandPropertiesViewModel = new(randomIsland);
+                    SelectedFixedIslandPropertiesViewModel = null;
+                }
+                else if (value is FixedIslandElement fixedIsland)
+                {
+                    SelectedRandomIslandPropertiesViewModel = null;
+                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland);
+                }
+            }
         }
-        private Island? _selectedIsland;
+        private IslandElement? _selectedIsland;
+
+        public RandomIslandPropertiesViewModel? SelectedRandomIslandPropertiesViewModel
+        {
+            get => _selectedRandomIslandPropertiesViewModel;
+            set => SetProperty(ref _selectedRandomIslandPropertiesViewModel, value);
+        }
+        private RandomIslandPropertiesViewModel? _selectedRandomIslandPropertiesViewModel;
+
+        public FixedIslandPropertiesViewModel? SelectedFixedIslandPropertiesViewModel
+        {
+            get => _selectedFixedIslandPropertiesViewModel;
+            set => SetProperty(ref _selectedFixedIslandPropertiesViewModel, value);
+        }
+        private FixedIslandPropertiesViewModel? _selectedFixedIslandPropertiesViewModel;
+
+        public SelectIslandViewModel? SelectIslandViewModel
+        {
+            get => _selectIslandViewModel;
+            set
+            {
+                SetProperty(ref _selectIslandViewModel, value);
+                OnPropertyChanged(nameof(ShowOverlay));
+            }
+        }
+        private SelectIslandViewModel? _selectIslandViewModel;
+
+        public bool ShowOverlay => SelectIslandViewModel != null;
 
         public string? SessionFilePath
         {
@@ -88,21 +136,14 @@ namespace AnnoMapEditor.UI.Windows.Main
             Settings = settings;
             Settings.PropertyChanged += Settings_PropertyChanged;
 
-            // trigger once ourselves
-            Settings_PropertyChanged(this, new PropertyChangedEventArgs("IsValidDataPath"));
+
+            UpdateStatusAndMenus();
         }
 
         private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName)
-            {
-                case "IsValidDataPath":
-                    UpdateStatusAndMenus();
-                    break;
-                case "DataArchive":
-                    UpdateStatusAndMenus();
-                    break;
-            }
+            if (e.PropertyName == nameof(Settings.IsLoading))
+                UpdateStatusAndMenus();
         }
 
         private void SelectedRegionChanged(object? sender, EventArgs _)
