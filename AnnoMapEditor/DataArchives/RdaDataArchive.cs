@@ -49,6 +49,7 @@ namespace AnnoMapEditor.DataArchives
                 .FromPath(System.IO.Path.Combine(Path, "maindata"))
                 .OnlyArchivesMatchingWildcard("data*.rda")
                 .WithDefaultSorting()
+                .ConfigureLoadZeroByteFiles(false)
                 .AddWhitelisted("*.a7tinfo", "*.png", "*.a7minfo", "*.a7t", "*.a7te", "assets.xml", "*.a7m");
             await Task.Run(() => 
             {
