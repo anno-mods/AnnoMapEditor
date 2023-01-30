@@ -88,13 +88,14 @@ namespace AnnoMapEditor.Utilities
 
                 try
                 {
-                    AssetRepository<RandomIslandAsset> randomIslandRepository = AssetRepository.Create<RandomIslandAsset>(archive);
-                    await randomIslandRepository.AwaitLoadingAsync();
+                    AssetRepository assetRepository = new(archive);
+                    assetRepository.RegisterAssetModel<RandomIslandAsset>();
+                    await assetRepository.LoadAsync();
 
                     FixedIslandRepository fixedIslandRepository = new(archive);
                     await fixedIslandRepository.AwaitLoadingAsync();
 
-                    IslandRepository islandRepository = new(fixedIslandRepository, randomIslandRepository);
+                    IslandRepository islandRepository = new(fixedIslandRepository, assetRepository);
                     await islandRepository.AwaitLoadingAsync();
 
                     Dispatch(() =>

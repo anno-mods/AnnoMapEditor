@@ -40,13 +40,13 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         private readonly FixedIslandRepository _fixedIslandRepository;
 
-        private readonly AssetRepository<RandomIslandAsset> _randomIslandRepository;
+        private readonly AssetRepository _assetRepository;
 
 
-        public IslandRepository(FixedIslandRepository fixedIslandRepository, AssetRepository<RandomIslandAsset> randomIslandRepository)
+        public IslandRepository(FixedIslandRepository fixedIslandRepository, AssetRepository assetRepository)
         {
             _fixedIslandRepository = fixedIslandRepository;
-            _randomIslandRepository = randomIslandRepository;
+            _assetRepository = assetRepository;
 
             LoadAsync();
         }
@@ -78,10 +78,11 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             // TODO: BUG In theory both randomIslandRepositoryand fixedIslandRepository should be
             //       able to initialize at the same time. However, there occurs a deadlock when
             //       doing so.
-            await _randomIslandRepository.AwaitLoadingAsync();
+            await _assetRepository.AwaitLoadingAsync();
             await _fixedIslandRepository.AwaitLoadingAsync();
 
-            Dictionary<string, RandomIslandAsset> randomByFilePath = _randomIslandRepository
+            Dictionary<string, RandomIslandAsset> randomByFilePath = _assetRepository
+                .GetAll<RandomIslandAsset>()
                 .ToDictionary(r => r.FilePath, r => r);
 
             _logger.LogInformation($"Begin processing islands.");

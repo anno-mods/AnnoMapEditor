@@ -21,8 +21,11 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         }
 
 
-        protected Task LoadAsync()
+        public Task LoadAsync()
         {
+            if (_loadingTask != null)
+                throw new InvalidOperationException();
+
             _loadingTask = Task.Run(async () => {
                 await DoLoad();
                 IsLoaded = true;
