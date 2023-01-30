@@ -2,7 +2,8 @@
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.UI.Controls.AddIsland;
 using AnnoMapEditor.UI.Controls.MapTemplates;
-using AnnoMapEditor.UI.Windows.SelectIsland;
+using AnnoMapEditor.UI.Overlays;
+using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
@@ -297,7 +298,7 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
-        private void SelectIslandViewModel_OverlayClosed(object? sender, Windows.OverlayClosedEventArgs e)
+        private void SelectIslandViewModel_OverlayClosed(object? sender, OverlayClosedEventArgs e)
         {
             SelectIslandViewModel = null;
         }

@@ -1,4 +1,4 @@
-﻿namespace AnnoMapEditor.UI.Windows
+﻿namespace AnnoMapEditor.UI.Overlays
 {
     public delegate void OverlayClosedEventHandler(object? sender, OverlayClosedEventArgs e);
 

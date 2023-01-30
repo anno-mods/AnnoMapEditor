@@ -4,7 +4,7 @@ using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.UI.Controls;
 using AnnoMapEditor.UI.Controls.IslandProperties;
-using AnnoMapEditor.UI.Windows.SelectIsland;
+using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;

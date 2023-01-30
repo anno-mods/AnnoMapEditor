@@ -1,11 +1,6 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace AnnoMapEditor.UI.Windows.SelectIsland
+namespace AnnoMapEditor.UI.Overlays.SelectIsland
 {
     public delegate void IslandSelectedEventHandler(object? sender, IslandSelectedEventArgs e);
 

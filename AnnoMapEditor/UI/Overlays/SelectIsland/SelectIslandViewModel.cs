@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Data;
 
-namespace AnnoMapEditor.UI.Windows.SelectIsland
+namespace AnnoMapEditor.UI.Overlays.SelectIsland
 {
     public class SelectIslandViewModel
     {

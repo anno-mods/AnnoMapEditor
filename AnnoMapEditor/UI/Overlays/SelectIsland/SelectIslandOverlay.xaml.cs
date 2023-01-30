@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace AnnoMapEditor.UI.Windows.SelectIsland
+namespace AnnoMapEditor.UI.Overlays.SelectIsland
 {
     /// <summary>
     /// Interaction logic for SelectIslandOverlay.xaml

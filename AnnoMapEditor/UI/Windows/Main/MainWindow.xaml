@@ -9,7 +9,7 @@
         xmlns:islandProperties="clr-namespace:AnnoMapEditor.UI.Controls.IslandProperties"
         xmlns:local="clr-namespace:AnnoMapEditor.UI.Windows.Main"
         xmlns:exportAsMod="clr-namespace:AnnoMapEditor.UI.Windows.ExportAsMod"
-        xmlns:selectIsland="clr-namespace:AnnoMapEditor.UI.Windows.SelectIsland"
+        xmlns:selectIsland="clr-namespace:AnnoMapEditor.UI.Overlays.SelectIsland"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1000"
