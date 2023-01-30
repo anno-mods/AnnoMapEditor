@@ -9,7 +9,7 @@ using System.Windows.Data;
 
 namespace AnnoMapEditor.UI.Overlays.SelectIsland
 {
-    public class SelectIslandViewModel
+    public class SelectIslandViewModel : ObservableBase
     {
         public event IslandSelectedEventHandler? IslandSelected;
 
@@ -31,6 +31,8 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
 
         public IEnumerable<Region?> Regions { get; init; } = Region.All;
 
+        private readonly Region _initialRegion;
+
         public Region? SelectedRegion
         {
             get => _selectedRegion;
@@ -38,6 +40,8 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
             {
                 _selectedRegion = value;
                 UpdateFilter();
+
+                ShowRegionWarning = _selectedRegion != _initialRegion;
             }
         }
         private Region? _selectedRegion;
@@ -81,20 +85,31 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
         }
         private IslandSize? _selectedIslandSize;
 
-        public IslandAsset SelectedIsland 
+        public IslandAsset? SelectedIsland
         {
             get => _selectedIsland;
-            set {
-                _selectedIsland = value;
-                IslandSelected?.Invoke(this, new(value));
+            set
+            {
+                if (value != null)
+                {
+                    _selectedIsland = value;
+                    IslandSelected?.Invoke(this, new(value));
+                }
             }
         }
-        public IslandAsset _selectedIsland;
+        public IslandAsset? _selectedIsland;
 
-
-        public SelectIslandViewModel(Region? region = null, IslandType? islandType = null, IslandSize? islandSize = null)
+        public bool ShowRegionWarning
         {
-            SelectedRegion = region;
+            get => _showRegionWarning;
+            set => SetProperty(ref _showRegionWarning, value);
+        }
+        private bool _showRegionWarning = false;
+
+
+        public SelectIslandViewModel(Region region, IslandType? islandType = null, IslandSize? islandSize = null)
+        {
+            SelectedRegion = _initialRegion = region;
             SelectedIslandType = islandType;
             SelectedIslandSize = islandSize;
             

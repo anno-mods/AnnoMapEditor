@@ -4,6 +4,7 @@ using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.UI.Controls;
 using AnnoMapEditor.UI.Controls.IslandProperties;
+using AnnoMapEditor.UI.Controls.MapTemplates;
 using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
 using System;
@@ -26,7 +27,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             {
                 if (value != _session)
                 {
-                    SetProperty(ref _session, value, new string[] { nameof(CanExport) });
+                    SetProperty(ref _session, value);
                     SelectedIsland = null;
 
                     if(SessionProperties is not null) 
@@ -44,9 +45,8 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
         }
         private Session? _session;
-        public bool CanExport => _session is not null;
         public SessionPropertiesViewModel? SessionProperties { get; private set; }
-        public SessionChecker? SessionChecker { get; private set; }
+        public SessionCheckerViewModel? SessionChecker { get; private set; }
 
         public IslandElement? SelectedIsland
         {

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AnnoMapEditor.UI.Overlays.SelectIsland"
+        xmlns:validation="clr-namespace:AnnoMapEditor.MapTemplates.Validation"
         mc:Ignorable="d"
         d:DataContext="{d:DesignData Type=local:SelectIslandViewModel}"
         d:DesignHeight="450"
@@ -19,6 +20,18 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
+            <RowDefinition>
+                <RowDefinition.Style>
+                    <Style TargetType="{x:Type RowDefinition}">
+                        <Setter Property="Height" Value="0" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShowRegionWarning}" Value="True">
+                                <Setter Property="Height" Value="30" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </RowDefinition.Style>
+            </RowDefinition>
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -65,8 +78,19 @@
                   ItemsSource="{Binding IslandDifficulties}"
                   SelectedItem="{Binding SelectedIslandDifficulty}"/>
 
+        <!-- region warning -->
+        <DockPanel Grid.Row="2"
+                   Grid.ColumnSpan="5"
+                   Background="DarkRed">
+            <TextBlock Text="{x:Static validation:Warnings.ISLAND_OTHER_REGION}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Margin="8,0,0,0"
+                       Foreground="White"/>
+        </DockPanel>
+
         <!-- tiles -->
-        <ListBox Grid.Row="2"
+        <ListBox Grid.Row="3"
                  Grid.ColumnSpan="5"
                  Name="IslandsList"
                  ItemsSource="{Binding Islands}"
