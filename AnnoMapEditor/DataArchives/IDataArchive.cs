@@ -14,7 +14,5 @@ namespace AnnoMapEditor.DataArchives
         Stream? OpenRead(string filePath);
 
         IEnumerable<string> Find(string pattern);
-
-        Task LoadAsync();
     }
 }

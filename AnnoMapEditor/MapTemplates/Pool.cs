@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AnnoMapEditor.MapTemplates.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace AnnoMapEditor.MapTemplates

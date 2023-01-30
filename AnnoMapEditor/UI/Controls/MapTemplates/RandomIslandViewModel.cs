@@ -1,0 +1,57 @@
+﻿using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.MapTemplates.Models;
+using System.ComponentModel;
+
+namespace AnnoMapEditor.UI.Controls.MapTemplates
+{
+    public class RandomIslandViewModel : IslandViewModel
+    {
+        public RandomIslandElement RandomIsland { get; init; }
+
+        public override string? Label => _label;
+        private string? _label;
+
+        public override int SizeInTiles => RandomIsland.IslandSize.DefaultSizeInTiles;
+
+
+        public RandomIslandViewModel(Session session, RandomIslandElement randomIsland)
+            : base(session, randomIsland)
+        {
+            RandomIsland = randomIsland;
+
+            UpdateLabel();
+
+            RandomIsland.PropertyChanged += RandomIsland_PropertyChanged;
+        }
+
+
+        private void RandomIsland_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IslandElement.IslandType) || e.PropertyName == nameof(IslandElement.Label))
+                UpdateLabel();
+
+            if (e.PropertyName == nameof(RandomIslandElement.IslandSize))
+                OnPropertyChanged(nameof(SizeInTiles));
+        }
+
+
+        private void UpdateLabel()
+        {
+            // use the island's label if it has one
+            if (RandomIsland.Label != null)
+                _label = RandomIsland.Label;
+
+            else
+            {
+                string label = $"Random\n{RandomIsland.IslandType.Name}";
+
+                if (RandomIsland.IslandType == IslandType.Starter)
+                    label += "\nwith Oil";
+
+                _label = label;
+            }
+
+            OnPropertyChanged(nameof(Label));
+        }
+    }
+}

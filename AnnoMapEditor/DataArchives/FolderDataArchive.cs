@@ -21,11 +21,6 @@ namespace AnnoMapEditor.DataArchives
         }
 
 
-        public Task LoadAsync()
-        {
-            return Task.Run(() => { });
-        }
-
         public Stream? OpenRead(string filePath)
         {
             if (!IsValid)

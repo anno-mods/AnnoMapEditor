@@ -2,23 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AnnoMapEditor.MapTemplates
+namespace AnnoMapEditor.MapTemplates.Enums
 {
     public class IslandSize
     {
-        public static readonly IslandSize Default = new("Small",   null, 192);
-        public static readonly IslandSize Small   = new("Small",   0,    192);
-        public static readonly IslandSize Medium  = new("Medium",  1,    320);
-        public static readonly IslandSize Large   = new("Large",   2,    384);
+        private static readonly Logger<IslandSize> _logger = new();
 
-        public static readonly IEnumerable<IslandSize> All = new[] { Default, Small, Medium, Large };
+        public static readonly IslandSize Default     = new("Small",       null, 192);
+        public static readonly IslandSize Small       = new("Small",       0,    192);
+        public static readonly IslandSize Medium      = new("Medium",      1,    320);
+        public static readonly IslandSize Large       = new("Large",       2,    384);
+        public static readonly IslandSize Continental = new("Continental", 2,    int.MaxValue);
+
+        public static readonly IEnumerable<IslandSize> All = new[] { Small, Medium, Large, Continental };
 
 
-        public readonly string Name;
+        public string Name { get; init; }
 
-        public readonly short? ElementValue;
+        public short? ElementValue { get; init; }
 
-        public readonly int DefaultSizeInTiles;
+        public int DefaultSizeInTiles { get; init; }
 
 
         private IslandSize(string name, short? elementValue, int defaultSizeInTiles)
@@ -35,7 +38,7 @@ namespace AnnoMapEditor.MapTemplates
 
             if (size is null)
             {
-                Log.Warn($"{elementValue} is not a valid element value for {nameof(IslandSize)}. Defaulting to {nameof(Default)}/{Default.ElementValue}.");
+                _logger.LogWarning($"{elementValue} is not a valid element value for {nameof(IslandSize)}. Defaulting to {nameof(Default)}/{Default.ElementValue}.");
                 size = Default;
             }
 

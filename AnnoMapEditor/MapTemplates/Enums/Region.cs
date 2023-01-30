@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace AnnoMapEditor.MapTemplates
+namespace AnnoMapEditor.MapTemplates.Enums
 {
     public class Region
     {

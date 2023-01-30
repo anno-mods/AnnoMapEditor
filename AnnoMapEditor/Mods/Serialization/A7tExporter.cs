@@ -1,5 +1,6 @@
 ﻿using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared;
 using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.MapTemplates.Enums;
 using FileDBSerializing;
 using FileDBSerializing.ObjectSerializer;
 using RDAExplorer;

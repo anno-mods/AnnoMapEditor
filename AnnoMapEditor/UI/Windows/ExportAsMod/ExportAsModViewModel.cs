@@ -1,4 +1,5 @@
-﻿using AnnoMapEditor.MapTemplates.Models;
+﻿using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Enums;
 using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.Utilities;
@@ -11,6 +12,8 @@ namespace AnnoMapEditor.UI.Windows.ExportAsMod
 {
     public class ExportAsModViewModel : ObservableBase
     {
+        private static readonly Logger<ExportAsModViewModel> _logger = new();
+
         enum ModStatus
         {
             NotFound,
@@ -34,7 +37,7 @@ namespace AnnoMapEditor.UI.Windows.ExportAsMod
                     AllowedMapTypes = Enumerable.Empty<MapType>();
                     SelectedMapType = null;
                 }
-                InfoMapTypeSelection = _session is not null && _session.Region == MapTemplates.Region.Moderate;
+                InfoMapTypeSelection = _session is not null && _session.Region == Region.Moderate;
                 CheckExistingMod();
             }
         }
@@ -96,7 +99,7 @@ namespace AnnoMapEditor.UI.Windows.ExportAsMod
 
         private void Settings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Settings.DataPath))
+            if (e.PropertyName == nameof(Settings.IsLoading))
                 CheckExistingMod();
         }
 
@@ -134,7 +137,7 @@ namespace AnnoMapEditor.UI.Windows.ExportAsMod
 
             if (!Directory.Exists(modsFolderPath) || Session is null)
             {
-                Log.Warn("mods/ path or session not set. This shouldn't have happened.");
+                _logger.LogWarning("mods/ path or session not set. This shouldn't have happened.");
                 return false;
             }
 

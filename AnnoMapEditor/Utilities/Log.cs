@@ -1,7 +1,6 @@
-﻿using System;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Windows;
 
 namespace AnnoMapEditor.Utilities
 {
@@ -23,7 +22,7 @@ namespace AnnoMapEditor.Utilities
         private static string? _logFilePath;
         private static bool firstStart = true;
 
-        private static void PrintLine(string message)
+        public static void PrintLine(string message)
         {
             if (LogFilePath is null)
                 return;
@@ -36,21 +35,7 @@ namespace AnnoMapEditor.Utilities
             }
 
             File.AppendAllText(LogFilePath, message + "\n");
-        }
-
-        public static void Info(string message)
-        {
-            PrintLine(message);
-        }
-
-        public static void Warn(string message)
-        {
-            PrintLine(message);
-        }
-
-        public static void Exception(string message, Exception e)
-        {
-            PrintLine(e.Message + "\n" + message);
+            Trace.WriteLine(message);
         }
     }
 }

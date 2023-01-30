@@ -1,4 +1,5 @@
-﻿using AnnoRDA;
+using AnnoMapEditor.Utilities;
+using AnnoRDA;
 using AnnoRDA.Builder;
 using System;
 using System.Collections.Generic;
@@ -8,22 +9,41 @@ using System.Threading.Tasks;
 
 namespace AnnoMapEditor.DataArchives
 {
-    public class RdaDataArchive : IDataArchive
+    public class RdaDataArchive : ObservableBase, IDataArchive
     {
+        private static readonly Logger<RdaDataArchive> _logger = new();
         public string Path { get; }
-        public bool IsValid { get; private set; }
+
+        public bool IsLoaded
+        {
+            get => _isLoading;
+            private set => SetProperty(ref _isLoading, value);
+        }
+        private bool _isLoading = false;
+
+        public bool IsValid
+        {
+            get => _isValid;
+            private set => SetProperty(ref _isValid, value);
+        }
+        private bool _isValid = false;
 
         private FileSystem _fileSystem;
+
+        private Task? _loadingTask;
 
         public RdaDataArchive(string folderPath)
         {
             Path = folderPath;
             IsValid = false;
         }
-        
+
+
 
         public async Task LoadAsync()
         {
+            IsLoaded = false;
+            IsValid = false;
             await Task.Run(() => 
             {
                 _fileSystem = FileSystemBuilder.Create()
@@ -32,8 +52,19 @@ namespace AnnoMapEditor.DataArchives
                 .AddWhitelisted("*.a7tinfo", "*.png", "*.a7minfo", "*.a7t", "*.a7te", "assets.xml")
                 .Build();
             });
+            IsLoaded = true;
             IsValid = true;
         }
+
+        public async Task AwaitLoadingAsync()
+        {
+            if (_loadingTask != null)
+                await _loadingTask;
+            else
+                throw new Exception($"LoadAsync has not been called.");
+        }
+
+
 
         public Stream? OpenRead(string filePath)
         {

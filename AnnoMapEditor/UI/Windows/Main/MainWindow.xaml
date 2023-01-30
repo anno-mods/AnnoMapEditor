@@ -5,9 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
         xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
+        xmlns:validation="clr-namespace:AnnoMapEditor.UI.Controls.MapTemplates"
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+        xmlns:islandProperties="clr-namespace:AnnoMapEditor.UI.Controls.IslandProperties"
         xmlns:local="clr-namespace:AnnoMapEditor.UI.Windows.Main"
         xmlns:exportAsMod="clr-namespace:AnnoMapEditor.UI.Windows.ExportAsMod"
+        xmlns:selectIsland="clr-namespace:AnnoMapEditor.UI.Overlays.SelectIsland"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1000"
@@ -16,13 +19,21 @@
         <ResourceDictionary Source="../../Resources/Styles.xaml" />
     </Window.Resources>
     <Grid VerticalAlignment="Stretch">
+        
         <Grid.Resources>
             <converters:VisibilityToBool x:Key="FalseOnVisible" OnVisible="False" />
+            <converters:BoolToVisibility x:Key="collapseOnFalse" />
+            <converters:BooleaNotConverter x:Key="booleanNot" />
         </Grid.Resources>
+        
+        <!-- Main -->
         <Grid x:Name="mainContent" IsEnabled="{Binding ElementName=exportDialog, Path=Visibility, Converter={StaticResource FalseOnVisible}}">
-            <controls:MapView Grid.Column="0"
-                              SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              DataContext="{Binding Session, Mode=OneWay}" />
+            <controls:MapView
+                x:Name="Map"
+                Grid.Column="0"
+                SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                SelectIslandViewModel="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectIslandViewModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                DataContext="{Binding Session, Mode=OneWay}" />
             <StackPanel Grid.Column="0"
                         VerticalAlignment="Top"
                         Margin="16,8">
@@ -39,7 +50,7 @@
                         </controls:DropDownButton.Menu>
                     </controls:DropDownButton>
                     <controls:DropDownButton HorizontalAlignment="Left"
-                                         IsEnabled="{Binding CanExport, UpdateSourceTrigger=PropertyChanged}">
+                                         IsEnabled="{Binding SessionChecker.HasErrors, Converter={StaticResource booleanNot}}">
                         <ContentControl Content="Save" />
                         <controls:DropDownButton.Menu>
                             <ContextMenu>
@@ -52,15 +63,22 @@
                 <controls:SessionProperties
                     DataContext="{Binding SessionProperties}"
                     HorizontalAlignment="Left" />
-                <emoji:TextBlock
-                    Style="{StaticResource DefaultLabelStyle}"
-                    Text="{Binding SessionChecker.Status, UpdateSourceTrigger=PropertyChanged}" 
-                    HorizontalAlignment="Left" />
+
+                <!-- validation warnings -->
+                <validation:ValidationResultList DataContext="{Binding SessionChecker}"
+                                                 />
+
             </StackPanel>
-            <controls:IslandProperties Grid.Column="0"
-                                       HorizontalAlignment="Right"
-                                       Margin="16,8"
-                                       DataContext="{Binding SelectedIsland, UpdateSourceTrigger=PropertyChanged}" />
+            
+            <!-- island properties -->
+            <islandProperties:RandomIslandProperties Grid.Column="0"
+                                                     HorizontalAlignment="Right"
+                                                     Margin="16,8"
+                                                     DataContext="{Binding SelectedRandomIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
+            <islandProperties:FixedIslandProperties Grid.Column="0"
+                                                    HorizontalAlignment="Right"
+                                                    Margin="16,8"
+                                                    DataContext="{Binding SelectedFixedIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
             <!-- bottom -->
             <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="8,0,0,0">
                 <emoji:TextBlock Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"
@@ -81,6 +99,22 @@
                 <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
             </TextBlock>
         </Grid>
+
+        <!-- ExportAsMod -->
         <exportAsMod:ExportAsModWindow x:Name="exportDialog" Grid.Column="0" />
+
+        <!-- Overlays -->
+        <Grid x:Name="Overlay"
+              Panel.ZIndex="1000"
+              Visibility="{Binding ShowOverlay, Converter={StaticResource collapseOnFalse}}">
+            <Grid.Background>
+                <SolidColorBrush Color="Black" />
+            </Grid.Background>
+
+            <!-- SelectIsland -->
+            <selectIsland:SelectIslandOverlay x:Name="selectIsland" 
+                                          DataContext="{Binding SelectIslandViewModel, UpdateSourceTrigger=PropertyChanged}"
+                                          Grid.Column="0" />
+        </Grid>
     </Grid>
 </Window>
