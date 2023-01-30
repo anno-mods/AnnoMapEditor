@@ -63,6 +63,10 @@ namespace AnnoMapEditor.UI.Controls.AddIsland
         {
             EndDrag();
 
+            // TODO: Implement proper loading!
+            if (Settings.Instance.IslandRepository == null)
+                return;
+
             IslandAdded?.Invoke(this, new(MapElementType, IslandType, IslandSize, newPosition));
         }
     }
