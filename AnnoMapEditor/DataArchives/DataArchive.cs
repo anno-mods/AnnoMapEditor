@@ -22,7 +22,7 @@ namespace AnnoMapEditor.DataArchives
             if (File.Exists(Path.Combine(adjustedPath, "maindata/data0.rda")))
             {
                 RdaDataArchive rdaArchive = new RdaDataArchive(adjustedPath);
-                await rdaArchive.AwaitLoadingAsync();
+                await rdaArchive.LoadAsync();
                 archive = rdaArchive;
             }
             else

@@ -1,11 +1,13 @@
 using AnnoMapEditor.Utilities;
 using AnnoRDA;
 using AnnoRDA.Builder;
+using FileDBReader.src.XmlRepresentation;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace AnnoMapEditor.DataArchives
 {
@@ -30,8 +32,6 @@ namespace AnnoMapEditor.DataArchives
 
         private FileSystem _fileSystem;
 
-        private Task? _loadingTask;
-
         public RdaDataArchive(string folderPath)
         {
             Path = folderPath;
@@ -44,34 +44,57 @@ namespace AnnoMapEditor.DataArchives
         {
             IsLoaded = false;
             IsValid = false;
+            _logger.LogInformation($"Discovering RDA archives at '{Path}'.");
+            var builder = FileSystemBuilder.Create()
+                .FromPath(System.IO.Path.Combine(Path, "maindata"))
+                .OnlyArchivesMatchingWildcard("data*.rda")
+                .WithDefaultSorting()
+                .AddWhitelisted("*.a7tinfo", "*.png", "*.a7minfo", "*.a7t", "*.a7te", "assets.xml", "*.a7m");
             await Task.Run(() => 
             {
-                _fileSystem = FileSystemBuilder.Create()
-                .FromPath(System.IO.Path.Combine(Path, "maindata"))
-                .WithDefaultSorting()
-                .AddWhitelisted("*.a7tinfo", "*.png", "*.a7minfo", "*.a7t", "*.a7te", "assets.xml")
-                .Build();
+                try
+                {
+                    _fileSystem = builder.Build();
+                }
+                catch (Exception e){
+                    _logger.LogError($"error loading RDAs from {Path}", e);
+                    IsValid = false;
+                    return;
+                }
             });
+            var loadedCount = builder.ArchiveFileNames.Count();
+            if (loadedCount == 0)
+            {
+                _logger.LogWarning($"No .rda files found at {System.IO.Path.Combine(Path, "maindata")}");
+                MessageBox.Show($"Something went wrong opening the RDA files.\n\nDo you have another Editor or the RDAExplorer open by any chance?\n\nLog file: {Log.LogFilePath}", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+            _logger.LogInformation($"Loaded {loadedCount} RDAs.");
             IsLoaded = true;
             IsValid = true;
         }
 
-        public async Task AwaitLoadingAsync()
-        {
-            if (_loadingTask != null)
-                await _loadingTask;
-            else
-                throw new Exception($"LoadAsync has not been called.");
-        }
-
-
-
         public Stream? OpenRead(string filePath)
         {
             if (!IsValid)
-                throw new InvalidOperationException("The data archive must be loaded before opening files!");
+            {
+                _logger.LogWarning($"archive not ready: {filePath}");
+                return null;
+            }
+                
             filePath = filePath.Replace("\\", "/");
-            return _fileSystem.OpenRead(filePath);
+            try
+            {
+                return _fileSystem.OpenRead(filePath);
+            }
+            catch (FileNotFoundException e)
+            {
+                _logger.LogWarning($"not found in archive: {filePath}");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"error reading archive: {filePath}", e);
+            }
+            return null;
         }
 
         public IEnumerable<string> Find(string pattern)
