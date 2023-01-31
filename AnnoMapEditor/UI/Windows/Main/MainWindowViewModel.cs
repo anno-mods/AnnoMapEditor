@@ -10,11 +10,13 @@ using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
@@ -259,7 +261,8 @@ namespace AnnoMapEditor.UI.Windows.Main
                     ["New World"] = new(@"data\/sessions\/.+colony01")
                 };
 
-                var mapTemplates = Settings.DataArchive.Find("**/*.a7tinfo");
+                //load from assets instead.
+                var mapTemplates = Settings.DataArchive.Find("*.a7tinfo");
 
                 Maps = new()
                 {
@@ -290,6 +293,18 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
 
             UpdateExportStatus();
+        }
+
+        private IEnumerable<String>? LoadMapsFromAssets()
+        {
+            Stopwatch stopwatch= Stopwatch.StartNew();
+            using var assetStream = Settings.DataArchive.OpenRead("data/config/export/main/asset/assets.xml");
+            XmlDocument doc = new XmlDocument();
+            doc.Load(assetStream);
+            var nodes = doc.SelectNodes("//Asset[Template='MapTemplate']/Values/MapTemplate[TemplateRegion]/*[self::TemplateFilename or self::EnlargedTemplateFilename]");
+            stopwatch.Stop();
+            double i = stopwatch.Elapsed.TotalMilliseconds;
+            return nodes?.Cast<XmlNode>().Select(x => Path.ChangeExtension(x.InnerText, "a7tinfo"));
         }
     }
 }

@@ -51,6 +51,9 @@
     <Reference Include="Anno.FileDBModels">
       <HintPath>Libs\Anno.FileDBModels.dll</HintPath>
     </Reference>
+    <Reference Include="AnnoRDA">
+      <HintPath>DataArchives\AnnoRDA.dll</HintPath>
+    </Reference>
     <Reference Include="FileDBReader">
       <HintPath>Libs\FileDBReader.dll</HintPath>
     </Reference>
