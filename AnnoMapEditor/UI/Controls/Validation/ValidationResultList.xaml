@@ -20,9 +20,10 @@
         
         <ListBox.ItemTemplate>
             <DataTemplate>
-                <Grid Background="Red"
-                                  Width="260"
-                                  Margin="0,0,0,4">
+
+                <Grid x:Name="Item"
+                      Width="260"
+                      Margin="0,0,0,4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="30" />
                         <ColumnDefinition />
@@ -66,6 +67,16 @@
                                            Foreground="White"
                                            TextWrapping="Wrap"/>
                 </Grid>
+
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding IsError}" Value="True">
+                        <Setter Property="Background" TargetName="Item" Value="Crimson" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsWarning}" Value="True">
+                        <Setter Property="Background" TargetName="Item" Value="Orange" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+
             </DataTemplate>
         </ListBox.ItemTemplate>
     </ListBox>
