@@ -13,7 +13,7 @@
         xmlns:selectIsland="clr-namespace:AnnoMapEditor.UI.Overlays.SelectIsland"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1000"
+        Title="MainWindow" Height="900" Width="1440"
         Background="{StaticResource BackgroundBrush}">
     <Window.Resources>
         <ResourceDictionary Source="../../Resources/Styles.xaml" />
@@ -26,85 +26,106 @@
             <converters:BooleaNotConverter x:Key="booleanNot" />
         </Grid.Resources>
         
-        <!-- Main -->
-        <Grid x:Name="mainContent" IsEnabled="{Binding ElementName=exportDialog, Path=Visibility, Converter={StaticResource FalseOnVisible}}">
-            <controls:MapView
+        <!-- layout -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="LeftSidebar" MaxWidth="300" />
+            <ColumnDefinition />
+            <ColumnDefinition x:Name="RightSidebar" MaxWidth="300" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="Content" />
+            <RowDefinition x:Name="Footer" Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <!-- map view -->
+        <controls:MapView
                 x:Name="Map"
-                Grid.Column="0"
+                Grid.Column="1"
+                Grid.Row="0"
                 SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 SelectIslandViewModel="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectIslandViewModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 DataContext="{Binding Session, Mode=OneWay}" />
-            <StackPanel Grid.Column="0"
-                        VerticalAlignment="Top"
-                        Margin="16,8">
-                <TextBlock
+        
+        <!-- session properties -->
+        <StackPanel Grid.Column="0"
+                    Grid.Row="0">
+            <TextBlock
                     Style="{StaticResource HeaderLabelStyle}"
                     HorizontalAlignment="Left"
                     Text="Session"
                     Margin="0,0,0,4" />
-                <StackPanel Margin="0,0,0,4" VerticalAlignment="Top" Orientation="Horizontal">
-                    <controls:DropDownButton HorizontalAlignment="Left">
-                        <ContentControl Content="Open" />
-                        <controls:DropDownButton.Menu>
-                            <ContextMenu Name="openMapMenu" />
-                        </controls:DropDownButton.Menu>
-                    </controls:DropDownButton>
-                    <controls:DropDownButton HorizontalAlignment="Left"
+            <StackPanel Margin="0,0,0,4" VerticalAlignment="Top" Orientation="Horizontal">
+                <controls:DropDownButton HorizontalAlignment="Left">
+                    <ContentControl Content="Open" />
+                    <controls:DropDownButton.Menu>
+                        <ContextMenu Name="openMapMenu" />
+                    </controls:DropDownButton.Menu>
+                </controls:DropDownButton>
+                <controls:DropDownButton HorizontalAlignment="Left"
                                          IsEnabled="{Binding SessionChecker.HasErrors, Converter={StaticResource booleanNot}}">
-                        <ContentControl Content="Save" />
-                        <controls:DropDownButton.Menu>
-                            <ContextMenu>
-                                <MenuItem Header="As map template..." Click="ExportMap_Click"/>
-                                <MenuItem Header="{Binding ExportStatus.ExportAsModText, UpdateSourceTrigger=PropertyChanged}" Click="ExportMod_Click" IsEnabled="{Binding ExportStatus.CanExportAsMod, UpdateSourceTrigger=PropertyChanged}" />
-                            </ContextMenu>
-                        </controls:DropDownButton.Menu>
-                    </controls:DropDownButton>
-                </StackPanel>
-                <controls:SessionProperties
+                    <ContentControl Content="Save" />
+                    <controls:DropDownButton.Menu>
+                        <ContextMenu>
+                            <MenuItem Header="As map template..." Click="ExportMap_Click"/>
+                            <MenuItem Header="{Binding ExportStatus.ExportAsModText, UpdateSourceTrigger=PropertyChanged}" Click="ExportMod_Click" IsEnabled="{Binding ExportStatus.CanExportAsMod, UpdateSourceTrigger=PropertyChanged}" />
+                        </ContextMenu>
+                    </controls:DropDownButton.Menu>
+                </controls:DropDownButton>
+            </StackPanel>
+            
+            <controls:SessionProperties
                     DataContext="{Binding SessionProperties}"
                     HorizontalAlignment="Left" />
 
-                <!-- validation warnings -->
-                <validation:ValidationResultList DataContext="{Binding SessionChecker}"
-                                                 />
+            <!-- validation warnings -->
+            <validation:ValidationResultList DataContext="{Binding SessionChecker}"/>
+        </StackPanel>
 
-            </StackPanel>
-            
-            <!-- island properties -->
-            <islandProperties:RandomIslandProperties Grid.Column="0"
-                                                     HorizontalAlignment="Right"
-                                                     Margin="16,8"
-                                                     DataContext="{Binding SelectedRandomIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
-            <islandProperties:FixedIslandProperties Grid.Column="0"
-                                                    HorizontalAlignment="Right"
-                                                    Margin="16,8"
-                                                    DataContext="{Binding SelectedFixedIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
-            <!-- bottom -->
-            <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Orientation="Horizontal" Margin="8,0,0,0">
-                <emoji:TextBlock Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"
+        <!-- island properties -->
+        <StackPanel Grid.Column="2"
+                    Grid.Row="0">
+            <islandProperties:RandomIslandProperties DataContext="{Binding SelectedRandomIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
+            <islandProperties:FixedIslandProperties DataContext="{Binding SelectedFixedIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+
+        <!-- footer -->
+        <StackPanel Grid.Column="0" 
+                    Grid.Row="1"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Bottom" 
+                    Margin="8,0,0,0">
+            <emoji:TextBlock Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"
                                  ToolTip="{Binding DataPathStatus.ToolTip, UpdateSourceTrigger=PropertyChanged}" />
-                <Button Click="Configure_Click" HorizontalAlignment="Left"
+            <Button Click="Configure_Click" HorizontalAlignment="Left"
                         Visibility="{Binding DataPathStatus.Configure, UpdateSourceTrigger=PropertyChanged}">
-                    <TextBlock Text="{Binding DataPathStatus.ConfigureText, UpdateSourceTrigger=PropertyChanged}"/>
-                </Button>
-                <Button Click="AutoDetect_Click" HorizontalAlignment="Left"
+                <TextBlock Text="{Binding DataPathStatus.ConfigureText, UpdateSourceTrigger=PropertyChanged}"/>
+            </Button>
+            <Button Click="AutoDetect_Click" HorizontalAlignment="Left"
                         Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}">Auto detect</Button>
-            </StackPanel>
-            <TextBlock Style="{StaticResource MutedLabelStyle}" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,0" TextAlignment="Right">
+        </StackPanel>
+        <TextBlock Grid.Column="2"
+                   Grid.Row="1"
+                   Style="{StaticResource MutedLabelStyle}"
+                   VerticalAlignment="Bottom"
+                   HorizontalAlignment="Right"
+                   TextAlignment="Right">
                 <Run>The editor is work in progress.</Run>
                 <LineBreak />
                 <Run>Visit GitHub for </Run>
                 <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor#roadmap" RequestNavigate="Hyperlink_OpenBrowser">roadmap</Hyperlink>
                 <Run>and</Run>
                 <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
-            </TextBlock>
-        </Grid>
+        </TextBlock>
 
         <!-- ExportAsMod -->
         <exportAsMod:ExportAsModWindow x:Name="exportDialog" Grid.Column="0" />
 
         <!-- Overlays -->
         <Grid x:Name="Overlay"
+              Grid.Column="0"
+              Grid.Row="0"
+              Grid.ColumnSpan="3"
+              Grid.RowSpan="3"
               Panel.ZIndex="1000"
               Visibility="{Binding ShowOverlay, Converter={StaticResource collapseOnFalse}}">
             <Grid.Background>
