@@ -68,7 +68,7 @@
                         <Run>Select the following map type in Sandbox mode:</Run>
                 </TextBlock>
                 <Grid Width="300" Margin="4,6,4,4">
-                    <Image Source="../Assets/maptype.png" />
+                    <Image Source="../../../Assets/maptype.png" />
                     <TextBlock FontFamily="Lucida Bright"
                                Text="{Binding ResultingModName, UpdateSourceTrigger=PropertyChanged}"
                                VerticalAlignment="Center"

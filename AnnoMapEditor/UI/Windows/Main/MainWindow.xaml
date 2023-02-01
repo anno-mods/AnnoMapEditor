@@ -32,7 +32,7 @@
             <ColumnDefinition x:Name="RightSidebar" MaxWidth="300" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition x:Name="Content" />
+            <RowDefinition />
             <RowDefinition x:Name="Footer" Height="Auto" />
         </Grid.RowDefinitions>
         

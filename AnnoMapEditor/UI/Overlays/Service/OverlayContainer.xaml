@@ -7,6 +7,6 @@
              d:DesignWidth="1440"
              d:DesignHeight="900">
 
-    <Grid x:Name="Content">
+    <Grid x:Name="ContentHost">
     </Grid>
 </UserControl>

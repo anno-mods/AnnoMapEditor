@@ -31,13 +31,13 @@ namespace AnnoMapEditor.UI.Overlays
             };
             overlayControl.DataContext = e.OverlayViewModel;
 
-            Content.Children.Add(overlayControl);
+            ContentHost.Children.Add(overlayControl);
         }
 
         private void OnOverlayClosed(object? sender, OverlayEventArgs e)
         {
             UserControl? closedControl = null;
-            foreach (UserControl overlayControl in Content.Children)
+            foreach (UserControl overlayControl in ContentHost.Children)
             {
                 if (overlayControl.DataContext == e.OverlayViewModel)
                 {
@@ -47,7 +47,10 @@ namespace AnnoMapEditor.UI.Overlays
             }
 
             if (closedControl != null)
-                Content.Children.Remove(closedControl);
+            {
+                closedControl.DataContext = null;
+                ContentHost.Children.Remove(closedControl);
+            }
         }
     }
 }
