@@ -9,8 +9,7 @@
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
         xmlns:islandProperties="clr-namespace:AnnoMapEditor.UI.Controls.IslandProperties"
         xmlns:local="clr-namespace:AnnoMapEditor.UI.Windows.Main"
-        xmlns:exportAsMod="clr-namespace:AnnoMapEditor.UI.Windows.ExportAsMod"
-        xmlns:selectIsland="clr-namespace:AnnoMapEditor.UI.Overlays.SelectIsland"
+        xmlns:overlays="clr-namespace:AnnoMapEditor.UI.Overlays"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="900" Width="1440"
@@ -43,7 +42,6 @@
                 Grid.Column="1"
                 Grid.Row="0"
                 SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                SelectIslandViewModel="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectIslandViewModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 DataContext="{Binding Session, Mode=OneWay}" />
         
         <!-- session properties -->
@@ -117,25 +115,8 @@
                 <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
         </TextBlock>
 
-        <!-- ExportAsMod -->
-        <exportAsMod:ExportAsModWindow x:Name="exportDialog" Grid.Column="0" />
-
         <!-- Overlays -->
-        <Grid x:Name="Overlay"
-              Grid.Column="0"
-              Grid.Row="0"
-              Grid.ColumnSpan="3"
-              Grid.RowSpan="3"
-              Panel.ZIndex="1000"
-              Visibility="{Binding ShowOverlay, Converter={StaticResource collapseOnFalse}}">
-            <Grid.Background>
-                <SolidColorBrush Color="Black" />
-            </Grid.Background>
-
-            <!-- SelectIsland -->
-            <selectIsland:SelectIslandOverlay x:Name="selectIsland" 
-                                          DataContext="{Binding SelectIslandViewModel, UpdateSourceTrigger=PropertyChanged}"
-                                          Grid.Column="0" />
-        </Grid>
+        <overlays:OverlayContainer Grid.ColumnSpan="3"
+                                   Grid.RowSpan="2" />
     </Grid>
 </Window>

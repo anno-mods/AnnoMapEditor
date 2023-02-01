@@ -1,39 +1,30 @@
-﻿using AnnoMapEditor.MapTemplates.Models;
+﻿using System;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace AnnoMapEditor.UI.Windows.ExportAsMod
+namespace AnnoMapEditor.UI.Overlays.ExportAsMod
 {
-    public partial class ExportAsModWindow : UserControl
+    public partial class ExportAsModOverlay : UserControl
     {
-        public ExportAsModViewModel ViewModel { get; init; } = new();
+        private ExportAsModViewModel _viewModel => DataContext as ExportAsModViewModel
+            ?? throw new Exception($"DataContext of {nameof(ExportAsModOverlay)} must extend {nameof(ExportAsModViewModel)}.");
 
-
-        public ExportAsModWindow()
+        public ExportAsModOverlay()
         {
             InitializeComponent();
-            Visibility = Visibility.Collapsed;
-            DataContext = ViewModel;
-        }
-
-
-        public void Show(Session session)
-        {
-            ViewModel.Session = session;
-            Visibility = Visibility.Visible;
             nameInput.Focus();
         }
 
+
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            Visibility = Visibility.Collapsed;
+            OverlayService.Instance.Close(_viewModel);
         }
 
         private async void Export_Click(object sender, RoutedEventArgs e)
-        {   
-            if (await ViewModel.Save())
-                Visibility = Visibility.Collapsed;
+        {
+            await _viewModel.Save();
         }
 
         static readonly Regex regex = new(@"[^\w ,\(\)\-_]");
