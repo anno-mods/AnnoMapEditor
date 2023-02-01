@@ -21,6 +21,19 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
         private IslandAsset _islandAsset;
 
+
+        public bool RandomizeRotation
+        {
+            get => _randomizeRotation;
+            set {
+                SetProperty(ref _randomizeRotation, value);
+
+                if (!value && Rotation == null)
+                    Rotation = 0;
+            }
+        }
+        private bool _randomizeRotation = true;
+
         public byte? Rotation
         {
             get => _rotation;
@@ -51,9 +64,10 @@ namespace AnnoMapEditor.MapTemplates.Models
             if (!islandRepository.TryGetByFilePath(mapFilePath, out var islandAsset))
                 throw new NullReferenceException($"Unknown island '{mapFilePath}'.");
 
-            _islandAsset   = islandAsset;
-            _rotation      = sourceElement.Rotation90;
-            _sourceElement = sourceElement;
+            _islandAsset       = islandAsset;
+            _randomizeRotation = sourceElement.Rotation90 == null;
+            _rotation          = sourceElement.Rotation90;
+            _sourceElement     = sourceElement;
         }
 
         protected override void ToTemplate(Element resultElement)
@@ -61,7 +75,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             base.ToTemplate(resultElement);
 
             resultElement.MapFilePath = _islandAsset.FilePath;
-            resultElement.Rotation90  = Rotation;
+            resultElement.Rotation90  = _randomizeRotation ? null : Rotation;
 
             // MineSlotMapping must always be set, but might be empty.
             resultElement.MineSlotMapping = new();
