@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.UI.Overlays.ExportAsMod;
+using AnnoMapEditor.UI.Overlays.SelectFertilities;
 using AnnoMapEditor.UI.Overlays.SelectIsland;
 using System;
 using System.Windows.Controls;
@@ -26,6 +27,7 @@ namespace AnnoMapEditor.UI.Overlays
             UserControl overlayControl = e.OverlayViewModel switch
             {
                 ExportAsModViewModel _ => new ExportAsModOverlay(),
+                SelectFertilitiesViewModel _ => new SelectFertilitiesOverlay(),
                 SelectIslandViewModel _ => new SelectIslandOverlay(),
                 _ => throw new ArgumentException()
             };

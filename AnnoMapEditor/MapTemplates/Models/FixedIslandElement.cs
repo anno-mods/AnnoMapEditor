@@ -3,6 +3,7 @@ using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.Utilities;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using IslandType = AnnoMapEditor.MapTemplates.Enums.IslandType;
 
@@ -45,6 +46,15 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
         private byte? _rotation;
 
+        public bool RandomizeFertilities
+        {
+            get => _randomizeFertilities;
+            set => SetProperty(ref _randomizeFertilities, value);
+        }
+        private bool _randomizeFertilities = true;
+
+        public ObservableCollection<FertilityAsset> Fertilities { get; init; } = new();
+
 
         public FixedIslandElement(IslandAsset islandAsset, IslandType islandType)
             : base(islandType)
@@ -68,6 +78,23 @@ namespace AnnoMapEditor.MapTemplates.Models
             if (!islandRepository.TryGetByFilePath(mapFilePath, out var islandAsset))
                 throw new NullReferenceException($"Unknown island '{mapFilePath}'.");
 
+            _sourceElement = sourceElement;
+            AssetRepository assetRepository = Settings.Instance.AssetRepository
+                ?? throw new Exception($"The {nameof(AssetRepository)} has not been loaded.");
+
+            // fertilities
+            _randomizeFertilities = sourceElement.RandomizeFertilities != false;
+            if (sourceElement.FertilityGuids != null)
+            {
+                foreach (int guid in sourceElement.FertilityGuids)
+                {
+                    if (assetRepository.TryGet(guid, out FertilityAsset? fertility) && fertility != null)
+                        Fertilities.Add(fertility);
+                    else
+                        throw new Exception($"Unrecognized {nameof(FertilityAsset)} for GUID {guid}.");
+                }
+            }
+
             _islandAsset       = islandAsset;
             _randomizeRotation = sourceElement.Rotation90 == null;
             _rotation          = sourceElement.Rotation90;
@@ -81,21 +108,18 @@ namespace AnnoMapEditor.MapTemplates.Models
             resultElement.MapFilePath = _islandAsset.FilePath;
             resultElement.Rotation90  = _randomizeRotation ? null : Rotation;
 
+            // fertilities
+            resultElement.RandomizeFertilities = RandomizeFertilities ? null : false;
+            if (RandomizeFertilities)
+                resultElement.FertilityGuids = Array.Empty<int>();
+            else
+                resultElement.FertilityGuids = Fertilities.Select(f => (int)f.GUID).ToArray();
+
             // MineSlotMapping must always be set, but might be empty.
             resultElement.MineSlotMapping = new();
 
             if (_sourceElement != null)
             {
-                // fixed fertilities
-                if (_sourceElement.FertilityGuids != null)
-                {
-                    resultElement.FertilityGuids = new int[_sourceElement.FertilityGuids.Length];
-                    Array.Copy(_sourceElement.FertilityGuids, resultElement.FertilityGuids, _sourceElement.FertilityGuids.Length);
-                }
-
-                // randomized fertilities
-                resultElement.RandomizeFertilities = _sourceElement.RandomizeFertilities;
-
                 // fixed mineslots
                 if (_sourceElement.MineSlotMapping != null)
                 {

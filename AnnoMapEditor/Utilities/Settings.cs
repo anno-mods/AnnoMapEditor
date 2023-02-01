@@ -28,6 +28,7 @@ namespace AnnoMapEditor.Utilities
                 OnPropertyChanged(nameof(DataPath));
             }
         }
+
         private IDataArchive _dataArchive = DataArchives.DataArchive.Default;
 
         public IslandRepository? IslandRepository
@@ -35,7 +36,14 @@ namespace AnnoMapEditor.Utilities
             get => _islandRepository;
             private set => SetProperty(ref _islandRepository, value);
         }
-        private IslandRepository? _islandRepository;  
+        private IslandRepository? _islandRepository;
+
+        public AssetRepository? AssetRepository 
+        { 
+            get => _assetRepository;
+            private set => SetProperty(ref _assetRepository, value); 
+        }
+        private AssetRepository? _assetRepository;
 
 
         public string? DataPath 

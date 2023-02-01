@@ -57,7 +57,17 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 {
                     // deserialize the asset
                     XElement valuesElement = assetElement.Element("Values")!;
-                    StandardAsset asset = deserializer(valuesElement);
+
+                    StandardAsset asset;
+                    try
+                    {
+                        asset = deserializer(valuesElement);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Could not deserialize asset of template '{templateName}'.", ex);
+                        continue;
+                    }
 
                     // load icons
                     if (asset.IconFilename != null)

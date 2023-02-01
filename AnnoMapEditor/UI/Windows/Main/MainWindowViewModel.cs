@@ -70,7 +70,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 else if (value is FixedIslandElement fixedIsland)
                 {
                     SelectedRandomIslandPropertiesViewModel = null;
-                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland);
+                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland, Session!.Region);
                 }
             }
         }
