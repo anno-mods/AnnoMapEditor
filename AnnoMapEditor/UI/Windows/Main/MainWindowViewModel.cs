@@ -249,7 +249,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 DataPathStatus = new DataPathStatus()
                 {
                     Status = Settings.DataArchive is RdaDataArchive ? "Game path set ✔" : "Extracted RDA path set ✔",
-                    ToolTip = Settings.DataArchive.Path,
+                    ToolTip = Settings.DataArchive.DataPath,
                     ConfigureText = "Change...",
                     AutoDetect = Settings.DataArchive is RdaDataArchive ? Visibility.Collapsed : Visibility.Visible,
                 };

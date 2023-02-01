@@ -6,8 +6,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
     [AssetTemplate("Fertility")]
     public class FertilityAsset : StandardAsset
     {
-        public FertilityAsset(XElement valuesXml) 
-            : base(valuesXml)
+        public FertilityAsset()
         {
         }
     }

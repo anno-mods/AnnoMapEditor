@@ -8,20 +8,20 @@ using System.Threading.Tasks;
 
 namespace AnnoMapEditor.DataArchives
 {
-    public class FolderDataArchive : IDataArchive
+    public class FolderDataArchive : DataArchive
     {
-        public string Path { get; }
+        public override string DataPath { get; }
 
-        public bool IsValid { get; } = true;
+        public override bool IsValid { get; protected set; } = true;
 
 
         public FolderDataArchive(string folderPath)
         {
-            Path = folderPath;
+            DataPath = folderPath;
         }
 
 
-        public Stream? OpenRead(string filePath)
+        public override Stream? OpenRead(string filePath)
         {
             if (!IsValid)
                 return null;
@@ -29,13 +29,13 @@ namespace AnnoMapEditor.DataArchives
 
             try
             {
-                stream = File.OpenRead(System.IO.Path.Combine(Path, filePath));
+                stream = File.OpenRead(System.IO.Path.Combine(DataPath, filePath));
             }
             catch { }
             return stream;
         }
 
-        public IEnumerable<string> Find(string pattern)
+        public override IEnumerable<string> Find(string pattern)
         {
             if (!IsValid)
                 return Array.Empty<string>();
@@ -44,7 +44,7 @@ namespace AnnoMapEditor.DataArchives
             matcher.AddIncludePatterns(new string[] { pattern });
 
             PatternMatchingResult result = matcher.Execute(
-                new DirectoryInfoWrapper(new DirectoryInfo(Path)));
+                new DirectoryInfoWrapper(new DirectoryInfo(DataPath)));
 
             return result.Files.Select(x => x.Path);
         }
