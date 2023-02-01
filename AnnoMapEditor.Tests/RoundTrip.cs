@@ -7,7 +7,7 @@ namespace AnnoMapEditor.Tests
 {
     public class RoundTrip
     {
-        [Theory]
+        [TheoryWithGameFiles]
         [InlineData("./TestData/moderate_c_01.xml")]
         [InlineData("./TestData/campaign_chapter03_colony01.xml")]
         [InlineData("./TestData/moderate_islandarc_ss_01.xml")]

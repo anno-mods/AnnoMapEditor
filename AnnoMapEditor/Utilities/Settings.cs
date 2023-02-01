@@ -5,6 +5,7 @@ using Microsoft.Win32;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -67,60 +68,144 @@ namespace AnnoMapEditor.Utilities
 
         private Task? _loadingTask;
 
+        /// <summary>
+        /// Useful if code needs to wait for a Loading Process to finish somewhere.
+        /// Like unit test setups for example.
+        /// </summary>
+        private ManualResetEvent LoadingDoneTrigger { get; init; }
 
-        public Settings()
+        /// <summary>
+        /// Private Constructor - only used for Singleton.
+        /// </summary>
+        private Settings()
         {
-            DataPath = UserSettings.Default.DataPath;
-            if (DataArchive?.IsValid != true)
-            {
-                // auto detect on start-up if not valid
-                DataPath = GetInstallDirFromRegistry();
-            }
+            //We set the LoadingDoneTrigger as Reset by default, so anything that waits for the setup to finish
+            //has to actually wait for the SetupAsync called in Initialize to finish.
+            LoadingDoneTrigger = new ManualResetEvent(false);
+            Initialize();
         }
 
-
-        public void LoadDataPath(string? path)
+        /// <summary>
+        /// Starts the asynchronous Setup on the Tread Pool, so it doesn't block.
+        /// </summary>
+        private void Initialize()
         {
             IsLoading = true;
 
             _loadingTask = Task.Run(async () => {
-                var archive = await DataArchives.DataArchive.OpenAsync(path);
-
-                try
-                {
-                    AssetRepository assetRepository = new(archive);
-                    assetRepository.RegisterAssetModel<RandomIslandAsset>();
-                    await assetRepository.LoadAsync();
-
-                    FixedIslandRepository fixedIslandRepository = new(archive);
-                    await fixedIslandRepository.AwaitLoadingAsync();
-
-                    IslandRepository islandRepository = new(fixedIslandRepository, assetRepository);
-                    await islandRepository.AwaitLoadingAsync();
-
-                    Dispatch(() =>
-                    {
-                        DataArchive = archive;
-                        IslandRepository = islandRepository;
-                        IsValidDataPath = true;
-                    });
-
-                }
-                catch (Exception ex)
-                {
-                    Dispatch(() =>
-                    {
-                        IsValidDataPath = false;
-                    });
-                }
-                finally
-                {
-                    Dispatch(() =>
-                    {
-                        IsLoading = false;
-                    });
-                }
+                await SetupAsync(true);
             });
+        }
+
+        /// <summary>
+        /// This avoids direct writes to the DataPath Property that would run
+        /// its setter on the thread pool, making proper awaiting of the setup impossible.
+        /// </summary>
+        /// <param name="updateInvalidUserSettings">If the UserSettings should be overwritten by a valid result.</param>
+        /// <returns></returns>
+        private async Task SetupAsync(bool updateInvalidUserSettings)
+        {
+            LoadingDoneTrigger.Reset();
+
+            if (!string.IsNullOrEmpty(UserSettings.Default.DataPath))
+            {
+                await LoadDataPathAsync(UserSettings.Default.DataPath);
+                OnPropertyChanged(nameof(DataPath));
+            }
+
+            if (DataArchive?.IsValid != true)
+            {
+                // auto detect on start-up if not valid
+                await LoadDataPathAsync(GetInstallDirFromRegistry());
+
+                OnPropertyChanged(nameof(DataPath));
+            }
+
+            if (DataArchive?.IsValid == true && updateInvalidUserSettings)
+            {
+                UserSettings.Default.DataPath = DataArchive.Path;
+                UserSettings.Default.Save();
+            }
+
+            LoadingDoneTrigger.Set();
+        }
+
+        /// <summary>
+        /// Used to set DataPath with a synchronous method call
+        /// by running the actual async code on the tread pool.
+        /// </summary>
+        /// <param name="path">The DataPath to load.</param>
+        private void LoadDataPath(string? path)
+        {
+            IsLoading = true;
+
+            _loadingTask = Task.Run(async () => {
+                await LoadDataPathAsync(path);
+            });
+        }
+
+        /// <summary>
+        /// Asynchronously sets the DataPath and reads all the Repositories.
+        /// </summary>
+        /// <param name="path">The DataPath to load.</param>
+        /// <returns></returns>
+        private async Task LoadDataPathAsync(string? path)
+        {
+            //Only use the LoadingDoneTrigger, if it is not already Reset.
+            //A reset LoadingDoneTrigger here means, that the Setup is using it.
+            bool loadingDoneTriggerNotBlocked = LoadingDoneTrigger.WaitOne(0);
+
+            if (loadingDoneTriggerNotBlocked)
+            {
+                LoadingDoneTrigger.Reset();
+            }
+
+            Dispatch(() =>
+            {
+                IsLoading = true;
+            });
+
+            var archive = await DataArchives.DataArchive.OpenAsync(path);
+
+            try
+            {
+                AssetRepository assetRepository = new(archive);
+                assetRepository.RegisterAssetModel<RandomIslandAsset>();
+                await assetRepository.LoadAsync();
+
+                FixedIslandRepository fixedIslandRepository = new(archive);
+                await fixedIslandRepository.AwaitLoadingAsync();
+
+                IslandRepository islandRepository = new(fixedIslandRepository, assetRepository);
+                await islandRepository.AwaitLoadingAsync();
+
+                Dispatch(() =>
+                {
+                    DataArchive = archive;
+                    IslandRepository = islandRepository;
+                    IsValidDataPath = true;
+                });
+
+            }
+            catch (Exception ex)
+            {
+                Dispatch(() =>
+                {
+                    IsValidDataPath = false;
+                });
+            }
+            finally
+            {
+                Dispatch(() =>
+                {
+                    IsLoading = false;
+                });
+
+                if (loadingDoneTriggerNotBlocked)
+                {
+                    LoadingDoneTrigger.Set();
+                }
+            }
         }
 
         private void Dispatch(Action action)
@@ -139,12 +224,25 @@ namespace AnnoMapEditor.Utilities
             return key?.GetValue("InstallDir") as string;
         }
 
+        /// <summary>
+        /// Waits until the current _loadingTask is finished.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception">Thrown when no loading Task has been set yet.</exception>
         public async Task AwaitLoadingAsync()
         {
             if (_loadingTask != null)
                 await _loadingTask;
             else
                 throw new Exception($"LoadAsync has not been called.");
+        }
+
+        /// <summary>
+        /// Waits until the current loading Task is finished by blocking until the LoadingDoneTrigger is set.
+        /// </summary>
+        public void WaitForLoadingBlocking()
+        {
+            LoadingDoneTrigger.WaitOne();
         }
     }
 }
