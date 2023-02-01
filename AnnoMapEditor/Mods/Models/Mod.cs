@@ -47,6 +47,9 @@ namespace AnnoMapEditor.Mods.Models
         {
             string fullModName = "[Map] " + modName;
 
+            List<string> sizes = _session.Region.GetAllSizeCombinations().ToList();
+            string size = sizes[0];
+
             try
             {
                 string? mapTypeFileName = MapType.ToFileName();
@@ -56,58 +59,51 @@ namespace AnnoMapEditor.Mods.Models
                     throw new Exception("invalid MapType");
 
                 if(!_session.Region.AllowModding)
-                {
                     throw new Exception("not supported map region");
-                }
 
                 FileUtils.TryDeleteDirectory(modPath);
                 Directory.CreateDirectory(modPath);
-                await WriteMetaJson(modPath, modName, modID);
 
                 //Only write Language XML for OW Maps, as only they need naming in a menu
-                if(!string.IsNullOrEmpty(mapTypeGuid))
+                if (!string.IsNullOrEmpty(mapTypeGuid))
                     await WriteLanguageXml(modPath, modName, mapTypeGuid);
 
+                // write meta JSON, assets XML, .a7tinfo, .a7t and .a7te
                 string mapFilePath = Path.Combine(AME_POOL_PATH, _session.Region.PoolFolderName, mapTypeFileName);
-                await WriteAssetsXml(modPath, fullModName, mapFilePath, _session.Region, MapType);
+                string a7tBasePath = Path.Combine(modPath, $"{mapFilePath}");
+                string a7tInfoPath = a7tBasePath + $"_{size}.a7tinfo";
+                string a7tPath     = a7tBasePath + $"_{size}.a7t";
+                string a7tePath    = a7tBasePath + $"_{size}.a7te";
 
-                //Create first entry with custom a7t and a7te
-                List<string> sizes = _session.Region.GetAllSizeCombinations().ToList();
-                string size = sizes[0];
-
-                string basePath = Path.Combine(modPath, $"{mapFilePath}");
-                await _session.SaveAsync(basePath + $"_{size}.a7tinfo");
-
-                //a7t Creation
-                string a7tPath = basePath + $"_{size}.a7t";
-                await Task.Run(() => new A7tExporter(_session.Size.X, _session.PlayableArea.Width, _session.Region).ExportA7T(a7tPath));
-
-                //a7te Creation
-                string a7tePath = basePath + $"_{size}.a7te";
-                await Task.Run(() => new A7teExporter(_session.Size.X).ExportA7te(a7tePath));
-
+                Task.WaitAll(
+                    WriteMetaJson(modPath, modName, modID),
+                    WriteAssetsXml(modPath, fullModName, mapFilePath, _session.Region, MapType),
+                    _session.SaveAsync(a7tBasePath + $"_{size}.a7tinfo"),
+                    Task.Run(() => new A7tExporter(_session.Size.X, _session.PlayableArea.Width, _session.Region).ExportA7T(a7tPath)),
+                    Task.Run(() => new A7teExporter(_session.Size.X).ExportA7te(a7tePath))
+                    );
 
                 if (_session.Region.HasMapExtension)
                 {
-                    await _session.SaveAsync(basePath + $"_{size}_enlarged.a7tinfo");
-                    File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}_enlarged.a7t");
-                    File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}_enlarged.a7te");
+                    File.Copy(a7tInfoPath, a7tBasePath + $"_{size}_enlarged.a7tinfo");
+                    File.Copy(a7tPath,     a7tBasePath + $"_{size}_enlarged.a7t");
+                    File.Copy(a7tePath,    a7tBasePath + $"_{size}_enlarged.a7te");
                 }
 
-                //copy a7t and a7te to remaining entries
+                //copy a7tinfo, a7t and a7te for all sizes
                 for (int i = 1; i<sizes.Count; i++)
                 {
                     size = sizes[i];
 
-                    await _session.SaveAsync(Path.Combine(modPath, $"{mapFilePath}_{size}.a7tinfo"));
-                    File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}.a7t");
-                    File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}.a7te");
+                    File.Copy(a7tInfoPath, a7tBasePath + $"_{size}.a7tinfo");
+                    File.Copy(a7tPath,     a7tBasePath + $"_{size}.a7t");
+                    File.Copy(a7tePath,    a7tBasePath + $"_{size}.a7te");
 
                     if (_session.Region.HasMapExtension)
                     {
-                        await _session.SaveAsync(basePath + $"_{size}_enlarged.a7tinfo");
-                        File.Copy(basePath + $"_{sizes[0]}.a7t", basePath + $"_{size}_enlarged.a7t");
-                        File.Copy(basePath + $"_{sizes[0]}.a7te", basePath + $"_{size}_enlarged.a7te");
+                        File.Copy(a7tInfoPath, a7tBasePath + $"_{size}_enlarged.a7tinfo");
+                        File.Copy(a7tPath,     a7tBasePath + $"_{size}_enlarged.a7t");
+                        File.Copy(a7tInfoPath, a7tBasePath + $"_{size}_enlarged.a7te");
                     }
                 }
             }

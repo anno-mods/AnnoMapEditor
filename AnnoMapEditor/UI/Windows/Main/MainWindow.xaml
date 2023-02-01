@@ -46,12 +46,12 @@
         
         <!-- session properties -->
         <StackPanel Grid.Column="0"
-                    Grid.Row="0">
+                    Grid.Row="0"
+                    Margin="16">
             <TextBlock
                     Style="{StaticResource HeaderLabelStyle}"
                     HorizontalAlignment="Left"
-                    Text="Session"
-                    Margin="0,0,0,4" />
+                    Text="Session"/>
             <StackPanel Margin="0,0,0,4" VerticalAlignment="Top" Orientation="Horizontal">
                 <controls:DropDownButton HorizontalAlignment="Left">
                     <ContentControl Content="Open" />
