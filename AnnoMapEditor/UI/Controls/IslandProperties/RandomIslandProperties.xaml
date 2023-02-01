@@ -23,8 +23,13 @@
     </UserControl.Resources>
 
     <StackPanel Visibility="{Binding Converter={StaticResource CollapsedOnNull}, UpdateSourceTrigger=PropertyChanged}"
-                Width="100"
-                Margin="0">
+                Margin="16">
+
+        <!-- Header -->
+        <TextBlock Style="{StaticResource HeaderLabelStyle}"
+                   HorizontalAlignment="Left"
+                   Text="Random Island"
+                   Margin="0"/>
 
         <!-- Label -->
         <TextBlock Text="Label"
