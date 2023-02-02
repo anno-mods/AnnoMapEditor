@@ -41,8 +41,8 @@
                 <DataTemplate>
                     <Image Source="{Binding Icon}"
                            ToolTip="{Binding DisplayName}"
-                           Width="22"
-                           Height="22"/>
+                           Width="28"
+                           Height="28"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
             <ListBox.ItemsPanel>

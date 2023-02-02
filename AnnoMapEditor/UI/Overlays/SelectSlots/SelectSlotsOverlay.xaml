@@ -87,11 +87,11 @@
                   VerticalAlignment="Center"
                   Background="Transparent"
                   BorderThickness="0"
-                  ItemsSource="{Binding FixedIsland.SlotAssignments.Values}">
+                  ItemsSource="{Binding SlotAssignmentViewModels}">
 
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <ComboBox ItemsSource="{Binding Slot.SlotAsset.ReplacementSlotAssets}"
+                    <ComboBox ItemsSource="{Binding SlotItems}"
                               SelectedItem="{Binding AssignedSlot}"
                               Height="38">
                         <ComboBox.ItemTemplate>

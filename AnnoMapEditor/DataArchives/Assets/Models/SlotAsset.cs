@@ -21,6 +21,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public IEnumerable<SlotAsset> ReplacementSlotAssets { get; set; }
 
 
+        public SlotAsset()
+        {
+
+        }
+
+        // deserialization constructor
         public SlotAsset(XElement valuesXml) 
             : base(valuesXml)
         {

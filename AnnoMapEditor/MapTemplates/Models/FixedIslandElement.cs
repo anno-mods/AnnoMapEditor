@@ -56,12 +56,12 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public ObservableCollection<FertilityAsset> Fertilities { get; init; } = new();
 
-        public bool RandomizeMineSlots
+        public bool RandomizeSlots
         {
-            get => _randomizeMineSlots;
-            set => SetProperty(ref _randomizeMineSlots, value);
+            get => _randomizeSlots;
+            set => SetProperty(ref _randomizeSlots, value);
         }
-        private bool _randomizeMineSlots = true;
+        private bool _randomizeSlots = true;
 
         public Dictionary<long, SlotAssignment> SlotAssignments { get; init; } = new();
 
@@ -119,6 +119,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             }
 
             // fixed slots
+            _randomizeSlots = sourceElement.MineSlotMapping == null || sourceElement.MineSlotMapping.Count == 0;
             if (sourceElement.MineSlotMapping != null)
             {
                 foreach ((long objectId, int slotGuid) in sourceElement.MineSlotMapping)
@@ -165,17 +166,49 @@ namespace AnnoMapEditor.MapTemplates.Models
             resultElement.MapFilePath = _islandAsset.FilePath;
             resultElement.Rotation90  = _randomizeRotation ? null : Rotation;
 
-            // fertilities
-            resultElement.RandomizeFertilities = RandomizeFertilities ? null : false;
-            if (RandomizeFertilities)
+            //
+            // Randomization of fertilities is controlled by the flag RandomizeFertilities. Instead
+            // of using true/false, true is replaced by null.
+            //
+            // Randomized fertilities:
+            //   RandomizeFertilities = null
+            //   FertilityGuids = []
+            //
+            // Fixed Fertilities:
+            //   RandomizedFertilities = false
+            //   FertilityGuids = [123456, ...]
+            //
+            resultElement.RandomizeFertilities = _randomizeFertilities ? null : false;
+            if (_randomizeFertilities)
                 resultElement.FertilityGuids = Array.Empty<int>();
             else
                 resultElement.FertilityGuids = Fertilities.Select(f => (int)f.GUID).ToArray();
 
-            // slots
-            resultElement.MineSlotMapping = SlotAssignments.Values
-                .Select(s => new Tuple<long, int>(s.Slot.ObjectId, (int)(s.AssignedSlot?.GUID ?? 0)))
-                .ToList();
+            //
+            // There exists no additional "RandomizeSlots" flag in the templates. Instead slots
+            // will be randomized if MineSlotMapping is an empty list. If it contains any elements,
+            // all slots will be fixed.
+            //
+            // 0 is used to set empty slots.
+            //
+            // Randomized slots:
+            //   MineSlotMapping = []
+            // Fixed slots
+            //   MineSlotMapping = [(8252351, 1000063), (162612, 0), ...]
+            //
+            if (_randomizeSlots)
+                resultElement.MineSlotMapping = new();
+            else
+                resultElement.MineSlotMapping = IslandAsset.Slots.Values
+                    .Select(s =>
+                    {
+                        int slotGuid = 0;
+                        if (SlotAssignments.TryGetValue(s.ObjectId, out SlotAssignment? assignment))
+                            slotGuid = (int)(assignment.AssignedSlot?.GUID ?? 0);
+
+                        return new Tuple<long, int>(s.ObjectId, slotGuid);
+                    })
+                    .ToList();
 
             // despite its name, all fixed islands must have a RandomIslandConfig.
             resultElement.RandomIslandConfig = new()

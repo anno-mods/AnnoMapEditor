@@ -29,25 +29,25 @@
 
         <controls:FancyToggle Label="Randomize" 
                               OnText="Yes" OffText="No" 
-                              IsChecked="{Binding FixedIsland.RandomizeMineSlots, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                              IsChecked="{Binding FixedIsland.RandomizeSlots, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
         <ListBox ItemsSource="{Binding SlotCounters}"
-                 Visibility="{Binding FixedIsland.RandomizeMineSlots, Converter={StaticResource VisibleOnFalse}}"
+                 Visibility="{Binding FixedIsland.RandomizeSlots, Converter={StaticResource VisibleOnFalse}}"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  IsEnabled="False"
                  BorderThickness="0"
                  Background="Transparent">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
+                    <Grid Width="40">
                         <Image Source="{Binding Slot.Icon}"
                                ToolTip="{Binding Slot.DisplayName}"
-                               Width="22"
-                               Height="22"/>
+                               Width="28"
+                               Height="28"/>
                         <TextBlock Text="{Binding Count}"
                                    VerticalAlignment="Bottom"
                                    HorizontalAlignment="Right"
-                                   Foreground="Red"
+                                   Foreground="#F5DBA8"
                                    FontWeight="Bold"/>
                     </Grid>
                 </DataTemplate>
@@ -61,7 +61,7 @@
 
         <Button Click="OnConfigureSlots_Cicked"
                 Content="Configure"
-                Visibility="{Binding FixedIsland.RandomizeMineSlots, Converter={StaticResource VisibleOnFalse}}"/>
+                Visibility="{Binding FixedIsland.RandomizeSlots, Converter={StaticResource VisibleOnFalse}}"/>
 
     </StackPanel>
 </UserControl>

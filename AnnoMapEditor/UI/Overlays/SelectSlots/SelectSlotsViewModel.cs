@@ -47,34 +47,41 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         }
         private bool _showOil = true;
 
+        public IEnumerable<SlotAssignmentViewModel> SlotAssignmentViewModels { get; init; }
+
 
         public SelectSlotsViewModel(Region region, FixedIslandElement fixedIsland)
         {
             Region = region;
             FixedIsland = fixedIsland;
 
-            CollectionView slotsLeftView = (CollectionView)CollectionViewSource.GetDefaultView(FixedIsland.SlotAssignments.Values);
+            SlotAssignmentViewModels = fixedIsland.SlotAssignments.Values
+                .Where(s => s.Slot.SlotAsset != null)
+                .Select(s => new SlotAssignmentViewModel(s))
+                .ToList();
+
+            CollectionView slotsLeftView = (CollectionView)CollectionViewSource.GetDefaultView(SlotAssignmentViewModels);
             slotsLeftView.Filter = SlotFilter;
         }
 
 
         private bool SlotFilter(object item)
         {
-            const int RANDOM_MINE_GROUP_ID = 1000029;
-            const int RANDOM_CLAY_GROUP_ID = 100417;
-            const int RANDOM_OIL_GROUP_ID  = 100849;
+            const int RANDOM_MINE_OBJECT_GUID = 1000029;
+            const int RANDOM_CLAY_OBJECT_GUID = 100417;
+            const int RANDOM_OIL_OBJECT_GUID  = 100849;
 
-            if (item is not SlotAssignment slotAssignment)
+            if (item is not SlotAssignmentViewModel slotAssignmentViewModel)
                 throw new ArgumentException();
-            long slotGroupId = slotAssignment.Slot.GroupId;
+            long slotGroupId = slotAssignmentViewModel.SlotAssignment.Slot.ObjectGuid;
 
-            if (!ShowMines && slotGroupId == RANDOM_MINE_GROUP_ID)
+            if (!ShowMines && slotGroupId == RANDOM_MINE_OBJECT_GUID)
                 return false;
 
-            if (!ShowClay && slotGroupId == RANDOM_CLAY_GROUP_ID)
+            if (!ShowClay && slotGroupId == RANDOM_CLAY_OBJECT_GUID)
                 return false;
 
-            if (!ShowOil && slotGroupId == RANDOM_OIL_GROUP_ID)
+            if (!ShowOil && slotGroupId == RANDOM_OIL_OBJECT_GUID)
                 return false;
 
             return true;
@@ -82,7 +89,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
         private void UpdateFilter()
         {
-            CollectionViewSource.GetDefaultView(FixedIsland.SlotAssignments.Values).Refresh();
+            CollectionViewSource.GetDefaultView(SlotAssignmentViewModels).Refresh();
         }
     }
 }
