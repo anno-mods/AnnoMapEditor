@@ -75,13 +75,11 @@ namespace AnnoMapEditor.Mods.Models
                 string a7tPath     = a7tBasePath + $"_{size}.a7t";
                 string a7tePath    = a7tBasePath + $"_{size}.a7te";
 
-                Task.WaitAll(
-                    WriteMetaJson(modPath, modName, modID),
-                    WriteAssetsXml(modPath, fullModName, mapFilePath, _session.Region, MapType),
-                    _session.SaveAsync(a7tBasePath + $"_{size}.a7tinfo"),
-                    Task.Run(() => new A7tExporter(_session.Size.X, _session.PlayableArea.Width, _session.Region).ExportA7T(a7tPath)),
-                    Task.Run(() => new A7teExporter(_session.Size.X).ExportA7te(a7tePath))
-                    );
+                await WriteMetaJson(modPath, modName, modID);
+                await WriteAssetsXml(modPath, fullModName, mapFilePath, _session.Region, MapType);
+                await _session.SaveAsync(a7tBasePath + $"_{size}.a7tinfo");
+                await Task.Run(() => new A7tExporter(_session.Size.X, _session.PlayableArea.Width, _session.Region).ExportA7T(a7tPath));
+                await Task.Run(() => new A7teExporter(_session.Size.X).ExportA7te(a7tePath));
 
                 if (_session.Region.HasMapExtension)
                 {
