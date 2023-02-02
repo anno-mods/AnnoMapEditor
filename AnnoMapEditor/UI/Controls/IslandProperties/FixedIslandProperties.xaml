@@ -7,6 +7,7 @@
              xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
              xmlns:maptemplates="clr-namespace:AnnoMapEditor.UI.Controls.MapTemplates"
              xmlns:fertilities="clr-namespace:AnnoMapEditor.UI.Controls.Fertilities"
+             xmlns:slots="clr-namespace:AnnoMapEditor.UI.Controls.Slots"
              d:DataContext="{d:DesignInstance Type=maptemplates:FixedIslandViewModel}"
              mc:Ignorable="d" 
              d:DesignWidth="300"
@@ -73,6 +74,9 @@
 
         <!-- Fertilities -->
         <fertilities:FertilityControl DataContext="{Binding FertilitiesViewModel}" />
+        
+        <!-- Slots -->
+        <slots:SlotsControl DataContext="{Binding SlotsViewModel}" />
 
     </StackPanel>
 </UserControl>

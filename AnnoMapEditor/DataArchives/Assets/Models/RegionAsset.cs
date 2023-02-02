@@ -22,6 +22,11 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         [AssetReference(nameof(AllowedFertilityGuids))]
         public IEnumerable<FertilityAsset> AllowedFertilities { get; init; }
 
+        public IEnumerable<long> AllowedMineSlotGuids { get; init; }
+
+        [AssetReference(nameof(AllowedMineSlotGuids))]
+        public IEnumerable<SlotAsset> AllowedMineSlots { get; init; }
+
 
         public RegionAsset(XElement valuesXml)
             : base(valuesXml)
@@ -38,6 +43,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
             RegionID = regionElement.Element("RegionID")?.Value;
 
             AllowedFertilityGuids = regionElement.Element("AllowedFertilities")?
+                .Elements("Item")?
+                .Select(x => long.Parse(x.Value))
+                .ToArray()
+                ?? Array.Empty<long>();
+
+            AllowedMineSlotGuids = regionElement.Element("AllowedMineSlots")?
                 .Elements("Item")?
                 .Select(x => long.Parse(x.Value))
                 .ToArray()

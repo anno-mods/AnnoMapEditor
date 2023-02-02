@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.UI.Controls.Fertilities;
+using AnnoMapEditor.UI.Controls.Slots;
 using AnnoMapEditor.Utilities;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -17,11 +18,14 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
 
         public FertilitiesViewModel FertilitiesViewModel { get; init; }
 
+        public SlotsViewModel SlotsViewModel { get; init; }
+
 
         public FixedIslandPropertiesViewModel(FixedIslandElement fixedIsland, Region region)
         {
             FixedIsland = fixedIsland;
             FertilitiesViewModel = new(fixedIsland, region);
+            SlotsViewModel = new(fixedIsland, region);
             IsContinentalIsland = FixedIsland.IslandAsset.IslandSize.FirstOrDefault() == IslandSize.Continental;
 
             IslandTypeItems.AddRange(FixedIsland.IslandAsset.IslandType);

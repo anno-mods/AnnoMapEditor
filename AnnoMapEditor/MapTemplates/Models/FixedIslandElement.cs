@@ -3,6 +3,7 @@ using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using IslandType = AnnoMapEditor.MapTemplates.Enums.IslandType;
@@ -55,11 +56,29 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public ObservableCollection<FertilityAsset> Fertilities { get; init; } = new();
 
+        public bool RandomizeMineSlots
+        {
+            get => _randomizeMineSlots;
+            set => SetProperty(ref _randomizeMineSlots, value);
+        }
+        private bool _randomizeMineSlots = true;
+
+        public Dictionary<long, SlotAssignment> SlotAssignments { get; init; } = new();
+
 
         public FixedIslandElement(IslandAsset islandAsset, IslandType islandType)
             : base(islandType)
         {
             _islandAsset = islandAsset;
+
+            foreach (Slot slot in islandAsset.Slots.Values)
+            {
+                SlotAssignments.Add(slot.ObjectId, new()
+                {
+                    Slot = slot,
+                    AssignedSlot = null
+                });
+            }
         }
 
 
@@ -78,7 +97,11 @@ namespace AnnoMapEditor.MapTemplates.Models
             if (!islandRepository.TryGetByFilePath(mapFilePath, out var islandAsset))
                 throw new NullReferenceException($"Unknown island '{mapFilePath}'.");
 
-            _sourceElement = sourceElement;
+            _islandAsset       = islandAsset;
+            _randomizeRotation = sourceElement.Rotation90 == null;
+            _rotation          = sourceElement.Rotation90;
+            _sourceElement     = sourceElement;
+
             AssetRepository assetRepository = Settings.Instance.AssetRepository
                 ?? throw new Exception($"The {nameof(AssetRepository)} has not been loaded.");
 
@@ -95,10 +118,44 @@ namespace AnnoMapEditor.MapTemplates.Models
                 }
             }
 
-            _islandAsset       = islandAsset;
-            _randomizeRotation = sourceElement.Rotation90 == null;
-            _rotation          = sourceElement.Rotation90;
-            _sourceElement     = sourceElement;
+            // fixed slots
+            if (sourceElement.MineSlotMapping != null)
+            {
+                foreach ((long objectId, int slotGuid) in sourceElement.MineSlotMapping)
+                {
+                    // skip unsupported slots
+                    if (!islandAsset.Slots.TryGetValue(objectId, out Slot? slot))
+                        throw new Exception($"Unrecognized {nameof(Slot)} id {objectId}.");
+
+                    SlotAsset? slotAsset;
+
+                    // 0 denotes an empty slot
+                    if (slotGuid == 0)
+                        slotAsset = null;
+
+                    else if (!assetRepository.TryGet(slotGuid, out slotAsset))
+                        throw new Exception($"Unrecognized {nameof(SlotAsset)} for GUID {slotGuid}.");
+
+                    SlotAssignments.Add(objectId, new()
+                    {
+                        Slot = slot,
+                        AssignedSlot = slotAsset
+                    });
+                }
+            }
+
+            // add remaining assignable slots
+            foreach (Slot slot in islandAsset.Slots.Values)
+            {
+                if (!SlotAssignments.ContainsKey(slot.ObjectId) && slot.SlotAsset != null)
+                {
+                    SlotAssignments.Add(slot.ObjectId, new()
+                    {
+                        Slot = slot,
+                        AssignedSlot = null
+                    });
+                }
+            }
         }
 
         protected override void ToTemplate(Element resultElement)
@@ -115,20 +172,10 @@ namespace AnnoMapEditor.MapTemplates.Models
             else
                 resultElement.FertilityGuids = Fertilities.Select(f => (int)f.GUID).ToArray();
 
-            // MineSlotMapping must always be set, but might be empty.
-            resultElement.MineSlotMapping = new();
-
-            if (_sourceElement != null)
-            {
-                // fixed mineslots
-                if (_sourceElement.MineSlotMapping != null)
-                {
-                    resultElement.MineSlotMapping.AddRange(
-                            _sourceElement.MineSlotMapping
-                            .Select(x => new Tuple<long, int>(x.Item1, x.Item2))
-                        );
-                }
-            }
+            // slots
+            resultElement.MineSlotMapping = SlotAssignments.Values
+                .Select(s => new Tuple<long, int>(s.Slot.ObjectId, (int)(s.AssignedSlot?.GUID ?? 0)))
+                .ToList();
 
             // despite its name, all fixed islands must have a RandomIslandConfig.
             resultElement.RandomIslandConfig = new()
