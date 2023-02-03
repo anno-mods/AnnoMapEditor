@@ -12,6 +12,9 @@ namespace AnnoMapEditor.MapTemplates.Models
 {
     public class FixedIslandElement : IslandElement
     {
+        private static readonly Logger<FixedIslandElement> _logger = new();
+
+
         // TODO: Deserialize Fertilities and MineSlotMappings instead of copying from the source template.
         // TODO: Remove _sourceTemplate alltogether
         private readonly Element? _sourceElement;
@@ -87,15 +90,15 @@ namespace AnnoMapEditor.MapTemplates.Models
         public FixedIslandElement(Element sourceElement)
             : base(sourceElement)
         {
-            string mapFilePath = sourceElement.MapFilePath
+            string islandFilePath = sourceElement.MapFilePath
                 ?? throw new ArgumentException($"Missing property '{nameof(Element.MapFilePath)}'.");
             IslandRepository islandRepository = Settings.Instance.IslandRepository
                 ?? throw new Exception($"No {nameof(IslandRepository)} could be found.");
             if (!islandRepository.IsLoaded)
                 throw new Exception($"The {nameof(IslandRepository)} has not been loaded.");
 
-            if (!islandRepository.TryGetByFilePath(mapFilePath, out var islandAsset))
-                throw new NullReferenceException($"Unknown island '{mapFilePath}'.");
+            if (!islandRepository.TryGetByFilePath(islandFilePath, out var islandAsset))
+                throw new NullReferenceException($"Unknown island '{islandFilePath}'.");
 
             _islandAsset       = islandAsset;
             _randomizeRotation = sourceElement.Rotation90 == null;
@@ -126,7 +129,10 @@ namespace AnnoMapEditor.MapTemplates.Models
                 {
                     // skip unsupported slots
                     if (!islandAsset.Slots.TryGetValue(objectId, out Slot? slot))
-                        throw new Exception($"Unrecognized {nameof(Slot)} id {objectId}.");
+                    {
+                        _logger.LogWarning($"Unrecognized {nameof(Slot)} id {objectId} on instance of '{islandFilePath}'. The slot will be skipped and the map may be corrupted.");
+                        continue;
+                    }
 
                     SlotAsset? slotAsset;
 
@@ -135,7 +141,10 @@ namespace AnnoMapEditor.MapTemplates.Models
                         slotAsset = null;
 
                     else if (!assetRepository.TryGet(slotGuid, out slotAsset))
-                        throw new Exception($"Unrecognized {nameof(SlotAsset)} for GUID {slotGuid}.");
+                    {
+                        _logger.LogWarning($"Unrecognized {nameof(SlotAsset)} GUID {slotGuid} on instance of '{islandFilePath}'. The slot will be skipped and the map may be corrupted.");
+                        continue;
+                    }
 
                     SlotAssignments.Add(objectId, new()
                     {
