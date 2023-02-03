@@ -57,8 +57,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 Attrib sizeInTilesAttrib = infoDoc.GetAttrib("MapSize");
                 int sizeInTiles = BitConverter.ToInt32(sizeInTilesAttrib.Content, 0);
 
-                // get mine slots
-                // The list of mine slots is found at <ObjectMetaInfo><SlotObjects> within the
+                // get slots
+                // The list of slots is found at <ObjectMetaInfo><SlotObjects> within the
                 // a7mfile. It has two kinds of elements.
                 //
                 // First there are lists with a single item of the following form. They denote the

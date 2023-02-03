@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AnnoMapEditor.UI.Overlays.SelectIsland"
         xmlns:validation="clr-namespace:AnnoMapEditor.MapTemplates.Validation"
+        xmlns:e="clr-namespace:EventBinder;assembly=EventBinder" Name="Wnd"
         mc:Ignorable="d"
         d:DataContext="{d:DesignData Type=local:SelectIslandViewModel}"
         d:DesignWidth="900"
@@ -45,7 +46,7 @@
         <!-- cancel button -->
         <Button Grid.Column="4"
                 Content="Cancel"
-                Click="Cancel_Click"
+                Click="{e:EventBinding OnCancel}"
                 IsCancel="True" />
         
         <!-- filters -->

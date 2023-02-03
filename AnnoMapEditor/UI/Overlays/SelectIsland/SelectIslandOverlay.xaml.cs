@@ -21,15 +21,5 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
         {
             Visibility = e.NewValue != null ? Visibility.Visible : Visibility.Collapsed;
         }
-
-        private void Cancel_Click(object sender, RoutedEventArgs e)
-        {
-            SelectIslandViewModel? viewModel = DataContext as SelectIslandViewModel;
-            if (viewModel != null)
-            {
-                viewModel.Cancel_Clicked();
-            }
-        }
-
     }
 }

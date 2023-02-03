@@ -1,6 +1,8 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.UI.Overlays;
+using AnnoMapEditor.UI.Overlays.SelectSlots;
 using AnnoMapEditor.Utilities;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -44,6 +46,25 @@ namespace AnnoMapEditor.UI.Controls.Slots
                         Count = 1
                     });
             }
+        }
+
+        public void OnConfigure()
+        {
+            SelectSlotsViewModel selectViewModel = new(Region, FixedIsland);
+
+            // register a one shot event listener
+            OverlayClosedEventHandler? closureHandler = null;
+            closureHandler = (sender, e) =>
+            {
+                if (e.OverlayViewModel == selectViewModel)
+                {
+                    RefreshMineSlotCount();
+                    OverlayService.Instance.OverlayClosed -= closureHandler;
+                }
+            };
+            OverlayService.Instance.OverlayClosed += closureHandler;
+
+            OverlayService.Instance.Show(selectViewModel);
         }
 
 

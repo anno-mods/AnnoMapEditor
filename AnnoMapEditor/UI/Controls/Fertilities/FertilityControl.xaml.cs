@@ -26,13 +26,5 @@ namespace AnnoMapEditor.UI.Controls.Fertilities
         {
             InitializeComponent();
         }
-
-
-        public void OnConfigureFertilities_Cicked(object sender, RoutedEventArgs args)
-        {
-            FertilitiesViewModel viewModel = (FertilitiesViewModel)DataContext;
-            SelectFertilitiesViewModel selectViewModel = new(viewModel.Region, viewModel.FixedIsland);
-            OverlayService.Instance.Show(selectViewModel);
-        }
     }
 }

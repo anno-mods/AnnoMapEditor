@@ -1,5 +1,12 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.UI.Overlays;
+using AnnoMapEditor.UI.Overlays.SelectFertilities;
+using AnnoMapEditor.Utilities;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 
 namespace AnnoMapEditor.UI.Controls.Fertilities
 {
@@ -14,6 +21,12 @@ namespace AnnoMapEditor.UI.Controls.Fertilities
         {
             FixedIsland = fixedIsland;
             Region = region;
+        }
+
+        public void OnConfigure()
+        {
+            SelectFertilitiesViewModel selectViewModel = new(Region, FixedIsland);
+            OverlayService.Instance.Show(selectViewModel);
         }
     }
 }

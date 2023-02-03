@@ -49,7 +49,7 @@
         
         <!-- cancel button -->
         <Button Grid.Column="4"
-                Content="Cancel"
+                Content="Close"
                 Click="{e:EventBinding OnClosed}"
                 IsCancel="True" />
         

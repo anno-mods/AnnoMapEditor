@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls.Slots"
              xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
              xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
+             xmlns:e="clr-namespace:EventBinder;assembly=EventBinder" Name="Wnd"
              d:DataContext="{d:DesignInstance Type=local:SlotsViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -52,14 +53,21 @@
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Margin="0"/>
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
+            
+            <ListBox.Style>
+                <Style TargetType="{x:Type ListBox}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListBox}">
+                                <WrapPanel IsItemsHost="true" />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.Style>
         </ListBox>
 
-        <Button Click="OnConfigureSlots_Cicked"
+        <Button Click="{e:EventBinding OnConfigure}"
                 Content="Configure"
                 Visibility="{Binding FixedIsland.RandomizeSlots, Converter={StaticResource VisibleOnFalse}}"/>
 

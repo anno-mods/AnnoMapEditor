@@ -14,13 +14,5 @@ namespace AnnoMapEditor.UI.Controls.Slots
         {
             InitializeComponent();
         }
-
-
-        public void OnConfigureSlots_Cicked(object sender, RoutedEventArgs args)
-        {
-            SlotsViewModel viewModel = (SlotsViewModel)DataContext;
-            SelectSlotsViewModel selectViewModel = new(viewModel.Region, viewModel.FixedIsland);
-            OverlayService.Instance.Show(selectViewModel);
-        }
     }
 }
