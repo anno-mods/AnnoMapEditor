@@ -25,7 +25,7 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public MapElement(Element element)
         {
-            _position = new Vector2(element.Position);
+            _position = new Vector2(element.Position![1], element.Position![0]);
         }
 
         public static MapElement FromTemplate(TemplateElement templateElement)
