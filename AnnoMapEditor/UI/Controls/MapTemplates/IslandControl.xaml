@@ -44,7 +44,7 @@
             <Polygon Stroke="DarkGoldenrod"
                      Fill="Gold"
                      Points="0,0 40,0 0,40"
-                     Visibility="{Binding Island.RandomizeRotation, Converter={StaticResource VisibleOnFalse}, FallbackValue=Hidden}"/>
+                     Visibility="{Binding RandomizeRotation, Converter={StaticResource VisibleOnFalse}, FallbackValue=Hidden}"/>
         </Canvas>
 
         <!-- Label -->

@@ -16,6 +16,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public override int ThumbnailRotation => _thumbnailRotation ?? 0;
         private int? _thumbnailRotation;
 
+        public override bool RandomizeRotation => _fixedIsland.RandomizeRotation;
+
 
         public FixedIslandViewModel(Session session, FixedIslandElement fixedIsland) 
             : base(session, fixedIsland)

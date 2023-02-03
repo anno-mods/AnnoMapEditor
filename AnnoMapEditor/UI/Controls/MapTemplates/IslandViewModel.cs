@@ -64,6 +64,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public virtual int ThumbnailRotation { get; }
 
+        public virtual bool RandomizeRotation => true;
+
 
         public IslandViewModel(Session session, IslandElement island)
             : base(island)
@@ -74,7 +76,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             UpdateBackground();
 
             PropertyChanged += This_PropertyChanged;
-            Island.PropertyChanged += RandomIsland_PropertyChanged;
+            Island.PropertyChanged += Island_PropertyChanged;
         }
 
 
@@ -84,10 +86,12 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                 UpdateBackground();
         }
 
-        private void RandomIsland_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void Island_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(IslandElement.IslandType))
                 UpdateBackground();
+            else if (e.PropertyName == nameof(FixedIslandElement.RandomizeRotation))
+                UpdateRotation();
         }
 
         private void UpdateBackground()
@@ -102,6 +106,11 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                 BorderBrush = BorderBrushes[Island.IslandType.Name];
                 BackgroundBrush = BackgroundBrushes[Island.IslandType.Name];
             }
+        }
+
+        private void UpdateRotation()
+        {
+            OnPropertyChanged(nameof(RandomizeRotation));
         }
 
         public override void OnDragged(Vector2 newPosition)
