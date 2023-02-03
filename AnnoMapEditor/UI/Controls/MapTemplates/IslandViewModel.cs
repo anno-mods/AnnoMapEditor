@@ -31,7 +31,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         };
 
 
-        private readonly Session _session;
+        protected readonly Session _session;
 
         public IslandElement Island { get; init; }
 
@@ -115,10 +115,17 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public override void OnDragged(Vector2 newPosition)
         {
-            // mark the island if it is out of bounds
             var mapArea = new Rect2(_session.Size - SizeInTiles + Vector2.Tile);
-            IsOutOfBounds = !newPosition.Within(mapArea);
 
+            // provide resistance against moving out of bounds
+            if (Element.Position.Within(mapArea) && !newPosition.Within(mapArea))
+            {
+                Vector2 safePosition = newPosition.Clamp(mapArea);
+                if ((safePosition - newPosition).Length < 150)
+                    newPosition = safePosition;
+            }
+
+            IsOutOfBounds = !newPosition.Within(mapArea);
             base.OnDragged(newPosition);
         }
     }

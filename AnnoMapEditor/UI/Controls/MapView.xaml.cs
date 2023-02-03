@@ -321,7 +321,16 @@ namespace AnnoMapEditor.UI.Controls
                 if (sender is IslandViewModel viewModel)
                 {
                     if (viewModel.IsOutOfBounds && !viewModel.IsDragging)
+                    {
                         session.Elements.Remove(viewModel.Element);
+
+                        // deselect the island if it was selected
+                        if (viewModel == _selectedElement)
+                        {
+                            _selectedElement = null;
+                            SelectedIsland = null;
+                        }
+                    }
                 }
             }
         }

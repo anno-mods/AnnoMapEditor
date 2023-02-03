@@ -37,7 +37,11 @@ namespace AnnoMapEditor.MapTemplates.Models
         public byte? Rotation
         {
             get => _rotation;
-            set => SetProperty(ref _rotation, value != null ? (byte)(value % 4) : null);
+            set 
+            {
+                SetProperty(ref _rotation, value != null ? (byte)(value % 4) : null);
+                SetProperty(ref _randomizeRotation, value == null);
+            }
         }
         private byte? _rotation;
 

@@ -18,7 +18,7 @@
                 <ResourceDictionary>
                     <converters:ObjectToVisibility x:Key="CollapsedOnNull" />
                     <converters:BoolToVisibility x:Key="VisibleOnFalse" OnTrue="Collapsed" OnFalse="Visible" />
-                    <converters:BooleaNotConverter x:Key="booleanNot" />
+                    <converters:BooleaNotConverter x:Key="BooleanNot" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -44,6 +44,7 @@
                    Style="{StaticResource SubHeaderLabelStyle}"/>
         <local:FancyToggle Label="Randomize"
                            OnText="Yes" OffText="No"
+                           IsEnabled="{Binding IsContinentalIsland, Converter={StaticResource BooleanNot}}"
                            IsChecked="{Binding FixedIsland.RandomizeRotation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Grid>
             <Grid.ColumnDefinitions>
