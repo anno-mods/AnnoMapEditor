@@ -11,6 +11,11 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
     [AssetTemplate("Slot")]
     public class SlotAsset : StandardAsset
     {
+        public const long RANDOM_MINE_GUID = 1000029;
+        public const long RANDOM_CLAY_GUID = 100417;
+        public const long RANDOM_OIL_GUID = 100849;
+
+
         public string DisplayName { get; init; }
 
         public bool IsRandomSlot { get; init; }
@@ -25,6 +30,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         {
 
         }
+
 
         // deserialization constructor
         public SlotAsset(XElement valuesXml) 

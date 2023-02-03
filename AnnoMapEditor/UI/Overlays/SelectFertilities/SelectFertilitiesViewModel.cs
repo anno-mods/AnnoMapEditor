@@ -126,5 +126,10 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
         {
             CollectionViewSource.GetDefaultView(FertilityItems).Refresh();
         }
+
+        public void OnClosed()
+        {
+            OverlayService.Instance.Close(this);
+        }
     }
 }

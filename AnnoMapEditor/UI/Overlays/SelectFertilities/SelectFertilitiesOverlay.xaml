@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AnnoMapEditor.UI.Overlays.SelectFertilities"
         xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
+        xmlns:e="clr-namespace:EventBinder;assembly=EventBinder" Name="Wnd"
         mc:Ignorable="d"
         d:DataContext="{d:DesignData Type=local:SelectFertilitiesViewModel}"
         d:DesignHeight="450"
@@ -49,7 +50,7 @@
         <!-- cancel button -->
         <Button Grid.Column="4"
                 Content="Cancel"
-                Click="Cancel_Click"
+                Click="{e:EventBinding OnClosed}"
                 IsCancel="True" />
         
         <!-- filters -->

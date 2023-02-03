@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:AnnoMapEditor.UI.Overlays.SelectSlots"
         xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
         xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
+        xmlns:e="clr-namespace:EventBinder;assembly=EventBinder" Name="Wnd"
         mc:Ignorable="d"
         d:DataContext="{d:DesignData Type=local:SelectSlotsViewModel}"
         d:DesignHeight="450"
@@ -14,7 +15,36 @@
         VerticalAlignment="Stretch">
 
     <UserControl.Resources>
-        <ResourceDictionary Source="../../Resources/Styles.xaml" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Resources/Styles.xaml" />
+                <ResourceDictionary>
+                    <DataTemplate x:Key="SelectorTemplate">
+                        <ComboBox ItemsSource="{Binding SlotItems}"
+                                  SelectedItem="{Binding AssignedSlot}"
+                                  Height="38"
+                                  Width="150"
+                                  GotFocus="{e:EventBinding OnGotFocus}"
+                                  LostFocus="{e:EventBinding OnLostFocus}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Height="40"
+                                    Orientation="Horizontal">
+                                        <Image Source="{Binding Icon}"
+                                               Width="32"
+                                               Height="32"
+                                               Margin="4"/>
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   Foreground="Black"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </DataTemplate>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="{StaticResource DialogBrush}">
@@ -37,28 +67,29 @@
         <!-- cancel button -->
         <Button Grid.Column="4"
                 Content="Cancel"
-                Click="Cancel_Click"
+                Click="{e:EventBinding OnClosed}"
                 IsCancel="True" />
 
         <!-- filters -->
-        <controls:FancyToggle Grid.Row="1"
+        <controls:FancyToggle x:Name="MinesFilter"
+                              Grid.Row="1"
                               Grid.Column="0"
                               Label="Mines" 
                               OnText="Show" OffText="Hide" 
                               IsChecked="{Binding ShowMines, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               HorizontalAlignment="Right"/>
-        <controls:FancyToggle Grid.Row="1"
+        <controls:FancyToggle x:Name="ClayFilter"
+                              Grid.Row="1"
                               Grid.Column="1"
                               Label="Clay" 
                               OnText="Show" OffText="Hide" 
-                              IsChecked="{Binding ShowClay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              HorizontalAlignment="Center"/>
-        <controls:FancyToggle Grid.Row="1"
+                              IsChecked="{Binding ShowClay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <controls:FancyToggle x:Name="OilFilter"
+                              Grid.Row="1"
                               Grid.Column="2"
                               Label="Oil" 
                               OnText="Show" OffText="Hide" 
-                              IsChecked="{Binding ShowOil, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              HorizontalAlignment="Left"/>
+                              IsChecked="{Binding ShowOil, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <!-- region warning -->
         <DockPanel Grid.Row="2"
@@ -72,46 +103,85 @@
         </DockPanel>
 
         <!-- map -->
-        <Image Grid.Row="3"
-               Grid.ColumnSpan="3"
-               Source="{Binding FixedIsland.IslandAsset.Thumbnail}">
-            <Image.LayoutTransform>
-                <RotateTransform CenterX="0.5" CenterY="0.5" Angle="-135"/>
-            </Image.LayoutTransform>
-        </Image>
+        <ListBox x:Name="Map"
+                 Grid.Row="3"
+                 Grid.ColumnSpan="3"
+                 ItemsSource="{Binding SlotAssignmentViewModels}"
+                 Width="{Binding FixedIsland.IslandAsset.SizeInTiles}"
+                 Height="{Binding FixedIsland.IslandAsset.SizeInTiles}"
+                 IsEnabled="False">
 
-        <!-- slots -->
-        <ListView Grid.Row="3"
+            <ListBox.LayoutTransform>
+                <RotateTransform CenterX="0.5" CenterY="0.5" Angle="-45" />
+            </ListBox.LayoutTransform>
+
+            <!-- Thumbnail Canvas -->
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas IsItemsHost="True">
+                        <Canvas.Background>
+                            <ImageBrush ImageSource="{Binding FixedIsland.IslandAsset.Thumbnail}">
+                                <ImageBrush.RelativeTransform>
+                                    <TransformGroup>
+                                        <RotateTransform CenterX="0.5" CenterY="0.5" Angle="-90"/>
+                                    </TransformGroup>
+                                </ImageBrush.RelativeTransform>
+                            </ImageBrush>
+                        </Canvas.Background>
+                    </Canvas>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+
+            <!-- Items -->
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Canvas.Right" Value="{Binding SlotAssignment.Slot.Position.Y}" />
+                    <Setter Property="Canvas.Bottom" Value="{Binding SlotAssignment.Slot.Position.X}" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Width="8"
+                            Height="8"
+                            CornerRadius="4"
+                            BorderThickness="{Binding PathThickness}"
+                            Background="{Binding BackgroundBrush}"
+                            BorderBrush="{Binding PinBrush}"
+                            RenderTransformOrigin="0.5,0.5" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- line canvas -->
+        <Canvas x:Name="LineCanvas"
+                Grid.Column="0"
+                Grid.Row="3"
+                Grid.ColumnSpan="3">
+        </Canvas>
+
+        <!-- selectors -->
+        <ListView x:Name="SlotSelectionsLeft"
+                  Grid.Row="3"
                   Grid.Column="0"
                   HorizontalAlignment="Left"
                   VerticalAlignment="Center"
                   Background="Transparent"
                   BorderThickness="0"
-                  ItemsSource="{Binding SlotAssignmentViewModels}">
-
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ComboBox ItemsSource="{Binding SlotItems}"
-                              SelectedItem="{Binding AssignedSlot}"
-                              Height="38">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Height="40"
-                                Orientation="Horizontal">
-                                    <Image Source="{Binding Icon}"
-                                           Width="32"
-                                           Height="32"
-                                           Margin="4"/>
-                                    <TextBlock Text="{Binding DisplayName}"
-                                               Foreground="Black"
-                                               VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-
+                  ItemsSource="{Binding SlotAssignmentViewModelsLeft}"
+                  ItemTemplate="{StaticResource SelectorTemplate}">
+        </ListView>
+        <ListView x:Name="SlotSelectionsRight"
+                  Grid.Row="3"
+                  Grid.Column="2"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Center"
+                  Background="Transparent"
+                  BorderThickness="0"
+                  ItemsSource="{Binding SlotAssignmentViewModelsRight}"
+                  ItemTemplate="{StaticResource SelectorTemplate}">
         </ListView>
     </Grid>
 </UserControl>
