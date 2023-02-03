@@ -31,7 +31,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         };
 
 
-        private readonly Session _session;
+        protected readonly Session _session;
 
         public IslandElement Island { get; init; }
 
