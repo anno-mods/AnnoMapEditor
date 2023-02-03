@@ -4,6 +4,7 @@ using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.UI.Overlays;
 using AnnoMapEditor.UI.Overlays.SelectSlots;
 using AnnoMapEditor.Utilities;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -15,7 +16,7 @@ namespace AnnoMapEditor.UI.Controls.Slots
 
         public Region Region { get; init; }
 
-        public ObservableCollection<MineSlotCounter> SlotCounters { get; init; } = new();
+        public ObservableCollection<SlotCounter> SlotCounters { get; init; } = new();
 
 
         public SlotsViewModel(FixedIslandElement fixedIsland, Region region)
@@ -28,24 +29,27 @@ namespace AnnoMapEditor.UI.Controls.Slots
 
         private void RefreshMineSlotCount()
         {
-            SlotCounters.Clear();
-
-            foreach (SlotAssignment mineSlot in FixedIsland.SlotAssignments.Values)
+            List<SlotCounter> slotCounters = new(SlotCounters);
+            foreach (SlotAssignment slot in FixedIsland.SlotAssignments.Values)
             {
                 // do not count empty slots
-                if (mineSlot.AssignedSlot == null)
+                if (slot.AssignedSlot == null)
                     continue;
 
-                MineSlotCounter? counter = SlotCounters.FirstOrDefault(c => c.Slot == mineSlot.AssignedSlot);
+                SlotCounter? counter = slotCounters.FirstOrDefault(c => c.Slot == slot.AssignedSlot);
                 if (counter != null)
                     counter.Count++;
 
                 else
-                    SlotCounters.Add(new(mineSlot.AssignedSlot)
+                    slotCounters.Add(new(slot.AssignedSlot!)
                     {
                         Count = 1
                     });
             }
+
+            SlotCounters.Clear();
+            foreach (SlotCounter counter in slotCounters.OrderBy(c => c.Slot, SlotComparer.Instance))
+                SlotCounters.Add(counter);
         }
 
         public void OnConfigure()
@@ -68,14 +72,14 @@ namespace AnnoMapEditor.UI.Controls.Slots
         }
 
 
-        public class MineSlotCounter : ObservableBase
+        public class SlotCounter : ObservableBase
         {
             public int Count { get; set; }
 
             public SlotAsset Slot { get; set; }
 
 
-            public MineSlotCounter(SlotAsset slot)
+            public SlotCounter(SlotAsset slot)
             {
                 Slot = slot;
             }

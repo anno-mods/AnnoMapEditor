@@ -31,7 +31,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
 
         private readonly Region _initialRegion;
 
-        public Region? SelectedRegion
+        public Region SelectedRegion
         {
             get => _selectedRegion;
             set
@@ -42,7 +42,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
                 ShowRegionWarning = _selectedRegion != _initialRegion;
             }
         }
-        private Region? _selectedRegion;
+        private Region _selectedRegion;
 
         public bool ShowRegionWarning
         {
@@ -72,7 +72,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
                 })
                 );
 
-            SelectedRegion = _initialRegion = region;
+            _selectedRegion = _initialRegion = region;
             FixedIsland = fixedIsland;
 
             CollectionView fertilitiesView = (CollectionView)CollectionViewSource.GetDefaultView(FertilityItems);

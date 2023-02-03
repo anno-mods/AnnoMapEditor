@@ -18,6 +18,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         public string DisplayName { get; init; }
 
+        public string? SlotType { get; init; }
+
         public bool IsRandomSlot { get; init; }
 
         public IEnumerable<long> ReplacementGuids { get; init; }
@@ -42,9 +44,11 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 .Element("Text")!
                 .Value!;
 
-            IsRandomSlot = valuesXml.Element("Slot")?
+
+            SlotType = valuesXml.Element("Slot")?
                 .Element("SlotType")?
-                .Value == "Random";
+                .Value;
+            IsRandomSlot = SlotType == "Random";
 
             IEnumerable<long>? replacementGuids = valuesXml.Element("RandomMapObject")?
                 .Element("Replacements")?

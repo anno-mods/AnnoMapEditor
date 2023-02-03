@@ -184,6 +184,7 @@ namespace AnnoMapEditor.Utilities
                 assetRepository.Register<FertilityAsset>();
                 assetRepository.Register<RandomIslandAsset>();
                 assetRepository.Register<SlotAsset>();
+                assetRepository.Register<MinimapSceneAsset>();
                 await assetRepository.LoadAsync();
 
                 FixedIslandRepository fixedIslandRepository = new(archive);

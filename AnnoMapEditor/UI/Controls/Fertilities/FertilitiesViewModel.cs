@@ -16,11 +16,22 @@ namespace AnnoMapEditor.UI.Controls.Fertilities
 
         public Region Region { get; init; }
 
+        public ObservableCollection<FertilityAsset> Fertilities { get; init; } = new();
+
 
         public FertilitiesViewModel(FixedIslandElement fixedIsland, Region region)
         {
             FixedIsland = fixedIsland;
             Region = region;
+
+            fixedIsland.Fertilities.CollectionChanged += SortFertilities;
+        }
+
+        private void SortFertilities(object? _ = null, NotifyCollectionChangedEventArgs? __ = null)
+        {
+            Fertilities.Clear();
+            foreach (FertilityAsset fertility in FixedIsland.Fertilities.OrderBy(FertilityComparer.Instance))
+                Fertilities.Add(fertility);
         }
 
         public void OnConfigure()
