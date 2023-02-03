@@ -15,13 +15,18 @@
 
     <local:MapElementControl.Resources>
         <converters:NegateDoubleConverter x:Key="negateDoubleConverter" />
-        <converters:BoolToVisibility x:Key="boolToVisibilityConverter" />
+        <converters:BoolToVisibility x:Key="VisibleOnTrue" />
+        <converters:BoolToVisibility x:Key="VisibleOnFalse" OnTrue="Collapsed" OnFalse="Visible" />
         <converters:ObjectToVisibility x:Key="collapseOnNull" />
     </local:MapElementControl.Resources>
 
     <Grid>
 
-        <Canvas>
+        <Canvas RenderTransformOrigin="0.5,0.5">
+            <Canvas.RenderTransform>
+                <RotateTransform Angle="{Binding ThumbnailRotation}"/>
+            </Canvas.RenderTransform>
+
             <!-- Background -->
             <Rectangle Fill="{Binding BackgroundBrush}"
                        Stroke="{Binding BorderBrush}"
@@ -32,12 +37,14 @@
             <Image Visibility="{Binding Thumbnail, Converter={StaticResource collapseOnNull}}"
                    Source="{Binding Thumbnail}"
                    Width="{Binding SizeInTiles}"
-                   Height="{Binding SizeInTiles}"
-                   RenderTransformOrigin="0.5,0.5">
-                <Image.RenderTransform>
-                    <RotateTransform Angle="{Binding ThumbnailRotation}"/>
-                </Image.RenderTransform>
+                   Height="{Binding SizeInTiles}">
             </Image>
+            
+            <!-- rotation indicator -->
+            <Polygon Stroke="DarkGoldenrod"
+                     Fill="Gold"
+                     Points="0,0 40,0 0,40"
+                     Visibility="{Binding RandomizeRotation, Converter={StaticResource VisibleOnFalse}, FallbackValue=Hidden}"/>
         </Canvas>
 
         <!-- Label -->
@@ -59,7 +66,7 @@
         </Border>
 
         <!-- Cross Out -->
-        <Grid Visibility="{Binding IsOutOfBounds, Converter={StaticResource boolToVisibilityConverter}}">
+        <Grid Visibility="{Binding IsOutOfBounds, Converter={StaticResource VisibleOnTrue}}">
             <Line
                 X1="0"
                 Y1="0"

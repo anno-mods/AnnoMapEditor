@@ -9,11 +9,9 @@ using System.Windows.Data;
 
 namespace AnnoMapEditor.UI.Overlays.SelectIsland
 {
-    public class SelectIslandViewModel : ObservableBase
+    public class SelectIslandViewModel : ObservableBase, IOverlayViewModel
     {
         public event IslandSelectedEventHandler? IslandSelected;
-
-        public event OverlayClosedEventHandler? OverlayClosed;
 
 
         public IslandRepository Islands { get; } = Settings.Instance.IslandRepository!;
@@ -93,6 +91,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
                 if (value != null)
                 {
                     _selectedIsland = value;
+                    OverlayService.Instance.Close(this);
                     IslandSelected?.Invoke(this, new(value));
                 }
             }
@@ -164,7 +163,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
 
         public void Cancel_Clicked()
         {
-            OverlayClosed?.Invoke(this, new());
+            OverlayService.Instance.Close(this);
         }
 
     }

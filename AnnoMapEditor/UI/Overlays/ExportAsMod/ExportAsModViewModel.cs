@@ -8,9 +8,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AnnoMapEditor.UI.Windows.ExportAsMod
+namespace AnnoMapEditor.UI.Overlays.ExportAsMod
 {
-    public class ExportAsModViewModel : ObservableBase
+    public class ExportAsModViewModel : ObservableBase, IOverlayViewModel
     {
         private static readonly Logger<ExportAsModViewModel> _logger = new();
 
@@ -42,6 +42,13 @@ namespace AnnoMapEditor.UI.Windows.ExportAsMod
             }
         }
         Session? _session;
+
+        public bool IsSaving
+        {
+            get => _isSaving;
+            private set => SetProperty(ref _isSaving, value);
+        }
+        private bool _isSaving;
 
         public string ModName
         {
@@ -131,6 +138,8 @@ namespace AnnoMapEditor.UI.Windows.ExportAsMod
 
         public async Task<bool> Save()
         {
+            IsSaving = true;
+
             string? modsFolderPath = Settings.Instance.DataPath;
             if (modsFolderPath is not null)
                 modsFolderPath = Path.Combine(modsFolderPath, "mods");
@@ -147,7 +156,12 @@ namespace AnnoMapEditor.UI.Windows.ExportAsMod
             };
 
             CheckExistingMod();
-            return await mod.Save(Path.Combine(modsFolderPath, ResultingFullModName), ResultingModName, ModID);
+            bool result = await mod.Save(Path.Combine(modsFolderPath, ResultingFullModName), ResultingModName, ModID);
+
+            OverlayService.Instance.Close(this);
+
+            IsSaving = false;
+            return result;
         }
     }
 }

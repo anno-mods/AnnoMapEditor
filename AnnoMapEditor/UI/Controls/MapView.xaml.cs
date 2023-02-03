@@ -46,24 +46,6 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
-        public static readonly DependencyProperty SelectIslandViewModelProperty =
-             DependencyProperty.Register("SelectIslandViewModel",
-                propertyType: typeof(SelectIslandViewModel),
-                ownerType: typeof(MapView),
-                typeMetadata: new FrameworkPropertyMetadata(defaultValue: null));
-
-        public SelectIslandViewModel? SelectIslandViewModel
-        {
-            get { return (SelectIslandViewModel?)GetValue(SelectIslandViewModelProperty); }
-            set
-            {
-                if ((SelectIslandViewModel?)GetValue(SelectIslandViewModelProperty) != value)
-                {
-                    SetValue(SelectIslandViewModelProperty, value);
-                }
-            }
-        }
-
         private MapElementViewModel? _selectedElement;
 
 
@@ -267,9 +249,10 @@ namespace AnnoMapEditor.UI.Controls
                     // if it is a FixedIsland, let the user select the correct island
                     if (protoViewModel.MapElementType == MapElementType.FixedIsland)
                     {
-                        SelectIslandViewModel = new(session.Region, protoViewModel.Island.IslandType, protoViewModel.IslandSize);
-                        SelectIslandViewModel.IslandSelected += (s, e) => SelectIsland_IslandSelected(s, e, protoViewModel.Island.Position);
-                        SelectIslandViewModel.OverlayClosed += SelectIslandViewModel_OverlayClosed;
+                        SelectIslandViewModel selectIslandViewModel = new(session.Region, protoViewModel.Island.IslandType, protoViewModel.IslandSize);
+                        selectIslandViewModel.IslandSelected += (s, e) => SelectIsland_IslandSelected(s, e, protoViewModel.Island.Position);
+
+                        OverlayService.Instance.Show(selectIslandViewModel);
                     }
 
                     // otherwise create a random island
@@ -298,15 +281,8 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
-        private void SelectIslandViewModel_OverlayClosed(object? sender, OverlayClosedEventArgs e)
-        {
-            SelectIslandViewModel = null;
-        }
-
         private void SelectIsland_IslandSelected(object? sender, IslandSelectedEventArgs e, Vector2 position)
         {
-            SelectIslandViewModel = null;
-
             // add the new Island
             // TODO: Select the correct IslandType.
             FixedIslandElement fixedIslandElement = new(e.IslandAsset, IslandType.Normal)

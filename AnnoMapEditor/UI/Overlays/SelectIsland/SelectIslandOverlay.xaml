@@ -7,8 +7,8 @@
         xmlns:validation="clr-namespace:AnnoMapEditor.MapTemplates.Validation"
         mc:Ignorable="d"
         d:DataContext="{d:DesignData Type=local:SelectIslandViewModel}"
-        d:DesignHeight="450"
-        d:DesignWidth="800"
+        d:DesignWidth="900"
+        d:DesignHeight="1440"
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch">
 

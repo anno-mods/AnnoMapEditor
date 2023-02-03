@@ -17,6 +17,7 @@
                 <ResourceDictionary Source="../../Resources/Styles.xaml" />
                 <ResourceDictionary>
                     <converters:ObjectToVisibility x:Key="CollapsedOnNull" />
+                    <converters:BoolToVisibility x:Key="VisibleOnFalse" OnTrue="Collapsed" OnFalse="Visible" />
                     <converters:BooleaNotConverter x:Key="booleanNot" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
@@ -24,9 +25,14 @@
     </UserControl.Resources>
 
     <StackPanel Visibility="{Binding Converter={StaticResource CollapsedOnNull}, UpdateSourceTrigger=PropertyChanged}"
-                Width="100"
-                Margin="0">
+                Margin="16">
 
+        <!-- Header -->
+        <TextBlock Style="{StaticResource HeaderLabelStyle}"
+                   HorizontalAlignment="Left"
+                   Text="Fixed Island"
+                   Margin="0"/>
+        
         <!-- Label -->
         <TextBlock Text="Label"
                    Style="{StaticResource SubHeaderLabelStyle}"/>
@@ -36,21 +42,24 @@
         <!-- Rotation -->
         <TextBlock Text="Rotation"
                    Style="{StaticResource SubHeaderLabelStyle}"/>
-        <local:FancyToggle Label="Random"
-                           IsChecked="{Binding RandomRotation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <local:FancyToggle Label="Randomize"
+                           OnText="Yes" OffText="No"
+                           IsChecked="{Binding FixedIsland.RandomizeRotation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0"
-                        Click="OnRotateCounterClockwise" 
-                        Content="⤹"
-                        IsEnabled="{Binding RandomRotation, Converter={StaticResource booleanNot}}"/>
+                    Click="OnRotateCounterClockwise"
+                    ToolTip="rotate counter clockwise"
+                    Content="⤹"
+                    Visibility="{Binding FixedIsland.RandomizeRotation, Converter={StaticResource VisibleOnFalse}}"/>
             <Button Grid.Column="1"
-                        Click="OnRotateClockwise" 
-                        Content="⤸"
-                        IsEnabled="{Binding RandomRotation, Converter={StaticResource booleanNot}}"/>
+                    Click="OnRotateClockwise" 
+                    ToolTip="rotate clockwise"
+                    Content="⤸"
+                    Visibility="{Binding FixedIsland.RandomizeRotation, Converter={StaticResource VisibleOnFalse}}"/>
         </Grid>
 
         <!-- IslandType -->

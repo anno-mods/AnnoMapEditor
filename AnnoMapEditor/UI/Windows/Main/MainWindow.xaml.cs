@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using AnnoMapEditor.Utilities;
+using AnnoMapEditor.UI.Overlays;
+using AnnoMapEditor.UI.Overlays.ExportAsMod;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
@@ -168,7 +170,10 @@ namespace AnnoMapEditor.UI.Windows.Main
             if (ViewModel.Session is null)
                 return;
 
-            exportDialog.Show(ViewModel.Session);
+            OverlayService.Instance.Show(new ExportAsModViewModel()
+            {
+                Session = ViewModel.Session
+            });
         }
 
         private void NewMapFile_Click(object sender, RoutedEventArgs e)

@@ -11,16 +11,6 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
 
         public ObservableCollection<IslandType> IslandTypeItems { get; } = new();
 
-        public bool RandomRotation
-        {
-            get => FixedIsland.Rotation == null;
-            set
-            {
-                FixedIsland.Rotation = value ? null : 0;
-                OnPropertyChanged();
-            }
-        }
-
 
         public FixedIslandPropertiesViewModel(FixedIslandElement fixedIslands)
         {
