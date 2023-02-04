@@ -45,6 +45,30 @@
                      Fill="Gold"
                      Points="0,0 40,0 0,40"
                      Visibility="{Binding RandomizeRotation, Converter={StaticResource VisibleOnFalse}, FallbackValue=Hidden}"/>
+
+        </Canvas>
+
+        <!-- lock icon-->
+        <Canvas RenderTransformOrigin="0.5,0.5"
+                Width="{Binding SizeInTiles}"
+                Height="{Binding SizeInTiles}"
+                Visibility="{Binding Island.IsLocked, Converter={StaticResource VisibleOnTrue}}">
+            <Canvas.RenderTransform>
+                <RotateTransform Angle="180"/>
+            </Canvas.RenderTransform>
+
+            <Image Source="{Binding LockIconOutline}"
+                   RenderTransformOrigin="0.5,0.5">
+                <Image.RenderTransform>
+                    <RotateTransform Angle="-45"/>
+                </Image.RenderTransform>
+            </Image>
+            <Image Source="{Binding LockIcon}"
+                   RenderTransformOrigin="0.5,0.5">
+                <Image.RenderTransform>
+                    <RotateTransform Angle="-45"/>
+                </Image.RenderTransform>
+            </Image>
         </Canvas>
 
         <!-- Label -->

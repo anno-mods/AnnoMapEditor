@@ -14,6 +14,19 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
         private Vector2 _position = Vector2.Zero;
 
+        public bool IsLocked 
+        {
+            get => _isLocked;
+            set => SetProperty(ref _isLocked, value, new[] { nameof(IsUnlocked) });
+        }
+        private bool _isLocked;
+
+        public bool IsUnlocked
+        {
+            get => !_isLocked;
+            set => SetProperty(ref _isLocked, !value, new[] { nameof(IsLocked) });
+        }
+
 
         public MapElement()
         {

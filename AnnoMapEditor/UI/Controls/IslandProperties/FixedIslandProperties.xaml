@@ -34,49 +34,58 @@
                    HorizontalAlignment="Left"
                    Text="Fixed Island"
                    Margin="0"/>
-        
-        <!-- Label -->
-        <TextBlock Text="Label"
-                   Style="{StaticResource SubHeaderLabelStyle}"/>
-        <TextBox Margin="2"
-                     Text="{Binding FixedIsland.Label, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <!-- Rotation -->
-        <TextBlock Text="Rotation"
+        <!-- lockable properties -->
+        <StackPanel IsEnabled="{Binding FixedIsland.IsUnlocked}">
+
+            <!-- Label -->
+            <TextBlock Text="Label"
                    Style="{StaticResource SubHeaderLabelStyle}"/>
-        <local:FancyToggle Label="Randomize"
+            <TextBox Margin="2"
+                     Text="{Binding FixedIsland.Label, UpdateSourceTrigger=PropertyChanged}" />
+
+            <!-- Rotation -->
+            <TextBlock Text="Rotation"
+                   Style="{StaticResource SubHeaderLabelStyle}"/>
+            <local:FancyToggle Label="Randomize"
                            OnText="Yes" OffText="No"
                            IsEnabled="{Binding IsContinentalIsland, Converter={StaticResource BooleanNot}}"
                            IsChecked="{Binding FixedIsland.RandomizeRotation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0"
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
                     Click="OnRotateCounterClockwise"
                     ToolTip="rotate counter clockwise"
                     Content="⤹"
                     Visibility="{Binding FixedIsland.RandomizeRotation, Converter={StaticResource VisibleOnFalse}}"/>
-            <Button Grid.Column="1"
+                <Button Grid.Column="1"
                     Click="OnRotateClockwise" 
                     ToolTip="rotate clockwise"
                     Content="⤸"
                     Visibility="{Binding FixedIsland.RandomizeRotation, Converter={StaticResource VisibleOnFalse}}"/>
-        </Grid>
+            </Grid>
 
-        <!-- IslandType -->
-        <TextBlock Text="Island Type"
-                   Style="{StaticResource SubHeaderLabelStyle}"/>
-        <ComboBox Margin="4"
-                      ItemsSource="{Binding IslandTypeItems}"
-                      SelectedItem="{Binding FixedIsland.IslandType}"/>
+            <!-- IslandType -->
+            <TextBlock Text="Island Type"
+                        Style="{StaticResource SubHeaderLabelStyle}"/>
+            <ComboBox Margin="4"
+                  ItemsSource="{Binding IslandTypeItems}" />
 
-        <!-- Fertilities -->
-        <fertilities:FertilityControl DataContext="{Binding FertilitiesViewModel}" />
+            <!-- Fertilities -->
+            <fertilities:FertilityControl DataContext="{Binding FertilitiesViewModel}" />
+
+            <!-- Slots -->
+            <slots:SlotsControl DataContext="{Binding SlotsViewModel}" />
+
+        </StackPanel>
         
-        <!-- Slots -->
-        <slots:SlotsControl DataContext="{Binding SlotsViewModel}" />
-
+        <!-- Locking -->
+        <local:FancyToggle Label="Lock Island"
+                           OnText="Locked" OffText="Unlocked"
+                           Margin="0,32"
+                           IsChecked="{Binding FixedIsland.IsLocked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
     </StackPanel>
 </UserControl>

@@ -17,6 +17,7 @@
                 <ResourceDictionary Source="../../Resources/Styles.xaml" />
                 <ResourceDictionary>
                     <converters:ObjectToVisibility x:Key="CollapsedOnNull" />
+                    <converters:BooleaNotConverter x:Key="BooleanNot" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -31,25 +32,35 @@
                    Text="Random Island"
                    Margin="0"/>
 
-        <!-- Label -->
-        <TextBlock Text="Label"
-                   Style="{StaticResource SubHeaderLabelStyle}"/>
-        <TextBox Margin="2"
-                    Text="{Binding RandomIsland.Label, UpdateSourceTrigger=PropertyChanged}"/>
+        <!-- lockable properties -->
+        <StackPanel IsEnabled="{Binding RandomIsland.IsUnlocked}">
 
-        <!-- IslandType -->
-        <TextBlock Text="Island Type"
-                   Style="{StaticResource SubHeaderLabelStyle}"/>
-        <ComboBox Margin="2"
-                    ItemsSource="{Binding IslandTypeItems}"
-                    SelectedItem="{Binding RandomIsland.IslandType}"/>
+            <!-- Label -->
+            <TextBlock Text="Label"
+                       Style="{StaticResource SubHeaderLabelStyle}"/>
+            <TextBox Margin="2"
+                     Text="{Binding RandomIsland.Label, UpdateSourceTrigger=PropertyChanged}" />
 
-        <!-- IslandSize -->
-        <TextBlock Text="Island Size"
-                   Style="{StaticResource SubHeaderLabelStyle}"/>
-        <ComboBox Margin="2"
-                    ItemsSource="{Binding IslandSizeItems}"
-                    SelectedItem="{Binding RandomIsland.IslandSize}"/>
-            
+            <!-- IslandType -->
+            <TextBlock Text="Island Type"
+                       Style="{StaticResource SubHeaderLabelStyle}"/>
+            <ComboBox Margin="2"
+                      ItemsSource="{Binding IslandTypeItems}"
+                      SelectedItem="{Binding RandomIsland.IslandType}" />
+
+            <!-- IslandSize -->
+            <TextBlock Text="Island Size"
+                      Style="{StaticResource SubHeaderLabelStyle}"/>
+            <ComboBox Margin="2"
+                      ItemsSource="{Binding IslandSizeItems}"
+                      SelectedItem="{Binding RandomIsland.IslandSize}" />
+
+        </StackPanel>
+
+        <!-- Locking -->
+        <local:FancyToggle Label="Lock Island"
+                           OnText="Locked" OffText="Unlocked"
+                           Margin="0,32"
+                           IsChecked="{Binding RandomIsland.IsLocked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
     </StackPanel>
 </UserControl>
