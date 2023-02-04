@@ -5,13 +5,9 @@ using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace AnnoMapEditor.UI.Overlays.SelectSlots
 {
@@ -59,7 +55,29 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
     public class SelectSlotsViewModel : ObservableBase, IOverlayViewModel
     {
-        public Region Region { get; init; }
+        public IEnumerable<Region?> Regions { get; init; } = Region.All;
+
+        private readonly Region _initialRegion;
+
+        public Region SelectedRegion
+        {
+            get => _selectedRegion;
+            set
+            {
+                _selectedRegion = value;
+                UpdateFilter();
+
+                ShowRegionWarning = _selectedRegion != _initialRegion;
+            }
+        }
+        private Region _selectedRegion;
+
+        public bool ShowRegionWarning
+        {
+            get => _showRegionWarning;
+            set => SetProperty(ref _showRegionWarning, value);
+        }
+        private bool _showRegionWarning = false;
 
         public FixedIslandElement FixedIsland { get; init; }
 
@@ -103,13 +121,13 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
         public SelectSlotsViewModel(Region region, FixedIslandElement fixedIsland)
         {
-            Region = region;
+            _selectedRegion = _initialRegion = region;
             FixedIsland = fixedIsland;
 
             SlotAssignmentViewModels = new(
                 fixedIsland.SlotAssignments.Values
                     .Where(s => s.Slot.SlotAsset != null)
-                    .Select(s => new SlotAssignmentViewModel(s))
+                    .Select(s => new SlotAssignmentViewModel(s, region))
                     .OrderBy(s => s.SlotAssignment.Slot.Position, new SlotPositionComparer(fixedIsland.IslandAsset.SizeInTiles))
                 );
 
@@ -144,7 +162,10 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
             long slotGroupId = slotAssignment.SlotAssignment.Slot.ObjectGuid;
 
-            if (!ShowMines && slotGroupId == SlotAsset.RANDOM_MINE_GUID)
+            if (!ShowMines && (
+                  slotGroupId == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID 
+               || slotGroupId == SlotAsset.RANDOM_MINE_NEW_WORLD_GUID
+               || slotGroupId == SlotAsset.RANDOM_MINE_ARCTIC_GUID))
                 return false;
 
             if (!ShowClay && slotGroupId == SlotAsset.RANDOM_CLAY_GUID)
@@ -161,6 +182,9 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             CollectionViewSource.GetDefaultView(SlotAssignmentViewModels).Refresh();
             CollectionViewSource.GetDefaultView(SlotAssignmentViewModelsLeft).Refresh();
             CollectionViewSource.GetDefaultView(SlotAssignmentViewModelsRight).Refresh();
+
+            foreach (SlotAssignmentViewModel slotAssignment in SlotAssignmentViewModels)
+                slotAssignment.SelectedRegion = _selectedRegion;
         }
 
         public void OnClosed()

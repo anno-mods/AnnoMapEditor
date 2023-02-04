@@ -1,9 +1,8 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
+using AnnoMapEditor.MapTemplates.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
@@ -11,7 +10,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
     [AssetTemplate("Slot")]
     public class SlotAsset : StandardAsset
     {
-        public const long RANDOM_MINE_GUID = 1000029;
+        public const long RANDOM_MINE_OLD_WORLD_GUID = 1000029;
+        public const long RANDOM_MINE_NEW_WORLD_GUID = 614;
+        public const long RANDOM_MINE_ARCTIC_GUID = 116037;
         public const long RANDOM_CLAY_GUID = 100417;
         public const long RANDOM_OIL_GUID = 100849;
 
@@ -26,6 +27,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         [AssetReference(nameof(ReplacementGuids))]
         public IEnumerable<SlotAsset> ReplacementSlotAssets { get; set; }
+
+        public IEnumerable<Region> AssociatedRegions { get; init; }
 
 
         public SlotAsset()
@@ -43,7 +46,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 .Element("English")!
                 .Element("Text")!
                 .Value!;
-
 
             SlotType = valuesXml.Element("Slot")?
                 .Element("SlotType")?
@@ -65,6 +67,14 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 .ToList();
 
             ReplacementGuids = replacementGuids ?? dlcReplacementGuids ?? Array.Empty<long>();
+
+            AssociatedRegions = valuesXml.Element("Building")?
+                .Element("AssociatedRegions")?
+                .Value?
+                .Split(';')
+                .Select(id => Region.FromRegionId(id))
+                .ToArray()
+                ?? Array.Empty<Region>();
         }
     }
 }

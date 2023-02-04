@@ -1,12 +1,11 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+using System.Windows.Data;
 using System.Windows.Media;
 
 namespace AnnoMapEditor.UI.Overlays.SelectSlots
@@ -33,7 +32,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             }
         }
 
-        public IEnumerable<SlotAsset> SlotItems { get; init; }
+        public ObservableCollection<SlotAsset> SlotItems { get; init; }
 
         public bool HasFocus
         {
@@ -63,19 +62,62 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         }
         private Brush _backgroundBrush;
 
+        public Region SelectedRegion
+        {
+            get => _selectedRegion;
+            set
+            {
+                SetProperty(ref _selectedRegion, value);
+                UpdateFilter();
+            }
+        }
+        private Region _selectedRegion;
 
-        public SlotAssignmentViewModel(SlotAssignment slotAssignment)
+
+        public SlotAssignmentViewModel(SlotAssignment slotAssignment, Region selectedRegion)
         {
             SlotAssignment = slotAssignment;
+            _selectedRegion = selectedRegion;
 
             // copy the list of allowed replacements and add the EmptySlot to the end
-            List<SlotAsset> slotItems = new(slotAssignment.Slot.SlotAsset!.ReplacementSlotAssets);
-            slotItems.Add(EmptySlot);
-            SlotItems = slotItems;
+            SlotItems = new(slotAssignment.Slot.SlotAsset!.ReplacementSlotAssets);
+            SlotItems.Add(EmptySlot);
+
+            CollectionView fertilitiesView = (CollectionView)CollectionViewSource.GetDefaultView(SlotItems);
+            fertilitiesView.Filter = SlotAssetFilter;
 
             UpdateBrushes();
         }
 
+
+        private bool SlotAssetFilter(object item)
+        {
+            if (item is not SlotAsset slotAsset)
+                throw new ArgumentException();
+
+            // Warning: Hardcoding
+            // The New World uses both random mine slots 614 and 1000029. However, none of the
+            // replacements for 1000029 contain the New World as an AssociatedRegion. Despite of
+            // this, it is possible to have both 1010502 Iron Deposit and 1010507 Gold Deposit in
+            // the New World.
+            if (_selectedRegion == Region.NewWorld
+                && SlotAssignment.Slot.ObjectGuid == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID
+                && (slotAsset.GUID == 1010501 || slotAsset.GUID == 1010507))
+                return true;
+
+            if (slotAsset == EmptySlot || slotAsset == AssignedSlot)
+                return true;
+
+            if (slotAsset.AssociatedRegions.Contains(_selectedRegion))
+                return true;
+
+            return false;
+        }
+
+        private void UpdateFilter()
+        {
+            CollectionViewSource.GetDefaultView(SlotItems).Refresh();
+        }
 
         public void OnGotFocus()
         {
@@ -98,11 +140,15 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             }
             else
             {
-                if (SlotAssignment.Slot.ObjectGuid == SlotAsset.RANDOM_MINE_GUID)
+                long randomSlotGuid = SlotAssignment.Slot.ObjectGuid;
+
+                if (randomSlotGuid == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID 
+                    || randomSlotGuid == SlotAsset.RANDOM_MINE_NEW_WORLD_GUID
+                    || randomSlotGuid == SlotAsset.RANDOM_MINE_ARCTIC_GUID)
                     PinBrush = Brushes.Gray;
-                else if (SlotAssignment.Slot.ObjectGuid == SlotAsset.RANDOM_CLAY_GUID)
+                else if (randomSlotGuid == SlotAsset.RANDOM_CLAY_GUID)
                     PinBrush = Brushes.SandyBrown;
-                else if (SlotAssignment.Slot.ObjectGuid == SlotAsset.RANDOM_OIL_GUID)
+                else if (randomSlotGuid == SlotAsset.RANDOM_OIL_GUID)
                     PinBrush = Brushes.DarkSlateGray;
                 else
                     PinBrush = Brushes.Red;

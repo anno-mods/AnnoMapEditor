@@ -23,8 +23,8 @@
         </Grid.Resources>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="32"/>
             <RowDefinition>
                 <RowDefinition.Style>
                     <Style TargetType="{x:Type RowDefinition}">

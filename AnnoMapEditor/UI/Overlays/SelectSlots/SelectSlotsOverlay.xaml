@@ -53,12 +53,24 @@
         </Grid.Resources>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="32"/>
+            <RowDefinition>
+                <RowDefinition.Style>
+                    <Style TargetType="{x:Type RowDefinition}">
+                        <Setter Property="Height" Value="0" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShowRegionWarning}" Value="True">
+                                <Setter Property="Height" Value="30" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </RowDefinition.Style>
+            </RowDefinition>
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition />
             <ColumnDefinition />
             <ColumnDefinition />
             <ColumnDefinition />
@@ -71,31 +83,39 @@
                 IsCancel="True" />
 
         <!-- filters -->
+        <ComboBox Grid.Row="1"
+                  Grid.Column="0" 
+                  HorizontalAlignment="Stretch"
+                  Margin="4"
+                  ItemsSource="{Binding Regions}"
+                  SelectedItem="{Binding SelectedRegion}"/>
         <controls:FancyToggle x:Name="MinesFilter"
                               Grid.Row="1"
-                              Grid.Column="0"
+                              Grid.Column="1"
                               Label="Mines" 
                               OnText="Show" OffText="Hide" 
                               IsChecked="{Binding ShowMines, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              HorizontalAlignment="Right"/>
+                              HorizontalAlignment="Center"/>
         <controls:FancyToggle x:Name="ClayFilter"
                               Grid.Row="1"
-                              Grid.Column="1"
+                              Grid.Column="2"
                               Label="Clay" 
                               OnText="Show" OffText="Hide" 
-                              IsChecked="{Binding ShowClay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                              IsChecked="{Binding ShowClay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              HorizontalAlignment="Center"/>
         <controls:FancyToggle x:Name="OilFilter"
                               Grid.Row="1"
-                              Grid.Column="2"
+                              Grid.Column="3"
                               Label="Oil" 
                               OnText="Show" OffText="Hide" 
-                              IsChecked="{Binding ShowOil, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                              IsChecked="{Binding ShowOil, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              HorizontalAlignment="Center"/>
 
         <!-- region warning -->
         <DockPanel Grid.Row="2"
                    Grid.ColumnSpan="5"
                    Background="DarkRed">
-            <TextBlock Text="Mines from regions other than the session's region may not work correctly. Additional mods may be required."
+            <TextBlock Text="Slots from regions other than the session's region may not work correctly. Additional mods may be required."
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Margin="8,0,0,0"
@@ -105,7 +125,7 @@
         <!-- map -->
         <ListBox x:Name="Map"
                  Grid.Row="3"
-                 Grid.ColumnSpan="3"
+                 Grid.ColumnSpan="4"
                  ItemsSource="{Binding SlotAssignmentViewModels}"
                  Width="{Binding FixedIsland.IslandAsset.SizeInTiles}"
                  Height="{Binding FixedIsland.IslandAsset.SizeInTiles}"
@@ -175,7 +195,7 @@
         </ListView>
         <ListView x:Name="SlotSelectionsRight"
                   Grid.Row="3"
-                  Grid.Column="2"
+                  Grid.Column="3"
                   HorizontalAlignment="Right"
                   VerticalAlignment="Center"
                   Background="Transparent"
