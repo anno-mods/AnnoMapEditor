@@ -10,5 +10,11 @@ namespace AnnoMapEditor.Utilities
     {
         public static IOrderedEnumerable<TSource> OrderBy<TSource>(this IEnumerable<TSource> source, IComparer<TSource>? comparer)
             => source.OrderBy(s => s, comparer);
+
+        public static (IEnumerable<T>, IEnumerable<T>) SliceHalf<T>(this IEnumerable<T> source)
+        {
+            var pivot = source.Count() /2;
+            return (source.Take(pivot), source.Skip(pivot));
+        }
     }
 }

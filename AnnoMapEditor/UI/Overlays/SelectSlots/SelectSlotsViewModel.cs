@@ -13,49 +13,66 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 {
     public delegate void FilterUpdatedEventHandler();
 
-
-    public class SlotPositionComparer : IComparer<Vector2>
+    public class SlotPositionXComparer : IComparer<Vector2>
     {
-        private static readonly Vector NORMAL = new(1, -1);
-
-        private readonly double _islandHalfSize;
-
-        private readonly Vector _islandCenter;
-
-
-        public SlotPositionComparer(int islandSize)
-        {
-            _islandHalfSize = islandSize / 2d;
-            _islandCenter = new(_islandHalfSize, _islandHalfSize);
-        }
-
-
+        /// <summary>
+        /// compares the position of slots on the horizontal axis (note: converter is inverted) 
+        /// </summary>
         public int Compare(Vector2? a, Vector2? b)
         {
             if (a == null || b == null)
                 throw new ArgumentNullException();
 
-            Vector aToCenter = new(a.X - _islandCenter.X, a.Y - _islandCenter.Y);
-            Vector bToCenter = new(b.X - _islandCenter.X, b.Y - _islandCenter.Y);
-
-            double aAngle = Vector.AngleBetween(aToCenter, NORMAL);
-            double bAngle = Vector.AngleBetween(bToCenter, NORMAL);
-
-
-            if (Math.Abs(aAngle - bAngle) < 10 && Math.Abs(aToCenter.Length - bToCenter.Length) > 50)
-                return bToCenter.Length.CompareTo(aToCenter.Length);
-
-            if (aAngle < bAngle)
-                return 1;
-
-            else if (aAngle > bAngle)
-                return -1;
-
-            else
-                return bToCenter.Length.CompareTo(aToCenter.Length);
+            return b.X.CompareTo(a.X);
         }
     }
 
+    public class SlotPositionYComparer : IComparer<Vector2>
+    {
+        /// <summary>
+        /// compares the position of slots on y
+        /// </summary>
+        public int Compare(Vector2? a, Vector2? b)
+        {
+            if (a == null || b == null)
+                throw new ArgumentNullException();
+
+            return a.Y.CompareTo(b.Y);
+        }
+    }
+
+
+    public class SlotPositionVerticalAxisComparer : IComparer<Vector2>
+    {
+        /// <summary>
+        /// compares the position of slots on the vertical view axis 
+        /// </summary>
+        public int Compare(Vector2? a, Vector2? b)
+        {
+            if (a == null || b == null)
+                throw new ArgumentNullException();
+
+            return LinearCombinationOf(a).CompareTo(LinearCombinationOf(b));
+        }
+
+        private float LinearCombinationOf(Vector2 a) => (a.Y - a.X) * 0.5f;
+    }
+
+    public class SlotPositionHorizontalAxisComparer : IComparer<Vector2>
+    {
+        /// <summary>
+        /// compares the position of slots on the horizontal view axis 
+        /// </summary>
+        public int Compare(Vector2? a, Vector2? b)
+        {
+            if (a == null || b == null)
+                throw new ArgumentNullException();
+
+            return LinearCombinationOf(a).CompareTo(LinearCombinationOf(b));
+        }
+
+        private float LinearCombinationOf(Vector2 a) => (a.X + a.Y) * 0.5f;
+    }
 
     public class SelectSlotsViewModel : ObservableBase, IOverlayViewModel
     {
@@ -119,8 +136,8 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         private bool _showOil = true;
 
         public ObservableCollection<SlotAssignmentViewModel> SlotAssignmentViewModels { get; init; }
-        public IEnumerable<SlotAssignmentViewModel> SlotAssignmentViewModelsLeft { get; init; }
-        public IEnumerable<SlotAssignmentViewModel> SlotAssignmentViewModelsRight { get; init; }
+        public IEnumerable<SlotAssignmentViewModel> SlotAssignmentViewModelsLeft { get; private set; }
+        public IEnumerable<SlotAssignmentViewModel> SlotAssignmentViewModelsRight { get; private set; }
 
 
         public SelectSlotsViewModel(Region region, FixedIslandElement fixedIsland)
@@ -132,23 +149,10 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 fixedIsland.SlotAssignments.Values
                     .Where(s => s.Slot.SlotAsset != null)
                     .Select(s => new SlotAssignmentViewModel(s, region))
-                    .OrderBy(s => s.SlotAssignment.Slot.Position, new SlotPositionComparer(fixedIsland.IslandAsset.SizeInTiles))
+                    .OrderByDescending(s => s.SlotAssignment.Slot.Position, new SlotPositionHorizontalAxisComparer())
                 );
 
-            List<SlotAssignmentViewModel> left = new();
-            Stack<SlotAssignmentViewModel> right = new();
-            foreach (SlotAssignmentViewModel slot in SlotAssignmentViewModels)
-            {
-                Vector2 slotPosition = slot.SlotAssignment.Slot.Position;
-
-                if (slotPosition.Y > -slotPosition.X + fixedIsland.IslandAsset.SizeInTiles)
-                    left.Add(slot);
-                else
-                    right.Push(slot);
-            }
-
-            SlotAssignmentViewModelsLeft = left;
-            SlotAssignmentViewModelsRight = right.ToList();
+            ArrangeSlots();
 
             CollectionView slotsView = (CollectionView)CollectionViewSource.GetDefaultView(SlotAssignmentViewModels);
             CollectionView slotsLeftView = (CollectionView)CollectionViewSource.GetDefaultView(SlotAssignmentViewModelsLeft);
@@ -156,6 +160,35 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             slotsView.Filter = SlotFilter;
             slotsLeftView.Filter = SlotFilter;
             slotsRightView.Filter = SlotFilter;
+        }
+
+        public void ArrangeSlots()
+        {
+            var (left, right) = SlotAssignmentViewModels.SliceHalf();
+
+            left = left.OrderBy(s => s.SlotAssignment.Slot.Position, new SlotPositionVerticalAxisComparer()).ToList();
+            right = right.OrderBy(s => s.SlotAssignment.Slot.Position, new SlotPositionVerticalAxisComparer()).ToList();
+
+            //quarters 
+            SlotAssignmentViewModelsLeft = SliceSortRecombine(left,
+                new SlotPositionYComparer(),
+                new SlotPositionXComparer());
+            SlotAssignmentViewModelsRight = SliceSortRecombine(right,
+                new SlotPositionXComparer(),
+                new SlotPositionYComparer());
+        }
+
+        private IEnumerable<SlotAssignmentViewModel> SliceSortRecombine(
+            IEnumerable<SlotAssignmentViewModel> slots,
+            IComparer<Vector2> upperComparer, 
+            IComparer<Vector2> lowerComparer)
+        {
+            var (upper, lower) = slots.SliceHalf();
+            upper = upper.OrderBy(s => s.SlotAssignment.Slot.Position, upperComparer);
+            lower = lower.OrderBy(s => s.SlotAssignment.Slot.Position, lowerComparer);
+            var result = upper.ToList();
+            result.AddRange(lower);
+            return result;
         }
 
 
