@@ -21,5 +21,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public IEnumerable<IslandType> IslandType { get; init; }
 
         public int SizeInTiles { get; init; }
+
+        public IReadOnlyDictionary<long, Slot> Slots { get; init; }
     }
 }

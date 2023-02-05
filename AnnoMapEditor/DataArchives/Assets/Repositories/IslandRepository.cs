@@ -1,6 +1,5 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Enums;
-using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections;
@@ -10,7 +9,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 
 namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
@@ -95,6 +93,13 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
                 IslandSize islandSize = IslandSize.All.FirstOrDefault(s => fixedIsland.SizeInTiles <= s.DefaultSizeInTiles)!;
                 
+                // resolve slot guids to assets ignoring WorkAreas
+                foreach (Slot slot in fixedIsland.Slots.Values)
+                {
+                    if (_assetRepository.TryGet(slot.ObjectGuid, out SlotAsset? slotAsset))
+                        slot.SlotAsset = slotAsset!;
+                }
+
                 Add(new()
                 {
                     FilePath = filePath,
@@ -105,6 +110,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     IslandType = randomIsland?.IslandType ?? new[] { DetectIslandTypeFromPath(filePath) },
                     IslandSize = new[] { islandSize },
                     SizeInTiles = fixedIsland.SizeInTiles,
+                    Slots = fixedIsland.Slots,
                 });
             }
 

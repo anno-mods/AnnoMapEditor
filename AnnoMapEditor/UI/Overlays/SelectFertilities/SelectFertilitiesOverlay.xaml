@@ -1,15 +1,15 @@
-﻿<UserControl x:Class="AnnoMapEditor.UI.Overlays.SelectIsland.SelectIslandOverlay"
+﻿<UserControl x:Class="AnnoMapEditor.UI.Overlays.SelectFertilities.SelectFertilitiesOverlay"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AnnoMapEditor.UI.Overlays.SelectIsland"
-        xmlns:validation="clr-namespace:AnnoMapEditor.MapTemplates.Validation"
+        xmlns:local="clr-namespace:AnnoMapEditor.UI.Overlays.SelectFertilities"
+        xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
         xmlns:e="clr-namespace:EventBinder;assembly=EventBinder" Name="Wnd"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignData Type=local:SelectIslandViewModel}"
-        d:DesignWidth="900"
-        d:DesignHeight="1440"
+        d:DataContext="{d:DesignData Type=local:SelectFertilitiesViewModel}"
+        d:DesignHeight="450"
+        d:DesignWidth="800"
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch">
 
@@ -18,6 +18,10 @@
     </UserControl.Resources>
 
     <Grid Background="{StaticResource DialogBrush}">
+        <Grid.Resources>
+            <converters:BoolToVisibility x:Key="boolToVisibility" OnTrue="Visible" OnFalse="Collapsed" />
+        </Grid.Resources>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition Height="32"/>
@@ -34,7 +38,7 @@
                 </RowDefinition.Style>
             </RowDefinition>
             <RowDefinition />
-        </Grid.RowDefinitions>
+        </Grid.RowDefinitions> 
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition />
@@ -45,45 +49,27 @@
         
         <!-- cancel button -->
         <Button Grid.Column="4"
-                Content="Cancel"
-                Click="{e:EventBinding OnCancel}"
+                Content="Close"
+                Click="{e:EventBinding OnClosed}"
                 IsCancel="True" />
         
         <!-- filters -->
         <TextBox Grid.Row="1"
                  Grid.Column="0"
                  Margin="4"
-                 Text="{Binding PathFilter, UpdateSourceTrigger=PropertyChanged}"/>
+                 Text="{Binding NameFilter, UpdateSourceTrigger=PropertyChanged}"/>
         <ComboBox Grid.Row="1"
                   Grid.Column="1" 
                   HorizontalAlignment="Stretch"
                   Margin="4"
                   ItemsSource="{Binding Regions}"
                   SelectedItem="{Binding SelectedRegion}"/>
-        <ComboBox Grid.Row="1"
-                  Grid.Column="2" 
-                  HorizontalAlignment="Stretch"
-                  Margin="4"
-                  ItemsSource="{Binding IslandSizes}"
-                  SelectedItem="{Binding SelectedIslandSize}"/>
-        <ComboBox Grid.Row="1"
-                  Grid.Column="3" 
-                  HorizontalAlignment="Stretch"
-                  Margin="4"
-                  ItemsSource="{Binding IslandTypes}"
-                  SelectedItem="{Binding SelectedIslandType}"/>
-        <ComboBox Grid.Row="1"
-                  Grid.Column="4"
-                  HorizontalAlignment="Stretch"
-                  Margin="4"
-                  ItemsSource="{Binding IslandDifficulties}"
-                  SelectedItem="{Binding SelectedIslandDifficulty}"/>
 
         <!-- region warning -->
         <DockPanel Grid.Row="2"
                    Grid.ColumnSpan="5"
                    Background="DarkRed">
-            <TextBlock Text="{x:Static validation:Warnings.ISLAND_OTHER_REGION}"
+            <TextBlock Text="Fertilities from regions other than the session's region may not work correctly. Additional mods may be required."
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Margin="8,0,0,0"
@@ -93,9 +79,8 @@
         <!-- tiles -->
         <ListBox Grid.Row="3"
                  Grid.ColumnSpan="5"
-                 Name="IslandsList"
-                 ItemsSource="{Binding Islands}"
-                 SelectedItem="{Binding SelectedIsland}"
+                 Name="FertilitiesList"
+                 ItemsSource="{Binding FertilityItems}"
                  HorizontalContentAlignment="Stretch"
                  VerticalContentAlignment="Stretch"
                  VerticalAlignment="Top"
@@ -104,23 +89,19 @@
             <!-- Items -->
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel ToolTip="{Binding DisplayName}">
-                        <Canvas VerticalAlignment="Bottom">
-                            <Image Source="{Binding Thumbnail}"
-                                Width="{Binding ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}}"/>
-                        </Canvas>
+                    <StackPanel Height="40"
+                                Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Image Source="{Binding FertilityAsset.Icon}"
+                               Width="32"
+                               Height="32"
+                               Margin="4"/>
+                        <TextBlock Text="{Binding FertilityAsset.DisplayName}"
+                                   Foreground="White"
+                                   VerticalAlignment="Center"/>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-
-            <!-- Style -->
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Padding" Value="0" />
-                    <!-- square tiles -->
-                    <Setter Property="Height" Value="{Binding ActualWidth, RelativeSource={RelativeSource Self}}" />
-                </Style>
-            </ListBox.ItemContainerStyle>
 
             <!-- Tiling -->
             <ListBox.Style>

@@ -39,14 +39,89 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
             foreach (string mapFilePath in _dataArchive.Find("**.a7m"))
             {
-                BitmapImage thumbnail = ReadThumbnail(mapFilePath)!;
-                int sizeInTiles = ReadSizeInTiles(mapFilePath);
+                // thumbnail
+                string thumbnailPath = Path.Combine(
+                    Path.GetDirectoryName(mapFilePath)!,
+                    "_gamedata",
+                    Path.GetFileNameWithoutExtension(mapFilePath),
+                    "mapimage.png");
+                BitmapImage thumbnail = _dataArchive.TryLoadPng(thumbnailPath)
+                    ?? throw new Exception($"Could not load island thumbnail '{thumbnailPath}'.");
+
+                // open a7minfo
+                string infoFilePath = mapFilePath + "info";
+                IFileDBDocument infoDoc = ReadFileDB(infoFilePath)
+                    ?? throw new Exception($"Could not load a7minfo '{infoFilePath}'.");
+
+                // get the island's size in tiles
+                Attrib sizeInTilesAttrib = infoDoc.GetAttrib("MapSize");
+                int sizeInTiles = BitConverter.ToInt32(sizeInTilesAttrib.Content, 0);
+
+                // get slots
+                // The list of slots is found at <ObjectMetaInfo><SlotObjects> within the
+                // a7mfile. It has two kinds of elements.
+                //
+                // First there are lists with a single item of the following form. They denote the
+                // slot group the following slots belong to.
+                //   <None>
+                //     <value>
+                //       <id>{byte[2]}</id>
+                //     </value>
+                //   </None>.
+                //
+                // The actual lists of slots look like this:
+                //   <None>
+                //     <None>
+                //       <ObjectId>{long}</ObjectId>
+                //       <ObjectGuid>{long}</ObjectGuid>
+                //       <Position>{float[3]}</Position>
+                //     <None>
+                //   <None>
+                Tag slotObjects = infoDoc.GetTag("ObjectMetaInfo").GetTag("SlotObjects");
+                Dictionary<long, Slot> mineSlots = new();
+                short slotGroupId = 0;
+                foreach (Tag child in slotObjects.Children)
+                {
+                    Tag? valueTag = child.Children.FirstOrDefault(c => c.Name == "value") as Tag;
+                    // group entry
+                    if (valueTag != null)
+                    {
+                        Attrib idAttrib = valueTag.GetAttrib("id");
+                        slotGroupId = BitConverter.ToInt16(idAttrib.Content, 0);
+                    }
+                    // slots entry
+                    else
+                    {
+                        foreach (Tag slotElement in child.Children)
+                        {
+                            Attrib objectIdAttrib = slotElement.GetAttrib("ObjectId");
+                            long objectId = BitConverter.ToInt64(objectIdAttrib.Content, 0);
+
+                            Attrib objectGuidAttrib = slotElement.GetAttrib("ObjectGuid");
+                            int objectGuid = BitConverter.ToInt32(objectGuidAttrib.Content, 0);
+
+                            Attrib positionAttrib = slotElement.GetAttrib("Position");
+                            float x = BitConverter.ToSingle(positionAttrib.Content, 0);
+                            float z = BitConverter.ToSingle(positionAttrib.Content, 8);
+
+                            Slot mineSlot = new()
+                            {
+                                GroupId = slotGroupId,
+                                ObjectId = objectId,
+                                ObjectGuid = objectGuid,
+                                Position = new((int)x, (int)z)
+                            };
+                            mineSlots.Add(mineSlot.ObjectId, mineSlot);
+                        }
+                    }
+                }
 
                 FixedIslandAsset fixedIsland = new()
                 {
                     FilePath = mapFilePath,
                     SizeInTiles = sizeInTiles,
-                    Thumbnail = thumbnail
+                    Thumbnail = thumbnail,
+                    Slots = mineSlots
                 };
 
                 Add(fixedIsland);
