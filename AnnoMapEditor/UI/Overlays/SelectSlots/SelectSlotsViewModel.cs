@@ -16,7 +16,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
     public class SlotPositionComparer : IComparer<Vector2>
     {
-        private static readonly Vector NORMAL = new(1, 0);
+        private static readonly Vector NORMAL = new(1, -1);
 
         private readonly double _islandHalfSize;
 
@@ -38,14 +38,18 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             Vector aToCenter = new(a.X - _islandCenter.X, a.Y - _islandCenter.Y);
             Vector bToCenter = new(b.X - _islandCenter.X, b.Y - _islandCenter.Y);
 
-            double aAngle = Math.Atan2(aToCenter.Y - NORMAL.Y, aToCenter.X - NORMAL.X);
-            double bAngle = Math.Atan2(bToCenter.Y - NORMAL.Y, bToCenter.X - NORMAL.X);
+            double aAngle = Vector.AngleBetween(aToCenter, NORMAL);
+            double bAngle = Vector.AngleBetween(bToCenter, NORMAL);
+
+
+            if (Math.Abs(aAngle - bAngle) < 10 && Math.Abs(aToCenter.Length - bToCenter.Length) > 50)
+                return bToCenter.Length.CompareTo(aToCenter.Length);
 
             if (aAngle < bAngle)
-                return -1;
+                return 1;
 
             else if (aAngle > bAngle)
-                return 1;
+                return -1;
 
             else
                 return bToCenter.Length.CompareTo(aToCenter.Length);
@@ -132,7 +136,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 );
 
             List<SlotAssignmentViewModel> left = new();
-            List<SlotAssignmentViewModel> right = new();
+            Stack<SlotAssignmentViewModel> right = new();
             foreach (SlotAssignmentViewModel slot in SlotAssignmentViewModels)
             {
                 Vector2 slotPosition = slot.SlotAssignment.Slot.Position;
@@ -140,11 +144,11 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 if (slotPosition.Y > -slotPosition.X + fixedIsland.IslandAsset.SizeInTiles)
                     left.Add(slot);
                 else
-                    right.Add(slot);
+                    right.Push(slot);
             }
 
             SlotAssignmentViewModelsLeft = left;
-            SlotAssignmentViewModelsRight = right;
+            SlotAssignmentViewModelsRight = right.ToList();
 
             CollectionView slotsView = (CollectionView)CollectionViewSource.GetDefaultView(SlotAssignmentViewModels);
             CollectionView slotsLeftView = (CollectionView)CollectionViewSource.GetDefaultView(SlotAssignmentViewModelsLeft);
@@ -163,7 +167,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             long slotGroupId = slotAssignment.SlotAssignment.Slot.ObjectGuid;
 
             if (!ShowMines && (
-                  slotGroupId == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID 
+                  slotGroupId == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID
                || slotGroupId == SlotAsset.RANDOM_MINE_NEW_WORLD_GUID
                || slotGroupId == SlotAsset.RANDOM_MINE_ARCTIC_GUID))
                 return false;
