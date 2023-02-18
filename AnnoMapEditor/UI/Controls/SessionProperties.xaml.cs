@@ -17,6 +17,7 @@ namespace AnnoMapEditor.UI.Controls
             
         }
 
+        
         private void Slider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             if (DataContext is SessionPropertiesViewModel viewModel)
@@ -30,14 +31,6 @@ namespace AnnoMapEditor.UI.Controls
             if (DataContext is SessionPropertiesViewModel viewModel)
             {
                 viewModel.DragInProgress = true;
-            }
-        }
-
-        private void FancyToggle_ValueChanged(object sender, RoutedEventArgs e)
-        {
-            if (DataContext is SessionPropertiesViewModel viewModel && viewModel.IsMarginNonCentered)
-            {
-                viewModel.Center();
             }
         }
     }

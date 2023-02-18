@@ -23,7 +23,7 @@ namespace AnnoMapEditor.UI.Controls
 
         private Session? session { get; set; }
         private Rectangle? mapRect { get; set; }
-        private Rectangle? playableRect { get; set; }
+        private PlayableAreaControl? playableRect { get; set; }
         private IList<AddIslandButton>? AddIslands { get; set; }
         private Vector2? oldSize { get; set; }
 
@@ -45,6 +45,84 @@ namespace AnnoMapEditor.UI.Controls
                 }
             }
         }
+
+
+        #region EditPlayableArea DependencyProperty
+        public static readonly DependencyProperty EditPlayableAreaProperty =
+             DependencyProperty.Register("EditPlayableArea",
+                propertyType: typeof(bool),
+                ownerType: typeof(MapView),
+                typeMetadata: new FrameworkPropertyMetadata(defaultValue: false, propertyChangedCallback: EditPlayableAreaPropertyChangedCallback));
+
+        public bool EditPlayableArea
+        {
+            get { return (bool)GetValue(EditPlayableAreaProperty); }
+            set
+            {
+                if ((bool)GetValue(EditPlayableAreaProperty) != value)
+                {
+                    SetValue(EditPlayableAreaProperty, value);
+                    if(playableRect is not null)
+                    {
+                        playableRect.IsEnabled = value;
+                    }
+                }
+            }
+        }
+
+        private static void EditPlayableAreaPropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
+        {
+            // this is the method that is called whenever the dependency property's value has changed
+            if(dependencyObject is MapView mvObject && mvObject.playableRect is not null)
+            {
+                bool val = (bool)args.NewValue;
+                mvObject.playableRect.IsEnabled = val;
+                if (val)
+                    Panel.SetZIndex(mvObject.playableRect, 1);
+                else
+                    Panel.SetZIndex(mvObject.playableRect, 0);
+                mvObject.EnableDisableIslands(!val);
+
+            }
+            
+        }
+        #endregion
+
+        #region ShowPlayableAreaMargins DependencyProperty
+        public static readonly DependencyProperty ShowPlayableAreaMarginsProperty =
+             DependencyProperty.Register("ShowPlayableAreaMargins",
+                propertyType: typeof(bool),
+                ownerType: typeof(MapView),
+                typeMetadata: new FrameworkPropertyMetadata(defaultValue: false, propertyChangedCallback: ShowPlayableAreaMarginsPropertyChangedCallback));
+
+        public bool ShowPlayableAreaMargins
+        {
+            get { return (bool)GetValue(ShowPlayableAreaMarginsProperty); }
+            set
+            {
+                if ((bool)GetValue(ShowPlayableAreaMarginsProperty) != value)
+                {
+                    SetValue(ShowPlayableAreaMarginsProperty, value);
+                    if (playableRect is not null)
+                    {
+                        playableRect.SetShowPlayableAreaMargins(value);
+                    }
+                }
+            }
+        }
+
+        private static void ShowPlayableAreaMarginsPropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
+        {
+            // this is the method that is called whenever the dependency property's value has changed
+            if (dependencyObject is MapView mvObject && mvObject.playableRect is not null)
+            {
+                bool val = (bool)args.NewValue;
+                mvObject.playableRect.SetShowPlayableAreaMargins(val);
+
+            }
+
+        }
+        #endregion
 
         private MapElementViewModel? _selectedElement;
 
@@ -80,91 +158,86 @@ namespace AnnoMapEditor.UI.Controls
         private void UpdateIslands(Session? session)
         {
             //Unlink event handlers from old session object
-            if(this.session is not null)
+            if(session != this.session)
             {
-                UnlinkSessionEventHandlers(this.session);
-            }
-
-            this.session = session;
-
-            sessionCanvas.Children.Clear();
-            if (session is null)
-            {
-                mapRect = null;
-                playableRect = null;
-                AddIslands = null;
-                return;
-            }
-
-            LinkSessionEventHandlers(session);
-
-            mapRect = new Rectangle
-            {
-                Fill = new SolidColorBrush(Color.FromArgb(255, 3, 19, 28)),
-                Width = session.Size.X,
-                Height = session.Size.Y
-            };
-            sessionCanvas.Children.Add(mapRect);
-
-            playableRect = new Rectangle
-            {
-                Fill = new SolidColorBrush(Color.FromArgb(255, 24, 43, 63)),
-                Width = session.PlayableArea.Width,
-                Height = session.PlayableArea.Height
-            };
-            Canvas.SetLeft(playableRect, session.PlayableArea.X);
-            Canvas.SetTop(playableRect, session.Size.Y - session.PlayableArea.Height - session.PlayableArea.Y - 1);
-            sessionCanvas.Children.Add(playableRect);
-
-            double requiredScaleX = sessionCanvas.ActualWidth / session.Size.X;
-            double requiredScaleY = sessionCanvas.ActualHeight / session.Size.Y;
-            float scale = (float)Math.Min(requiredScaleX, requiredScaleY);
-            sessionCanvas.RenderTransform = new ScaleTransform(scale, scale);
-            //sessionCanvas.Scale = new Vector3(scale, scale, 1);
-
-            // add session islands
-            foreach (var element in session.Elements)
-            {
-                MapElementViewModel viewModel;
-                MapElementControl control;
-
-                if (element is StartingSpotElement startingSpot) {
-                    viewModel = new StartingSpotViewModel(session, startingSpot);
-                    control = new StartingSpotControl();
-                }
-                else if (element is RandomIslandElement randomIsland)
+                if (this.session is not null)
                 {
-                    viewModel = new RandomIslandViewModel(session, randomIsland);
-                    control = new IslandControl();
+                    UnlinkSessionEventHandlers(this.session);
                 }
-                else if (element is FixedIslandElement fixedIsland)
+
+                this.session = session;
+
+                sessionCanvas.Children.Clear();
+                if (session is null)
                 {
-                    viewModel = new FixedIslandViewModel(session, fixedIsland);
-                    control = new IslandControl();
+                    mapRect = null;
+                    playableRect = null;
+                    AddIslands = null;
+                    return;
                 }
-                else
-                    throw new NotImplementedException();
 
-                viewModel.PropertyChanged += MapElementViewModel_PropertyChanged;
+                if(session is not null)
+                {
+                    LinkSessionEventHandlers(session);
 
-                control.DataContext = viewModel;
-                sessionCanvas.Children.Add(control);
+                    mapRect = new Rectangle
+                    {
+                        Fill = new SolidColorBrush(Color.FromArgb(255, 3, 19, 28)),
+                        Width = session.Size.X,
+                        Height = session.Size.Y
+                    };
+                    sessionCanvas.Children.Add(mapRect);
+
+                    playableRect = new PlayableAreaControl(session);
+                    sessionCanvas.Children.Add(playableRect);
+
+                    // add session islands
+                    foreach (var element in session.Elements)
+                    {
+                        MapElementViewModel viewModel;
+                        MapElementControl control;
+
+                        if (element is StartingSpotElement startingSpot)
+                        {
+                            viewModel = new StartingSpotViewModel(session, startingSpot);
+                            control = new StartingSpotControl();
+                        }
+                        else if (element is RandomIslandElement randomIsland)
+                        {
+                            viewModel = new RandomIslandViewModel(session, randomIsland);
+                            control = new IslandControl();
+                        }
+                        else if (element is FixedIslandElement fixedIsland)
+                        {
+                            viewModel = new FixedIslandViewModel(session, fixedIsland);
+                            control = new IslandControl();
+                        }
+                        else
+                            throw new NotImplementedException();
+
+                        viewModel.PropertyChanged += MapElementViewModel_PropertyChanged;
+
+                        control.DataContext = viewModel;
+                        sessionCanvas.Children.Add(control);
+                    }
+
+                    AddIslands = new List<AddIslandButton>();
+
+                    // create add islands
+                    CreateAddIsland(MapElementType.PoolIsland, IslandSize.Small, IslandType.PirateIsland);
+                    CreateAddIsland(MapElementType.PoolIsland, IslandSize.Small, IslandType.ThirdParty);
+                    CreateAddIsland(MapElementType.PoolIsland, IslandSize.Small, IslandType.Normal);
+                    CreateAddIsland(MapElementType.PoolIsland, IslandSize.Medium, IslandType.Normal);
+                    CreateAddIsland(MapElementType.PoolIsland, IslandSize.Large, IslandType.Normal);
+
+                    CreateAddIsland(MapElementType.FixedIsland, IslandSize.Small, IslandType.PirateIsland);
+                    CreateAddIsland(MapElementType.FixedIsland, IslandSize.Small, IslandType.ThirdParty);
+                    CreateAddIsland(MapElementType.FixedIsland, IslandSize.Small, IslandType.Normal);
+                    CreateAddIsland(MapElementType.FixedIsland, IslandSize.Medium, IslandType.Normal);
+                    CreateAddIsland(MapElementType.FixedIsland, IslandSize.Large, IslandType.Normal);
+                }
+                
             }
-
-            AddIslands = new List<AddIslandButton>();
-
-            // create add islands
-            CreateAddIsland(MapElementType.PoolIsland, IslandSize.Small, IslandType.PirateIsland);
-            CreateAddIsland(MapElementType.PoolIsland, IslandSize.Small, IslandType.ThirdParty);
-            CreateAddIsland(MapElementType.PoolIsland, IslandSize.Small, IslandType.Normal);
-            CreateAddIsland(MapElementType.PoolIsland, IslandSize.Medium, IslandType.Normal);
-            CreateAddIsland(MapElementType.PoolIsland, IslandSize.Large, IslandType.Normal);
-
-            CreateAddIsland(MapElementType.FixedIsland, IslandSize.Small, IslandType.PirateIsland);
-            CreateAddIsland(MapElementType.FixedIsland, IslandSize.Small, IslandType.ThirdParty);
-            CreateAddIsland(MapElementType.FixedIsland, IslandSize.Small, IslandType.Normal);
-            CreateAddIsland(MapElementType.FixedIsland, IslandSize.Medium, IslandType.Normal);
-            CreateAddIsland(MapElementType.FixedIsland, IslandSize.Large, IslandType.Normal);
 
             UpdateSize();
         }
@@ -277,6 +350,21 @@ namespace AnnoMapEditor.UI.Controls
                         sessionCanvas.Children.Remove(islandControl);
                         break;
                     }
+                }
+            }
+        }
+
+        public void EnableDisableIslands(bool enable)
+        {
+            foreach (object item in sessionCanvas.Children)
+            {
+                if (item is AddIslandButton addIsland)
+                {
+                    addIsland.IsEnabled = enable;
+                }
+                else if (item is MapElementControl mapElement)
+                {
+                    mapElement.IsEnabled = enable;
                 }
             }
         }
@@ -427,16 +515,6 @@ namespace AnnoMapEditor.UI.Controls
                     mapRect.Height = session.Size.Y;
 
                     Canvas.SetBottom(mapRect, -session.Size.Y);
-                }
-
-                if(playableRect is not null)
-                {
-                    playableRect.Width = session.PlayableArea.Width;
-                    playableRect.Height = session.PlayableArea.Height;
-
-                    //Set Playable area to center of map
-                    Canvas.SetLeft(playableRect, session.PlayableArea.X);
-                    Canvas.SetTop(playableRect, session.Size.Y - session.PlayableArea.Height - session.PlayableArea.Y - 1);
                 }
 
                 bool sizeIncrease = session.Size.X > oldSize.X;
