@@ -77,9 +77,6 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
         private void SelectSlotsViewModel_FilterChanged(object? sender, SelectSlotsViewModel.FilteredItemsChangedEventArgs<SlotAssignmentViewModel> e)
         {
-            SlotSelectionsLeft.UpdateLayout();
-            SlotSelectionsRight.UpdateLayout();
-
             if (e.RemovedItems != null)
             {
                 foreach (SlotAssignmentViewModel slotAssignment in e.RemovedItems)
