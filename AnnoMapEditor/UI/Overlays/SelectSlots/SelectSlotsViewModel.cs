@@ -76,6 +76,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
     public class SelectSlotsViewModel : ObservableBase, IOverlayViewModel
     {
+        public event EventHandler<FilteredItemsChangedEventArgs<SlotAssignmentViewModel>>? FilterModified;
         public IEnumerable<Region?> Regions { get; init; } = Region.All;
 
         private readonly Region _initialRegion;
@@ -216,9 +217,19 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
         private void UpdateFilter()
         {
-            CollectionViewSource.GetDefaultView(SlotAssignmentViewModels).Refresh();
+            HashSet<SlotAssignmentViewModel> before = new(CollectionViewSource.GetDefaultView(SlotAssignmentViewModels).Cast<SlotAssignmentViewModel>());
+
             CollectionViewSource.GetDefaultView(SlotAssignmentViewModelsLeft).Refresh();
             CollectionViewSource.GetDefaultView(SlotAssignmentViewModelsRight).Refresh();
+            CollectionViewSource.GetDefaultView(SlotAssignmentViewModels).Refresh();
+
+            HashSet<SlotAssignmentViewModel> after = new(CollectionViewSource.GetDefaultView(SlotAssignmentViewModels).Cast<SlotAssignmentViewModel>());
+
+            IEnumerable<SlotAssignmentViewModel> removedItems = before.Except(after);
+            IEnumerable<SlotAssignmentViewModel> addedItems = after.Except(before);
+            IEnumerable<SlotAssignmentViewModel> unchangedItems = before.Intersect(after);
+
+            FilterModified?.Invoke(this, new FilteredItemsChangedEventArgs<SlotAssignmentViewModel>(removedItems, addedItems, unchangedItems));
 
             foreach (SlotAssignmentViewModel slotAssignment in SlotAssignmentViewModels)
                 slotAssignment.SelectedRegion = _selectedRegion;
@@ -227,6 +238,20 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         public void OnClosed()
         {
             OverlayService.Instance.Close(this);
+        }
+
+        public class FilteredItemsChangedEventArgs<T> : EventArgs
+        {
+            public FilteredItemsChangedEventArgs(IEnumerable<T> removedItems, IEnumerable<T> addedItems, IEnumerable<T> unchangedItems)
+            {
+                RemovedItems = removedItems;
+                AddedItems = addedItems;
+                UnchangedItems = unchangedItems;
+            }
+
+            public IEnumerable<T> RemovedItems { get; init; }
+            public IEnumerable<T> AddedItems { get; init; }
+            public IEnumerable<T> UnchangedItems { get; init; }
         }
     }
 }
