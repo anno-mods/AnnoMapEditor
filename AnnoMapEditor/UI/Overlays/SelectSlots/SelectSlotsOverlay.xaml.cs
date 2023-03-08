@@ -60,14 +60,14 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         {
             if (e.OldValue is SelectSlotsViewModel oldViewModel)
             {
-                oldViewModel.SlotAssignmentViewModels.CollectionChanged -= SlotAssignmentViewModels_CollectionChanged;
+                oldViewModel.FilterModified -= SelectSlotsViewModel_FilterChanged;
                 foreach (SlotAssignmentViewModel slotAssignment in oldViewModel.SlotAssignmentViewModels)
                     slotAssignment.PropertyChanged -= SlotAssginment_PropertyChanged;
             }
 
             if (e.NewValue is SelectSlotsViewModel newViewModel)
             {
-                newViewModel.SlotAssignmentViewModels.CollectionChanged += SlotAssignmentViewModels_CollectionChanged;
+                newViewModel.FilterModified += SelectSlotsViewModel_FilterChanged;
                 foreach (SlotAssignmentViewModel slotAssignment in newViewModel.SlotAssignmentViewModels)
                     slotAssignment.PropertyChanged += SlotAssginment_PropertyChanged;
             }
@@ -75,11 +75,11 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             UpdatePointers();
         }
 
-        private void SlotAssignmentViewModels_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        private void SelectSlotsViewModel_FilterChanged(object? sender, SelectSlotsViewModel.FilteredItemsChangedEventArgs<SlotAssignmentViewModel> e)
         {
-            if (e.OldItems != null)
+            if (e.RemovedItems != null)
             {
-                foreach (SlotAssignmentViewModel slotAssignment in e.OldItems)
+                foreach (SlotAssignmentViewModel slotAssignment in e.RemovedItems)
                 {
                     slotAssignment.PropertyChanged -= SlotAssginment_PropertyChanged;
 
@@ -90,11 +90,20 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 }
             }
 
-            if (e.NewItems != null)
+            if (e.AddedItems != null)
             {
-                foreach (SlotAssignmentViewModel slotAssignment in e.NewItems)
+                foreach (SlotAssignmentViewModel slotAssignment in e.AddedItems)
                 {
                     slotAssignment.PropertyChanged += SlotAssginment_PropertyChanged;
+                    UpdatePointer(slotAssignment);
+                }
+            }
+
+            //Update the lines for the unchanged items as well, since the combobox positions will have changed
+            if(e.UnchangedItems != null)
+            {
+                foreach (SlotAssignmentViewModel slotAssignment in e.UnchangedItems)
+                {
                     UpdatePointer(slotAssignment);
                 }
             }
