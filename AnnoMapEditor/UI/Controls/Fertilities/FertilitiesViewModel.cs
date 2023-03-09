@@ -24,6 +24,9 @@ namespace AnnoMapEditor.UI.Controls.Fertilities
             FixedIsland = fixedIsland;
             Region = region;
 
+            if(fixedIsland.RandomizeFertilities == false)
+                SortFertilities();
+
             fixedIsland.Fertilities.CollectionChanged += SortFertilities;
         }
 
