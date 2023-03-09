@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
-    public class StandardAsset : ObservableBase
+    public abstract class StandardAsset : ObservableBase
     {
         private static readonly string TemplateName = "Standard";
 
