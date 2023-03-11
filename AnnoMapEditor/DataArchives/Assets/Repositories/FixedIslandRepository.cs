@@ -37,7 +37,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         {
             _logger.LogInformation($"Begin loading fixed islands.");
 
-            foreach (string mapFilePath in _dataArchive.Find("**.a7m"))
+            foreach (string mapFilePath in _dataArchive.Find("*.a7m"))
             {
                 // thumbnail
                 string thumbnailPath = Path.Combine(
