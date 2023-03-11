@@ -78,7 +78,7 @@ namespace AnnoMapEditor.UI.Controls
                 bool val = (bool)args.NewValue;
                 mvObject.playableRect.IsEnabled = val;
                 if (val)
-                    Panel.SetZIndex(mvObject.playableRect, 1);
+                    Panel.SetZIndex(mvObject.playableRect, 10);
                 else
                     Panel.SetZIndex(mvObject.playableRect, 0);
                 mvObject.EnableDisableIslands(!val);
