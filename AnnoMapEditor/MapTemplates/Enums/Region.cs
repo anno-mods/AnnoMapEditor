@@ -98,11 +98,11 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
         public static Region DetectFromPath(string filePath)
         {
-            if (filePath.Contains("colony01"))
+            if (filePath.Contains("colony01") || filePath.Contains("ggj") || filePath.Contains("scenario03"))
                 return NewWorld;
             else if (filePath.Contains("dlc03") || filePath.Contains("colony_03"))
                 return Arctic;
-            else if (filePath.Contains("dlc06") || filePath.Contains("colony02"))
+            else if (filePath.Contains("dlc06") || filePath.Contains("colony02") || filePath.Contains("scenario02"))
                 return Enbesa;
             return Moderate;
         }

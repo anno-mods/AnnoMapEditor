@@ -31,9 +31,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public IEnumerable<Region> AssociatedRegions { get; init; }
 
 
-        public SlotAsset()
+        public SlotAsset() : base()
         {
-
+            DisplayName = "";
+            ReplacementGuids = Enumerable.Empty<long>();
+            ReplacementSlotAssets = Enumerable.Empty<SlotAsset>();
+            AssociatedRegions = Enumerable.Empty<Region>();
         }
 
 
@@ -75,6 +78,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 .Select(id => Region.FromRegionId(id))
                 .ToArray()
                 ?? Array.Empty<Region>();
+
+            ReplacementSlotAssets = Enumerable.Empty<SlotAsset>();
         }
     }
 }
