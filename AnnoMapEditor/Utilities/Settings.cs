@@ -13,6 +13,8 @@ namespace AnnoMapEditor.Utilities
 {
     public class Settings : ObservableBase
     {
+        private readonly Logger<Settings> _logger = new();
+
         public static Settings Instance { get; } = new();
 
         public IDataArchive DataArchive
@@ -26,6 +28,7 @@ namespace AnnoMapEditor.Utilities
                 OnPropertyChanged(nameof(DataPath));
             }
         }
+
         private IDataArchive _dataArchive = DataArchives.DataArchive.Default;
 
         public IslandRepository? IslandRepository
@@ -33,18 +36,25 @@ namespace AnnoMapEditor.Utilities
             get => _islandRepository;
             private set => SetProperty(ref _islandRepository, value);
         }
-        private IslandRepository? _islandRepository;  
+        private IslandRepository? _islandRepository;
+
+        public AssetRepository? AssetRepository 
+        { 
+            get => _assetRepository;
+            private set => SetProperty(ref _assetRepository, value); 
+        }
+        private AssetRepository? _assetRepository;
 
 
         public string? DataPath 
         {
-            get => _dataArchive.Path;
+            get => _dataArchive.DataPath;
             set
             {
                 if (value != DataPath)
                 {
                     LoadDataPath(value);
-                    UserSettings.Default.DataPath = DataArchive.Path;
+                    UserSettings.Default.DataPath = DataArchive.DataPath;
                     UserSettings.Default.Save();
                     OnPropertyChanged(nameof(DataPath));
                     OnPropertyChanged(nameof(IsValidDataPath));
@@ -123,7 +133,7 @@ namespace AnnoMapEditor.Utilities
 
             if (DataArchive?.IsValid == true && updateInvalidUserSettings)
             {
-                UserSettings.Default.DataPath = DataArchive.Path;
+                UserSettings.Default.DataPath = DataArchive.DataPath;
                 UserSettings.Default.Save();
             }
 
@@ -164,13 +174,17 @@ namespace AnnoMapEditor.Utilities
             {
                 IsLoading = true;
             });
-
+    
             var archive = await DataArchives.DataArchive.OpenAsync(path);
 
             try
             {
                 AssetRepository assetRepository = new(archive);
-                assetRepository.RegisterAssetModel<RandomIslandAsset>();
+                assetRepository.Register<RegionAsset>();
+                assetRepository.Register<FertilityAsset>();
+                assetRepository.Register<RandomIslandAsset>();
+                assetRepository.Register<SlotAsset>();
+                assetRepository.Register<MinimapSceneAsset>();
                 await assetRepository.LoadAsync();
 
                 FixedIslandRepository fixedIslandRepository = new(archive);
@@ -182,13 +196,14 @@ namespace AnnoMapEditor.Utilities
                 Dispatch(() =>
                 {
                     DataArchive = archive;
+                    AssetRepository = assetRepository;
                     IslandRepository = islandRepository;
                     IsValidDataPath = true;
                 });
-
             }
             catch (Exception ex)
             {
+                _logger.LogError($"An error occured during setup.", ex);
                 Dispatch(() =>
                 {
                     IsValidDataPath = false;

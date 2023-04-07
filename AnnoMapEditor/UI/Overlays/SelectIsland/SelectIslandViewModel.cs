@@ -161,7 +161,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
             CollectionViewSource.GetDefaultView(Islands).Refresh();
         }
 
-        public void Cancel_Clicked()
+        public void OnCancel()
         {
             OverlayService.Instance.Close(this);
         }

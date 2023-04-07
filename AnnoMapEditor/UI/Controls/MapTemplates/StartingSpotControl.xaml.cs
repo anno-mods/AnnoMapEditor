@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
@@ -14,6 +15,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public StartingSpotControl()
         {
             InitializeComponent();
+            Panel.SetZIndex(this, 1);
         }
     }
 }

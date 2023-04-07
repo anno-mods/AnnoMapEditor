@@ -41,6 +41,7 @@
 
   <ItemGroup>
     <PackageReference Include="Emoji.Wpf" Version="0.3.3" />
+    <PackageReference Include="EventBinder" Version="2.5.0.2" />
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />

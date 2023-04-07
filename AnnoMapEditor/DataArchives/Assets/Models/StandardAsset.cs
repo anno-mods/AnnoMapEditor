@@ -1,15 +1,12 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
 using AnnoMapEditor.Utilities;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
-    public class StandardAsset : ObservableBase
+    public abstract class StandardAsset : ObservableBase
     {
         private static readonly string TemplateName = "Standard";
 
@@ -18,8 +15,20 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         public string? Name { get; init; }
 
-        public string? IconFileName { get; init; }
+        public string? IconFilename { get; init; }
 
+        public ImageSource? Icon
+        {
+            get => _icon;
+            set => SetProperty(ref _icon, value);
+        }
+        private ImageSource? _icon;
+
+
+        protected StandardAsset()
+        {
+
+        }
 
         public StandardAsset(XElement valuesXml)
         {
@@ -36,7 +45,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
             // Name and IconFilename
             Name = standardValues.Element(nameof(Name))?.Value;
-            IconFileName = standardValues.Element(nameof(IconFileName))?.Value; 
+            IconFilename = standardValues.Element(nameof(IconFilename))?.Value;
         }
     }
 }

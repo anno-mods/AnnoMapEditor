@@ -11,10 +11,11 @@ using System.Windows;
 
 namespace AnnoMapEditor.DataArchives
 {
-    public class RdaDataArchive : ObservableBase, IDataArchive
+    public class RdaDataArchive : DataArchive, IDataArchive
     {
         private static readonly Logger<RdaDataArchive> _logger = new();
-        public string Path { get; }
+
+        public override string DataPath { get; }
 
         public bool IsLoaded
         {
@@ -23,18 +24,19 @@ namespace AnnoMapEditor.DataArchives
         }
         private bool _isLoading = false;
 
-        public bool IsValid
+        public override bool IsValid
         {
             get => _isValid;
-            private set => SetProperty(ref _isValid, value);
+            protected set => SetProperty(ref _isValid, value);
         }
         private bool _isValid = false;
 
         private FileSystem _fileSystem;
 
+
         public RdaDataArchive(string folderPath)
         {
-            Path = folderPath;
+            DataPath = folderPath;
             IsValid = false;
         }
 
@@ -44,13 +46,14 @@ namespace AnnoMapEditor.DataArchives
         {
             IsLoaded = false;
             IsValid = false;
-            _logger.LogInformation($"Discovering RDA archives at '{Path}'.");
+            _logger.LogInformation($"Discovering RDA archives at '{DataPath}'.");
             var builder = FileSystemBuilder.Create()
-                .FromPath(System.IO.Path.Combine(Path, "maindata"))
+                .FromPath(System.IO.Path.Combine(DataPath, "maindata"))
                 .OnlyArchivesMatchingWildcard("data*.rda")
                 .WithDefaultSorting()
                 .ConfigureLoadZeroByteFiles(false)
-                .AddWhitelisted("*.a7tinfo", "*.png", "*.a7minfo", "*.a7t", "*.a7te", "assets.xml", "*.a7m");
+                .AddWhitelisted("*.a7tinfo", "*.png", "*.a7minfo", "*.a7t", "*.a7te", "assets.xml", "*.a7m", "*.dds");
+
             await Task.Run(() => 
             {
                 try
@@ -58,15 +61,16 @@ namespace AnnoMapEditor.DataArchives
                     _fileSystem = builder.Build();
                 }
                 catch (Exception e){
-                    _logger.LogError($"error loading RDAs from {Path}", e);
+                    _logger.LogError($"error loading RDAs from {DataPath}", e);
                     IsValid = false;
                     return;
                 }
             });
+
             var loadedCount = builder.ArchiveFileNames.Count();
             if (loadedCount == 0)
             {
-                _logger.LogWarning($"No .rda files found at {System.IO.Path.Combine(Path, "maindata")}");
+                _logger.LogWarning($"No .rda files found at {System.IO.Path.Combine(DataPath, "maindata")}");
                 MessageBox.Show($"Something went wrong opening the RDA files.\n\nDo you have another Editor or the RDAExplorer open by any chance?\n\nLog file: {Log.LogFilePath}", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
             _logger.LogInformation($"Loaded {loadedCount} RDAs.");
@@ -74,7 +78,7 @@ namespace AnnoMapEditor.DataArchives
             IsValid = true;
         }
 
-        public Stream? OpenRead(string filePath)
+        public override Stream? OpenRead(string filePath)
         {
             if (!IsValid)
             {
@@ -98,7 +102,7 @@ namespace AnnoMapEditor.DataArchives
             return null;
         }
 
-        public IEnumerable<string> Find(string pattern)
+        public override IEnumerable<string> Find(string pattern)
         {
             return _fileSystem.FindFiles(pattern);
         }
