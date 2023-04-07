@@ -42,6 +42,8 @@
                 Grid.Column="1"
                 Grid.Row="0"
                 SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                EditPlayableArea="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SessionProperties.EditPlayableArea, Mode=OneWay}"
+                ShowPlayableAreaMargins="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SessionProperties.ShowPlayableAreaMargins, Mode=OneWay}"
                 DataContext="{Binding Session, Mode=OneWay}" />
         
         <!-- session properties -->

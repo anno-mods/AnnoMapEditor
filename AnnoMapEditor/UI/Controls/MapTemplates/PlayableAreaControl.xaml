@@ -1,0 +1,116 @@
+﻿<controls:DraggingControl x:Class="AnnoMapEditor.UI.Controls.MapTemplates.PlayableAreaControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls.MapTemplates"
+             xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
+             xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=local:PlayableAreaViewModel}"
+             d:DesignHeight="400" d:DesignWidth="400">
+
+    <controls:DraggingControl.Resources>
+        <converters:BoolToVisibility x:Key="VisibleOnTrue" />
+        <converters:BoolToVisibility x:Key="VisibleOnFalse" OnTrue="Collapsed" OnFalse="Visible" />
+        <converters:IntToGridLengthConverter x:Key="IntToGridLength" />
+    </controls:DraggingControl.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding PlayableSize, Mode=TwoWay, Converter={StaticResource IntToGridLength}}" 
+                              MinWidth="{Binding MinSize}" MaxWidth="{Binding MaxSize, Mode=OneWay}"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding PlayableSize, Mode=TwoWay, Converter={StaticResource IntToGridLength}}" 
+                           MinHeight="{Binding MinSize}" MaxHeight="{Binding MaxSize, Mode=OneWay}"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="1" Grid.Column="0" IsHitTestVisible="False" Background="Transparent" VerticalAlignment="Stretch" SizeChanged="MarginRightTop_SizeChanged"/>
+        <Border Grid.Row="0" Grid.Column="1" IsHitTestVisible="False" Background="Transparent" VerticalAlignment="Stretch" SizeChanged="MarginLeftTop_SizeChanged"/>
+
+        <GridSplitter Grid.Column="0" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="16" 
+                      Background="#C0315881" ResizeDirection="Columns" ResizeBehavior="CurrentAndNext"
+                      Cursor="SizeNWSE" Margin="0,32,0,40" DragIncrement="8" DragStarted="Splitter_DragStarted" DragCompleted="Splitter_DragCompleted"
+                      Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource VisibleOnTrue}}"/>
+        <GridSplitter Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="16" 
+                      Background="#C0315881" ResizeDirection="Rows" ResizeBehavior="CurrentAndNext" 
+                      Cursor="SizeNESW" Margin="32,0,40,0" DragIncrement="8" DragStarted="Splitter_DragStarted" DragCompleted="Splitter_DragCompleted"
+                      Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource VisibleOnTrue}}"/>
+
+
+
+        <Grid Grid.Row="0" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" MinHeight="140"/>
+                <RowDefinition Height="14*"/>
+                <RowDefinition Height="*" MinHeight="140"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="140"/>
+                <ColumnDefinition Width="14*"/>
+                <ColumnDefinition Width="*" MinWidth="140"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="1" FontSize="{Binding MarginFontSize, Mode=OneWay}" Foreground="{StaticResource TextBrush}"
+                       VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False"
+                       Visibility="{Binding ShowPlayableAreaMargins, Mode=OneWay, Converter={StaticResource VisibleOnTrue}}">
+                <TextBlock.LayoutTransform>
+                    <RotateTransform Angle="180"/>
+                </TextBlock.LayoutTransform>
+                    <Run Text="Margin:"/>
+                    <Run Text="{Binding PosY, Mode=OneWay}"/>
+            </TextBlock>
+
+
+            <TextBlock Grid.Row="2" Grid.Column="1" FontSize="{Binding MarginFontSize, Mode=OneWay}" Foreground="{StaticResource TextBrush}"
+                       VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False"
+                       Visibility="{Binding ShowPlayableAreaMargins, Mode=OneWay, Converter={StaticResource VisibleOnTrue}}">
+                <TextBlock.LayoutTransform>
+                    <RotateTransform Angle="180"/>
+                </TextBlock.LayoutTransform>
+                    <Run Text="Margin:"/>
+                    <Run Text="{Binding MarginRightTop, Mode=OneWay}"/>
+            </TextBlock>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" FontSize="{Binding MarginFontSize, Mode=OneWay}" Foreground="{StaticResource TextBrush}"
+                       VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False"
+                       Visibility="{Binding ShowPlayableAreaMargins, Mode=OneWay, Converter={StaticResource VisibleOnTrue}}">
+                <TextBlock.LayoutTransform>
+                    <RotateTransform Angle="90"/>
+                </TextBlock.LayoutTransform>
+                    <Run Text="Margin:"/>
+                    <Run Text="{Binding PosX, Mode=OneWay}"/>
+            </TextBlock>
+
+            <TextBlock Grid.Row="1" Grid.Column="2" FontSize="{Binding MarginFontSize, Mode=OneWay}" Foreground="{StaticResource TextBrush}"
+                       VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False"
+                       Visibility="{Binding ShowPlayableAreaMargins, Mode=OneWay, Converter={StaticResource VisibleOnTrue}}">
+                <TextBlock.LayoutTransform>
+                    <RotateTransform Angle="90"/>
+                </TextBlock.LayoutTransform>
+                    <Run Text="Margin:"/>
+                    <Run Text="{Binding MarginLeftTop, Mode=OneWay}"/>
+            </TextBlock>
+
+            <!-- Main Background -->
+            <Border Grid.RowSpan="3" Grid.ColumnSpan="3"  BorderThickness="0" Background="#80182B3F" Panel.ZIndex="-1" IsHitTestVisible="False">
+
+            </Border>
+
+            <!-- Drag Part -->
+            <Border Grid.Row="0" Grid.Column="0" IsEnabled="True" Background="#C0315881" IsHitTestVisible="True" Cursor="Hand"
+                    Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource VisibleOnTrue}}">
+                <Viewbox Stretch="Uniform">
+                    <Path Stroke="{StaticResource TextBrush}" StrokeThickness="7" Margin="20" Data="
+                          M 0,25 L 0,0 25,0 
+                          M 50,0 L 75,0 75,25 
+                          M 75,50 L 75,75 50,75
+                          M 25,75 L 0,75 0,50"/>
+                </Viewbox>
+            </Border>
+        </Grid>
+    </Grid>
+</controls:DraggingControl>
