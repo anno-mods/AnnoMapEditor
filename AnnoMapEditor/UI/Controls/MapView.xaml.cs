@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -408,7 +409,7 @@ namespace AnnoMapEditor.UI.Controls
             {
                 if (sender is IslandViewModel viewModel)
                 {
-                    if (viewModel.IsOutOfBounds && !viewModel.IsDragging)
+                    if (viewModel.IsOutOfBounds && !viewModel.IsDragging && !session.ResizingInProgress)
                     {
                         session.Elements.Remove(viewModel.Element);
 
@@ -521,7 +522,13 @@ namespace AnnoMapEditor.UI.Controls
 
                 if (sizeIncrease)
                 {
-                    UpdateSize();
+                    UpdateSize(); 
+                    //Always keep AddIsland controls outside map area
+                    RecalculateAddIslandCoordinates();
+                }
+                else
+                {
+                    MarkOOBIslands();
                 }
             }
         }
@@ -529,11 +536,13 @@ namespace AnnoMapEditor.UI.Controls
         private void HandleSessionSizeCommitted(object? sender, EventArgs _)
         {
             oldSize = null;
-            RecalculateIslandCoordinates();
+            RecalculateAddIslandCoordinates();
             UpdateSize();
+            KeepStartingSpotsInBounds();
+            ClearOOBIslands();
         }
 
-        private void RecalculateIslandCoordinates()
+        private void RecalculateAddIslandCoordinates()
         {
             if (session is null) return;
 
@@ -543,11 +552,53 @@ namespace AnnoMapEditor.UI.Controls
                 {
                     MoveAddIsland(addIsland);
                 }
-//                else if (item is MapElementControl mapElement && mapElement.DataContext is MapElementViewModel mapElementViewModel)
-//                {
-//                    Vector2 canvasLocation = mapElement.GetPosition();
-//                    mapElementViewModel.Position = canvasLocation;
-//                }
+            }
+        }
+
+        private void MarkOOBIslands()
+        {
+            if (session is null) return;
+
+            foreach (object item in sessionCanvas.Children)
+            {
+                if (item is IslandControl mapIsland && mapIsland.DataContext is IslandViewModel islandViewModel)
+                {
+                    islandViewModel.BoundsCheck();
+                }
+            }
+        }
+
+        private void ClearOOBIslands()
+        {
+            if (session is null) return;
+
+            List<UIElement> childrenCopy = sessionCanvas.Children.Cast<UIElement>().ToList();
+            foreach (object item in childrenCopy)
+            {
+                if (item is IslandControl mapIsland && mapIsland.DataContext is IslandViewModel islandViewModel && islandViewModel.IsOutOfBounds)
+                {
+                    session.Elements.Remove(islandViewModel.Element);
+
+                    // deselect the island if it was selected
+                    if (islandViewModel == _selectedElement)
+                    {
+                        _selectedElement = null;
+                        SelectedIsland = null;
+                    }
+                }
+            }
+        }
+
+        private void KeepStartingSpotsInBounds()
+        {
+            if (session is null) return;
+
+            foreach (object item in sessionCanvas.Children)
+            {
+                if (item is StartingSpotControl start && start.DataContext is StartingSpotViewModel startViewModel)
+                {
+                    startViewModel.Element.Position = startViewModel.Element.Position.Clamp(session.PlayableArea);
+                }
             }
         }
     }
