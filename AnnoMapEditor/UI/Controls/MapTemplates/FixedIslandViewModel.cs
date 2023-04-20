@@ -44,6 +44,18 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
             if (e.PropertyName == nameof(FixedIslandElement.Rotation))
                 UpdateThumbnailRotation();
+
+            if (e.PropertyName == nameof(FixedIslandElement.IslandAsset))
+                Redraw();
+        }
+
+        private void Redraw()
+        {
+            OnPropertyChanged(nameof(Label));
+            OnPropertyChanged(nameof(SizeInTiles));
+            OnPropertyChanged(nameof(Thumbnail));
+            OnPropertyChanged(nameof(RandomizeRotation));
+            UpdateThumbnailRotation();
         }
 
         private void UpdateThumbnailRotation()
