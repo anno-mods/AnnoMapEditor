@@ -17,6 +17,7 @@
                 <ResourceDictionary Source="../../Resources/Styles.xaml" />
                 <ResourceDictionary>
                     <converters:ObjectToVisibility x:Key="CollapsedOnNull" />
+                    <converters:BoolToVisibility x:Key="VisibleOnTrue" OnTrue="Visible" OnFalse="Collapsed" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -46,10 +47,12 @@
 
         <!-- IslandSize -->
         <TextBlock Text="Island Size"
-                   Style="{StaticResource SubHeaderLabelStyle}"/>
+                   Style="{StaticResource SubHeaderLabelStyle}"
+                   Visibility="{Binding ShowIslandSizeItems, Converter={StaticResource VisibleOnTrue}}"/>
         <ComboBox Margin="2"
-                    ItemsSource="{Binding IslandSizeItems}"
-                    SelectedItem="{Binding RandomIsland.IslandSize}"/>
+                  ItemsSource="{Binding IslandSizeItems}"
+                  SelectedItem="{Binding RandomIsland.IslandSize}"
+                  Visibility="{Binding ShowIslandSizeItems, Converter={StaticResource VisibleOnTrue}}"/>
             
     </StackPanel>
 </UserControl>

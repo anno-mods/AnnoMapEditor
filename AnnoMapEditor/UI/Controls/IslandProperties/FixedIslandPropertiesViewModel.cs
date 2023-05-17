@@ -14,6 +14,8 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
 
         public ObservableCollection<IslandType> IslandTypeItems { get; } = new();
 
+        public bool ShowIslandTypeItems { get; init; }
+
         public bool IsContinentalIsland { get; init; }
 
         public FertilitiesViewModel FertilitiesViewModel { get; init; }
@@ -29,6 +31,7 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
             IsContinentalIsland = FixedIsland.IslandAsset.IslandSize.FirstOrDefault() == IslandSize.Continental;
 
             IslandTypeItems.AddRange(FixedIsland.IslandAsset.IslandType);
+            ShowIslandTypeItems = IslandTypeItems.Count > 1;
         }
     }
 }
