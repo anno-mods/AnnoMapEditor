@@ -101,7 +101,7 @@ namespace AnnoMapEditor.Mods.Models
                     {
                         File.Copy(a7tInfoPath, a7tBasePath + $"_{size}_enlarged.a7tinfo");
                         File.Copy(a7tPath,     a7tBasePath + $"_{size}_enlarged.a7t");
-                        File.Copy(a7tInfoPath, a7tBasePath + $"_{size}_enlarged.a7te");
+                        File.Copy(a7tePath,    a7tBasePath + $"_{size}_enlarged.a7te");
                     }
                 }
             }

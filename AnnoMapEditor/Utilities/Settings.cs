@@ -17,6 +17,11 @@ namespace AnnoMapEditor.Utilities
 
         public static Settings Instance { get; } = new();
 
+        /// <summary>
+        /// Is Invoked when loading all repositories from the game path finishes.
+        /// </summary>
+        public event EventHandler? LoadingFinished;
+
         public IDataArchive DataArchive
         {
             get => _dataArchive;
@@ -220,6 +225,12 @@ namespace AnnoMapEditor.Utilities
                 {
                     LoadingDoneTrigger.Set();
                 }
+
+                //If not Dispatched to UI thread, only the first item will be invoked somehow?
+                Dispatch(() =>
+                {
+                    LoadingFinished?.Invoke(this, EventArgs.Empty);
+                });
             }
         }
 
@@ -227,7 +238,6 @@ namespace AnnoMapEditor.Utilities
         {
             if (Application.Current?.Dispatcher != null)
                 Application.Current.Dispatcher.Invoke(action);
-
             else
                 action();
         }

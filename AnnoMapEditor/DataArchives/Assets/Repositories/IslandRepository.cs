@@ -127,6 +127,22 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 return IslandType.Normal;
         }
 
+        public static IslandSize DetectDefaultIslandSizeFromPath(string filePath)
+        {
+            if (filePath.Contains("_d_"))
+                return IslandSize.Default;
+            else if (filePath.Contains("_s_"))
+                return IslandSize.Small;
+            else if (filePath.Contains("_m_"))
+                return IslandSize.Medium;
+            else if (filePath.Contains("_l_"))
+                return IslandSize.Large;
+            else if (filePath.Contains("_c_"))
+                return IslandSize.Continental;
+            else
+                return IslandSize.Default;
+        }
+
 
         public IEnumerator<IslandAsset> GetEnumerator() => _byFilePath.Values.GetEnumerator();
 

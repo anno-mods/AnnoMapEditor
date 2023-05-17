@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Imaging;
 
@@ -30,8 +31,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             _fixedIsland = fixedIsland;
             _isContinentalIsland = _fixedIsland.IslandAsset.IslandSize.FirstOrDefault() == IslandSize.Continental;
 
-            UpdateThumbnailRotation();
             SnapContinentalIsland();
+            UpdateThumbnailRotation();
 
             fixedIsland.PropertyChanged += FixedIsland_PropertyChanged;
         }
@@ -43,6 +44,18 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
             if (e.PropertyName == nameof(FixedIslandElement.Rotation))
                 UpdateThumbnailRotation();
+
+            if (e.PropertyName == nameof(FixedIslandElement.IslandAsset))
+                Redraw();
+        }
+
+        private void Redraw()
+        {
+            OnPropertyChanged(nameof(Label));
+            OnPropertyChanged(nameof(SizeInTiles));
+            OnPropertyChanged(nameof(Thumbnail));
+            OnPropertyChanged(nameof(RandomizeRotation));
+            UpdateThumbnailRotation();
         }
 
         private void UpdateThumbnailRotation()
@@ -72,20 +85,22 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             {
                 Vector2 islandCenter = _fixedIsland.Position;
                 Vector2 mapCenterOffset = new((_session.Size.X - SizeInTiles) / 2, (_session.Size.Y - SizeInTiles) / 2);
+                string islandFileName = System.IO.Path.GetFileNameWithoutExtension(_fixedIsland.IslandAsset.FilePath);
+                int rotationOffset = ContinentalRotationAtTop[islandFileName];
 
                 if (islandCenter.X <= mapCenterOffset.X)
                 {
                     // bottom
                     if (islandCenter.Y <= mapCenterOffset.Y)
                     {
-                        _fixedIsland.Rotation = 3;
+                        _fixedIsland.Rotation = (byte)((2 + rotationOffset) % 4);
                         _fixedIsland.Position = new(0, 0);
                     }
 
                     // right
                     else
                     {
-                        _fixedIsland.Rotation = 0;
+                        _fixedIsland.Rotation = (byte)((3 + rotationOffset) % 4);
                         _fixedIsland.Position = new(0, _session.Size.Y - SizeInTiles);
                     }
                 }
@@ -94,18 +109,24 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                     // left
                     if (islandCenter.Y <= mapCenterOffset.Y)
                     {
-                        _fixedIsland.Rotation = 2;
+                        _fixedIsland.Rotation = (byte)((1 + rotationOffset)%4);
                         _fixedIsland.Position = new(_session.Size.X - SizeInTiles, 0);
                     }
 
                     // top
                     else
                     {
-                        _fixedIsland.Rotation = 1;
+                        _fixedIsland.Rotation = (byte)((0 + rotationOffset)%4);
                         _fixedIsland.Position = new(_session.Size.X - SizeInTiles, _session.Size.Y - SizeInTiles);
                     }
                 }
             }
         }
+
+        private static readonly Dictionary<string, int> ContinentalRotationAtTop = new Dictionary<string, int>()
+        {
+            { "colony01_c_01", 0 },
+            { "moderate_c_01", 1}
+        };
     }
 }

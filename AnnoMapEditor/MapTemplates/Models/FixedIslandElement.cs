@@ -1,10 +1,12 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
+using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using IslandType = AnnoMapEditor.MapTemplates.Enums.IslandType;
 
@@ -21,8 +23,9 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public IslandAsset IslandAsset 
         { 
-            get => _islandAsset; 
-            set => SetProperty(ref _islandAsset, value);
+            get => _islandAsset;
+            [MemberNotNull(nameof(_islandAsset))]
+            private set => SetProperty(ref _islandAsset!, value);
         }
         private IslandAsset _islandAsset;
 
@@ -68,6 +71,21 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public Dictionary<long, SlotAssignment> SlotAssignments { get; init; } = new();
 
+        /// <summary>
+        /// For tracking if the island needs yet to be loaded.
+        /// </summary>
+        public bool DelayedLoading
+        {
+            get => _delayedLoading;
+            private set => SetProperty(ref _delayedLoading, value);
+        }
+        private bool _delayedLoading = false;
+
+        /// <summary>
+        /// Used for tracking the original label during delayed loading.
+        /// </summary>
+        private string? prevLabel;
+
 
         public FixedIslandElement(IslandAsset islandAsset, IslandType islandType)
             : base(islandType)
@@ -87,8 +105,52 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         // ---- Serialization ----
 
-        public FixedIslandElement(Element sourceElement)
-            : base(sourceElement)
+        public FixedIslandElement(Element sourceElement) : base(sourceElement)
+        {
+            _sourceElement = sourceElement;
+
+            string islandFilePath = sourceElement.MapFilePath
+                ?? throw new ArgumentException($"Missing property '{nameof(Element.MapFilePath)}'.");
+
+            _randomizeRotation = sourceElement.Rotation90 == null;
+            _rotation = sourceElement.Rotation90;
+
+            System.Diagnostics.Debug.WriteLineIf(sourceElement.Rotation90 != null, $"Reading source data {sourceElement.Rotation90} to rotation value of {_rotation} on path {islandFilePath}.");
+
+            _randomizeFertilities = sourceElement.RandomizeFertilities != false;
+            _randomizeSlots = sourceElement.MineSlotMapping == null || sourceElement.MineSlotMapping.Count == 0;
+
+            if (Settings.Instance.IsLoading)
+            {
+                DelayedLoading = true;
+                //Show island file if not labelled, while still loading
+                prevLabel = Label;
+                if (string.IsNullOrEmpty(Label))
+                {
+                    Label = System.IO.Path.GetFileNameWithoutExtension(islandFilePath);
+                }
+                SetDummyAsset(sourceElement);
+                System.Diagnostics.Debug.WriteLine($"Queueing item {sourceElement!.MapFilePath} for LoadingFinished.");
+                Settings.Instance.LoadingFinished += DelayedLoadAssetData;
+            }
+            else
+            {
+                LoadIslandDataFromRepository(sourceElement, false);
+            }
+            
+        }
+
+        /// <summary>
+        /// Loads the Asset data from the IslandRepository. 
+        /// Should only be called when the IslandRepository is actually loaded, errors otherwise.
+        /// </summary>
+        /// <param name="sourceElement">The element from the template.</param>
+        /// <param name="delayed">Whether this is a delayed loading call (which means cleanup needs to be done after loading).</param>
+        /// <exception cref="ArgumentException">The sourceElement does not have a MapFilePath. This is forbidden on FixedIslands.</exception>
+        /// <exception cref="Exception">The IslandRepository either does not exist or has not finished loading yet.</exception>
+        /// <exception cref="NullReferenceException">The given MapFilePath does not match any islands in the IslandRepository.</exception>
+        [MemberNotNull(nameof(_islandAsset))]
+        private void LoadIslandDataFromRepository(Element sourceElement, bool delayed)
         {
             string islandFilePath = sourceElement.MapFilePath
                 ?? throw new ArgumentException($"Missing property '{nameof(Element.MapFilePath)}'.");
@@ -100,16 +162,14 @@ namespace AnnoMapEditor.MapTemplates.Models
             if (!islandRepository.TryGetByFilePath(islandFilePath, out var islandAsset))
                 throw new NullReferenceException($"Unknown island '{islandFilePath}'.");
 
-            _islandAsset       = islandAsset;
-            _randomizeRotation = sourceElement.Rotation90 == null;
-            _rotation          = sourceElement.Rotation90;
-            _sourceElement     = sourceElement;
+            IslandAsset = islandAsset;
+            //Rotation is not asset bound, thus loaded in constructor
 
             AssetRepository assetRepository = Settings.Instance.AssetRepository
                 ?? throw new Exception($"The {nameof(AssetRepository)} has not been loaded.");
 
             // fertilities
-            _randomizeFertilities = sourceElement.RandomizeFertilities != false;
+            //  _randomizeFertilities is loaded in constructor.
             if (sourceElement.FertilityGuids != null)
             {
                 foreach (int guid in sourceElement.FertilityGuids)
@@ -122,7 +182,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             }
 
             // fixed slots
-            _randomizeSlots = sourceElement.MineSlotMapping == null || sourceElement.MineSlotMapping.Count == 0;
+            // _randomizeSlots is loaded in constructor.
             if (sourceElement.MineSlotMapping != null)
             {
                 foreach ((long objectId, int slotGuid) in sourceElement.MineSlotMapping)
@@ -166,6 +226,55 @@ namespace AnnoMapEditor.MapTemplates.Models
                     });
                 }
             }
+
+            //Deregister when delayed loading
+            if (delayed)
+            {
+                Settings.Instance.LoadingFinished -= DelayedLoadAssetData;
+
+                if(Label != prevLabel)
+                {
+                    Label = prevLabel;
+                }
+
+                DelayedLoading = false;
+            }
+        }
+
+        /// <summary>
+        /// Creates an empty IslandAsset that gets replaced with the correct one as soon as the Repository is loaded.
+        /// </summary>
+        /// <param name="sourceElement">The element from the template.</param>
+        /// <exception cref="ArgumentException">The sourceElement does not have a MapFilePath. This is forbidden on FixedIslands.</exception>
+        [MemberNotNull(nameof(_islandAsset))]
+        private void SetDummyAsset(Element sourceElement)
+        {
+            string islandFilePath = sourceElement.MapFilePath
+                ?? throw new ArgumentException($"Missing property '{nameof(Element.MapFilePath)}'.");
+
+            IslandSize islandSize = IslandRepository.DetectDefaultIslandSizeFromPath(islandFilePath);
+            IslandDifficulty? islandDifficulty = IslandDifficulty.FromElementValue(sourceElement.Difficulty?.id);
+
+
+            IslandAsset dummyAsset = new IslandAsset()
+            {
+                FilePath = islandFilePath,
+                DisplayName = System.IO.Path.GetFileNameWithoutExtension(islandFilePath),
+                Thumbnail = null,
+                Region = Region.DetectFromPath(islandFilePath),
+                IslandDifficulty =  new[] { islandDifficulty },
+                IslandType = new[] { IslandRepository.DetectIslandTypeFromPath(islandFilePath) },
+                IslandSize = new[] { islandSize },
+                SizeInTiles = Math.Min(islandSize.DefaultSizeInTiles, 768),
+                Slots = new Dictionary<long, Slot>()
+            };
+
+            IslandAsset = dummyAsset;
+        }
+
+        private void DelayedLoadAssetData(object? sender, EventArgs _)
+        {
+            LoadIslandDataFromRepository(_sourceElement!, true);
         }
 
         protected override void ToTemplate(Element resultElement)
