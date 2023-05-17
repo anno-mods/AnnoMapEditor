@@ -36,6 +36,13 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
         private Region _region;
 
+        public bool ResizingInProgress
+        {
+            get => _resizingInProgress;
+            set => SetProperty(ref _resizingInProgress, value);
+        }
+        private bool _resizingInProgress = false;
+
         private MapTemplateDocument _template = new();
 
         public event EventHandler<SessionResizeEventArgs>? MapSizeConfigChanged;
@@ -178,6 +185,8 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public void ResizeSession(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
         {
+            ResizingInProgress = true;
+
             Vector2 oldMapSize = new(Size);
             Size = new(mapSize, mapSize);
 
@@ -203,6 +212,8 @@ namespace AnnoMapEditor.MapTemplates.Models
 
             Vector2 oldPlayableSize = new(PlayableArea.Width, PlayableArea.Height);
             PlayableArea = new(_template.MapTemplate.PlayableArea);
+
+            ResizingInProgress = false;
 
             MapSizeConfigChanged?.Invoke(this, new SessionResizeEventArgs(oldMapSize, oldPlayableSize));
             MapSizeConfigCommitted?.Invoke(this, new EventArgs());

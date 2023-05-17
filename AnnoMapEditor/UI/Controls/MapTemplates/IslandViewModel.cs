@@ -125,8 +125,15 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                     newPosition = safePosition;
             }
 
-            IsOutOfBounds = !newPosition.Within(mapArea);
+            BoundsCheck(newPosition);
             base.OnDragged(newPosition);
+        }
+
+        public void BoundsCheck(Vector2? pos = null)
+        {
+            var mapArea = new Rect2(_session.Size - SizeInTiles + Vector2.Tile);
+            Vector2 position = pos ?? Element.Position;
+            IsOutOfBounds = !position.Within(mapArea);
         }
     }
 }
