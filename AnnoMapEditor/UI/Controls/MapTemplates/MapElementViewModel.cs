@@ -23,7 +23,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public override void OnDragged(Vector2 newPosition)
         {
-            Element.Position = newPosition;
+            if (!Element.IsLocked)
+                Element.Position = newPosition;
         }
     }
 }

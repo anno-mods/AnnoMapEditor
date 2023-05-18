@@ -1,4 +1,6 @@
-﻿namespace AnnoMapEditor.UI.Controls.MapTemplates
+﻿using System.Windows.Media;
+
+namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
     /// <summary>
     /// Interaction logic for IslandControl.xaml

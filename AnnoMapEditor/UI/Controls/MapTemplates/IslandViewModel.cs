@@ -9,6 +9,11 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
     public abstract class IslandViewModel : MapElementViewModel
     {
+        public static ImageSource LockIcon { get; } = Settings.Instance.DataArchive.TryLoadIcon("data/ui/2kimages/main/icons/icon_lock_0.dds")!;
+
+        public static ImageSource LockIconOutline { get; } = Settings.Instance.DataArchive.TryLoadIcon("data/ui/2kimages/main/icons/icon_lock_outline_0.dds")!;
+
+
         static readonly Dictionary<string, SolidColorBrush> BorderBrushes = new()
         {
             ["Normal"] = new(Color.FromArgb(255, 8, 172, 137)),
