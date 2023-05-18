@@ -1,6 +1,9 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Models;
+﻿using Anno.FileDBModels.Anno1800.IslandTemplate;
+using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.Utilities;
 using FileDBSerializing;
+using FileDBSerializing.ObjectSerializer;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -50,12 +53,18 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
                 // open a7minfo
                 string infoFilePath = mapFilePath + "info";
+
                 IFileDBDocument infoDoc = ReadFileDB(infoFilePath)
                     ?? throw new Exception($"Could not load a7minfo '{infoFilePath}'.");
 
+                FileDBDocumentDeserializer<IslandTemplateDocument> deserializer = new(
+                    new FileDBSerializerOptions() { IgnoreMissingProperties = true }
+                );
+                IslandTemplateDocument islandTemplate = deserializer.GetObjectStructureFromFileDBDocument(infoDoc) 
+                    ?? throw new Exception($"Could not interpret a7minfo '{infoFilePath}'.");
+
                 // get the island's size in tiles
-                Attrib sizeInTilesAttrib = infoDoc.GetAttrib("MapSize");
-                int sizeInTiles = BitConverter.ToInt32(sizeInTilesAttrib.Content, 0);
+                int sizeInTiles = islandTemplate.MapSize?[0] ?? IslandSize.Default.DefaultSizeInTiles;
 
                 // get slots
                 // The list of slots is found at <ObjectMetaInfo><SlotObjects> within the
@@ -77,41 +86,30 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 //       <Position>{float[3]}</Position>
                 //     <None>
                 //   <None>
-                Tag slotObjects = infoDoc.GetTag("ObjectMetaInfo").GetTag("SlotObjects");
                 Dictionary<long, Slot> mineSlots = new();
-                short slotGroupId = 0;
-                foreach (Tag child in slotObjects.Children)
+                if(islandTemplate.ObjectMetaInfo?.SlotObjects is not null)
                 {
-                    Tag? valueTag = child.Children.FirstOrDefault(c => c.Name == "value") as Tag;
-                    // group entry
-                    if (valueTag != null)
+                    foreach ((ShortIdValueWrapper id, List<ObjectItem> items) in islandTemplate.ObjectMetaInfo.SlotObjects)
                     {
-                        Attrib idAttrib = valueTag.GetAttrib("id");
-                        slotGroupId = BitConverter.ToInt16(idAttrib.Content, 0);
-                    }
-                    // slots entry
-                    else
-                    {
-                        foreach (Tag slotElement in child.Children)
+                        short slotGroupId = id?.value?.id ?? 0;
+                        foreach (ObjectItem item in items)
                         {
-                            Attrib objectIdAttrib = slotElement.GetAttrib("ObjectId");
-                            long objectId = BitConverter.ToInt64(objectIdAttrib.Content, 0);
+                            if (item?.ObjectId is null || item?.ObjectGuid is null || 
+                                item?.Position is null || item?.Position.Length != 3)
+                                continue;
 
-                            Attrib objectGuidAttrib = slotElement.GetAttrib("ObjectGuid");
-                            int objectGuid = BitConverter.ToInt32(objectGuidAttrib.Content, 0);
-
-                            Attrib positionAttrib = slotElement.GetAttrib("Position");
-                            float x = BitConverter.ToSingle(positionAttrib.Content, 0);
-                            float z = BitConverter.ToSingle(positionAttrib.Content, 8);
+                            long index = item.ObjectId.Value;
 
                             Slot mineSlot = new()
                             {
                                 GroupId = slotGroupId,
-                                ObjectId = objectId,
-                                ObjectGuid = objectGuid,
-                                Position = new((int)x, (int)z)
+                                ObjectId = index,
+                                ObjectGuid = item.ObjectGuid.Value,
+                                //Position is stored as xyz, and we need x and z
+                                Position = new((int)item.Position[0], (int)item.Position[2])
                             };
-                            mineSlots.Add(mineSlot.ObjectId, mineSlot);
+
+                            mineSlots.Add(index, mineSlot);
                         }
                     }
                 }
