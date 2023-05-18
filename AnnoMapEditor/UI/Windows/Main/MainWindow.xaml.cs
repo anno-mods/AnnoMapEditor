@@ -90,6 +90,10 @@ namespace AnnoMapEditor.UI.Windows.Main
                 UseDescriptionForTitle = true,
                 Description = "Select your game (i.e. \"Anno 1800/\") folder or a folder where all .rda files are extracted into"
             };
+
+            if (Settings.Instance.DataPath != null)
+                picker.SelectedPath = Settings.Instance.DataPath;
+
             if (true == picker.ShowDialog())
             {
                 Settings.Instance.DataPath = picker.SelectedPath;
