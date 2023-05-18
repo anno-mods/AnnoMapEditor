@@ -194,9 +194,7 @@ namespace AnnoMapEditor.Mods.Models
             if (assetsXmlDir is not null)
                 Directory.CreateDirectory(assetsXmlDir);
 
-            string fullMapPath = Path.Combine("mods", fullModName, mapFilePath).Replace("\\", "/");
-
-            string content = CreateAssetsModOps(region, mapType, fullMapPath);
+            string content = CreateAssetsModOps(region, mapType, mapFilePath.Replace("\\", "/"));
 
             using StreamWriter writer = new(File.Create(assetsXmlPath));
             await writer.WriteAsync(content);
