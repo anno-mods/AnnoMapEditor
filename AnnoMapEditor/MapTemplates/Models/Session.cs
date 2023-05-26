@@ -210,6 +210,9 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public void ResizeAndCommitSession(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
         {
+            if (_template.MapTemplate == null)
+                throw new InvalidDataException();
+
             //Commit means write to template
             _template.MapTemplate.Size = new int[] { mapSize, mapSize };
             _template.MapTemplate.PlayableArea = new int[] { 

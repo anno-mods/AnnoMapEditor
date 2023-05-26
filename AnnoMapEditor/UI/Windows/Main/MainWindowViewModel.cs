@@ -295,8 +295,11 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         private IEnumerable<String>? LoadMapsFromAssets()
         {
+            const string assetsXmlPath = "data/config/export/main/asset/assets.xml";
+
             Stopwatch stopwatch= Stopwatch.StartNew();
-            using var assetStream = Settings.DataArchive.OpenRead("data/config/export/main/asset/assets.xml");
+            using var assetStream = Settings.DataArchive.OpenRead(assetsXmlPath)
+                ?? throw new FileNotFoundException(assetsXmlPath);
             XmlDocument doc = new XmlDocument();
             doc.Load(assetStream);
             var nodes = doc.SelectNodes("//Asset[Template='MapTemplate']/Values/MapTemplate[TemplateRegion]/*[self::TemplateFilename or self::EnlargedTemplateFilename]");
