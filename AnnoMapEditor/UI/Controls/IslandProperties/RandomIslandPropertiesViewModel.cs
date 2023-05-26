@@ -26,6 +26,8 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
 
         public ObservableCollection<IslandSize> IslandSizeItems { get; } = new();
 
+        public bool ShowIslandSizeItems => IslandSizeItems.Count > 1;
+
 
         public RandomIslandPropertiesViewModel(RandomIslandElement randomIsland)
         {
@@ -59,6 +61,8 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
                         IslandSizeItems.RemoveAt(i);
                         --i;
                     }
+
+                OnPropertyChanged(nameof(ShowIslandSizeItems));
             }
         }
     }
