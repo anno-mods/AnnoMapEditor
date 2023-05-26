@@ -43,7 +43,9 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
             else
             {
-                string label = $"Random\n{RandomIsland.IslandType.Name}";
+                string label = RandomIsland.IslandType == IslandType.Normal 
+                    ? $"Random\n{RandomIsland.IslandSize.Name}"
+                    : $"Random\n{RandomIsland.IslandType.Name}";
 
                 if (RandomIsland.IslandType == IslandType.Starter)
                     label += "\nwith Oil";
