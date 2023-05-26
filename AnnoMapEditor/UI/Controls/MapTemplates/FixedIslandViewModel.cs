@@ -126,7 +126,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         private static readonly Dictionary<string, int> ContinentalRotationAtTop = new Dictionary<string, int>()
         {
             { "colony01_c_01", 0 },
-            { "moderate_c_01", 1}
+            { "moderate_c_01", 1},
+            { "colony03_a03_01", 2}
         };
     }
 }

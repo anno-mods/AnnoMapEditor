@@ -153,23 +153,21 @@ namespace AnnoMapEditor.UI.Windows.Main
             UpdateExportStatus();
         }
 
-        public async Task OpenMap(string filePath, bool fromArchive = false)
+        public async Task OpenMap(string a7tinfoPath, bool fromArchive = false)
         {
-            SessionFilePath = Path.GetFileName(filePath);
+            SessionFilePath = Path.GetFileName(a7tinfoPath);
 
             if (fromArchive)
-            {
-                Stream? fs = Settings?.DataArchive.OpenRead(filePath);
-                if (fs is not null)
-                    Session = await Session.FromA7tinfoAsync(fs, filePath);
-            }
+                Session = await Session.FromDataArchive(a7tinfoPath);
+
+            else if (Path.GetExtension(a7tinfoPath).ToLower() == ".a7tinfo")
+                Session = await Session.FromBinaryFileAsync(a7tinfoPath);
+
+            else if (Path.GetExtension(a7tinfoPath).ToLower() == ".xml")
+                Session = await Session.FromXmlFileAsync(a7tinfoPath);
+
             else
-            {
-                if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
-                    Session = await Session.FromA7tinfoAsync(filePath);
-                else
-                    Session = await Session.FromXmlAsync(filePath);
-            }
+                throw new ArgumentException();
 
             UpdateExportStatus();
         }

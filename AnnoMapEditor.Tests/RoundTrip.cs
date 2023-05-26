@@ -1,3 +1,4 @@
+using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Tests.Utils;
@@ -18,7 +19,8 @@ namespace AnnoMapEditor.Tests
             await Settings.Instance.AwaitLoadingAsync();
 
             using Stream inputXml = File.OpenRead(filePath);
-            Session? session = await Session.FromXmlAsync(inputXml, filePath);
+            Region region = Region.DetectFromPath(filePath);
+            Session? session = await Session.FromXmlStreamAsync(region, inputXml);
 
             Assert.NotNull(session);
 
@@ -30,7 +32,7 @@ namespace AnnoMapEditor.Tests
                 await Serializer.WriteAsync(export!, a7tinfo);
 
                 a7tinfo.Position = 0;
-                session = await Session.FromA7tinfoAsync(a7tinfo, filePath);
+                session = await Session.FromBinaryStreamAsync(region, a7tinfo);
                 Assert.NotNull(session);
             }
 

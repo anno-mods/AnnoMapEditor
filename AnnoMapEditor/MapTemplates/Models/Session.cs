@@ -58,36 +58,45 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
 
 
-        public static async Task<Session?> FromA7tinfoAsync(string filePath)
+        #region loading
+
+        public static async Task<Session?> FromDataArchive(string a7tinfoPath)
         {
-            return await FromA7tinfoAsync(File.OpenRead(filePath), filePath);
+            Region region = Region.DetectFromPath(a7tinfoPath);
+            Stream? a7tinfoStream = Settings.Instance!.DataArchive.OpenRead(a7tinfoPath);
+            return await FromBinaryStreamAsync(region, a7tinfoStream);
         }
 
-        public static async Task<Session?> FromA7tinfoAsync(Stream? stream, string internalPath)
+        public static async Task<Session?> FromBinaryFileAsync(string a7tinfoPath)
         {
-            var doc = await Serializer.ReadAsync<MapTemplateDocument>(stream);
+            Region region = Region.DetectFromPath(a7tinfoPath);
+            Stream a7tinfoStream = File.OpenRead(a7tinfoPath);
+            return await FromBinaryStreamAsync(region, a7tinfoStream);
+        }
+
+        public static async Task<Session?> FromBinaryStreamAsync(Region region, Stream? a7tinfoStream)
+        {
+            var doc = await Serializer.ReadAsync<MapTemplateDocument>(a7tinfoStream);
             if (doc is null)
                 return null;
 
-            return FromTemplateDocument(doc, Region.DetectFromPath(internalPath));
+            return FromTemplateDocument(doc, region);
         }
 
-        public static async Task<Session?> FromXmlAsync(string filePath)
+        public static async Task<Session?> FromXmlFileAsync(string a7tinfoPath)
         {
-            var doc = await Serializer.ReadFromXmlAsync<MapTemplateDocument>(File.OpenRead(filePath));
+            Region region = Region.DetectFromPath(a7tinfoPath);
+            Stream a7tinfoXmlStream = File.OpenRead(a7tinfoPath);
+            return await FromXmlStreamAsync(region, a7tinfoXmlStream);
+        }
+
+        public static async Task<Session?> FromXmlStreamAsync(Region region, Stream? a7tinfoXmlStream)
+        {
+            var doc = await Serializer.ReadFromXmlAsync<MapTemplateDocument>(a7tinfoXmlStream);
             if (doc is null)
                 return null;
 
-            return FromTemplateDocument(doc, Region.DetectFromPath(filePath));
-        }
-
-        public static async Task<Session?> FromXmlAsync(Stream? stream, string internalPath)
-        {
-            var doc = await Serializer.ReadFromXmlAsync<MapTemplateDocument>(stream);
-            if (doc is null)
-                return null;
-
-            return FromTemplateDocument(doc, Region.DetectFromPath(internalPath));
+            return FromTemplateDocument(doc, region);
         }
 
         public static Session? FromTemplateDocument(MapTemplateDocument document, Region region)
@@ -120,6 +129,9 @@ namespace AnnoMapEditor.MapTemplates.Models
 
             return session;
         }
+
+        #endregion loading
+
 
         public static Session? FromNewMapDimensions(int mapSize, int playableSize, Region region)
         {
