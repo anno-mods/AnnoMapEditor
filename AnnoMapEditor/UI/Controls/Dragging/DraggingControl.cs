@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace AnnoMapEditor.UI.Controls
+namespace AnnoMapEditor.UI.Controls.Dragging
 {
     public abstract class DraggingControl : UserControl
     {
