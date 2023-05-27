@@ -47,10 +47,10 @@
             Size = max - Position;
         }
 
-        public Rect2(Vector2 min, Vector2 max)
+        public Rect2(Vector2 position, Vector2 size)
         {
-            Position = min;
-            Size = max - Position;
+            Position = position;
+            Size = size;
         }
     }
 }

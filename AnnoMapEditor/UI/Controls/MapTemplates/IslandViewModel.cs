@@ -58,8 +58,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public abstract string? Label { get; }
 
-        public abstract int SizeInTiles { get; }
-
         public virtual BitmapImage? Thumbnail { get; }
 
         public virtual int ThumbnailRotation { get; }
@@ -116,7 +114,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public override void OnDragged(Vector2 delta)
         {
             Vector2 newPosition = Element.Position + delta;
-            Rect2 mapArea = new(_session.Size - SizeInTiles + Vector2.Tile);
+            Rect2 mapArea = new(_session.Size - Island.SizeInTiles + Vector2.Tile);
 
             // provide resistance against moving out of bounds
             if (Element.Position.Within(mapArea) && !newPosition.Within(mapArea) && delta.Length > 150)
@@ -126,7 +124,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             }
             
             base.OnDragged(delta);
-            BoundsCheck(delta);
+            BoundsCheck();
         }
 
         public void BoundsCheck()

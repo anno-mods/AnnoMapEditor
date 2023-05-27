@@ -1,5 +1,6 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.Utilities;
 using IslandType = AnnoMapEditor.MapTemplates.Enums.IslandType;
 
 namespace AnnoMapEditor.MapTemplates.Models
@@ -32,10 +33,43 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
         private IslandDifficulty? _islandDifficulty;
 
+        public int SizeInTiles
+        {
+            get => _sizeInTiles;
+            protected set
+            {
+                SetProperty(ref _sizeInTiles, value);
+                Area = new(Position, new Vector2(value, value));
+            }
+        }
+        private int _sizeInTiles;
+
+        public Rect2 Area
+        {
+            get => _area;
+            private set => SetProperty(ref _area, value);
+        }
+        private Rect2 _area;
+
+
 
         public IslandElement(IslandType islandType)
         {
             _islandType = islandType;
+
+            PropertyChanged += This_PropertyChanged;
+        }
+
+
+        private void This_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Position))
+                UpdateArea();
+        }
+
+        private void UpdateArea()
+        {
+            Area = new(Position, new Vector2(_sizeInTiles, _sizeInTiles));
         }
 
 
