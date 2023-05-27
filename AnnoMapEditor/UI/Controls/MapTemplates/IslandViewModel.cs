@@ -113,27 +113,26 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             OnPropertyChanged(nameof(RandomizeRotation));
         }
 
-        public override void OnDragged(Vector2 newPosition)
+        public override void OnDragged(Vector2 delta)
         {
-            var mapArea = new Rect2(_session.Size - SizeInTiles + Vector2.Tile);
+            Vector2 newPosition = Element.Position + delta;
+            Rect2 mapArea = new(_session.Size - SizeInTiles + Vector2.Tile);
 
             // provide resistance against moving out of bounds
-            if (Element.Position.Within(mapArea) && !newPosition.Within(mapArea))
+            if (Element.Position.Within(mapArea) && !newPosition.Within(mapArea) && delta.Length > 150)
             {
                 Vector2 safePosition = newPosition.Clamp(mapArea);
-                if ((safePosition - newPosition).Length < 150)
-                    newPosition = safePosition;
+                delta = safePosition - Element.Position;
             }
-
-            BoundsCheck(newPosition);
-            base.OnDragged(newPosition);
+            
+            base.OnDragged(delta);
+            BoundsCheck(delta);
         }
 
-        public void BoundsCheck(Vector2? pos = null)
+        public void BoundsCheck()
         {
-            var mapArea = new Rect2(_session.Size - SizeInTiles + Vector2.Tile);
-            Vector2 position = pos ?? Element.Position;
-            IsOutOfBounds = !position.Within(mapArea);
+            Rect2 mapArea = new(_session.Size - Island.SizeInTiles + Vector2.Tile);
+            IsOutOfBounds = !Element.Position.Within(mapArea);
         }
     }
 }

@@ -22,9 +22,9 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
 
 
-        public override void OnDragged(Vector2 newPosition)
+        public override void OnDragged(Vector2 delta)
         {
-            Element.Position = newPosition;
+            Element.Position = Element.Position + delta;
         }
     }
 }

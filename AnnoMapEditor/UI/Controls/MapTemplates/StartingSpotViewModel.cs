@@ -61,12 +61,13 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                 BackgroundBrush = _startingSpot.Index == 0 ? Yellow : Red;
         }
 
-        public override void OnDragged(Vector2 newPosition)
+        public override void OnDragged(Vector2 delta)
         {
             // prevent moving StartingSpots outside of the Session's playable area.
-            newPosition = newPosition.Clamp(_session.PlayableArea);
+            Vector2 newPosition = Element.Position + delta;
+            Vector2 safePosition = newPosition.Clamp(_session.PlayableArea);
 
-            base.OnDragged(newPosition);
+            base.OnDragged(safePosition - Element.Position);
         }
     }
 }

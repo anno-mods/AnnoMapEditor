@@ -40,6 +40,6 @@ namespace AnnoMapEditor.UI.Controls.Dragging
             DragEnded?.Invoke(this, new());
         }
 
-        public abstract void OnDragged(Vector2 newPosition);
+        public abstract void OnDragged(Vector2 delta);
     }
 }

@@ -57,10 +57,10 @@ namespace AnnoMapEditor.UI.Controls.Dragging
         {
             if (e.LeftButton == MouseButtonState.Pressed && _viewModel.IsDragging)
             {
-                IInputElement parentElement = Parent as IInputElement
-                    ?? throw new Exception($"Parent of {nameof(DraggingControl)} must be an {nameof(IInputElement)}.");
-                Vector2 newPosition = new Vector2(e.GetPosition(parentElement)) - _viewModel.MouseOffset!;
-                _viewModel.OnDragged(newPosition);
+                Vector2 newMouseOffset = new(e.GetPosition(this));
+                Vector2 delta = new(newMouseOffset.X - _viewModel.MouseOffset!.X, newMouseOffset.Y - _viewModel.MouseOffset!.Y);
+
+                _viewModel.OnDragged(delta);
             }
         }
     }
