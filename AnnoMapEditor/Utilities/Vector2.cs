@@ -100,5 +100,10 @@ namespace AnnoMapEditor.Utilities
         }
 
         private static int Normalize(int x) => (x + 4) / 8 * 8;
+
+        public override string ToString()
+        {
+            return $"<{X},{Y}>";
+        }
     }
 }

@@ -60,15 +60,17 @@ namespace AnnoMapEditor.UI.Controls.AddIsland
         }
 
 
-        public override void OnDragged(Vector2 newPosition)
+        public override void OnDragged(Vector2 delta)
         {
+            base.OnDragged(delta);
+
             EndDrag();
 
             // TODO: Implement proper loading!
             if (Settings.Instance.IslandRepository == null)
                 return;
 
-            IslandAdded?.Invoke(this, new(MapElementType, IslandType, IslandSize, newPosition));
+            IslandAdded?.Invoke(this, new(MapElementType, IslandType, IslandSize, delta));
         }
     }
 }

@@ -1,15 +1,15 @@
 ﻿using AnnoMapEditor.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 
 namespace AnnoMapEditor.UI.Controls.Dragging
 {
     public abstract class DraggingViewModel : ObservableBase
     {
         public event DragEndedEventHandler? DragEnded;
+
+        public event DragStartedEventHandler? DragStarted;
+
+        public event DraggingEventHandler? Dragging;
 
 
         public bool IsDragging
@@ -27,10 +27,12 @@ namespace AnnoMapEditor.UI.Controls.Dragging
         private Vector2? _mouseOffset;
 
 
-        public void BeginDrag(Vector2 mouseOffset)
+        public void BeginDrag(Vector2 localMousePos)
         {
-            MouseOffset = mouseOffset;
+            MouseOffset = localMousePos;
             IsDragging = true;
+
+            DragStarted?.Invoke(this, new());
         }
 
         public void EndDrag()
@@ -40,6 +42,15 @@ namespace AnnoMapEditor.UI.Controls.Dragging
             DragEnded?.Invoke(this, new());
         }
 
-        public abstract void OnDragged(Vector2 delta);
+        public void ContinueDrag(Vector2 localMousePos)
+        {
+            Vector2 delta = new(localMousePos.X - _mouseOffset!.X, localMousePos.Y - _mouseOffset!.Y);
+            OnDragged(delta);
+        }
+
+        public virtual void OnDragged(Vector2 delta)
+        {
+            Dragging?.Invoke(this, new(delta));
+        }
     }
 }

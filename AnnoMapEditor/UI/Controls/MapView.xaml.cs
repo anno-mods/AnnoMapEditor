@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -48,6 +49,8 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
+        private HashSet<MapElementViewModel> _selectedElements = new();
+
 
         #region EditPlayableArea DependencyProperty
         public static readonly DependencyProperty EditPlayableAreaProperty =
@@ -64,7 +67,7 @@ namespace AnnoMapEditor.UI.Controls
                 if ((bool)GetValue(EditPlayableAreaProperty) != value)
                 {
                     SetValue(EditPlayableAreaProperty, value);
-                    if(playableRect is not null)
+                    if (playableRect is not null)
                     {
                         playableRect.IsEnabled = value;
                     }
@@ -75,7 +78,7 @@ namespace AnnoMapEditor.UI.Controls
         private static void EditPlayableAreaPropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
         {
             // this is the method that is called whenever the dependency property's value has changed
-            if(dependencyObject is MapView mvObject && mvObject.playableRect is not null)
+            if (dependencyObject is MapView mvObject && mvObject.playableRect is not null)
             {
                 bool val = (bool)args.NewValue;
                 mvObject.playableRect.IsEnabled = val;
@@ -83,10 +86,10 @@ namespace AnnoMapEditor.UI.Controls
                     Panel.SetZIndex(mvObject.playableRect, 10);
                 else
                     Panel.SetZIndex(mvObject.playableRect, 0);
-                mvObject.EnableDisableIslands(!val);
+                mvObject.EnableDisableAddIslandButtons(!val);
 
             }
-            
+
         }
         #endregion
 
@@ -160,7 +163,7 @@ namespace AnnoMapEditor.UI.Controls
         private void UpdateIslands(Session? session)
         {
             //Unlink event handlers from old session object
-            if(session != this.session)
+            if (session != this.session)
             {
                 if (this.session is not null)
                 {
@@ -178,7 +181,7 @@ namespace AnnoMapEditor.UI.Controls
                     return;
                 }
 
-                if(session is not null)
+                if (session is not null)
                 {
                     LinkSessionEventHandlers(session);
 
@@ -218,6 +221,8 @@ namespace AnnoMapEditor.UI.Controls
                             throw new NotImplementedException();
 
                         viewModel.PropertyChanged += MapElementViewModel_PropertyChanged;
+                        viewModel.Dragging += MapElementViewModel_Dragging;
+                        viewModel.DragEnded += MapElementViewModel_DragEnded;
 
                         control.DataContext = viewModel;
                         sessionCanvas.Children.Add(control);
@@ -238,7 +243,7 @@ namespace AnnoMapEditor.UI.Controls
                     CreateAddIsland(MapElementType.FixedIsland, IslandSize.Medium, IslandType.Normal);
                     CreateAddIsland(MapElementType.FixedIsland, IslandSize.Large, IslandType.Normal);
                 }
-                
+
             }
 
             UpdateSize();
@@ -254,7 +259,7 @@ namespace AnnoMapEditor.UI.Controls
                 DataContext = viewModel
             };
 
-            viewModel.IslandAdded += IslandAdded;
+            viewModel.IslandAdded += AddIslandButton_IslandAdded;
 
             AddIslands.Add(button);
             sessionCanvas.Children.Add(button);
@@ -302,61 +307,10 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
-        private void IslandAdded(object? sender, IslandAddedEventArgs e)
-        {
-            ProtoIslandViewModel protoViewModel = new(session, e.MapElementType, e.IslandType, e.IslandSize, e.Position);
-            sessionCanvas.Children.Add(new IslandControl()
-            {
-                DataContext = protoViewModel
-            });
-            protoViewModel.DragEnded += ProtoIsland_DragEnded;
-            protoViewModel.IsSelected = true;
-            protoViewModel.BeginDrag(Vector2.Zero);
-        }
 
-        private void ProtoIsland_DragEnded(object? sender, DragEndedEventArgs e)
-        {
-            if (sender is ProtoIslandViewModel protoViewModel)
-            {
-                // if the proto island is within bounds add the new island
-                if (!protoViewModel.IsOutOfBounds)
-                {
-                    // if it is a FixedIsland, let the user select the correct island
-                    if (protoViewModel.MapElementType == MapElementType.FixedIsland)
-                    {
-                        SelectIslandViewModel selectIslandViewModel = new(session.Region, protoViewModel.Island.IslandType, protoViewModel.IslandSize);
-                        selectIslandViewModel.IslandSelected += (s, e) => SelectIsland_IslandSelected(s, e, protoViewModel.Island.Position);
+        #region adding islands
 
-                        OverlayService.Instance.Show(selectIslandViewModel);
-                    }
-
-                    // otherwise create a random island
-                    else if (protoViewModel.MapElementType == MapElementType.PoolIsland)
-                    {
-                        RandomIslandElement islandElement = new(protoViewModel.IslandSize, protoViewModel.Island.IslandType)
-                        {
-                            Position = protoViewModel.Island.Position
-                        };
-                        session!.Elements.Add(islandElement);
-                    }
-                    else
-                        throw new NotImplementedException();
-                }
-
-                // remove the proto island
-                foreach (var child in sessionCanvas.Children)
-                {
-                    if (child is IslandControl islandControl && islandControl.DataContext == protoViewModel)
-                    {
-                        protoViewModel.DragEnded -= ProtoIsland_DragEnded;
-                        sessionCanvas.Children.Remove(islandControl);
-                        break;
-                    }
-                }
-            }
-        }
-
-        public void EnableDisableIslands(bool enable)
+        public void EnableDisableAddIslandButtons(bool enable)
         {
             foreach (object item in sessionCanvas.Children)
             {
@@ -371,6 +325,75 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
+        private void AddIslandButton_IslandAdded(object? sender, IslandAddedEventArgs e)
+        {
+            DeselectAllMapElements();
+
+            AddIslandButton button = AddIslands.FirstOrDefault(b => b.DataContext == sender)
+                ?? throw new ArgumentException(nameof(sender));
+            AddProtoIsland(button.GetPosition(), e.MapElementType, e.IslandType, e.IslandSize);
+        }
+
+        private void AddProtoIsland(Vector2 position, MapElementType mapElementType, IslandType islandType, IslandSize islandSize)
+        {
+            ProtoIslandViewModel protoIslandViewModel = new(session, mapElementType, islandType, islandSize, position);
+            sessionCanvas.Children.Add(new IslandControl()
+            {
+                DataContext = protoIslandViewModel
+            });
+
+            protoIslandViewModel.Dragging += MapElementViewModel_Dragging;
+            protoIslandViewModel.DragEnded += ProtoIsland_DragEnded;
+            protoIslandViewModel.IsSelected = true;
+            _selectedElements.Add(protoIslandViewModel);
+            protoIslandViewModel.BeginDrag(Vector2.Zero);
+        }
+
+        private void ProtoIsland_DragEnded(object? sender, DragEndedEventArgs e)
+        {
+            ProtoIslandViewModel protoIslandViewModel = sender as ProtoIslandViewModel
+                ?? throw new ArgumentException(nameof(sender));
+            FinalizeProtoIsland(protoIslandViewModel);
+        }
+
+        private void FinalizeProtoIsland(ProtoIslandViewModel protoIslandViewModel)
+        {
+            // if the ProtoIslandViewModel is within bounds, convert it into an actual island
+            if (!protoIslandViewModel.IsOutOfBounds)
+            {
+                // if it is a FixedIsland, let the user select the correct island
+                if (protoIslandViewModel.MapElementType == MapElementType.FixedIsland)
+                {
+                    SelectIslandViewModel selectIslandViewModel = new(session.Region, protoIslandViewModel.Island.IslandType, protoIslandViewModel.IslandSize);
+                    selectIslandViewModel.IslandSelected += (s, e) => SelectIsland_IslandSelected(s, e, protoIslandViewModel.Island.Position);
+
+                    OverlayService.Instance.Show(selectIslandViewModel);
+                }
+
+                // otherwise create a random island
+                else if (protoIslandViewModel.MapElementType == MapElementType.PoolIsland)
+                {
+                    RandomIslandElement islandElement = new(protoIslandViewModel.IslandSize, protoIslandViewModel.Island.IslandType)
+                    {
+                        Position = protoIslandViewModel.Island.Position
+                    };
+                    session!.Elements.Add(islandElement);
+                }
+                else
+                    throw new NotImplementedException();
+            }
+
+            // remove the ProtoIslandViewModel and its control
+            IslandControl protoIslandControl = sessionCanvas.Children.OfType<IslandControl>()
+                .FirstOrDefault(c => c.DataContext == protoIslandViewModel)
+                ?? throw new Exception($"Could not find IslandControl for PrtoIslandViewModel.");
+
+            protoIslandViewModel.Dragging -= MapElementViewModel_Dragging;
+            protoIslandViewModel.DragEnded -= ProtoIsland_DragEnded;
+            sessionCanvas.Children.Remove(protoIslandControl);
+            _selectedElements.Remove(protoIslandViewModel);
+        }
+
         private void SelectIsland_IslandSelected(object? sender, IslandSelectedEventArgs e, Vector2 position)
         {
             // add the new Island
@@ -382,48 +405,77 @@ namespace AnnoMapEditor.UI.Controls
             session.Elements.Add(fixedIslandElement);
         }
 
+        #endregion adding islands
+
+
+        private void OnMapElementSelected(MapElementViewModel viewModel)
+        {
+            // if shift is not pressed, deselect all previously selected elements
+            if (!Keyboard.IsKeyDown(Key.LeftShift))
+                DeselectAllMapElements();
+
+            _selectedElements.Add(viewModel);
+
+            if (viewModel is IslandViewModel islandElement)
+                SelectedIsland = islandElement.Island;
+        }
+
+        private void DeselectAllMapElements()
+        {
+            foreach (var element in _selectedElements)
+                DeselectMapElement(element);
+        }
+
+        private void DeselectMapElement(MapElementViewModel viewModel)
+        {
+            _selectedElements.Remove(viewModel);
+            viewModel.IsSelected = false;
+
+            if (viewModel is IslandViewModel islandElement && islandElement.Island == SelectedIsland)
+                SelectedIsland = null;
+        }
+
         private void MapElementViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
+            MapElementViewModel mapElementViewModel = sender as MapElementViewModel
+                ?? throw new ArgumentException(nameof(sender));
+
             // handle selection of elements
             if (e.PropertyName == nameof(MapElementViewModel.IsSelected))
             {
-                MapElementViewModel viewModel = sender as MapElementViewModel
-                    ?? throw new Exception();
+                if (mapElementViewModel.IsSelected)
+                    OnMapElementSelected(mapElementViewModel);
 
-                if (viewModel.IsSelected && viewModel != _selectedElement)
-                {
-                    // deselect the currently selected
-                    if (_selectedElement != null)
-                    {
-                        _selectedElement.IsSelected = false;
-                        SelectedIsland = null;
-                    }
-
-                    _selectedElement = viewModel;
-                    if (viewModel is IslandViewModel islandViewModel)
-                        SelectedIsland = islandViewModel.Island;
-                }
+                else
+                    DeselectMapElement(mapElementViewModel);
             }
+        }
 
-            // handle removal of islands
-            else if (e.PropertyName == nameof(IslandViewModel.IsOutOfBounds) || e.PropertyName == nameof(DraggingViewModel.IsDragging))
+        private void RemoveMapElement(MapElementViewModel mapElementViewModel)
+        {
+            DeselectMapElement(mapElementViewModel);
+            session.Elements.Remove(mapElementViewModel.Element);
+        }
+
+        private void MapElementViewModel_Dragging(object? sender, DraggingEventArgs e)
+        {
+            MapElementViewModel senderViewModel = sender as MapElementViewModel
+                ?? throw new ArgumentException(nameof(sender));
+
+            if (senderViewModel.IsSelected)
             {
-                if (sender is IslandViewModel viewModel)
+                foreach (MapElementViewModel mapElementViewModel in _selectedElements)
                 {
-                    if (viewModel.IsOutOfBounds && !viewModel.IsDragging && !session.ResizingInProgress)
-                    {
-                        session.Elements.Remove(viewModel.Element);
-
-                        // deselect the island if it was selected
-                        if (viewModel == _selectedElement)
-                        {
-                            _selectedElement = null;
-                            SelectedIsland = null;
-                        }
-                    }
+                    mapElementViewModel.Move(e.Delta);
                 }
             }
         }
+
+        private void MapElementViewModel_DragEnded(object? sender, DragEndedEventArgs e)
+        {
+            ClearOOBIslands();
+        }
+
 
         void UpdateSize()
         {
@@ -466,11 +518,13 @@ namespace AnnoMapEditor.UI.Controls
                         // find the correct control
                         foreach (var child in sessionCanvas.Children)
                         {
-                            if (child is IslandControl control 
+                            if (child is IslandControl control
                                 && control.DataContext is IslandViewModel viewModel
                                 && viewModel.Element == island)
                             {
+                                viewModel.Dragging -= MapElementViewModel_Dragging;
                                 viewModel.PropertyChanged -= MapElementViewModel_PropertyChanged;
+                                viewModel.DragEnded -= MapElementViewModel_DragEnded;
                                 sessionCanvas.Children.Remove(control);
 
                                 break;
@@ -498,20 +552,22 @@ namespace AnnoMapEditor.UI.Controls
                     });
 
                     viewModel.PropertyChanged += MapElementViewModel_PropertyChanged;
-//                    viewModel.IsSelected = true;
-//                    viewModel.BeginDrag(Vector2.Zero);
+                    viewModel.Dragging += MapElementViewModel_Dragging;
+                    viewModel.DragEnded += MapElementViewModel_DragEnded;
+                    viewModel.IsSelected = true;
+                    viewModel.BeginDrag(Vector2.Zero);
                 }
             }
         }
 
         private void HandleSessionResized(object? sender, Session.SessionResizeEventArgs args)
         {
-            if(sender is Session session)
+            if (sender is Session session)
             {
                 if (oldSize is null)
                     oldSize = new Vector2(args.OldMapSize);
 
-                if(mapRect is not null)
+                if (mapRect is not null)
                 {
                     mapRect.Width = session.Size.X;
                     mapRect.Height = session.Size.Y;
@@ -523,7 +579,7 @@ namespace AnnoMapEditor.UI.Controls
 
                 if (sizeIncrease)
                 {
-                    UpdateSize(); 
+                    UpdateSize();
                     //Always keep AddIsland controls outside map area
                     RecalculateAddIslandCoordinates();
                 }

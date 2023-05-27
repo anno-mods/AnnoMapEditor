@@ -11,6 +11,7 @@
         public int Width => Size.X;
         public int Height => Size.Y;
 
+
         public Rect2(string? area)
         {
             if (area is not null)
@@ -26,6 +27,12 @@
 
             Position = Vector2.Zero;
             Size = Vector2.Zero;
+        }
+
+        public Rect2(int x1, int y1, int x2, int y2)
+        {
+            Position = new Vector2(x1, y1);
+            Size = new Vector2(x2, y2);
         }
 
         public Rect2(int[]? numbers)

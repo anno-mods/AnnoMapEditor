@@ -45,6 +45,9 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
             if (e.PropertyName == nameof(FixedIslandElement.IslandAsset))
                 Redraw();
+
+            if (e.PropertyName == nameof(FixedIslandElement.Position))
+                SnapContinentalIsland();
         }
 
         private void Redraw()
@@ -65,13 +68,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             _thumbnailRotation = (_fixedIsland.Rotation - 1) * -90;
 
             OnPropertyChanged(nameof(ThumbnailRotation));
-        }
-
-
-        public override void OnDragged(Vector2 newPosition)
-        {
-            base.OnDragged(newPosition);
-            SnapContinentalIsland();
         }
 
         // Rotates and snaps continental islands to the corners of the map.

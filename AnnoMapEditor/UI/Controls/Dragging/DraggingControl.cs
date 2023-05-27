@@ -40,27 +40,38 @@ namespace AnnoMapEditor.UI.Controls.Dragging
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            Vector2 mouseOffset = new(Mouse.GetPosition(this));
-            _viewModel.BeginDrag(mouseOffset);
+            Vector2 localMousePos = new(Mouse.GetPosition(this));
+            Rect2 actualSize = new(0, 0, (int)ActualWidth, (int)ActualHeight);
+
+            if (localMousePos.Within(actualSize))
+            {
+                _viewModel.BeginDrag(localMousePos);
+                CaptureMouse();
+            }
+            else
+            {
+                ReleaseMouseCapture();
+                _viewModel.EndDrag();
+            }
 
             base.OnMouseLeftButtonDown(e);
         }
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            _viewModel.EndDrag();
-
-            base.OnMouseLeftButtonUp(e);
+            if (_viewModel.IsDragging)
+            {
+                ReleaseMouseCapture();
+                _viewModel.EndDrag();
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && _viewModel.IsDragging)
             {
-                Vector2 newMouseOffset = new(e.GetPosition(this));
-                Vector2 delta = new(newMouseOffset.X - _viewModel.MouseOffset!.X, newMouseOffset.Y - _viewModel.MouseOffset!.Y);
-
-                _viewModel.OnDragged(delta);
+                Vector2 localMousePos = new(e.GetPosition(this));
+                _viewModel.ContinueDrag(localMousePos);
             }
         }
     }

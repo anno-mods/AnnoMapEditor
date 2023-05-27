@@ -136,6 +136,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public override void OnDragged(Vector2 newPosition)
         {
+            base.OnDragged(newPosition);
+
             //This limits movement so that the minimum Margin is always remaining.
             Vector2 newPos = newPosition.Clamp(MinMarginVector, new Vector2(Session.Size.X - PlayableSize - MinMargin, Session.Size.Y - PlayableSize - MinMargin));
             PosX = newPos.X;

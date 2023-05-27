@@ -49,13 +49,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
         private SolidColorBrush _borderBrush = BorderBrushes["Normal"];
 
-        public bool IsOutOfBounds
-        {
-            get => _isOutOfBounds;
-            set => SetProperty(ref _isOutOfBounds, value);
-        }
-        private bool _isOutOfBounds;
-
         public abstract string? Label { get; }
 
         public virtual BitmapImage? Thumbnail { get; }
@@ -88,8 +81,12 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         {
             if (e.PropertyName == nameof(IslandElement.IslandType))
                 UpdateBackground();
+
             else if (e.PropertyName == nameof(FixedIslandElement.RandomizeRotation))
                 UpdateRotation();
+
+            else if (e.PropertyName == nameof(FixedIslandElement.Position))
+                BoundsCheck();
         }
 
         private void UpdateBackground()
@@ -111,19 +108,17 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             OnPropertyChanged(nameof(RandomizeRotation));
         }
 
-        public override void OnDragged(Vector2 delta)
+        public override void Move(Vector2 delta)
         {
             Vector2 newPosition = Element.Position + delta;
             Rect2 mapArea = new(_session.Size - Island.SizeInTiles + Vector2.Tile);
 
             // provide resistance against moving out of bounds
             if (Element.Position.Within(mapArea) && !newPosition.Within(mapArea) && delta.Length > 150)
-            {
-                Vector2 safePosition = newPosition.Clamp(mapArea);
-                delta = safePosition - Element.Position;
-            }
-            
-            base.OnDragged(delta);
+                newPosition = newPosition.Clamp(mapArea);
+
+            Element.Position = newPosition;
+
             BoundsCheck();
         }
 

@@ -7,9 +7,9 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
     public class StartingSpotViewModel : MapElementViewModel
     {
-        static readonly SolidColorBrush White  = new(Color.FromArgb(255, 255, 255, 255));
+        static readonly SolidColorBrush White = new(Color.FromArgb(255, 255, 255, 255));
         static readonly SolidColorBrush Yellow = new(Color.FromArgb(255, 234, 224, 83));
-        static readonly SolidColorBrush Red    = new(Color.FromArgb(255, 234, 83, 83));
+        static readonly SolidColorBrush Red = new(Color.FromArgb(255, 234, 83, 83));
 
 
         private readonly Session _session;
@@ -43,8 +43,14 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             UpdateBackground();
 
             PropertyChanged += This_PropertyChanged;
+            startingSpot.PropertyChanged += StartingSpot_PropertyChanged;
         }
 
+        private void StartingSpot_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(StartingSpotElement.Position))
+                BoundsCheck();
+        }
 
         private void This_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
@@ -61,13 +67,21 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                 BackgroundBrush = _startingSpot.Index == 0 ? Yellow : Red;
         }
 
-        public override void OnDragged(Vector2 delta)
+        public void BoundsCheck(Vector2? pos = null)
         {
+            IsOutOfBounds = !Element.Position.Within(_session.PlayableArea);
+        }
+
+
+        private static Logger<StartingSpotViewModel> LOGGER = new();
+
+        public override void Move(Vector2 delta)
+        {
+            LOGGER.LogInformation("Moving " + delta);
+
             // prevent moving StartingSpots outside of the Session's playable area.
             Vector2 newPosition = Element.Position + delta;
-            Vector2 safePosition = newPosition.Clamp(_session.PlayableArea);
-
-            base.OnDragged(safePosition - Element.Position);
+            Element.Position = newPosition.Clamp(_session.PlayableArea);
         }
     }
 }

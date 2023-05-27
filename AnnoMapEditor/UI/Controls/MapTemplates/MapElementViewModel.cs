@@ -15,6 +15,13 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
         private bool _isSelected;
 
+        public bool IsOutOfBounds
+        {
+            get => _isOutOfBounds;
+            set => SetProperty(ref _isOutOfBounds, value);
+        }
+        private bool _isOutOfBounds;
+
 
         public MapElementViewModel(MapElement element)
         {
@@ -22,7 +29,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
 
 
-        public override void OnDragged(Vector2 delta)
+        public virtual void Move(Vector2 delta)
         {
             Element.Position = Element.Position + delta;
         }

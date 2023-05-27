@@ -14,15 +14,15 @@ namespace AnnoMapEditor.UI.Controls.AddIsland
         
         public IslandSize IslandSize { get; init; }
 
-        public Vector2 Position { get; init; }
+        public Vector2 Delta { get; init; }
 
 
-        public IslandAddedEventArgs(MapElementType mapElementType, IslandType islandType, IslandSize islandSize, Vector2 position)
+        public IslandAddedEventArgs(MapElementType mapElementType, IslandType islandType, IslandSize islandSize, Vector2 delta)
         {
             MapElementType = mapElementType;
             IslandType = islandType;
             IslandSize = islandSize;
-            Position = position;
+            Delta = delta;
         }
     }
 }
