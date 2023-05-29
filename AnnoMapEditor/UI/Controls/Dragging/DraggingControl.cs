@@ -32,9 +32,9 @@ namespace AnnoMapEditor.UI.Controls.Dragging
             if (e.PropertyName == nameof(DraggingViewModel.IsDragging))
             {
                 if (_viewModel.IsDragging)
-                    Mouse.Capture(this);
+                    CaptureMouse();
                 else
-                    Mouse.Capture(null);
+                    ReleaseMouseCapture();
             }
         }
 
@@ -54,6 +54,7 @@ namespace AnnoMapEditor.UI.Controls.Dragging
                 _viewModel.EndDrag();
             }
 
+            e.Handled = true;
             base.OnMouseLeftButtonDown(e);
         }
 
@@ -63,6 +64,8 @@ namespace AnnoMapEditor.UI.Controls.Dragging
             {
                 ReleaseMouseCapture();
                 _viewModel.EndDrag();
+
+                e.Handled = true;
             }
         }
 
@@ -72,6 +75,8 @@ namespace AnnoMapEditor.UI.Controls.Dragging
             {
                 Point localMousePos = e.GetPosition(this);
                 _viewModel.ContinueDrag(localMousePos);
+
+                e.Handled = true;
             }
         }
     }

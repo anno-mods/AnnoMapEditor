@@ -72,13 +72,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             IsOutOfBounds = !Element.Position.Within(_session.PlayableArea);
         }
 
-
-        private static Logger<StartingSpotViewModel> LOGGER = new();
-
         public override void Move(Vector2 delta)
         {
-            LOGGER.LogInformation("Moving " + delta);
-
             // prevent moving StartingSpots outside of the Session's playable area.
             Vector2 newPosition = Element.Position + delta;
             Element.Position = newPosition.Clamp(_session.PlayableArea);

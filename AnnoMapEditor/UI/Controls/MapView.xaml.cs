@@ -3,6 +3,7 @@ using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.UI.Controls.AddIsland;
 using AnnoMapEditor.UI.Controls.Dragging;
 using AnnoMapEditor.UI.Controls.MapTemplates;
+using AnnoMapEditor.UI.Controls.Selection;
 using AnnoMapEditor.UI.Overlays;
 using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
@@ -407,11 +408,14 @@ namespace AnnoMapEditor.UI.Controls
 
         #endregion adding islands
 
+        #region selecting
+
+        private SelectionBoxControl? _selectionBox;
 
         private void OnMapElementSelected(MapElementViewModel viewModel)
         {
             // if shift is not pressed, deselect all previously selected elements
-            if (!Keyboard.IsKeyDown(Key.LeftShift))
+            if (!Keyboard.IsKeyDown(Key.LeftShift) && _selectionBox == null)
                 DeselectAllMapElements();
 
             _selectedElements.Add(viewModel);
@@ -434,6 +438,89 @@ namespace AnnoMapEditor.UI.Controls
             if (viewModel is IslandViewModel islandElement && islandElement.Island == SelectedIsland)
                 SelectedIsland = null;
         }
+
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            // TODO:    base.OnMouseLeftButtonDown(e);      Handle clicking on other elements
+            if (_selectionBox != null)
+                RemoveSelectionBox();
+
+            Point start = e.GetPosition(sessionCanvas);
+            SelectionBoxViewModel selectionBoxViewModel = new SelectionBoxViewModel(start);
+            _selectionBox = new()
+            {
+                DataContext = selectionBoxViewModel
+            };
+
+            sessionCanvas.Children.Add(_selectionBox);
+
+            selectionBoxViewModel.BeginDrag(start);
+            selectionBoxViewModel.DragEnded += SelectionBoxViewModel_DragEnded;
+        }
+
+        private void SelectionBoxViewModel_DragEnded(object? sender, DragEndedEventArgs e)
+        {
+            SelectionBoxViewModel selectionBoxViewModel = sender as SelectionBoxViewModel
+                ?? throw new ArgumentException();
+
+            if (!Keyboard.IsKeyDown(Key.LeftShift))
+                DeselectAllMapElements();
+
+            foreach (var control in sessionCanvas.Children)
+            {
+                if (control is StartingSpotControl startingSpotControl)
+                {
+                    StartingSpotViewModel startingSpotViewModel = startingSpotControl.DataContext as StartingSpotViewModel
+                        ?? throw new Exception();
+
+                    if (selectionBoxViewModel.Contains(startingSpotControl.GetPosition()))
+                        startingSpotViewModel.IsSelected = true;
+                }
+
+                else if (control is IslandControl islandControl)
+                {
+                    IslandViewModel islandViewModel = islandControl.DataContext as IslandViewModel
+                        ?? throw new Exception();
+                    int sizeInTiles = islandViewModel.Island.SizeInTiles;
+
+                    Vector2[] islandCorners = new[]
+                    {
+                        islandControl.GetPosition(),
+                        islandControl.GetPosition() + new Vector2(sizeInTiles, 0),
+                        islandControl.GetPosition() + new Vector2(0, sizeInTiles),
+                        islandControl.GetPosition() + new Vector2(sizeInTiles, sizeInTiles),
+                    };
+
+                    if (islandCorners.Any(c => selectionBoxViewModel.Contains(c)))
+                        islandViewModel.IsSelected = true;
+                }
+            }
+
+            RemoveSelectionBox();
+        }
+
+        private void RemoveSelectionBox()
+        {
+            if (_selectionBox != null)
+            {
+                SelectionBoxViewModel selectionBoxViewModel = _selectionBox.DataContext as SelectionBoxViewModel
+                    ?? throw new ArgumentException();
+                selectionBoxViewModel.DragEnded -= SelectionBoxViewModel_DragEnded;
+                sessionCanvas.Children.Remove(_selectionBox);
+                _selectionBox = null;
+            }
+        }
+
+        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
+        {
+            DeselectAllMapElements();
+            
+            e.Handled = true;
+            base.OnMouseRightButtonDown(e);
+        }
+
+        #endregion
+
 
         private void MapElementViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {

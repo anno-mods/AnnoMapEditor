@@ -34,7 +34,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public virtual void Move(Vector2 delta)
         {
-            Element.Position = Element.Position + delta;
+            Element.Position += delta;
         }
     }
 }

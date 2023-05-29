@@ -42,7 +42,7 @@ namespace AnnoMapEditor.UI.Controls.Dragging
             DragEnded?.Invoke(this, new());
         }
 
-        public void ContinueDrag(Point localMousePos)
+        public virtual void ContinueDrag(Point localMousePos)
         {
             Point delta = new(localMousePos.X - _mouseOffset!.Value.X, localMousePos.Y - _mouseOffset!.Value.Y);
             OnDragged(delta);
