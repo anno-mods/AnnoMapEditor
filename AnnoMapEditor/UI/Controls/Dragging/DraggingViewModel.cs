@@ -19,17 +19,17 @@ namespace AnnoMapEditor.UI.Controls.Dragging
         }
         private bool _isDragging;
 
-        public Vector2? MouseOffset
+        public Point? MouseOffset
         {
             get => _mouseOffset;
             private set => SetProperty(ref _mouseOffset, value);
         }
-        private Vector2? _mouseOffset;
+        private Point? _mouseOffset;
 
 
-        public void BeginDrag(Vector2 localMousePos)
+        public void BeginDrag(Point? localMousePos = null)
         {
-            MouseOffset = localMousePos;
+            MouseOffset = localMousePos ?? new();
             IsDragging = true;
 
             DragStarted?.Invoke(this, new());
@@ -42,13 +42,13 @@ namespace AnnoMapEditor.UI.Controls.Dragging
             DragEnded?.Invoke(this, new());
         }
 
-        public void ContinueDrag(Vector2 localMousePos)
+        public void ContinueDrag(Point localMousePos)
         {
-            Vector2 delta = new(localMousePos.X - _mouseOffset!.X, localMousePos.Y - _mouseOffset!.Y);
+            Point delta = new(localMousePos.X - _mouseOffset!.Value.X, localMousePos.Y - _mouseOffset!.Value.Y);
             OnDragged(delta);
         }
 
-        public virtual void OnDragged(Vector2 delta)
+        public virtual void OnDragged(Point delta)
         {
             Dragging?.Invoke(this, new(delta));
         }

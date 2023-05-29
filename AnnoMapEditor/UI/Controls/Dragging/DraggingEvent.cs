@@ -1,4 +1,4 @@
-﻿using AnnoMapEditor.Utilities;
+﻿using System.Windows;
 
 namespace AnnoMapEditor.UI.Controls.Dragging
 {
@@ -7,10 +7,10 @@ namespace AnnoMapEditor.UI.Controls.Dragging
 
     public class DraggingEventArgs
     {
-        public Vector2 Delta { get; init; }
+        public Point Delta { get; init; }
 
 
-        public DraggingEventArgs(Vector2 delta)
+        public DraggingEventArgs(Point delta)
         {
             Delta = delta;
         }

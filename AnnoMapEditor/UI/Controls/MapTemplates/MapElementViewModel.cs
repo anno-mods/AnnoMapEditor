@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.UI.Controls.Dragging;
 using AnnoMapEditor.Utilities;
+using System.Windows;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
@@ -28,6 +29,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             Element = element;
         }
 
+
+        public virtual void Move(Point delta) => Move(new Vector2(delta));
 
         public virtual void Move(Vector2 delta)
         {

@@ -346,7 +346,7 @@ namespace AnnoMapEditor.UI.Controls
             protoIslandViewModel.DragEnded += ProtoIsland_DragEnded;
             protoIslandViewModel.IsSelected = true;
             _selectedElements.Add(protoIslandViewModel);
-            protoIslandViewModel.BeginDrag(Vector2.Zero);
+            protoIslandViewModel.BeginDrag();
         }
 
         private void ProtoIsland_DragEnded(object? sender, DragEndedEventArgs e)
@@ -555,7 +555,7 @@ namespace AnnoMapEditor.UI.Controls
                     viewModel.Dragging += MapElementViewModel_Dragging;
                     viewModel.DragEnded += MapElementViewModel_DragEnded;
                     viewModel.IsSelected = true;
-                    viewModel.BeginDrag(Vector2.Zero);
+                    viewModel.BeginDrag();
                 }
             }
         }

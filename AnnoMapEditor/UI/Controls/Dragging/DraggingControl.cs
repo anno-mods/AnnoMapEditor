@@ -40,7 +40,7 @@ namespace AnnoMapEditor.UI.Controls.Dragging
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            Vector2 localMousePos = new(Mouse.GetPosition(this));
+            Point localMousePos = Mouse.GetPosition(this);
             Rect2 actualSize = new(0, 0, (int)ActualWidth, (int)ActualHeight);
 
             if (localMousePos.Within(actualSize))
@@ -70,7 +70,7 @@ namespace AnnoMapEditor.UI.Controls.Dragging
         {
             if (e.LeftButton == MouseButtonState.Pressed && _viewModel.IsDragging)
             {
-                Vector2 localMousePos = new(e.GetPosition(this));
+                Point localMousePos = e.GetPosition(this);
                 _viewModel.ContinueDrag(localMousePos);
             }
         }
