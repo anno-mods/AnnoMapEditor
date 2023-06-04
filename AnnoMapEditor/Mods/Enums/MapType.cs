@@ -10,14 +10,14 @@ namespace AnnoMapEditor.Mods.Enums
         private static readonly Logger<MapType> _logger = new();
 
         //Old World
-        public static readonly MapType Archipelago = new("Archipelago", guid: "17079", assetName: "moderate_archipel");
-        public static readonly MapType Atoll       = new("Atoll",       guid: "17080", assetName: "moderate_atoll");
-        public static readonly MapType Corners     = new("Corners",     guid: "17082", assetName: "moderate_corners");
-        public static readonly MapType IslandArc   = new("Island Arc",  guid: "17081", assetName: "moderate_islandarc", templateType: "Arc");
-        public static readonly MapType Snowflake   = new("Snowflake",   guid: "17083", assetName: "moderate_snowflake");
+        public static readonly MapType Archipelago = new("Archipelago", "Archipelago", guid: "17079", assetName: "moderate_archipel");
+        public static readonly MapType Atoll       = new("Atoll",       "Atoll", guid: "17080", assetName: "moderate_atoll");
+        public static readonly MapType Corners     = new("Corners",     "Corners", guid: "17082", assetName: "moderate_corners");
+        public static readonly MapType IslandArc   = new("Island Arc",  "Island Arc", guid: "17081", assetName: "moderate_islandarc", templateType: "Arc");
+        public static readonly MapType Snowflake   = new("Snowflake",   "Snowflake", guid: "17083", assetName: "moderate_snowflake");
 
         //New World
-        public static readonly MapType Colony01 = new("New World", guid: "", assetName: "SouthAmerica", ' ', fileNamePart: "colony01");
+        public static readonly MapType Colony01 = new("New World", "New World", guid: "", assetName: "SouthAmerica", ' ', fileNamePart: "colony01");
 
         //Lists
         public static readonly IEnumerable<MapType> OldWorld = new[] { Archipelago, Atoll, Corners, IslandArc, Snowflake };
@@ -32,6 +32,7 @@ namespace AnnoMapEditor.Mods.Enums
         };
 
 
+        public readonly string DisplayName;
         public readonly string Name;
         public readonly string Guid;
         public readonly string AssetName;
@@ -40,8 +41,9 @@ namespace AnnoMapEditor.Mods.Enums
         public readonly string TemplateType;
 
 
-        private MapType(string name, string guid, string assetName, char assetNameSeparator = '_', string? fileNamePart = null, string? templateType = null)
+        private MapType(string displayName, string name, string guid, string assetName, char assetNameSeparator = '_', string? fileNamePart = null, string? templateType = null)
         {
+            DisplayName = displayName;
             Name = name;
             Guid = guid;
             AssetName = assetName;
@@ -50,7 +52,7 @@ namespace AnnoMapEditor.Mods.Enums
             TemplateType = templateType ?? name;
         }
 
-        public override string ToString() => Name;
+        public override string ToString() => DisplayName;
 
         public string ToName() => AssetName + AssetNameSeparator;
 
@@ -59,7 +61,7 @@ namespace AnnoMapEditor.Mods.Enums
 
         public static MapType? FromName(string name)
         {
-            MapType? type = All.FirstOrDefault(t => t.Name == name);
+            MapType? type = All.FirstOrDefault(t => t.DisplayName == name);
 
             if (type is null)
             {
