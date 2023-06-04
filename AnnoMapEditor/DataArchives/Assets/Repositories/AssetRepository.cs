@@ -149,14 +149,15 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         {
             AssetTemplateAttribute assetTemplateAttribute = typeof(TAsset).GetCustomAttribute<AssetTemplateAttribute>()
                 ?? throw new Exception($"Cannot register type '{typeof(TAsset).FullName}' as an asset model, because it lacks the {nameof(AssetTemplateAttribute)}.");
-            string templateName = assetTemplateAttribute.TemplateName;
+            string[] templateNames = assetTemplateAttribute.TemplateNames;
 
             // get the deserializer
             ConstructorInfo deserializerConstructor = typeof(TAsset).GetConstructor(new[] { typeof(XElement) })
                 ?? throw new Exception($"Type {typeof(TAsset).FullName} is not a valid asset model. Asset models must have a deserialization constructor.");
             Func<XElement, TAsset> deserializer = (x) => (TAsset)deserializerConstructor.Invoke(new[] { x });
-
-            _deserializers.Add(templateName, deserializer);
+            
+            foreach (string templateName in templateNames)
+                _deserializers.Add(templateName, deserializer);
 
             // prepare to resolve references
             foreach (PropertyInfo property in typeof(TAsset).GetProperties(BindingFlags.Instance | BindingFlags.Public))
