@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
+using AnnoMapEditor.DataArchives.Assets.Deserialization;
 using AnnoMapEditor.MapTemplates.Enums;
 using System;
 using System.Collections.Generic;
@@ -25,8 +26,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         public IEnumerable<long> ReplacementGuids { get; init; }
 
-        [AssetReference(nameof(ReplacementGuids))]
-        public IEnumerable<SlotAsset> ReplacementSlotAssets { get; set; }
+        [GuidReference(nameof(ReplacementGuids))]
+        public ICollection<SlotAsset> ReplacementSlotAssets { get; set; }
 
         public IEnumerable<Region> AssociatedRegions { get; init; }
 
@@ -35,7 +36,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         {
             DisplayName = "";
             ReplacementGuids = Enumerable.Empty<long>();
-            ReplacementSlotAssets = Enumerable.Empty<SlotAsset>();
+            ReplacementSlotAssets = new SlotAsset[0];
             AssociatedRegions = Enumerable.Empty<Region>();
         }
 
@@ -78,8 +79,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 .Select(id => Region.FromRegionId(id))
                 .ToArray()
                 ?? Array.Empty<Region>();
-
-            ReplacementSlotAssets = Enumerable.Empty<SlotAsset>();
         }
     }
 }

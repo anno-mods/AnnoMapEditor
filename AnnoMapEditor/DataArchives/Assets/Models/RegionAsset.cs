@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
+using AnnoMapEditor.DataArchives.Assets.Deserialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         public IEnumerable<long> AllowedFertilityGuids { get; init; }
 
-        [AssetReference(nameof(AllowedFertilityGuids))]
-        public IEnumerable<FertilityAsset> AllowedFertilities { get; init; }
+        [GuidReference(nameof(AllowedFertilityGuids))]
+        public ICollection<FertilityAsset> AllowedFertilities { get; set; }
         
         
         public RegionAsset(XElement valuesXml)
