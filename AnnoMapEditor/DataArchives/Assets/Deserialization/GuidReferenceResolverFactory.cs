@@ -58,13 +58,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Deserialization
             return (asset) =>
             {
                 long? guid = guidProperty.GetValue(asset) as long?;
-                if (guid.HasValue)
-                {
-                    if (TryGetReferencedAsset(guid.Value, out StandardAsset? referencedAsset, referencedType))
+                if (guid.HasValue && TryGetReferencedAsset(guid.Value, out StandardAsset? referencedAsset, referencedType))
                         referenceProperty.SetValue(asset, referencedAsset);
-                    else
-                        _logger.LogWarning($"Could not resolve GUID reference {guid} to type {referencedType.FullName}. No matching asset could be found.");
-                }
             };
         }
 
@@ -106,8 +101,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Deserialization
                     {
                         if (TryGetReferencedAsset(guid, out StandardAsset? referencedAsset, referencedType))
                             list.Add(referencedAsset);
-                        else
-                            _logger.LogWarning($"Could not resolve reference GUID {guid} to type {referencedType.FullName}. No matching asset with that GUID could be found.");
                     }
 
                     referenceProperty.SetValue(asset, list);

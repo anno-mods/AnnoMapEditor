@@ -65,8 +65,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Deserialization
                     RegionAsset? regionAsset = _assetRepository.GetAll<RegionAsset>().FirstOrDefault(r => r.RegionID == regionId);
                     if (regionAsset != null)
                         referenceProperty.SetValue(asset, regionAsset);
-                    else
-                        _logger.LogWarning($"Could not resolve RegionID reference {regionId}. No matching RegionAsset with that GUID could be found.");
                 }
             };
         }
@@ -111,8 +109,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Deserialization
                         RegionAsset? regionAsset = regionAssets.FirstOrDefault(r => r.RegionID == regionId);
                         if (regionAsset != null)
                             list.Add(regionAsset);
-                        else
-                            _logger.LogWarning($"Could not resolve RegionID reference {regionId}. No matching RegionAsset could be found.");
                     }
 
                     referenceProperty.SetValue(asset, list);
