@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
@@ -77,11 +78,12 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
     public class SelectSlotsViewModel : ObservableBase, IOverlayViewModel
     {
         public event EventHandler<FilteredItemsChangedEventArgs<SlotAssignmentViewModel>>? FilterModified;
-        public IEnumerable<Region?> Regions { get; init; } = Region.All;
 
-        private readonly Region _initialRegion;
+        public IEnumerable<RegionAsset> Regions { get; init; }
 
-        public Region SelectedRegion
+        private readonly RegionAsset _initialRegion;
+
+        public RegionAsset SelectedRegion
         {
             get => _selectedRegion;
             set
@@ -92,7 +94,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 ShowRegionWarning = _selectedRegion != _initialRegion;
             }
         }
-        private Region _selectedRegion;
+        private RegionAsset _selectedRegion;
 
         public bool ShowRegionWarning
         {
@@ -143,13 +145,18 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
         public SelectSlotsViewModel(Region region, FixedIslandElement fixedIsland)
         {
-            _selectedRegion = _initialRegion = region;
+            AssetRepository assetRepository = Settings.Instance.AssetRepository
+                ?? throw new Exception();
+
+            Regions = assetRepository.GetAll<RegionAsset>();
+
+            _selectedRegion = _initialRegion = assetRepository.Get<RegionAsset>(region.AssetGuid);
             FixedIsland = fixedIsland;
 
             SlotAssignmentViewModels = new(
                 fixedIsland.SlotAssignments.Values
                     .Where(s => s.Slot.SlotAsset != null)
-                    .Select(s => new SlotAssignmentViewModel(s, region))
+                    .Select(s => new SlotAssignmentViewModel(s, _initialRegion))
                     .OrderByDescending(s => s.SlotAssignment.Slot.Position, new SlotPositionHorizontalAxisComparer())
                 );
 

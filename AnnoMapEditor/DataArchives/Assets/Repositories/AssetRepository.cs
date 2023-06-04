@@ -24,6 +24,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         private readonly GuidReferenceResolverFactory _guidReferenceResolverFactory;
 
+        private readonly RegionIdReferenceResolverFactory _regionIdReferenceResolverFactory;
+
         private readonly Dictionary<string, Func<XElement, StandardAsset>> _deserializers = new();
 
         private readonly Dictionary<Type, List<Action<object>>> _referenceResolvers = new();
@@ -35,6 +37,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         {
             _dataArchive = dataArchive;
             _guidReferenceResolverFactory = new(this);
+            _regionIdReferenceResolverFactory = new(this);
         }
 
 
@@ -162,7 +165,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             // prepare to resolve references
             foreach (PropertyInfo property in typeof(TAsset).GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                Action<object>? resolver = _guidReferenceResolverFactory.CreateResolver<TAsset>(property);
+                Action<object>? resolver = _guidReferenceResolverFactory.CreateResolver<TAsset>(property)
+                    ?? _regionIdReferenceResolverFactory.CreateResolver<TAsset>(property);
 
                 // keep track of all resolvers
                 if (resolver != null)

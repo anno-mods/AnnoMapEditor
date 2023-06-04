@@ -3,7 +3,6 @@ using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -27,11 +26,11 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
         }
         private string? _nameFilter;
 
-        public IEnumerable<Region?> Regions { get; init; } = Region.All;
+        public IEnumerable<RegionAsset> Regions { get; init; }
 
-        private readonly Region _initialRegion;
+        private readonly RegionAsset _initialRegion;
 
-        public Region SelectedRegion
+        public RegionAsset SelectedRegion
         {
             get => _selectedRegion;
             set
@@ -42,7 +41,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
                 ShowRegionWarning = _selectedRegion != _initialRegion;
             }
         }
-        private Region _selectedRegion;
+        private RegionAsset _selectedRegion;
 
         public bool ShowRegionWarning
         {
@@ -72,7 +71,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
                 })
                 );
 
-            _selectedRegion = _initialRegion = region;
+            _selectedRegion = _initialRegion = assetRepository.Get<RegionAsset>(region.AssetGuid);
             FixedIsland = fixedIsland;
 
             CollectionView fertilitiesView = (CollectionView)CollectionViewSource.GetDefaultView(FertilityItems);
@@ -104,11 +103,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
 
             if (SelectedRegion != null)
             {
-                // TODO: Should this happen here?
-                AssetRepository assetRepository = Settings.Instance.AssetRepository!;
-                RegionAsset regionAsset = assetRepository.Get<RegionAsset>(SelectedRegion.AssetGuid);
-
-                if (!regionAsset.AllowedFertilities.Contains(fertilityAsset))
+                if (!SelectedRegion.AllowedFertilities.Contains(fertilityAsset))
                     return false;
             }
 

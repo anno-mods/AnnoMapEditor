@@ -4,7 +4,6 @@ using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -62,7 +61,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         }
         private Brush _backgroundBrush;
 
-        public Region SelectedRegion
+        public RegionAsset SelectedRegion
         {
             get => _selectedRegion;
             set
@@ -71,10 +70,10 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 UpdateFilter();
             }
         }
-        private Region _selectedRegion;
+        private RegionAsset _selectedRegion;
 
 
-        public SlotAssignmentViewModel(SlotAssignment slotAssignment, Region selectedRegion)
+        public SlotAssignmentViewModel(SlotAssignment slotAssignment, RegionAsset selectedRegion)
         {
             SlotAssignment = slotAssignment;
             _selectedRegion = selectedRegion;
@@ -100,7 +99,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             // replacements for 1000029 contain the New World as an AssociatedRegion. Despite of
             // this, it is possible to have both 1010502 Iron Deposit and 1010507 Gold Deposit in
             // the New World.
-            if (_selectedRegion == Region.NewWorld
+            if (_selectedRegion.GUID == RegionAsset.REGION_NEWWORLD_GUID
                 && SlotAssignment.Slot.ObjectGuid == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID
                 && (slotAsset.GUID == 1010501 || slotAsset.GUID == 1010507))
                 return true;
