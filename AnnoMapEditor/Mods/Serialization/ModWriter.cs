@@ -1,17 +1,23 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
-using AnnoMapEditor.MapTemplates.Models;
+﻿using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared;
+using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Mods.Enums;
 using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.Utilities;
+using FileDBSerializing;
+using FileDBSerializing.ObjectSerializer;
 using Newtonsoft.Json;
+using RDAExplorer;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace AnnoMapEditor.Mods.Serialization
 {
@@ -22,128 +28,237 @@ namespace AnnoMapEditor.Mods.Serialization
 
         private readonly MapTemplateWriter _mapTemplateWriter;
 
+        private readonly AssetRepository _assetRepository;
+
 
         public ModWriter()
         {
             _mapTemplateWriter = new();
+            _assetRepository = Settings.Instance.AssetRepository
+                ?? throw new Exception($"AssetRepository has not been initialized.");
         }
 
 
-        public async Task WriteAsync(Mod mod, string modPath, string modName, string? modID)
+        private IList<MapTemplateAsset> GetMapTemplatesToReplace(SessionAsset session, MapType? mapType = null)
         {
-            string fullModName = "[Map] " + modName;
-
-            List<string> sizes = mod.MapTemplate.Region.GetAllSizeCombinations().ToList();
-            string size = sizes[0];
-
-            try
+            // Sessions may reference the MapTemplates to be used directly via the MapTemplate and
+            // MapTemplateForMultiplayer attributes.
+            if (session.MapTemplate != null)
             {
-                string? mapTypeFileName = mod.MapType.ToFileName();
-                string? mapTypeGuid = mod.MapType.Guid;
+                List<MapTemplateAsset> mapTemplates = new();
+                mapTemplates.Add(session.MapTemplate);
+                if (session.MapTemplateForMultiplayer != null)
+                    mapTemplates.Add(session.MapTemplateForMultiplayer);
 
-                if (mapTypeFileName is null || mapTypeGuid is null)
-                    throw new Exception("invalid MapType");
+                return mapTemplates;
+            }
 
-                if (!mod.MapTemplate.Region.AllowModding)
-                    throw new Exception("not supported map region");
+            // Otherwise get pool maps matching the Session's region.
+            else
+            {
+                IEnumerable<MapTemplateAsset> mapTemplates = _assetRepository.GetAll<MapTemplateAsset>()
+                    .Where(m => m.TemplateRegion == session.Region)
+                    .Where(m => m.TemplateFilename.Contains("pool"));
 
-                FileUtils.TryDeleteDirectory(modPath);
-                Directory.CreateDirectory(modPath);
-
-                //Only write Language XML for OW Maps, as only they need naming in a menu
-                if (!string.IsNullOrEmpty(mapTypeGuid))
-                    await WriteLanguageXml(modPath, modName, mapTypeGuid);
-
-                // write meta JSON, assets XML, .a7tinfo, .a7t and .a7te
-                string mapFilePath = Path.Combine(AME_POOL_PATH, mod.MapTemplate.Region.PoolFolderName, mapTypeFileName);
-                string a7tBasePath = Path.Combine(modPath, $"{mapFilePath}");
-                string a7tInfoPath = a7tBasePath + $"_{size}.a7tinfo";
-                string a7tPath = a7tBasePath + $"_{size}.a7t";
-                string a7tePath = a7tBasePath + $"_{size}.a7te";
-
-                await WriteMetaJson(modPath, modName, modID);
-                await WriteAssetsXml(modPath, fullModName, mapFilePath, mod.MapTemplate.Region, mod.MapType);
-                await _mapTemplateWriter.WriteA7tinfoAsync(mod.MapTemplate, a7tBasePath + $"_{size}.a7tinfo");
-                await Task.Run(() => new A7tExporter(mod.MapTemplate.Size.X, mod.MapTemplate.PlayableArea.Width, mod.MapTemplate.Region).ExportA7T(a7tPath));
-                await Task.Run(() => new A7teExporter(mod.MapTemplate.Size.X).ExportA7te(a7tePath));
-
-                if (mod.MapTemplate.Region.HasMapExtension)
+                // For The Old World filter according to the MapType.
+                if (session == SessionAsset.OldWorld)
                 {
-                    File.Copy(a7tInfoPath, a7tBasePath + $"_{size}_enlarged.a7tinfo");
-                    File.Copy(a7tPath, a7tBasePath + $"_{size}_enlarged.a7t");
-                    File.Copy(a7tePath, a7tBasePath + $"_{size}_enlarged.a7te");
+                    if (mapType != null)
+                        mapTemplates = mapTemplates.Where(m => m.TemplateMapType == mapType);
+                    else
+                        throw new ArgumentException($"Cannot determine MapTemplates to replace for session {session.GUID} \"{session.DisplayName}\" without a given {typeof(MapType).FullName}.");
                 }
 
-                //copy a7tinfo, a7t and a7te for all sizes
-                for (int i = 1; i < sizes.Count; i++)
+                return mapTemplates.ToList();
+            }
+        }
+
+        public async Task<bool> WriteAsync(Mod mod, string modPath, string modName, string? modID)
+        {
+            FileUtils.TryDeleteDirectory(modPath);
+            Directory.CreateDirectory(modPath);
+
+            SessionAsset session = mod.MapTemplate.Session;
+
+            IList<MapTemplateAsset> mapTemplatesToReplace = GetMapTemplatesToReplace(session, mod.MapType);
+
+            await WriteModinfoJson(modPath, modName, modID);
+
+            //Only write Language XML for OW Maps, as only they need naming in a menu
+            if (session == SessionAsset.OldWorld)
+                await WriteLanguageXml(modPath, modName, mod.MapType.Guid);
+
+            // create the first copy of a7t, a7tinfo and a7te
+            MapTemplateAsset firstMapTemplate = mapTemplatesToReplace.First();
+            string mapFileDirectory = Path.Combine(modPath, AME_POOL_PATH);
+            string a7tPath = Path.Combine(mapFileDirectory, Path.GetFileName(firstMapTemplate.TemplateFilename));
+            string a7tinfoPath = Path.ChangeExtension(a7tPath, "a7tinfo");
+            string a7tePath = Path.ChangeExtension(a7tPath, "a7te");
+
+            await _mapTemplateWriter.WriteA7tinfoAsync(mod.MapTemplate, Path.Combine(modPath, a7tinfoPath));
+            WriteA7T(mod, a7tPath);
+            WriteA7te(mod.MapTemplate.Size.X, a7tePath);
+
+            // copy a7t, a7tinfo and a7te for all MapTemplates that must be replaced
+            for (int i = 1; i < mapTemplatesToReplace.Count; ++i)
+            {
+                MapTemplateAsset mapTemplate = mapTemplatesToReplace[i];
+                string mapFilename = Path.GetFileNameWithoutExtension(mapTemplate.TemplateFilename);
+
+                File.Copy(a7tPath, Path.Combine(mapFileDirectory, mapFilename + ".a7t"));
+                File.Copy(a7tinfoPath, Path.Combine(mapFileDirectory, mapFilename + ".a7tinfo"));
+                File.Copy(a7tePath, Path.Combine(mapFileDirectory, mapFilename + ".a7te"));
+
+                if (mapTemplate.EnlargedTemplateFilename != null)
                 {
-                    size = sizes[i];
-
-                    File.Copy(a7tInfoPath, a7tBasePath + $"_{size}.a7tinfo");
-                    File.Copy(a7tPath, a7tBasePath + $"_{size}.a7t");
-                    File.Copy(a7tePath, a7tBasePath + $"_{size}.a7te");
-
-                    if (mod.MapTemplate.Region.HasMapExtension)
-                    {
-                        File.Copy(a7tInfoPath, a7tBasePath + $"_{size}_enlarged.a7tinfo");
-                        File.Copy(a7tPath, a7tBasePath + $"_{size}_enlarged.a7t");
-                        File.Copy(a7tePath, a7tBasePath + $"_{size}_enlarged.a7te");
-                    }
+                    File.Copy(a7tPath, Path.Combine(mapFileDirectory, mapFilename + "_enlarged.a7t"));
+                    File.Copy(a7tinfoPath, Path.Combine(mapFileDirectory, mapFilename + "_enlarged.a7tinfo"));
+                    File.Copy(a7tePath, Path.Combine(mapFileDirectory, mapFilename + "_enlarged.a7te"));
                 }
             }
-            catch (UnauthorizedAccessException)
-            {
-                MessageBox.Show("Failed to save the mod.\n\nIt looks like some files are locked, possibly by another application.\n\nThe mod may be broken now.", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Failed to save the mod.\n\nThe mod may be broken now.", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
+
+            await WriteAssetsXml(modPath, mapTemplatesToReplace);
+
+            return true;
         }
 
-
-        public static bool CanSave(MapTemplate? mapTemplate)
+        private static async Task WriteAssetsXml(string modPath, IEnumerable<MapTemplateAsset> mapTemplatesToReplace)
         {
-            if (mapTemplate is null)
-                return false;
+            string assetsXmlPath = Path.Combine(modPath, @"data\config\export\main\asset\assets.xml");
 
-            return mapTemplate.Region.AllowModding;
+            string? assetsXmlDir = Path.GetDirectoryName(assetsXmlPath);
+            if (assetsXmlDir is not null)
+                Directory.CreateDirectory(assetsXmlDir);
+
+            StringBuilder sb = new();
+            sb.Append("<ModOps>\n");
+
+            foreach (MapTemplateAsset mapTemplateAsset in mapTemplatesToReplace)
+            {
+                string templateFilename = Path.Combine(AME_POOL_PATH, Path.GetFileName(mapTemplateAsset.TemplateFilename));
+                string? enlargedTemplateFilename = mapTemplateAsset.EnlargedTemplateFilename != null ? Path.Combine(AME_POOL_PATH, Path.GetFileName(mapTemplateAsset.EnlargedTemplateFilename)) : null;
+
+                WriteModOpReplaceTemplateFilename(sb, mapTemplateAsset.GUID, templateFilename, enlargedTemplateFilename);
+
+                if (mapTemplateAsset.EnlargedTemplateFilename != null)
+                    WriteModOpReplaceTemplateFilename(sb, mapTemplateAsset.GUID, templateFilename, enlargedTemplateFilename);
+            }
+
+            sb.Append("</ModOps>\n");
+
+            using StreamWriter writer = new(File.Create(assetsXmlPath));
+            await writer.WriteAsync(sb.ToString());
         }
 
-        private static async Task WriteMetaJson(string modPath, string modName, string? modID)
+        private static async Task WriteModinfoJson(string modPath, string modName, string? modID)
         {
-            Modinfo? modinfo;
+            Modinfo modinfo = new()
+            {
+                Version = "1",
+                ModID = string.IsNullOrEmpty(modID) ? $"ame_{MakeSafeName(modName)}_{Guid.NewGuid().ToString().Split('-').FirstOrDefault("")}" : modID,
+                ModName = new(modName),
+                Category = new("Map"),
+                Description = new($"Select Map Type '{modName}' to play this map.\n" +
+                $"World and island sizes are fixed.\n" +
+                $"\n" +
+                $"Note:\n" +
+                $"- Do not rename the mod folder. It will lead to a loading screen freeze.\n" +
+                $"- You can combine map mods as long as they do not replace the same map type.\n" +
+                $"\n" +
+                $"This mod has been created with the {App.Title}.\n" +
+                $"You can download the editor at:\nhttps://github.com/anno-mods/AnnoMapEditor/releases/latest"),
+                CreatorName = App.TitleShort,
+                CreatorContact = "https://github.com/anno-mods/AnnoMapEditor"
+            };
 
             string modinfoPath = Path.Combine(modPath, "modinfo.json");
-            //if (File.Exists(modinfoPath))
-            //{
-            //    modinfo = JsonConvert.DeserializeObject<Modinfo?>(File.ReadAllText(modinfoPath));
-            //}
-
-            //if (modinfo is null)
-            {
-                modinfo = new()
-                {
-                    Version = "1",
-                    ModID = string.IsNullOrEmpty(modID) ? $"ame_{MakeSafeName(modName)}_{Guid.NewGuid().ToString().Split('-').FirstOrDefault("")}" : modID,
-                    ModName = new(modName),
-                    Category = new("Map"),
-                    Description = new($"Select Map Type '{modName}' to play this map.\n" +
-                    $"World and island sizes are fixed.\n" +
-                    $"\n" +
-                    $"Note:\n" +
-                    $"- Do not rename the mod folder. It will lead to a loading screen freeze.\n" +
-                    $"- You can combine map mods as long as they do not replace the same map type.\n" +
-                    $"\n" +
-                    $"This mod has been created with the {App.Title}.\n" +
-                    $"You can download the editor at:\nhttps://github.com/anno-mods/AnnoMapEditor/releases/latest"),
-                    CreatorName = App.TitleShort,
-                    CreatorContact = "https://github.com/anno-mods/AnnoMapEditor"
-                };
-            }
 
             using StreamWriter writer = new(File.Create(modinfoPath));
             await writer.WriteAsync(JsonConvert.SerializeObject(modinfo, Newtonsoft.Json.Formatting.Indented));
+        }
+
+        private static void WriteModOpReplaceTemplateFilename(StringBuilder sb, long mapTemplateGuid, string templateFilename, string? enlargedTemplateFilename)
+        {
+            sb.Append($"  <ModOp GUID=\"{mapTemplateGuid}\" Type=\"merge\" Path=\"/Values/MapTemplate\">\n")
+              .Append($"    <TemplateFilename>{templateFilename.Replace('\\', '/')}</TemplateFilename>\n");
+
+            if (enlargedTemplateFilename != null)
+                sb.Append($"    <EnlargedTemplateFilename>{templateFilename.Replace('\\', '/')}</EnlargedTemplateFilename>\n");
+
+            sb.Append($"  </ModOp>\n");
+        }
+
+
+        private static void WriteA7T(Mod mod, string a7tPath)
+        {
+            using MemoryStream nestedDataStream = new();
+
+            // If the session has existing Gamedata, it must be updated to reflect all changes made within the AME.
+            Gamedata gameDataItem = new(mod.MapTemplate.Size.X, mod.MapTemplate.PlayableArea.Width, mod.MapTemplate.Session.Region.Ambiente!, true);
+
+            //Create actual a7t File
+            FileDBDocumentSerializer serializer = new(new() { Version = FileDBDocumentVersion.Version1 });
+            IFileDBDocument generatedFileDB = serializer.WriteObjectStructureToFileDBDocument(gameDataItem);
+
+            using MemoryStream fileDbStream = new();
+
+            DocumentWriter gamedataDocWriter = new();
+            gamedataDocWriter.WriteFileDBToStream(generatedFileDB, fileDbStream);
+
+            if (fileDbStream.Position > 0)
+            {
+                fileDbStream.Seek(0, SeekOrigin.Begin);
+            }
+
+            RDABlockCreator.FileType_CompressedExtensions.Add(".data");
+
+            using (RDAReader rdaReader = new())
+            using (BinaryReader reader = new(fileDbStream))
+            {
+                RDAFolder rdaFolder = new(FileHeader.Version.Version_2_2);
+
+                rdaReader.rdaFolder = rdaFolder;
+                DirEntry gamedataFileDirEntry = new()
+                {
+                    filename = RDAFile.FileNameToRDAFileName("gamedata.data", ""),
+                    offset = 0,
+                    compressed = (ulong)fileDbStream.Length,
+                    filesize = (ulong)fileDbStream.Length,
+                    timestamp = RDAExplorer.Misc.DateTimeExtension.ToTimeStamp(DateTime.Now),
+                };
+
+                BlockInfo gamedataFileBlockInfo = new()
+                {
+                    flags = 0,
+                    fileCount = 1,
+                    directorySize = (ulong)fileDbStream.Length,
+                    decompressedSize = (ulong)fileDbStream.Length,
+                    nextBlock = 0
+                };
+
+                RDAFile rdaFile = RDAFile.FromUnmanaged(FileHeader.Version.Version_2_2, gamedataFileDirEntry, gamedataFileBlockInfo, reader, null);
+                rdaFolder.AddFiles(new List<RDAFile>() { rdaFile });
+                RDAWriter writer = new(rdaFolder);
+                bool compress = true;
+                writer.Write(a7tPath, FileHeader.Version.Version_2_2, compress, rdaReader, null);
+
+            }
+
+            RDABlockCreator.FileType_CompressedExtensions.Remove(".data");
+        }
+
+        private static void WriteA7te(int mapRadius, string a7tePath)
+        {
+            AnnoEditorLevel a7te = new(mapRadius);
+
+            XmlSerializer a7teSerializer = new(typeof(AnnoEditorLevel));
+            XmlWriterSettings xmlSettings = new() { Indent = true, IndentChars = "  ", OmitXmlDeclaration = true, Async = true };
+            XmlSerializerNamespaces noNamespaces = new(new XmlQualifiedName[] { XmlQualifiedName.Empty });
+
+            using StreamWriter streamWriter = new(a7tePath, false, Encoding.UTF8);
+            using XmlWriter xmlWriter = XmlWriter.Create(streamWriter, xmlSettings);
+
+            a7teSerializer.Serialize(xmlWriter, a7te, noNamespaces);
         }
 
         private static async Task WriteLanguageXml(string modPath, string name, string guid)
@@ -169,89 +284,6 @@ namespace AnnoMapEditor.Mods.Serialization
             }
         }
 
-        private static async Task WriteAssetsXml(string modPath, string fullModName, string mapFilePath, Region region, MapType mapType)
-        {
-            string assetsXmlPath = Path.Combine(modPath, @"data\config\export\main\asset\assets.xml");
-            string? assetsXmlDir = Path.GetDirectoryName(assetsXmlPath);
-            if (assetsXmlDir is not null)
-                Directory.CreateDirectory(assetsXmlDir);
-
-            string content = CreateAssetsModOps(region, mapType, mapFilePath.Replace("\\", "/"));
-
-            using StreamWriter writer = new(File.Create(assetsXmlPath));
-            await writer.WriteAsync(content);
-        }
-
-        public static string CreateAssetsModOps(Region region, MapType mapType, string fullMapPath)
-        {
-            IEnumerable<string> sizes = region.MapSizes;
-            // some maps have updates sizes, but make sure to only replace one
-            IEnumerable<string> subSizes = region.MapSizeIndices;
-
-            static string MakeXPath(string mapTypeName, string size, string subsize)
-            {
-                if (string.IsNullOrEmpty(subsize))
-                    return $"../Standard/Name='{mapTypeName}{size}'";
-                else
-                    return $"../Standard/Name='{mapTypeName}{size}_{subsize}'";
-            }
-
-            string content = "<ModOps>\n";
-
-            if (region.UsesAllSizeIndices)
-            {
-                //Single ModOp for all Sub-Sizes
-                foreach (var size in sizes)
-                {
-                    foreach (var subsize in subSizes)
-                    {
-                        content += CreateModOp(
-                            new string[] { MakeXPath(mapType.ToName(), size, subsize) },
-                            fullMapPath,
-                            $"{size}_{subsize}",
-                            region.HasMapExtension);
-                    }
-                }
-            }
-            else
-            {
-                //XPath OR
-                foreach (var size in sizes)
-                {
-                    var xpaths = subSizes.Select(x => MakeXPath(mapType.ToName(), size, x));
-
-                    content += CreateModOp(xpaths, fullMapPath, size, region.HasMapExtension);
-                }
-            }
-
-
-            content += "</ModOps>\n";
-            return content;
-        }
-
-        private static string CreateModOp(IEnumerable<string> xPaths, string basePath, string size, bool extension)
-        {
-            string result = CreateModOpSingle(xPaths, basePath, size, false);
-            if (extension)
-            {
-                result += CreateModOpSingle(xPaths, basePath, size, true);
-            }
-            return result;
-        }
-
-        private static string CreateModOpSingle(IEnumerable<string> xPaths, string basePath, string size, bool extension)
-        {
-            const string TEMPLATE = "TemplateFilename";
-            const string ENLARGED_TEMPLATE = "EnlargedTemplateFilename";
-
-            string target = extension ? ENLARGED_TEMPLATE : TEMPLATE;
-
-            string result = $"  <ModOp Type=\"replace\" Path=\"//MapTemplate[{string.Join(" or ", xPaths)}][last()]/{target}\">\n" +
-                            $"    <{target}>{basePath}_{size}{(extension ? "_enlarged" : "")}.a7t</{target}>\n" +
-                            $"  </ModOp>\n";
-
-            return result;
-        }
 
         private static string MakeSafeName(string unsafeName) => new Regex(@"\W").Replace(unsafeName, "_").ToLower();
     }

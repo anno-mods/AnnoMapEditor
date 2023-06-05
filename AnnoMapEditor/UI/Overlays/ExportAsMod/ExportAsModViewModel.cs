@@ -1,4 +1,4 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Enums;
 using AnnoMapEditor.Mods.Models;
@@ -7,7 +7,6 @@ using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -24,27 +23,7 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
             Inactive
         }
 
-        public MapTemplate? MapTemplate
-        { 
-            get => _mapTemplate;
-            set
-            {
-                _mapTemplate = value;
-                if(_mapTemplate is not null)
-                {
-                    AllowedMapTypes = MapType.MapTypesForRegion[_mapTemplate.Region];
-                    SelectedMapType = AllowedMapTypes.First();
-                }
-                else
-                {
-                    AllowedMapTypes = Enumerable.Empty<MapType>();
-                    SelectedMapType = null;
-                }
-                InfoMapTypeSelection = _mapTemplate is not null && _mapTemplate.Region == Region.Moderate;
-                CheckExistingMod();
-            }
-        }
-        MapTemplate? _mapTemplate;
+        public MapTemplate MapTemplate { get; init; }
 
         public bool IsSaving
         {
@@ -70,12 +49,7 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
 
         public string ModExistsWarning { get; private set; } = string.Empty;
 
-        public bool InfoMapTypeSelection
-        {
-            get => _infoMapTypeSelection;
-            set => SetProperty(ref _infoMapTypeSelection, value);
-        }
-        private bool _infoMapTypeSelection = true;
+        public bool ShowMapTypeSelection { get; init; }
 
         public string ModID
         {
@@ -95,17 +69,26 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
         }
         private MapType? _mapType = null;
 
-        public IEnumerable<MapType> AllowedMapTypes
-        {
-            get => _allowedMapTypes;
-            set => SetProperty(ref _allowedMapTypes, value);
-        }
-        private IEnumerable<MapType> _allowedMapTypes = Enumerable.Empty<MapType>();
+        public IEnumerable<MapType>? AllowedMapTypes { get; init; }
 
-        public ExportAsModViewModel()
+
+        public ExportAsModViewModel(MapTemplate mapTemplate)
         {
+            MapTemplate = mapTemplate;
+
+            if (mapTemplate.Session == SessionAsset.OldWorld)
+            {
+                AllowedMapTypes = MapType.All;
+                ShowMapTypeSelection = mapTemplate.Session == SessionAsset.OldWorld;
+            }
+            else
+                ShowMapTypeSelection = false;
+
             Settings.Instance.PropertyChanged += Settings_PropertyChanged;
+
+            CheckExistingMod();
         }
+
 
         private void Settings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {

@@ -16,20 +16,7 @@ namespace AnnoMapEditor.Mods.Enums
         public static readonly MapType IslandArc   = new("Island Arc",  "Island Arc", guid: "17081", assetName: "moderate_islandarc", templateType: "Arc");
         public static readonly MapType Snowflake   = new("Snowflake",   "Snowflake", guid: "17083", assetName: "moderate_snowflake");
 
-        //New World
-        public static readonly MapType Colony01 = new("New World", "New World", guid: "", assetName: "SouthAmerica", ' ', fileNamePart: "colony01");
-
-        //Lists
-        public static readonly IEnumerable<MapType> OldWorld = new[] { Archipelago, Atoll, Corners, IslandArc, Snowflake };
-        public static readonly IEnumerable<MapType> NewWorld = new[] { Colony01 };
-        public static readonly IEnumerable<MapType> All      = new[] { Archipelago, Atoll, Corners, IslandArc, Snowflake, Colony01 };
-
-        //Region/MapType Dictionary
-        public static readonly Dictionary<Region, IEnumerable<MapType>> MapTypesForRegion = new()
-        {
-            [Region.Moderate] = OldWorld,
-            [Region.NewWorld] = NewWorld
-        };
+        public static readonly IEnumerable<MapType> All      = new[] { Archipelago, Atoll, Corners, IslandArc, Snowflake };
 
 
         public readonly string DisplayName;

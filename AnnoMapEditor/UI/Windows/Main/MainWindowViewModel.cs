@@ -1,5 +1,5 @@
 ﻿using AnnoMapEditor.DataArchives;
-using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.UI.Controls;
@@ -33,13 +33,13 @@ namespace AnnoMapEditor.UI.Windows.Main
                     SelectedIsland = null;
 
                     if(MapTemplateProperties is not null) 
-                        MapTemplateProperties.SelectedRegionChanged -= SelectedRegionChanged;
+                        MapTemplateProperties.SelectedSessionChanged -= SelectedRegionChanged;
 
                     MapTemplateProperties = value is null ? null : new(value);
                     OnPropertyChanged(nameof(MapTemplateProperties));
 
                     if(MapTemplateProperties is not null)
-                        MapTemplateProperties.SelectedRegionChanged += SelectedRegionChanged;
+                        MapTemplateProperties.SelectedSessionChanged += SelectedRegionChanged;
 
                     MapTemplateChecker = value is null ? null : new(value);
                     OnPropertyChanged(nameof(MapTemplateChecker));
@@ -70,7 +70,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 else if (value is FixedIslandElement fixedIsland)
                 {
                     SelectedRandomIslandPropertiesViewModel = null;
-                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland, MapTemplate!.Region);
+                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland, MapTemplate!.Session.Region);
                 }
             }
         }
@@ -181,7 +181,7 @@ namespace AnnoMapEditor.UI.Windows.Main
 
             MapTemplateFilePath = null;
 
-            MapTemplate = MapTemplate.FromNewMapDimensions(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, Region.Moderate);
+            MapTemplate = MapTemplate.FromNewMapDimensions(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, SessionAsset.OldWorld);
 
             UpdateExportStatus();
         }

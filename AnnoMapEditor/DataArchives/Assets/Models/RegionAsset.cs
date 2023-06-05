@@ -35,6 +35,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public static RegionAsset Africa { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
+        public static IEnumerable<RegionAsset> SupportedRegions => new[] { Moderate, SouthAmerica, Arctic, Africa };
+
 
         /// <summary>
         /// Each region has its own AmbientName, which is needed when creating the .a7t. These
@@ -91,6 +93,18 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 Ambiente = REGION_AMBIENTE_HARDCODED[GUID];
         }
 
+
+        public static RegionAsset DetectFromPath(string filePath)
+        {
+            if (filePath.Contains("colony01") || filePath.Contains("ggj") || filePath.Contains("scenario03"))
+                return SouthAmerica;
+            else if (filePath.Contains("dlc03") || filePath.Contains("colony_03"))
+                return Arctic;
+            else if (filePath.Contains("dlc06") || filePath.Contains("colony02") || filePath.Contains("scenario02"))
+                return Africa;
+            else
+                return Moderate;
+        }
 
         public override string ToString() => DisplayName;
     }

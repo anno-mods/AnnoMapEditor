@@ -13,6 +13,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
     {
         public const long SESSION_OLDWORLD_GUID = 180023;
         public const long SESSION_NEWWORLD_GUID = 180025;
+        public const long SESSION_SUNKENTREASURES_GUID = 110934;
         public const long SESSION_ARCTIC_GUID = 180045;
         public const long SESSION_ENBESA_GUID = 112132;
 
@@ -24,12 +25,17 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         [StaticAsset(SESSION_NEWWORLD_GUID)]
         public static SessionAsset NewWorld { get; private set; }
 
+        [StaticAsset(SESSION_SUNKENTREASURES_GUID)]
+        public static SessionAsset SunkenTreasures { get; private set; }
+
         [StaticAsset(SESSION_ARCTIC_GUID)]
         public static SessionAsset Arctic { get; private set; }
 
         [StaticAsset(SESSION_ENBESA_GUID)]
         public static SessionAsset Enbesa { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+        public static IEnumerable<SessionAsset> SupportedSessions => new[] { OldWorld, NewWorld, SunkenTreasures, Arctic, Enbesa };
 
 
         /// <summary>

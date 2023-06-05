@@ -1,6 +1,5 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
-using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
@@ -53,8 +52,10 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
         public ObservableCollection<SelectFertilityItem> FertilityItems { get; init; }
 
 
-        public SelectFertilitiesViewModel(Region region, FixedIslandElement fixedIsland)
+        public SelectFertilitiesViewModel(RegionAsset region, FixedIslandElement fixedIsland)
         {
+            Regions = RegionAsset.SupportedRegions;
+
             // TODO: Should this happen here?
             AssetRepository assetRepository = Settings.Instance.AssetRepository!;
             FertilityItems = new(assetRepository.GetAll<RegionAsset>()
@@ -71,7 +72,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
                 })
                 );
 
-            _selectedRegion = _initialRegion = assetRepository.Get<RegionAsset>(region.AssetGuid);
+            _selectedRegion = _initialRegion = region;
             FixedIsland = fixedIsland;
 
             CollectionView fertilitiesView = (CollectionView)CollectionViewSource.GetDefaultView(FertilityItems);

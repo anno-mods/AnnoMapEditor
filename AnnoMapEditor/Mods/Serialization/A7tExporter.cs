@@ -1,6 +1,5 @@
 ﻿using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared;
-using AnnoMapEditor.MapTemplates;
-using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using FileDBSerializing;
 using FileDBSerializing.ObjectSerializer;
 using RDAExplorer;
@@ -16,10 +15,10 @@ namespace AnnoMapEditor.Mods.Serialization
 
         private readonly int _playableArea;
 
-        private readonly Region _mapRegion;
+        private readonly RegionAsset _mapRegion;
 
 
-        public A7tExporter(int mapSize, int playableArea, Region mapRegion)
+        public A7tExporter(int mapSize, int playableArea, RegionAsset mapRegion)
         {
             _mapSize = mapSize;
             _playableArea = playableArea;
@@ -32,7 +31,7 @@ namespace AnnoMapEditor.Mods.Serialization
             using MemoryStream nestedDataStream = new();
 
             //Create actual a7t File
-            Gamedata gameDataItem = new(_mapSize, _playableArea, _mapRegion.AmbientName, true);
+            Gamedata gameDataItem = new(_mapSize, _playableArea, _mapRegion.Ambiente!, true);
 
             FileDBDocumentSerializer serializer = new(new() { Version = FileDBDocumentVersion.Version1 });
             IFileDBDocument generatedFileDB = serializer.WriteObjectStructureToFileDBDocument(gameDataItem);

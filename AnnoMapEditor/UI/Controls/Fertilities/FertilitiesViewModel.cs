@@ -1,5 +1,4 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
-using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.UI.Overlays;
 using AnnoMapEditor.UI.Overlays.SelectFertilities;
@@ -14,12 +13,12 @@ namespace AnnoMapEditor.UI.Controls.Fertilities
     {
         public FixedIslandElement FixedIsland { get; init; }
 
-        public Region Region { get; init; }
+        public RegionAsset Region { get; init; }
 
         public ObservableCollection<FertilityAsset> Fertilities { get; init; } = new();
 
 
-        public FertilitiesViewModel(FixedIslandElement fixedIsland, Region region)
+        public FertilitiesViewModel(FixedIslandElement fixedIsland, RegionAsset region)
         {
             FixedIsland = fixedIsland;
             Region = region;

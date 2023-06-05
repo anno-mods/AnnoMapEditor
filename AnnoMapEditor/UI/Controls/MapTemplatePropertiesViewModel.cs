@@ -1,7 +1,8 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System;
+using System.Collections.Generic;
 
 namespace AnnoMapEditor.UI.Controls
 {
@@ -18,27 +19,6 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
         private string _mapSizeText = "";
-        public Region SelectedRegion
-        {
-            get => _selectedRegion;
-            set
-            {
-                if (value != _selectedRegion)
-                {
-                    _selectedRegion = value;
-                    _mapTemplate.Region = value;
-                    OnSelectedRegionChanged();
-                }
-            }
-        }
-        private Region _selectedRegion;
-
-        public event EventHandler? SelectedRegionChanged;
-
-        private void OnSelectedRegionChanged()
-        {
-            SelectedRegionChanged?.Invoke(this, EventArgs.Empty);
-        }
 
         private bool allowMapTemplateUpdate = false;
         private void ResizeMapTemplateValues()
@@ -61,7 +41,24 @@ namespace AnnoMapEditor.UI.Controls
                 _mapTemplate.PlayableArea.Y + _mapTemplate.PlayableArea.Height);
         }
 
-        public Region[] Regions { get; } = Region.All;
+        public IEnumerable<SessionAsset> Sessions { get; } = SessionAsset.SupportedSessions;
+
+        public SessionAsset SelectedSession
+        {
+            get => _selectedSession;
+            set
+            {
+                if (value != _selectedSession)
+                {
+                    _selectedSession = value;
+                    _mapTemplate.Session = value;
+                    SelectedSessionChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+        private SessionAsset _selectedSession;
+
+        public event EventHandler? SelectedSessionChanged;
 
         public int MapSize
         {
@@ -115,7 +112,7 @@ namespace AnnoMapEditor.UI.Controls
             _mapTemplate = mapTemplate;
             _mapTemplate.MapSizeConfigCommitted += HandleMapTemplateSizeCommitted;
 
-            _selectedRegion = _mapTemplate.Region;
+            _selectedSession = _mapTemplate.Session;
 
             MapSize = mapTemplate.Size.X;
 

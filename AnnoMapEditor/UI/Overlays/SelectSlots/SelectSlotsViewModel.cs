@@ -1,13 +1,10 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
-using AnnoMapEditor.DataArchives.Assets.Repositories;
-using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Data;
 
 namespace AnnoMapEditor.UI.Overlays.SelectSlots
@@ -143,14 +140,11 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         public IEnumerable<SlotAssignmentViewModel> SlotAssignmentViewModelsRight { get; private set; }
 
 
-        public SelectSlotsViewModel(Region region, FixedIslandElement fixedIsland)
+        public SelectSlotsViewModel(RegionAsset region, FixedIslandElement fixedIsland)
         {
-            AssetRepository assetRepository = Settings.Instance.AssetRepository
-                ?? throw new Exception();
+            Regions = RegionAsset.SupportedRegions;
 
-            Regions = assetRepository.GetAll<RegionAsset>();
-
-            _selectedRegion = _initialRegion = assetRepository.Get<RegionAsset>(region.AssetGuid);
+            _selectedRegion = _initialRegion = region;
             FixedIsland = fixedIsland;
 
             SlotAssignmentViewModels = new(

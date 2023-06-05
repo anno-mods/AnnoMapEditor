@@ -1,6 +1,6 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
-using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Deserialization;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
@@ -108,7 +108,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 foreach (PropertyInfo staticProperty in assetType.GetProperties(BindingFlags.Static | BindingFlags.Public))
                 {
                     StaticAssetAttribute? staticAssetAttribute = staticProperty.GetCustomAttribute<StaticAssetAttribute>();
-                    if (staticProperty == null)
+                    if (staticAssetAttribute == null)
                         continue;
 ;
                     if (TryGet(staticAssetAttribute.GUID, out StandardAsset? asset))

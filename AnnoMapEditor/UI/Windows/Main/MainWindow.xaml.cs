@@ -1,13 +1,13 @@
-﻿using Microsoft.Win32;
+﻿using AnnoMapEditor.UI.Overlays;
+using AnnoMapEditor.UI.Overlays.ExportAsMod;
+using AnnoMapEditor.Utilities;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using AnnoMapEditor.Utilities;
-using AnnoMapEditor.UI.Overlays;
-using AnnoMapEditor.UI.Overlays.ExportAsMod;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
@@ -174,10 +174,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             if (ViewModel.MapTemplate is null)
                 return;
 
-            OverlayService.Instance.Show(new ExportAsModViewModel()
-            {
-                MapTemplate = ViewModel.MapTemplate
-            });
+            OverlayService.Instance.Show(new ExportAsModViewModel(ViewModel.MapTemplate));
         }
 
         private void NewMapFile_Click(object sender, RoutedEventArgs e)

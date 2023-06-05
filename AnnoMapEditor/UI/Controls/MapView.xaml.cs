@@ -321,7 +321,7 @@ namespace AnnoMapEditor.UI.Controls
                     // if it is a FixedIsland, let the user select the correct island
                     if (protoViewModel.MapElementType == MapElementType.FixedIsland)
                     {
-                        SelectIslandViewModel selectIslandViewModel = new(_mapTemplate.Region, protoViewModel.Island.IslandType, protoViewModel.IslandSize);
+                        SelectIslandViewModel selectIslandViewModel = new(_mapTemplate.Session.Region, protoViewModel.Island.IslandType, protoViewModel.IslandSize);
                         selectIslandViewModel.IslandSelected += (s, e) => SelectIsland_IslandSelected(s, e, protoViewModel.Island.Position);
 
                         OverlayService.Instance.Show(selectIslandViewModel);

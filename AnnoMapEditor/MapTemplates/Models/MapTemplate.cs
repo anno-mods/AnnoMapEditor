@@ -1,5 +1,5 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
-using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Utilities;
 using System;
@@ -29,12 +29,12 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
         private Rect2 _playableAea = new();
 
-        public Region Region 
+        public SessionAsset Session 
         { 
-            get => _region;
-            set => SetProperty(ref _region, value);
+            get => _session;
+            set => SetProperty(ref _session, value);
         }
-        private Region _region;
+        private SessionAsset _session;
 
         public bool ResizingInProgress
         {
@@ -51,12 +51,26 @@ namespace AnnoMapEditor.MapTemplates.Models
         public string MapSizeText => $"Size: {Size.X}, Playable: {PlayableArea.Width}";
 
 
-        public MapTemplate(Region region)
+        public MapTemplate(SessionAsset session)
         {
-            _region = region;
+            _session = session;
             _templateDocument = new MapTemplateDocument();
         }
 
+
+        public static SessionAsset DetectSessionFromPath(string path)
+        {
+            if (path.Contains("colony01") || path.Contains("ggj") || path.Contains("scenario03"))
+                return SessionAsset.NewWorld;
+            else if (path.Contains("dlc03") || path.Contains("colony_03"))
+                return SessionAsset.Arctic;
+            else if (path.Contains("dlc06") || path.Contains("colony02") || path.Contains("scenario02"))
+                return SessionAsset.Enbesa;
+            else if (path.Contains("sunken_treasures"))
+                return SessionAsset.SunkenTreasures;
+            else
+                return SessionAsset.OldWorld;
+        }
 
         public static async Task<MapTemplate?> FromA7tinfoAsync(string filePath)
         {
@@ -69,7 +83,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             if (doc is null)
                 return null;
 
-            return FromTemplateDocument(doc, Region.DetectFromPath(internalPath));
+            return FromTemplateDocument(doc, DetectSessionFromPath(internalPath));
         }
 
         public static async Task<MapTemplate?> FromXmlAsync(string filePath)
@@ -78,7 +92,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             if (doc is null)
                 return null;
 
-            return FromTemplateDocument(doc, Region.DetectFromPath(filePath));
+            return FromTemplateDocument(doc, DetectSessionFromPath(filePath));
         }
 
         public static async Task<MapTemplate?> FromXmlAsync(Stream? stream, string internalPath)
@@ -87,12 +101,12 @@ namespace AnnoMapEditor.MapTemplates.Models
             if (doc is null)
                 return null;
 
-            return FromTemplateDocument(doc, Region.DetectFromPath(internalPath));
+            return FromTemplateDocument(doc, DetectSessionFromPath(internalPath));
         }
 
-        public static MapTemplate? FromTemplateDocument(MapTemplateDocument document, Region region)
+        public static MapTemplate? FromTemplateDocument(MapTemplateDocument document, SessionAsset session)
         {
-            MapTemplate mapTemplate = new(region)
+            MapTemplate mapTemplate = new(session)
             {
                 Size = new Vector2(document.MapTemplate?.Size),
                 PlayableArea = new Rect2(document.MapTemplate?.PlayableArea),
@@ -121,7 +135,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             return mapTemplate;
         }
 
-        public static MapTemplate? FromNewMapDimensions(int mapSize, int playableSize, Region region)
+        public static MapTemplate? FromNewMapDimensions(int mapSize, int playableSize, SessionAsset session)
         {
             int margin = (mapSize - playableSize) / 2;
 
@@ -135,7 +149,7 @@ namespace AnnoMapEditor.MapTemplates.Models
                 }
             };
 
-            MapTemplate mapTemplate = new(region)
+            MapTemplate mapTemplate = new(session)
             {
                 Size = new Vector2(createdTemplateDoc.MapTemplate.Size),
                 PlayableArea = new Rect2(createdTemplateDoc.MapTemplate.PlayableArea),
@@ -227,7 +241,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             _templateDocument.MapTemplate.TemplateElement = new List<TemplateElement>(Elements.Select(x => x.ToTemplate()).Where(x => x is not null)!);
             _templateDocument.MapTemplate.ElementCount = _templateDocument.MapTemplate.TemplateElement.Count;
 
-            if (Region.HasMapExtension && writeInitialArea)
+            if (Session == SessionAsset.NewWorld && writeInitialArea)
                 _templateDocument.MapTemplate.InitialPlayableArea = _templateDocument.MapTemplate.PlayableArea;
             else
                 _templateDocument.MapTemplate.InitialPlayableArea = null;

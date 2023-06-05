@@ -1,13 +1,13 @@
 ﻿<UserControl x:Class="AnnoMapEditor.UI.Overlays.ExportAsMod.ExportAsModOverlay"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:AnnoMapEditor.UI.Overlays.ExportAsMod"
-      xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
-      xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
-      xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
-      d:DataContext="{d:DesignInstance Type=local:ExportAsModViewModel}"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
+             xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
+             xmlns:local="clr-namespace:AnnoMapEditor.UI.Overlays.ExportAsMod"
+             xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+             d:DataContext="{d:DesignInstance Type=local:ExportAsModViewModel}"
       mc:Ignorable="d" 
       d:DesignWidth="1440"
       d:DesignHeight="900"
@@ -63,7 +63,7 @@
                                  HorizontalAlignment="Right" />
 
             <!-- Informational Messages -->
-            <StackPanel Visibility="{Binding InfoMapTypeSelection, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel Visibility="{Binding ShowMapTypeSelection, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
                 <TextBlock Style="{StaticResource MutedLabelStyle}">
                         <Run>Select the following map type in Sandbox mode:</Run>
                 </TextBlock>
@@ -79,7 +79,7 @@
                 </Grid>
             </StackPanel>
             <TextBlock Style="{StaticResource MutedLabelStyle}" TextWrapping="Wrap" 
-                           Visibility="{Binding InfoMapTypeSelection, Mode=OneWay, Converter={StaticResource InvertedBoolToVisibility}}">
+                           Visibility="{Binding ShowMapTypeSelection, Mode=OneWay, Converter={StaticResource InvertedBoolToVisibility}}">
                     <Run>The map mod will automatically apply to the selected region.</Run>
                     <LineBreak/>
                     <Run>Please make sure that only one Map Mod per non-moderate Region is active.</Run>
