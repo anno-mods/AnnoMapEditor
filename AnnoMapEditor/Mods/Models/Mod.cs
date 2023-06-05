@@ -1,16 +1,5 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
-using AnnoMapEditor.MapTemplates.Models;
+﻿using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Enums;
-using AnnoMapEditor.Mods.Serialization;
-using AnnoMapEditor.Utilities;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows;
 
 /*
  * Modloader doesn't support a7t because they are loaded as .rda archive.
@@ -29,14 +18,14 @@ namespace AnnoMapEditor.Mods.Models
     public class Mod
     {
 
-        public Session Session { get; init; }
+        public MapTemplate MapTemplate { get; init; }
 
         public MapType MapType { get; init; }
 
 
-        public Mod(Session session)
+        public Mod(MapTemplate mapTemplate)
         {
-            Session = session;
+            MapTemplate = mapTemplate;
             MapType = MapType.Archipelago;
         }
     }

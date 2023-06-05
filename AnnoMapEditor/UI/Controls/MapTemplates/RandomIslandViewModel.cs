@@ -14,8 +14,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public override int SizeInTiles => RandomIsland.IslandSize.DefaultSizeInTiles;
 
 
-        public RandomIslandViewModel(Session session, RandomIslandElement randomIsland)
-            : base(session, randomIsland)
+        public RandomIslandViewModel(MapTemplate mapTemplate, RandomIslandElement randomIsland)
+            : base(mapTemplate, randomIsland)
         {
             RandomIsland = randomIsland;
 

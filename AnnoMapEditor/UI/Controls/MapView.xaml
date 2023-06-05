@@ -13,7 +13,7 @@
                 <RotateTransform Angle="{Binding Source={x:Static local:MapView.MAP_ROTATION_ANGLE}}"/>
             </Canvas.RenderTransform>
             <Canvas 
-                Name="sessionCanvas"
+                Name="mapTemplateCanvas"
                 Width="0"
                 Height="0" />
             <Canvas

@@ -18,11 +18,11 @@ namespace AnnoMapEditor.Tests
             await Settings.Instance.AwaitLoadingAsync();
 
             using Stream inputXml = File.OpenRead(filePath);
-            Session? session = await Session.FromXmlAsync(inputXml, filePath);
+            MapTemplate? mapTemplate = await MapTemplate.FromXmlAsync(inputXml, filePath);
 
-            Assert.NotNull(session);
+            Assert.NotNull(mapTemplate);
 
-            var export = session!.ToTemplate();
+            var export = mapTemplate!.ToTemplate();
             Assert.NotNull(export);
 
             using (Stream a7tinfo = new MemoryStream())
@@ -30,11 +30,11 @@ namespace AnnoMapEditor.Tests
                 await Serializer.WriteAsync(export!, a7tinfo);
 
                 a7tinfo.Position = 0;
-                session = await Session.FromA7tinfoAsync(a7tinfo, filePath);
-                Assert.NotNull(session);
+                mapTemplate = await MapTemplate.FromA7tinfoAsync(a7tinfo, filePath);
+                Assert.NotNull(mapTemplate);
             }
 
-            var template = session!.ToTemplate();
+            var template = mapTemplate!.ToTemplate();
             Assert.NotNull(template);
 
             using (MemoryStream outStream = new MemoryStream())

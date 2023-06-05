@@ -12,7 +12,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         static readonly SolidColorBrush Red    = new(Color.FromArgb(255, 234, 83, 83));
 
 
-        private readonly Session _session;
+        private readonly MapTemplate _mapTemplate;
 
         private readonly StartingSpotElement _startingSpot;
 
@@ -26,10 +26,10 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public string Label { get; init; }
 
 
-        public StartingSpotViewModel(Session session, StartingSpotElement startingSpot)
+        public StartingSpotViewModel(MapTemplate mapTemplate, StartingSpotElement startingSpot)
             : base(startingSpot)
         {
-            _session = session;
+            _mapTemplate = mapTemplate;
             _startingSpot = startingSpot;
 
             Label = _startingSpot.Index switch
@@ -63,8 +63,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public override void OnDragged(Vector2 newPosition)
         {
-            // prevent moving StartingSpots outside of the Session's playable area.
-            newPosition = newPosition.Clamp(_session.PlayableArea);
+            // prevent moving StartingSpots outside of the MapTemplate's playable area.
+            newPosition = newPosition.Clamp(_mapTemplate.PlayableArea);
 
             base.OnDragged(newPosition);
         }

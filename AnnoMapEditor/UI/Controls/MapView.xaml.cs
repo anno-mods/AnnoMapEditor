@@ -22,7 +22,7 @@ namespace AnnoMapEditor.UI.Controls
         public static readonly double MAP_ROTATION_ANGLE = -135;
 
 
-        private Session? session { get; set; }
+        private MapTemplate? _mapTemplate { get; set; }
         private Rectangle? mapRect { get; set; }
         private PlayableAreaControl? playableRect { get; set; }
         private IList<AddIslandButton>? AddIslands { get; set; }
@@ -140,15 +140,15 @@ namespace AnnoMapEditor.UI.Controls
 
         private void MapView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            UpdateIslands(DataContext as Session);
+            UpdateIslands(DataContext as MapTemplate);
         }
 
         private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (DataContext is not Session session)
+            if (DataContext is not MapTemplate mapTemplate)
                 return;
 
-            UpdateIslands(session);
+            UpdateIslands(mapTemplate);
         }
 
         private void MapView_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -156,20 +156,18 @@ namespace AnnoMapEditor.UI.Controls
             UpdateSize();
         }
 
-        private void UpdateIslands(Session? session)
+        private void UpdateIslands(MapTemplate? mapTemplate)
         {
-            //Unlink event handlers from old session object
-            if(session != this.session)
+            //Unlink event handlers from old map template object
+            if(mapTemplate != this._mapTemplate)
             {
-                if (this.session is not null)
-                {
-                    UnlinkSessionEventHandlers(this.session);
-                }
+                if (_mapTemplate is not null)
+                    UnlinkMapTemplateEventHandlers(_mapTemplate);
 
-                this.session = session;
+                _mapTemplate = mapTemplate;
 
-                sessionCanvas.Children.Clear();
-                if (session is null)
+                mapTemplateCanvas.Children.Clear();
+                if (mapTemplate is null)
                 {
                     mapRect = null;
                     playableRect = null;
@@ -177,40 +175,40 @@ namespace AnnoMapEditor.UI.Controls
                     return;
                 }
 
-                if(session is not null)
+                if(mapTemplate is not null)
                 {
-                    LinkSessionEventHandlers(session);
+                    LinkMapTemplateEventHandlers(mapTemplate);
 
                     mapRect = new Rectangle
                     {
                         Fill = new SolidColorBrush(Color.FromArgb(255, 3, 19, 28)),
-                        Width = session.Size.X,
-                        Height = session.Size.Y
+                        Width = mapTemplate.Size.X,
+                        Height = mapTemplate.Size.Y
                     };
-                    sessionCanvas.Children.Add(mapRect);
+                    mapTemplateCanvas.Children.Add(mapRect);
 
-                    playableRect = new PlayableAreaControl(session);
-                    sessionCanvas.Children.Add(playableRect);
+                    playableRect = new PlayableAreaControl(mapTemplate);
+                    mapTemplateCanvas.Children.Add(playableRect);
 
-                    // add session islands
-                    foreach (var element in session.Elements)
+                    // add islands
+                    foreach (var element in mapTemplate.Elements)
                     {
                         MapElementViewModel viewModel;
                         MapElementControl control;
 
                         if (element is StartingSpotElement startingSpot)
                         {
-                            viewModel = new StartingSpotViewModel(session, startingSpot);
+                            viewModel = new StartingSpotViewModel(mapTemplate, startingSpot);
                             control = new StartingSpotControl();
                         }
                         else if (element is RandomIslandElement randomIsland)
                         {
-                            viewModel = new RandomIslandViewModel(session, randomIsland);
+                            viewModel = new RandomIslandViewModel(mapTemplate, randomIsland);
                             control = new IslandControl();
                         }
                         else if (element is FixedIslandElement fixedIsland)
                         {
-                            viewModel = new FixedIslandViewModel(session, fixedIsland);
+                            viewModel = new FixedIslandViewModel(mapTemplate, fixedIsland);
                             control = new IslandControl();
                         }
                         else
@@ -219,7 +217,7 @@ namespace AnnoMapEditor.UI.Controls
                         viewModel.PropertyChanged += MapElementViewModel_PropertyChanged;
 
                         control.DataContext = viewModel;
-                        sessionCanvas.Children.Add(control);
+                        mapTemplateCanvas.Children.Add(control);
                     }
 
                     AddIslands = new List<AddIslandButton>();
@@ -245,7 +243,7 @@ namespace AnnoMapEditor.UI.Controls
 
         private void CreateAddIsland(MapElementType mapElementType, IslandSize size, IslandType type)
         {
-            if (session is null || AddIslands is null) return;
+            if (_mapTemplate is null || AddIslands is null) return;
 
             AddIslandViewModel viewModel = new(mapElementType, type, size);
             AddIslandButton button = new()
@@ -256,14 +254,14 @@ namespace AnnoMapEditor.UI.Controls
             viewModel.IslandAdded += IslandAdded;
 
             AddIslands.Add(button);
-            sessionCanvas.Children.Add(button);
+            mapTemplateCanvas.Children.Add(button);
 
             MoveAddIsland(button);
         }
 
         private void MoveAddIsland(AddIslandButton addIsland)
         {
-            if (session is null || AddIslands is null) return;
+            if (_mapTemplate is null || AddIslands is null) return;
 
             if (AddIslands.Contains(addIsland) && addIsland.DataContext is AddIslandViewModel island)
             {
@@ -273,7 +271,7 @@ namespace AnnoMapEditor.UI.Controls
                 int islandLength = IslandSize.Small.DefaultSizeInTiles * 2 + 10 +
                         IslandSize.Medium.DefaultSizeInTiles + 25 +
                         IslandSize.Large.DefaultSizeInTiles + 25;
-                int offset = Math.Max(250, (session.Size.Y - islandLength) / 2);
+                int offset = Math.Max(250, (_mapTemplate.Size.Y - islandLength) / 2);
 
                 Vector2 position;
 
@@ -297,14 +295,14 @@ namespace AnnoMapEditor.UI.Controls
                 if (island.MapElementType == MapElementType.PoolIsland)
                     position = new(position.Y, position.X);
 
-                addIsland.SetPosition(session.Size + position);
+                addIsland.SetPosition(_mapTemplate.Size + position);
             }
         }
 
         private void IslandAdded(object? sender, IslandAddedEventArgs e)
         {
-            ProtoIslandViewModel protoViewModel = new(session, e.MapElementType, e.IslandType, e.IslandSize, e.Position);
-            sessionCanvas.Children.Add(new IslandControl()
+            ProtoIslandViewModel protoViewModel = new(_mapTemplate, e.MapElementType, e.IslandType, e.IslandSize, e.Position);
+            mapTemplateCanvas.Children.Add(new IslandControl()
             {
                 DataContext = protoViewModel
             });
@@ -323,7 +321,7 @@ namespace AnnoMapEditor.UI.Controls
                     // if it is a FixedIsland, let the user select the correct island
                     if (protoViewModel.MapElementType == MapElementType.FixedIsland)
                     {
-                        SelectIslandViewModel selectIslandViewModel = new(session.Region, protoViewModel.Island.IslandType, protoViewModel.IslandSize);
+                        SelectIslandViewModel selectIslandViewModel = new(_mapTemplate.Region, protoViewModel.Island.IslandType, protoViewModel.IslandSize);
                         selectIslandViewModel.IslandSelected += (s, e) => SelectIsland_IslandSelected(s, e, protoViewModel.Island.Position);
 
                         OverlayService.Instance.Show(selectIslandViewModel);
@@ -336,19 +334,19 @@ namespace AnnoMapEditor.UI.Controls
                         {
                             Position = protoViewModel.Island.Position
                         };
-                        session!.Elements.Add(islandElement);
+                        _mapTemplate!.Elements.Add(islandElement);
                     }
                     else
                         throw new NotImplementedException();
                 }
 
                 // remove the proto island
-                foreach (var child in sessionCanvas.Children)
+                foreach (var child in mapTemplateCanvas.Children)
                 {
                     if (child is IslandControl islandControl && islandControl.DataContext == protoViewModel)
                     {
                         protoViewModel.DragEnded -= ProtoIsland_DragEnded;
-                        sessionCanvas.Children.Remove(islandControl);
+                        mapTemplateCanvas.Children.Remove(islandControl);
                         break;
                     }
                 }
@@ -357,7 +355,7 @@ namespace AnnoMapEditor.UI.Controls
 
         public void EnableDisableIslands(bool enable)
         {
-            foreach (object item in sessionCanvas.Children)
+            foreach (object item in mapTemplateCanvas.Children)
             {
                 if (item is AddIslandButton addIsland)
                 {
@@ -378,7 +376,7 @@ namespace AnnoMapEditor.UI.Controls
             {
                 Position = position
             };
-            session.Elements.Add(fixedIslandElement);
+            _mapTemplate.Elements.Add(fixedIslandElement);
         }
 
         private void MapElementViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -409,9 +407,9 @@ namespace AnnoMapEditor.UI.Controls
             {
                 if (sender is IslandViewModel viewModel)
                 {
-                    if (viewModel.IsOutOfBounds && !viewModel.IsDragging && !session.ResizingInProgress)
+                    if (viewModel.IsOutOfBounds && !viewModel.IsDragging && !_mapTemplate.ResizingInProgress)
                     {
-                        session.Elements.Remove(viewModel.Element);
+                        _mapTemplate.Elements.Remove(viewModel.Element);
 
                         // deselect the island if it was selected
                         if (viewModel == _selectedElement)
@@ -426,35 +424,35 @@ namespace AnnoMapEditor.UI.Controls
 
         void UpdateSize()
         {
-            if (session is null)
+            if (_mapTemplate is null)
                 return;
 
             double size = Math.Min(ActualWidth, ActualHeight);
             size = Math.Sqrt((size * size) / 2);
 
-            double requiredScaleX = size / session.Size.X;
-            double requiredScaleY = size / session.Size.Y;
+            double requiredScaleX = size / _mapTemplate.Size.X;
+            double requiredScaleY = size / _mapTemplate.Size.Y;
             float scale = (float)Math.Min(requiredScaleX, requiredScaleY);
 
-            sessionCanvas.RenderTransform = new ScaleTransform(scale, scale);
-            rotationCanvas.Width = scale * session.Size.X;
-            rotationCanvas.Height = scale * session.Size.Y;
+            mapTemplateCanvas.RenderTransform = new ScaleTransform(scale, scale);
+            rotationCanvas.Width = scale * _mapTemplate.Size.X;
+            rotationCanvas.Height = scale * _mapTemplate.Size.Y;
         }
 
-        private void LinkSessionEventHandlers(Session session)
+        private void LinkMapTemplateEventHandlers(MapTemplate mapTemplate)
         {
-            session.MapSizeConfigChanged += HandleSessionResized;
-            session.MapSizeConfigCommitted += HandleSessionSizeCommitted;
-            session.Elements.CollectionChanged += Session_ElementsChanged;
+            mapTemplate.MapSizeConfigChanged += HandleMapTemplateResized;
+            mapTemplate.MapSizeConfigCommitted += HandleMapTemplateSizeCommitted;
+            mapTemplate.Elements.CollectionChanged += MapTemplate_ElementsChanged;
         }
-        private void UnlinkSessionEventHandlers(Session session)
+        private void UnlinkMapTemplateEventHandlers(MapTemplate mapTemplate)
         {
-            session.MapSizeConfigCommitted -= HandleSessionSizeCommitted;
-            session.MapSizeConfigChanged -= HandleSessionResized;
-            session.Elements.CollectionChanged -= Session_ElementsChanged;
+            mapTemplate.MapSizeConfigCommitted -= HandleMapTemplateSizeCommitted;
+            mapTemplate.MapSizeConfigChanged -= HandleMapTemplateResized;
+            mapTemplate.Elements.CollectionChanged -= MapTemplate_ElementsChanged;
         }
 
-        private void Session_ElementsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        private void MapTemplate_ElementsChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
             {
@@ -463,14 +461,14 @@ namespace AnnoMapEditor.UI.Controls
                     if (oldItem is IslandElement island)
                     {
                         // find the correct control
-                        foreach (var child in sessionCanvas.Children)
+                        foreach (var child in mapTemplateCanvas.Children)
                         {
                             if (child is IslandControl control 
                                 && control.DataContext is IslandViewModel viewModel
                                 && viewModel.Element == island)
                             {
                                 viewModel.PropertyChanged -= MapElementViewModel_PropertyChanged;
-                                sessionCanvas.Children.Remove(control);
+                                mapTemplateCanvas.Children.Remove(control);
 
                                 break;
                             }
@@ -485,13 +483,13 @@ namespace AnnoMapEditor.UI.Controls
                 {
                     IslandViewModel viewModel;
                     if (newItem is RandomIslandElement randomIsland)
-                        viewModel = new RandomIslandViewModel(session, randomIsland);
+                        viewModel = new RandomIslandViewModel(_mapTemplate, randomIsland);
                     else if (newItem is FixedIslandElement fixedIsland)
-                        viewModel = new FixedIslandViewModel(session, fixedIsland);
+                        viewModel = new FixedIslandViewModel(_mapTemplate, fixedIsland);
                     else
                         continue;
 
-                    sessionCanvas.Children.Add(new IslandControl()
+                    mapTemplateCanvas.Children.Add(new IslandControl()
                     {
                         DataContext = viewModel
                     });
@@ -503,22 +501,22 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
-        private void HandleSessionResized(object? sender, Session.SessionResizeEventArgs args)
+        private void HandleMapTemplateResized(object? sender, MapTemplate.MapTemplateResizeEventArgs args)
         {
-            if(sender is Session session)
+            if(sender is MapTemplate mapTemplate)
             {
                 if (oldSize is null)
                     oldSize = new Vector2(args.OldMapSize);
 
                 if(mapRect is not null)
                 {
-                    mapRect.Width = session.Size.X;
-                    mapRect.Height = session.Size.Y;
+                    mapRect.Width = mapTemplate.Size.X;
+                    mapRect.Height = mapTemplate.Size.Y;
 
-                    Canvas.SetBottom(mapRect, -session.Size.Y);
+                    Canvas.SetBottom(mapRect, -mapTemplate.Size.Y);
                 }
 
-                bool sizeIncrease = session.Size.X > oldSize.X;
+                bool sizeIncrease = mapTemplate.Size.X > oldSize.X;
 
                 if (sizeIncrease)
                 {
@@ -533,7 +531,7 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
-        private void HandleSessionSizeCommitted(object? sender, EventArgs _)
+        private void HandleMapTemplateSizeCommitted(object? sender, EventArgs _)
         {
             oldSize = null;
             RecalculateAddIslandCoordinates();
@@ -544,9 +542,9 @@ namespace AnnoMapEditor.UI.Controls
 
         private void RecalculateAddIslandCoordinates()
         {
-            if (session is null) return;
+            if (_mapTemplate is null) return;
 
-            foreach (object item in sessionCanvas.Children)
+            foreach (object item in mapTemplateCanvas.Children)
             {
                 if (item is AddIslandButton addIsland)
                 {
@@ -557,9 +555,9 @@ namespace AnnoMapEditor.UI.Controls
 
         private void MarkOOBIslands()
         {
-            if (session is null) return;
+            if (_mapTemplate is null) return;
 
-            foreach (object item in sessionCanvas.Children)
+            foreach (object item in mapTemplateCanvas.Children)
             {
                 if (item is IslandControl mapIsland && mapIsland.DataContext is IslandViewModel islandViewModel)
                 {
@@ -570,14 +568,14 @@ namespace AnnoMapEditor.UI.Controls
 
         private void ClearOOBIslands()
         {
-            if (session is null) return;
+            if (_mapTemplate is null) return;
 
-            List<UIElement> childrenCopy = sessionCanvas.Children.Cast<UIElement>().ToList();
+            List<UIElement> childrenCopy = mapTemplateCanvas.Children.Cast<UIElement>().ToList();
             foreach (object item in childrenCopy)
             {
                 if (item is IslandControl mapIsland && mapIsland.DataContext is IslandViewModel islandViewModel && islandViewModel.IsOutOfBounds)
                 {
-                    session.Elements.Remove(islandViewModel.Element);
+                    _mapTemplate.Elements.Remove(islandViewModel.Element);
 
                     // deselect the island if it was selected
                     if (islandViewModel == _selectedElement)
@@ -591,13 +589,13 @@ namespace AnnoMapEditor.UI.Controls
 
         private void KeepStartingSpotsInBounds()
         {
-            if (session is null) return;
+            if (_mapTemplate is null) return;
 
-            foreach (object item in sessionCanvas.Children)
+            foreach (object item in mapTemplateCanvas.Children)
             {
                 if (item is StartingSpotControl start && start.DataContext is StartingSpotViewModel startViewModel)
                 {
-                    startViewModel.Element.Position = startViewModel.Element.Position.Clamp(session.PlayableArea);
+                    startViewModel.Element.Position = startViewModel.Element.Position.Clamp(_mapTemplate.PlayableArea);
                 }
             }
         }

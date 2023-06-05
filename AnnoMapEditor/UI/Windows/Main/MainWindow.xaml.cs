@@ -46,10 +46,10 @@ namespace AnnoMapEditor.UI.Windows.Main
         {
             switch (e.PropertyName)
             {
-                case "Session":
-                    if (ViewModel?.Session is not null)
+                case "MapTemplate":
+                    if (ViewModel?.MapTemplate is not null)
                     {
-                        Title = $"{title} - {Path.GetFileName(ViewModel.SessionFilePath)}";
+                        Title = $"{title} - {Path.GetFileName(ViewModel.MapTemplateFilePath)}";
                     }
                     else
                         Title = title;
@@ -158,8 +158,8 @@ namespace AnnoMapEditor.UI.Windows.Main
             {
                 DefaultExt = ".a7tinfo",
                 Filter = "Map template (*.a7tinfo)|*.a7tinfo|XML map template (*.xml)|*.xml",
-                FilterIndex = Path.GetExtension(ViewModel.SessionFilePath)?.ToLower() == ".xml" ? 2 : 1,
-                FileName = Path.GetFileName(ViewModel.SessionFilePath),
+                FilterIndex = Path.GetExtension(ViewModel.MapTemplateFilePath)?.ToLower() == ".xml" ? 2 : 1,
+                FileName = Path.GetFileName(ViewModel.MapTemplateFilePath),
                 OverwritePrompt = true
             };
 
@@ -171,12 +171,12 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         private void ExportMod_Click(object sender, RoutedEventArgs e)
         {
-            if (ViewModel.Session is null)
+            if (ViewModel.MapTemplate is null)
                 return;
 
             OverlayService.Instance.Show(new ExportAsModViewModel()
             {
-                Session = ViewModel.Session
+                MapTemplate = ViewModel.MapTemplate
             });
         }
 

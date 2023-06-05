@@ -31,7 +31,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         };
 
 
-        protected readonly Session _session;
+        protected readonly MapTemplate _mapTemplate;
 
         public IslandElement Island { get; init; }
 
@@ -67,10 +67,10 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public virtual bool RandomizeRotation => true;
 
 
-        public IslandViewModel(Session session, IslandElement island)
+        public IslandViewModel(MapTemplate mapTemplate, IslandElement island)
             : base(island)
         {
-            _session = session;
+            _mapTemplate = mapTemplate;
             Island = island;
 
             UpdateBackground();
@@ -115,7 +115,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public override void OnDragged(Vector2 newPosition)
         {
-            var mapArea = new Rect2(_session.Size - SizeInTiles + Vector2.Tile);
+            var mapArea = new Rect2(_mapTemplate.Size - SizeInTiles + Vector2.Tile);
 
             // provide resistance against moving out of bounds
             if (Element.Position.Within(mapArea) && !newPosition.Within(mapArea))
@@ -131,7 +131,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public void BoundsCheck(Vector2? pos = null)
         {
-            var mapArea = new Rect2(_session.Size - SizeInTiles + Vector2.Tile);
+            var mapArea = new Rect2(_mapTemplate.Size - SizeInTiles + Vector2.Tile);
             Vector2 position = pos ?? Element.Position;
             IsOutOfBounds = !position.Within(mapArea);
         }

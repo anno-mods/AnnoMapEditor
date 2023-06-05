@@ -42,11 +42,11 @@
                 Grid.Column="1"
                 Grid.Row="0"
                 SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                EditPlayableArea="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SessionProperties.EditPlayableArea, Mode=OneWay}"
-                ShowPlayableAreaMargins="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SessionProperties.ShowPlayableAreaMargins, Mode=OneWay}"
-                DataContext="{Binding Session, Mode=OneWay}" />
+                EditPlayableArea="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.MapTemplateProperties.EditPlayableArea, Mode=OneWay}"
+                ShowPlayableAreaMargins="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.MapTemplateProperties.ShowPlayableAreaMargins, Mode=OneWay}"
+                DataContext="{Binding MapTemplate, Mode=OneWay}" />
         
-        <!-- session properties -->
+        <!-- MapTemplate properties -->
         <StackPanel Grid.Column="0"
                     Grid.Row="0"
                     Margin="16">
@@ -62,7 +62,7 @@
                     </controls:DropDownButton.Menu>
                 </controls:DropDownButton>
                 <controls:DropDownButton HorizontalAlignment="Left"
-                                         IsEnabled="{Binding SessionChecker.HasErrors, Converter={StaticResource booleanNot}}">
+                                         IsEnabled="{Binding MapTemplateChecker.HasErrors, Converter={StaticResource booleanNot}}">
                     <ContentControl Content="Save" />
                     <controls:DropDownButton.Menu>
                         <ContextMenu>
@@ -73,12 +73,12 @@
                 </controls:DropDownButton>
             </StackPanel>
             
-            <controls:SessionProperties
-                    DataContext="{Binding SessionProperties}"
+            <controls:MapTemplateProperties
+                    DataContext="{Binding MapTemplateProperties}"
                     HorizontalAlignment="Left" />
 
             <!-- validation warnings -->
-            <validation:ValidationResultList DataContext="{Binding SessionChecker}"/>
+            <validation:ValidationResultList DataContext="{Binding MapTemplateChecker}"/>
         </StackPanel>
 
         <!-- island properties -->
