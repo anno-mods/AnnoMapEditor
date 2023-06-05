@@ -28,6 +28,9 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
         public static IslandDifficulty FromName(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return Normal;
+
             IslandDifficulty? difficulty = All.FirstOrDefault(d => d.Name == name);
 
             if (difficulty is null)
@@ -41,6 +44,9 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
         public static IslandDifficulty FromElementValue(short? elementValue)
         {
+            if (elementValue == null)
+                return Normal;
+
             IslandDifficulty? difficulty = All.FirstOrDefault(d => d.ElementValue == elementValue);
 
             if (difficulty is null)

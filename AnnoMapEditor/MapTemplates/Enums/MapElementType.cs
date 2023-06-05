@@ -25,6 +25,9 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
         public static MapElementType FromElementValue(int? elementValue)
         {
+            if (elementValue == null)
+                return FixedIsland;
+
             MapElementType? mapElementType = All.FirstOrDefault(d => d.ElementValue == elementValue);
 
             if (mapElementType is null)

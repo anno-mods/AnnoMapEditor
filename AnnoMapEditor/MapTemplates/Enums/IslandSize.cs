@@ -34,6 +34,9 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
         public static IslandSize FromElementValue(short? elementValue)
         {
+            if (elementValue == null)
+                return Default;
+
             IslandSize? size = All.FirstOrDefault(t => t.ElementValue == elementValue);
 
             if (size is null)

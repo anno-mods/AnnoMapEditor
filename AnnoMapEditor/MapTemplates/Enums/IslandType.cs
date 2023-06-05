@@ -36,6 +36,9 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
         public static IslandType FromName(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return Normal;
+
             IslandType? type = All.FirstOrDefault(d => d.Name == name);
 
             if (type is null)
@@ -49,6 +52,9 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
         public static IslandType FromElementValue(short? elementValue)
         {
+            if (elementValue == null)
+                return Normal;
+
             IslandType? type = All.FirstOrDefault(t => t.ElementValue == elementValue);
 
             if (type is null)
