@@ -1,5 +1,6 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
 using AnnoMapEditor.DataArchives.Assets.Deserialization;
+using AnnoMapEditor.DataArchives.Assets.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,11 @@ using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
-    [AssetTemplate("Region")]
+    [AssetTemplate(TemplateName)]
     public class RegionAsset : StandardAsset
     {
+        private const string TemplateName = "Region";
+
         public const long REGION_MODERATE_GUID = 5000000;
         public const long REGION_NEWWORLD_GUID = 5000001;
         public const long REGION_ARCTIC_GUID = 160001;
@@ -18,7 +21,20 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public const string REGION_MODERATE_REGIONID = "Moderate";
 
 
-        private static readonly string TemplateName = "Region";
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        [StaticAsset(REGION_MODERATE_GUID)]
+        public static RegionAsset Moderate { get; private set; }
+
+        [StaticAsset(REGION_NEWWORLD_GUID)]
+        public static RegionAsset NewWorld { get; private set; }
+
+        [StaticAsset(REGION_ARCTIC_GUID)]
+        public static RegionAsset Arctic { get; private set; }
+
+        [StaticAsset(REGION_ENBESA_GUID)]
+        public static RegionAsset Enbesa { get; private set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
 
         /// <summary>
         /// Each region has its own AmbientName, which is needed when creating the .a7t. These

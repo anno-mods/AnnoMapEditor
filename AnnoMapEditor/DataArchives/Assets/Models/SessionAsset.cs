@@ -17,6 +17,21 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public const long SESSION_ENBESA_GUID = 112132;
 
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        [StaticAsset(SESSION_MODERATE_GUID)]
+        public static SessionAsset Moderate { get; private set; }
+
+        [StaticAsset(SESSION_NEWWORLD_GUID)]
+        public static SessionAsset NewWorld { get; private set; }
+
+        [StaticAsset(SESSION_ARCTIC_GUID)]
+        public static SessionAsset Arctic { get; private set; }
+
+        [StaticAsset(SESSION_ENBESA_GUID)]
+        public static SessionAsset Enbesa { get; private set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+
         /// <summary>
         /// The session assets for The Old World and The New World to not properly reference their
         /// respective regions in assets.xml.

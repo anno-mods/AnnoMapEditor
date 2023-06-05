@@ -32,6 +32,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         private readonly Dictionary<long, StandardAsset> _assets = new();
 
+        private readonly List<Type> _assetTypes = new();
+
 
         public AssetRepository(IDataArchive dataArchive)
         {
@@ -93,9 +95,35 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                         resolver(asset);
             }
 
+            InitializeStaticAssets();
+
             _logger.LogInformation($"Finished loading {_assets.Count} assets.");
             return Task.CompletedTask;
         }
+
+        private void InitializeStaticAssets()
+        {
+            foreach (Type assetType in _assetTypes)
+            {
+                foreach (PropertyInfo staticProperty in assetType.GetProperties(BindingFlags.Static | BindingFlags.Public))
+                {
+                    StaticAssetAttribute? staticAssetAttribute = staticProperty.GetCustomAttribute<StaticAssetAttribute>();
+                    if (staticProperty == null)
+                        continue;
+;
+                    if (TryGet(staticAssetAttribute.GUID, out StandardAsset? asset))
+                    {
+                        if (!staticProperty.PropertyType.IsAssignableFrom(asset!.GetType()))
+                            throw new Exception($"Could not resolve StaticAsset {assetType.FullName}.{staticProperty.Name}. The asset's type {asset.GetType().FullName} does not match the property's type {staticProperty.PropertyType.FullName}.");
+
+                        staticProperty.SetValue(null, asset);
+                    }
+                    else
+                        throw new Exception($"Could not resolve StaticAsset {assetType.FullName}.{staticProperty.Name}. There exists no asset with GUID {staticAssetAttribute.GUID}.");
+                }
+            }
+        }
+
 
         public TAsset Get<TAsset>(long guid)
             where TAsset : StandardAsset
@@ -179,6 +207,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     resolvers.Add(resolver);
                 }
             }
+
+            _assetTypes.Add(typeof(TAsset));
 
             _logger.LogInformation($"Registered asset type '{typeof(TAsset).FullName}'.");
         }
