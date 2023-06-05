@@ -20,7 +20,9 @@ namespace AnnoMapEditor.Tests
 
             using Stream inputXml = File.OpenRead(filePath);
             Region region = Region.DetectFromPath(filePath);
-            Session? session = await Session.FromXmlStreamAsync(region, inputXml);
+
+            SessionReader sessionReader = new();
+            Session? session = await sessionReader.FromXmlStreamAsync(region, inputXml);
 
             Assert.NotNull(session);
 
@@ -29,10 +31,10 @@ namespace AnnoMapEditor.Tests
 
             using (Stream a7tinfo = new MemoryStream())
             {
-                await Serializer.WriteAsync(export!, a7tinfo);
+                await FileDBSerializer.WriteAsync(export!, a7tinfo);
 
                 a7tinfo.Position = 0;
-                session = await Session.FromBinaryStreamAsync(region, a7tinfo);
+                session = await sessionReader.FromBinaryStreamAsync(region, a7tinfo);
                 Assert.NotNull(session);
             }
 
@@ -41,7 +43,7 @@ namespace AnnoMapEditor.Tests
 
             using (MemoryStream outStream = new MemoryStream())
             {
-                await Serializer.WriteToXmlAsync(template!, outStream);
+                await FileDBSerializer.WriteToXmlAsync(template!, outStream);
 
                 //Uncomment for debugging:
                 //string content = System.Text.Encoding.UTF8.GetString(outStream.ToArray());

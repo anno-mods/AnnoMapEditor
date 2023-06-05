@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.UI.Controls;
 using AnnoMapEditor.UI.Controls.IslandProperties;
@@ -156,18 +157,13 @@ namespace AnnoMapEditor.UI.Windows.Main
         public async Task OpenMap(string a7tinfoPath, bool fromArchive = false)
         {
             SessionFilePath = Path.GetFileName(a7tinfoPath);
+            SessionReader sessionReader = new();
 
             if (fromArchive)
-                Session = await Session.FromDataArchive(a7tinfoPath);
-
-            else if (Path.GetExtension(a7tinfoPath).ToLower() == ".a7tinfo")
-                Session = await Session.FromBinaryFileAsync(a7tinfoPath);
-
-            else if (Path.GetExtension(a7tinfoPath).ToLower() == ".xml")
-                Session = await Session.FromXmlFileAsync(a7tinfoPath);
+                Session = await sessionReader.FromDataArchiveAsync(a7tinfoPath);
 
             else
-                throw new ArgumentException();
+                Session = await sessionReader.FromFileAsync(a7tinfoPath);
 
             UpdateExportStatus();
         }
@@ -179,7 +175,7 @@ namespace AnnoMapEditor.UI.Windows.Main
 
             SessionFilePath = null;
 
-            Session = Session.FromNewMapDimensions(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, Region.Moderate);
+            Session = new Session(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, Region.Moderate);
 
             UpdateExportStatus();
         }
@@ -190,11 +186,12 @@ namespace AnnoMapEditor.UI.Windows.Main
                 return;
 
             SessionFilePath = Path.GetFileName(filePath);
+            SessionWriter sessionWriter = new();
 
             if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
-                await Session.SaveAsync(filePath);
+                await sessionWriter.ToA7tinfoAsync(Session, filePath);
             else
-                await Session.SaveToXmlAsync(filePath);
+                await sessionWriter.ToXmlAsync(Session, filePath);
         }
 
         private void UpdateExportStatus()

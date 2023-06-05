@@ -1,5 +1,6 @@
 ﻿using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Mods.Enums;
 using AnnoMapEditor.Mods.Serialization;
 using AnnoMapEditor.Utilities;
@@ -77,7 +78,10 @@ namespace AnnoMapEditor.Mods.Models
 
                 await WriteMetaJson(modPath, modName, modID);
                 await WriteAssetsXml(modPath, fullModName, mapFilePath, _session.Region, MapType);
-                await _session.SaveAsync(a7tBasePath + $"_{size}.a7tinfo");
+
+                SessionWriter sessionWriter = new();
+                await sessionWriter.ToA7tinfoAsync(_session, a7tBasePath + $"_{size}.a7tinfo");
+
                 await Task.Run(() => new A7tExporter(_session.Size.X, _session.PlayableArea.Width, _session.Region).ExportA7T(a7tPath));
                 await Task.Run(() => new A7teExporter(_session.Size.X).ExportA7te(a7tePath));
 

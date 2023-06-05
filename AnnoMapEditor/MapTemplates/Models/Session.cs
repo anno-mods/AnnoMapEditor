@@ -1,13 +1,11 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.MapTemplates.Enums;
-using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace AnnoMapEditor.MapTemplates.Models
 {
@@ -43,9 +41,10 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
         private bool _resizingInProgress = false;
 
-        private MapTemplateDocument _template = new();
+        private MapTemplateDocument _templateDocument = new();
 
         public event EventHandler<SessionResizeEventArgs>? MapSizeConfigChanged;
+
         public event EventHandler? MapSizeConfigCommitted;
 
         public string MapSizeText => $"Size: {Size.X}, Playable: {PlayableArea.Width}";
@@ -54,59 +53,15 @@ namespace AnnoMapEditor.MapTemplates.Models
         public Session(Region region)
         {
             _region = region;
-            _template = new MapTemplateDocument();
+            _templateDocument = new MapTemplateDocument();
         }
 
-
-        #region loading
-
-        public static async Task<Session?> FromDataArchive(string a7tinfoPath)
+        public Session(MapTemplateDocument document, Region region)
         {
-            Region region = Region.DetectFromPath(a7tinfoPath);
-            Stream? a7tinfoStream = Settings.Instance!.DataArchive.OpenRead(a7tinfoPath);
-            return await FromBinaryStreamAsync(region, a7tinfoStream);
-        }
-
-        public static async Task<Session?> FromBinaryFileAsync(string a7tinfoPath)
-        {
-            Region region = Region.DetectFromPath(a7tinfoPath);
-            Stream a7tinfoStream = File.OpenRead(a7tinfoPath);
-            return await FromBinaryStreamAsync(region, a7tinfoStream);
-        }
-
-        public static async Task<Session?> FromBinaryStreamAsync(Region region, Stream? a7tinfoStream)
-        {
-            var doc = await Serializer.ReadAsync<MapTemplateDocument>(a7tinfoStream);
-            if (doc is null)
-                return null;
-
-            return FromTemplateDocument(doc, region);
-        }
-
-        public static async Task<Session?> FromXmlFileAsync(string a7tinfoPath)
-        {
-            Region region = Region.DetectFromPath(a7tinfoPath);
-            Stream a7tinfoXmlStream = File.OpenRead(a7tinfoPath);
-            return await FromXmlStreamAsync(region, a7tinfoXmlStream);
-        }
-
-        public static async Task<Session?> FromXmlStreamAsync(Region region, Stream? a7tinfoXmlStream)
-        {
-            var doc = await Serializer.ReadFromXmlAsync<MapTemplateDocument>(a7tinfoXmlStream);
-            if (doc is null)
-                return null;
-
-            return FromTemplateDocument(doc, region);
-        }
-
-        public static Session? FromTemplateDocument(MapTemplateDocument document, Region region)
-        {
-            Session session = new(region)
-            {
-                Size = new Vector2(document.MapTemplate?.Size),
-                PlayableArea = new Rect2(document.MapTemplate?.PlayableArea),
-                _template = document
-            };
+            _region = region;
+            _size = new Vector2(document.MapTemplate?.Size);
+            _playableAea = new Rect2(document.MapTemplate?.PlayableArea);
+            _templateDocument = document;
 
             // TODO: Allow empty templates?
             int startingSpotCounter = 0;
@@ -117,27 +72,19 @@ namespace AnnoMapEditor.MapTemplates.Models
                 if (element is StartingSpotElement startingSpot)
                     startingSpot.Index = startingSpotCounter++;
 
-                session.Elements.Add(element);
+                Elements.Add(element);
             }
 
             // clear links in the original
-            if (session._template.MapTemplate is not null)
-                session._template.MapTemplate.TemplateElement = null;
-
-            if (session.Size.X == 0)
-                return null;
-
-            return session;
+            if (_templateDocument.MapTemplate is not null)
+                _templateDocument.MapTemplate.TemplateElement = null;
         }
 
-        #endregion loading
-
-
-        public static Session? FromNewMapDimensions(int mapSize, int playableSize, Region region)
+        public Session(int mapSize, int playableSize, Region region)
         {
             int margin = (mapSize - playableSize) / 2;
 
-            MapTemplateDocument createdTemplateDoc = new()
+            _templateDocument = new()
             {
                 MapTemplate = new()
                 {
@@ -147,21 +94,14 @@ namespace AnnoMapEditor.MapTemplates.Models
                 }
             };
 
-            Session session = new(region)
-            {
-                Size = new Vector2(createdTemplateDoc.MapTemplate.Size),
-                PlayableArea = new Rect2(createdTemplateDoc.MapTemplate.PlayableArea),
-                _template = createdTemplateDoc
-            };
+            _region = region;
+            _size = new Vector2(_templateDocument.MapTemplate.Size);
+            _playableAea = new Rect2(_templateDocument.MapTemplate.PlayableArea);
 
             // create starting spots in the default location
-            session.Elements.AddRange(CreateNewStartingSpots(mapSize));
-
-            if (session.Size.X == 0)
-                return null;
-
-            return session;
+            Elements.AddRange(CreateNewStartingSpots(mapSize));
         }
+
 
         public static List<StartingSpotElement> CreateNewStartingSpots(int mapSize)
         {
@@ -210,12 +150,12 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public void ResizeAndCommitSession(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
         {
-            if (_template.MapTemplate == null)
+            if (_templateDocument.MapTemplate == null)
                 throw new InvalidDataException();
 
             //Commit means write to template
-            _template.MapTemplate.Size = new int[] { mapSize, mapSize };
-            _template.MapTemplate.PlayableArea = new int[] { 
+            _templateDocument.MapTemplate.Size = new int[] { mapSize, mapSize };
+            _templateDocument.MapTemplate.PlayableArea = new int[] { 
                 playableAreaMargins.x1, 
                 playableAreaMargins.y1, 
                 playableAreaMargins.x2, 
@@ -223,10 +163,10 @@ namespace AnnoMapEditor.MapTemplates.Models
             };
 
             Vector2 oldMapSize = new(Size);
-            Size = new(_template.MapTemplate.Size);
+            Size = new(_templateDocument.MapTemplate.Size);
 
             Vector2 oldPlayableSize = new(PlayableArea.Width, PlayableArea.Height);
-            PlayableArea = new(_template.MapTemplate.PlayableArea);
+            PlayableArea = new(_templateDocument.MapTemplate.PlayableArea);
 
             ResizingInProgress = false;
 
@@ -236,44 +176,20 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public MapTemplateDocument? ToTemplate(bool writeInitialArea = false)
         {
-            if (_template.MapTemplate?.Size is null || _template.MapTemplate?.PlayableArea is null)
+            if (_templateDocument.MapTemplate?.Size is null || _templateDocument.MapTemplate?.PlayableArea is null)
                 return null;
 
-            _template.MapTemplate.TemplateElement = new List<TemplateElement>(Elements.Select(x => x.ToTemplate()).Where(x => x is not null)!);
-            _template.MapTemplate.ElementCount = _template.MapTemplate.TemplateElement.Count;
+            _templateDocument.MapTemplate.TemplateElement = new List<TemplateElement>(Elements.Select(x => x.ToTemplate()).Where(x => x is not null)!);
+            _templateDocument.MapTemplate.ElementCount = _templateDocument.MapTemplate.TemplateElement.Count;
 
             if (Region.HasMapExtension && writeInitialArea)
-                _template.MapTemplate.InitialPlayableArea = _template.MapTemplate.PlayableArea;
+                _templateDocument.MapTemplate.InitialPlayableArea = _templateDocument.MapTemplate.PlayableArea;
             else
-                _template.MapTemplate.InitialPlayableArea = null;
+                _templateDocument.MapTemplate.InitialPlayableArea = null;
 
-            return _template;
+            return _templateDocument;
         }
 
-        public async Task SaveToXmlAsync(string filePath)
-        {
-            var export = ToTemplate();
-            if (export is null)
-                return;
-
-            using Stream file = File.OpenWrite(filePath);
-            file.SetLength(0); // clear
-            await Serializer.WriteToXmlAsync(export, file);
-        }
-
-        public async Task SaveAsync(string filePath)
-        {
-            var export = ToTemplate();
-            if (export is null)
-                return;
-
-            var parentPath = Path.GetDirectoryName(filePath);
-            if (parentPath is not null)
-                Directory.CreateDirectory(parentPath);
-            using Stream file = File.OpenWrite(filePath);
-            file.SetLength(0); // clear
-            await Serializer.WriteAsync(export, file);
-        }
 
         public class SessionResizeEventArgs : EventArgs
         {
