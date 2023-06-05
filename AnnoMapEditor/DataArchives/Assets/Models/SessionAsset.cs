@@ -11,15 +11,15 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
     [AssetTemplate("SessionModerate", "SessionSouthAmerica", "SessionArctic")]
     public class SessionAsset : StandardAsset
     {
-        public const long SESSION_MODERATE_GUID = 180023;
+        public const long SESSION_OLDWORLD_GUID = 180023;
         public const long SESSION_NEWWORLD_GUID = 180025;
         public const long SESSION_ARCTIC_GUID = 180045;
         public const long SESSION_ENBESA_GUID = 112132;
 
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        [StaticAsset(SESSION_MODERATE_GUID)]
-        public static SessionAsset Moderate { get; private set; }
+        [StaticAsset(SESSION_OLDWORLD_GUID)]
+        public static SessionAsset OldWorld { get; private set; }
 
         [StaticAsset(SESSION_NEWWORLD_GUID)]
         public static SessionAsset NewWorld { get; private set; }
@@ -38,8 +38,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         /// </summary>
         private static readonly Dictionary<long, long> REGIONID_HARDCODED = new()
         {
-            [SESSION_MODERATE_GUID] = RegionAsset.REGION_MODERATE_GUID, // The Old World => Moderate
-            [SESSION_NEWWORLD_GUID] = RegionAsset.REGION_NEWWORLD_GUID  // The New World => Colony01
+            [SESSION_OLDWORLD_GUID] = RegionAsset.REGION_MODERATE_GUID, // The Old World => Moderate
+            [SESSION_NEWWORLD_GUID] = RegionAsset.REGION_SOUTHAMERICA_GUID  // The New World => Colony01
         };
 
 
@@ -125,7 +125,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
             else if (filePath.Contains("dlc06") || filePath.Contains("colony02") || filePath.Contains("scenario02"))
                 sessionGuid = SESSION_ENBESA_GUID;
             else
-                sessionGuid = SESSION_MODERATE_GUID;
+                sessionGuid = SESSION_OLDWORLD_GUID;
 
             return assetRepository.Get<SessionAsset>(sessionGuid);
         }    

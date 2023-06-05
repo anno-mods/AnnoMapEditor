@@ -14,9 +14,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         private const string TemplateName = "Region";
 
         public const long REGION_MODERATE_GUID = 5000000;
-        public const long REGION_NEWWORLD_GUID = 5000001;
+        public const long REGION_SOUTHAMERICA_GUID = 5000001;
         public const long REGION_ARCTIC_GUID = 160001;
-        public const long REGION_ENBESA_GUID = 114327;
+        public const long REGION_AFRICA_GUID = 114327;
 
         public const string REGION_MODERATE_REGIONID = "Moderate";
 
@@ -25,14 +25,14 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         [StaticAsset(REGION_MODERATE_GUID)]
         public static RegionAsset Moderate { get; private set; }
 
-        [StaticAsset(REGION_NEWWORLD_GUID)]
-        public static RegionAsset NewWorld { get; private set; }
+        [StaticAsset(REGION_SOUTHAMERICA_GUID)]
+        public static RegionAsset SouthAmerica { get; private set; }
 
         [StaticAsset(REGION_ARCTIC_GUID)]
         public static RegionAsset Arctic { get; private set; }
 
-        [StaticAsset(REGION_ENBESA_GUID)]
-        public static RegionAsset Enbesa { get; private set; }
+        [StaticAsset(REGION_AFRICA_GUID)]
+        public static RegionAsset Africa { get; private set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
 
@@ -47,9 +47,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         private static readonly Dictionary<long, string> REGION_AMBIENTE_HARDCODED = new Dictionary<long, string>()
         {
             [REGION_MODERATE_GUID] = "Moderate_01_day_night",
-            [REGION_NEWWORLD_GUID] = "south_america_caribic_01",
+            [REGION_SOUTHAMERICA_GUID] = "south_america_caribic_01",
             [REGION_ARCTIC_GUID] = "DLC03_01",
-            [REGION_ENBESA_GUID] = "Colony_02"
+            [REGION_AFRICA_GUID] = "Colony_02"
         };
 
 
