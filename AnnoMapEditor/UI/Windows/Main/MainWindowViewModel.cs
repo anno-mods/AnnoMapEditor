@@ -1,7 +1,7 @@
 ﻿using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
-using AnnoMapEditor.Mods.Models;
+using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.UI.Controls;
 using AnnoMapEditor.UI.Controls.IslandProperties;
 using AnnoMapEditor.UI.Controls.MapTemplates;
@@ -193,10 +193,8 @@ namespace AnnoMapEditor.UI.Windows.Main
 
             SessionFilePath = Path.GetFileName(filePath);
 
-            if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
-                await Session.SaveAsync(filePath);
-            else
-                await Session.SaveToXmlAsync(filePath);
+            SessionWriter sessionWriter = new();
+            await sessionWriter.WriteAsync(Session, filePath);
         }
 
         private void UpdateExportStatus()
@@ -212,13 +210,12 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
             else if (Settings.IsValidDataPath)
             {
-                bool supportedFormat = Mod.CanSave(Session);
                 bool archiveReady = Settings.DataArchive is RdaDataArchive;
 
                 ExportStatus = new ExportStatus()
                 {
-                    CanExportAsMod = archiveReady && supportedFormat,
-                    ExportAsModText = archiveReady ? supportedFormat ? "As playable mod..." : "As mod: only works with Old World maps currently" : "As mod: set game path to save"
+                    CanExportAsMod = archiveReady,
+                    ExportAsModText = archiveReady ? "As playable mod..." : "As mod: set game path to save"
                 };
             }
             else

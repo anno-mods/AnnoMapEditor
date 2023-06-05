@@ -235,31 +235,6 @@ namespace AnnoMapEditor.MapTemplates.Models
             return _template;
         }
 
-        public async Task SaveToXmlAsync(string filePath)
-        {
-            var export = ToTemplate();
-            if (export is null)
-                return;
-
-            using Stream file = File.OpenWrite(filePath);
-            file.SetLength(0); // clear
-            await Serializer.WriteToXmlAsync(export, file);
-        }
-
-        public async Task SaveAsync(string filePath)
-        {
-            var export = ToTemplate();
-            if (export is null)
-                return;
-
-            var parentPath = Path.GetDirectoryName(filePath);
-            if (parentPath is not null)
-                Directory.CreateDirectory(parentPath);
-            using Stream file = File.OpenWrite(filePath);
-            file.SetLength(0); // clear
-            await Serializer.WriteAsync(export, file);
-        }
-
         public class SessionResizeEventArgs : EventArgs
         {
             public SessionResizeEventArgs(Vector2 oldMapSize, Vector2 oldPlayableSize)

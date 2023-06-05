@@ -2,11 +2,14 @@
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Enums;
 using AnnoMapEditor.Mods.Models;
+using AnnoMapEditor.Mods.Serialization;
 using AnnoMapEditor.Utilities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace AnnoMapEditor.UI.Overlays.ExportAsMod
 {
@@ -138,8 +141,6 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
 
         public async Task<bool> Save()
         {
-            IsSaving = true;
-
             string? modsFolderPath = Settings.Instance.DataPath;
             if (modsFolderPath is not null)
                 modsFolderPath = Path.Combine(modsFolderPath, "mods");
@@ -156,12 +157,31 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
             };
 
             CheckExistingMod();
-            bool result = await mod.Save(Path.Combine(modsFolderPath, ResultingFullModName), ResultingModName, ModID);
 
-            OverlayService.Instance.Close(this);
+            try
+            {
+                IsSaving = true;
 
-            IsSaving = false;
-            return result;
+                ModWriter modWriter = new();
+                await modWriter.WriteAsync(mod, Path.Combine(modsFolderPath, ResultingFullModName), ResultingModName, ModID);
+
+                OverlayService.Instance.Close(this);
+                return true;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("Failed to save the mod.\n\nIt looks like some files are locked, possibly by another application.\n\nThe mod may be broken now.", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Failed to save the mod.\n\nThe mod may be broken now.", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+            finally
+            {
+                IsSaving = false;
+            }
         }
     }
 }
