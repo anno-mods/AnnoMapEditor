@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace AnnoMapEditor.MapTemplates.Serializing
 {
-    public class SessionWriter
+    public class MapTemplateWriter
     {
-        public async Task ToXmlAsync(Session session, string filePath)
+        public async Task ToXmlAsync(MapTemplate mapTemplate, string filePath)
         {
-            var export = session.ToTemplate();
+            var export = mapTemplate.ToTemplateDocument();
             if (export is null)
                 return;
 
@@ -17,9 +17,9 @@ namespace AnnoMapEditor.MapTemplates.Serializing
             await FileDBSerializer.WriteToXmlAsync(export, file);
         }
 
-        public async Task ToA7tinfoAsync(Session session, string filePath)
+        public async Task ToA7tinfoAsync(MapTemplate mapTemplate, string filePath)
         {
-            var export = session.ToTemplate();
+            var export = mapTemplate.ToTemplateDocument();
             if (export is null)
                 return;
 

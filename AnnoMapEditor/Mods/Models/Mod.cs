@@ -32,15 +32,15 @@ namespace AnnoMapEditor.Mods.Models
         public const string AME_POOL_PATH = @"data\ame\maps\pool";
 
 
-        private readonly Session _session;
+        public MapTemplate MapTemplate { get; init; }
 
-        public MapType MapType { get; set; }
+        public MapType MapType { get; init; }
 
 
-        public Mod(Session session)
+        public Mod(MapTemplate mapTemplate, MapType? mapType)
         {
-            this._session = session;
-            MapType = MapType.Archipelago;
+            MapTemplate = mapTemplate;
+            MapType = mapType;
         }
 
 
@@ -48,7 +48,7 @@ namespace AnnoMapEditor.Mods.Models
         {
             string fullModName = "[Map] " + modName;
 
-            List<string> sizes = _session.Region.GetAllSizeCombinations().ToList();
+            List<string> sizes = MapTemplate.Region.GetAllSizeCombinations().ToList();
             string size = sizes[0];
 
             try
@@ -59,7 +59,7 @@ namespace AnnoMapEditor.Mods.Models
                 if (mapTypeFileName is null || mapTypeGuid is null)
                     throw new Exception("invalid MapType");
 
-                if(!_session.Region.AllowModding)
+                if(!MapTemplate.Region.AllowModding)
                     throw new Exception("not supported map region");
 
                 FileUtils.TryDeleteDirectory(modPath);
@@ -70,22 +70,22 @@ namespace AnnoMapEditor.Mods.Models
                     await WriteLanguageXml(modPath, modName, mapTypeGuid);
 
                 // write meta JSON, assets XML, .a7tinfo, .a7t and .a7te
-                string mapFilePath = Path.Combine(AME_POOL_PATH, _session.Region.PoolFolderName, mapTypeFileName);
+                string mapFilePath = Path.Combine(AME_POOL_PATH, MapTemplate.Region.PoolFolderName, mapTypeFileName);
                 string a7tBasePath = Path.Combine(modPath, $"{mapFilePath}");
                 string a7tInfoPath = a7tBasePath + $"_{size}.a7tinfo";
                 string a7tPath     = a7tBasePath + $"_{size}.a7t";
                 string a7tePath    = a7tBasePath + $"_{size}.a7te";
 
                 await WriteMetaJson(modPath, modName, modID);
-                await WriteAssetsXml(modPath, fullModName, mapFilePath, _session.Region, MapType);
+                await WriteAssetsXml(modPath, fullModName, mapFilePath, MapTemplate.Region, MapType);
 
-                SessionWriter sessionWriter = new();
-                await sessionWriter.ToA7tinfoAsync(_session, a7tBasePath + $"_{size}.a7tinfo");
+                MapTemplateWriter mapTemplateWriter = new();
+                await mapTemplateWriter.ToA7tinfoAsync(MapTemplate, a7tBasePath + $"_{size}.a7tinfo");
 
-                await Task.Run(() => new A7tExporter(_session.Size.X, _session.PlayableArea.Width, _session.Region).ExportA7T(a7tPath));
-                await Task.Run(() => new A7teExporter(_session.Size.X).ExportA7te(a7tePath));
+                await Task.Run(() => new A7tExporter(MapTemplate.Size.X, MapTemplate.PlayableArea.Width, MapTemplate.Region).ExportA7T(a7tPath));
+                await Task.Run(() => new A7teExporter(MapTemplate.Size.X).ExportA7te(a7tePath));
 
-                if (_session.Region.HasMapExtension)
+                if (MapTemplate.Region.HasMapExtension)
                 {
                     File.Copy(a7tInfoPath, a7tBasePath + $"_{size}_enlarged.a7tinfo");
                     File.Copy(a7tPath,     a7tBasePath + $"_{size}_enlarged.a7t");
@@ -101,7 +101,7 @@ namespace AnnoMapEditor.Mods.Models
                     File.Copy(a7tPath,     a7tBasePath + $"_{size}.a7t");
                     File.Copy(a7tePath,    a7tBasePath + $"_{size}.a7te");
 
-                    if (_session.Region.HasMapExtension)
+                    if (MapTemplate.Region.HasMapExtension)
                     {
                         File.Copy(a7tInfoPath, a7tBasePath + $"_{size}_enlarged.a7tinfo");
                         File.Copy(a7tPath,     a7tBasePath + $"_{size}_enlarged.a7t");
@@ -124,12 +124,12 @@ namespace AnnoMapEditor.Mods.Models
         }
 
 
-        public static bool CanSave(Session? session)
+        public static bool CanSave(MapTemplate? mapTemplate)
         {
-            if (session is null)
+            if (mapTemplate is null)
                 return false;
 
-            return session.Region.AllowModding;
+            return mapTemplate.Region.AllowModding;
         }
 
         private static async Task WriteMetaJson(string modPath, string modName, string? modID)

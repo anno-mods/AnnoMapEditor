@@ -1,6 +1,6 @@
 ﻿namespace AnnoMapEditor.MapTemplates.Validation
 {
-    public enum SessionValidatorStatus
+    public enum MapTemplateValidatorStatus
     {
         Ok,
         Warning,

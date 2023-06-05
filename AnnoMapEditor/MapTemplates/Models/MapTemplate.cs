@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace AnnoMapEditor.MapTemplates.Models
 {
-    public class Session : ObservableBase
+    public class MapTemplate : ObservableBase
     {
         public ObservableCollection<MapElement> Elements { get; } = new();
 
@@ -43,20 +43,20 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         private MapTemplateDocument _templateDocument = new();
 
-        public event EventHandler<SessionResizeEventArgs>? MapSizeConfigChanged;
+        public event EventHandler<MapTemplateResizeEventArgs>? MapSizeConfigChanged;
 
         public event EventHandler? MapSizeConfigCommitted;
 
         public string MapSizeText => $"Size: {Size.X}, Playable: {PlayableArea.Width}";
 
 
-        public Session(Region region)
+        public MapTemplate(Region region)
         {
             _region = region;
             _templateDocument = new MapTemplateDocument();
         }
 
-        public Session(MapTemplateDocument document, Region region)
+        public MapTemplate(MapTemplateDocument document, Region region)
         {
             _region = region;
             _size = new Vector2(document.MapTemplate?.Size);
@@ -80,7 +80,7 @@ namespace AnnoMapEditor.MapTemplates.Models
                 _templateDocument.MapTemplate.TemplateElement = null;
         }
 
-        public Session(int mapSize, int playableSize, Region region)
+        public MapTemplate(int mapSize, int playableSize, Region region)
         {
             int margin = (mapSize - playableSize) / 2;
 
@@ -135,7 +135,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             return starts;
         }
 
-        public void ResizeSession(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
+        public void ResizeMapTemplate(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
         {
             ResizingInProgress = true;
 
@@ -145,10 +145,10 @@ namespace AnnoMapEditor.MapTemplates.Models
             Vector2 oldPlayableSize = new(PlayableArea.Width, PlayableArea.Height);
             PlayableArea = new(new int[] { playableAreaMargins.x1, playableAreaMargins.y1, playableAreaMargins.x2, playableAreaMargins.y2 });
 
-            MapSizeConfigChanged?.Invoke(this, new SessionResizeEventArgs(oldMapSize, oldPlayableSize));
+            MapSizeConfigChanged?.Invoke(this, new MapTemplateResizeEventArgs(oldMapSize, oldPlayableSize));
         }
 
-        public void ResizeAndCommitSession(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
+        public void ResizeAndCommitMapTemplate(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
         {
             if (_templateDocument.MapTemplate == null)
                 throw new InvalidDataException();
@@ -170,11 +170,11 @@ namespace AnnoMapEditor.MapTemplates.Models
 
             ResizingInProgress = false;
 
-            MapSizeConfigChanged?.Invoke(this, new SessionResizeEventArgs(oldMapSize, oldPlayableSize));
+            MapSizeConfigChanged?.Invoke(this, new MapTemplateResizeEventArgs(oldMapSize, oldPlayableSize));
             MapSizeConfigCommitted?.Invoke(this, new EventArgs());
         }
 
-        public MapTemplateDocument? ToTemplate(bool writeInitialArea = false)
+        public MapTemplateDocument? ToTemplateDocument(bool writeInitialArea = false)
         {
             if (_templateDocument.MapTemplate?.Size is null || _templateDocument.MapTemplate?.PlayableArea is null)
                 return null;
@@ -191,9 +191,9 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
 
 
-        public class SessionResizeEventArgs : EventArgs
+        public class MapTemplateResizeEventArgs : EventArgs
         {
-            public SessionResizeEventArgs(Vector2 oldMapSize, Vector2 oldPlayableSize)
+            public MapTemplateResizeEventArgs(Vector2 oldMapSize, Vector2 oldPlayableSize)
             {
                 OldMapSize = new Vector2(oldMapSize);
                 OldPlayableSize = new Vector2(oldPlayableSize);

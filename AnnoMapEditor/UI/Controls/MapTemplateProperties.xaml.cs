@@ -3,9 +3,9 @@ using System.Windows.Controls;
 
 namespace AnnoMapEditor.UI.Controls
 {
-    public partial class SessionProperties : UserControl
+    public partial class MapTemplateProperties : UserControl
     {
-        public SessionProperties()
+        public MapTemplateProperties()
         {
             InitializeComponent();
 
@@ -20,7 +20,7 @@ namespace AnnoMapEditor.UI.Controls
         
         private void Slider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
-            if (DataContext is SessionPropertiesViewModel viewModel)
+            if (DataContext is MapTemplatePropertiesViewModel viewModel)
             {
                 viewModel.DragInProgress = false;
             }
@@ -28,7 +28,7 @@ namespace AnnoMapEditor.UI.Controls
 
         private void Slider_DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
         {
-            if (DataContext is SessionPropertiesViewModel viewModel)
+            if (DataContext is MapTemplatePropertiesViewModel viewModel)
             {
                 viewModel.DragInProgress = true;
             }

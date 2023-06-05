@@ -1,30 +1,27 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
     public class PlayableAreaViewModel : DraggingViewModel
     {
-        public PlayableAreaViewModel(Session session)
+        public PlayableAreaViewModel(MapTemplate mapTemplate)
         {
-            Session = session;
+            MapTemplate = mapTemplate;
+
             //Flip X/Y
-            this.PosY = session.PlayableArea.Position.X;
-            this.PosX = session.PlayableArea.Position.Y;
+            PosY = mapTemplate.PlayableArea.Position.X;
+            PosX = mapTemplate.PlayableArea.Position.Y;
 
             //Flip here as well?
-            this.PlayableSize = session.PlayableArea.Width;
+            PlayableSize = mapTemplate.PlayableArea.Width;
 
-            this.DragEnded += OnDragEnded;
-            session.MapSizeConfigCommitted += OnSessionSizeCommitted;
+            DragEnded += OnDragEnded;
+            mapTemplate.MapSizeConfigCommitted += OnMapTemplateSizeCommitted;
         }
 
-        private Session Session { get; init; }
+        private MapTemplate MapTemplate { get; init; }
 
         private const int MinMargin = 32; //Arbitrary Value
         private static readonly Vector2 MinMarginVector = new Vector2(MinMargin, MinMargin);
@@ -42,7 +39,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
         private bool _showPlayableAreaMargins = false;
 
-
         public int PosX
         {
             get => _posX;
@@ -52,6 +48,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             }
         }
         private int _posX;
+
         public int PosY
         {
             get => _posY;
@@ -62,8 +59,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
         private int _posY;
 
-        public int ControlWidth => Session.Size.X - PosX;
-        public int ControlHeight => Session.Size.Y - PosY;
+        public int ControlWidth => MapTemplate.Size.X - PosX;
+        public int ControlHeight => MapTemplate.Size.Y - PosY;
 
         /// <summary>
         /// Used for automatic font scaling to avoid clipping.
@@ -80,7 +77,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                     return 100.0 - 40.0*(1.0 - ((PlayableSize - MinSize)/(double)(FONTSIZE_CUTOFF - MinSize)));
             } 
         }
-
 
         public int MarginLeftTop
         {
@@ -102,7 +98,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
         private int _marginRightTop;
 
-
         public int PlayableSize
         {
             get => _playableSize;
@@ -117,7 +112,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         /// Maximum Size allowed during resizing.<br/>
         /// Based on Position and minimum Margin.
         /// </summary>
-        public int MaxSize => Math.Min(Session.Size.X - PosX - MinMargin, Session.Size.Y - PosY - MinMargin);
+        public int MaxSize => Math.Min(MapTemplate.Size.X - PosX - MinMargin, MapTemplate.Size.Y - PosY - MinMargin);
 
         /// <summary>
         /// Always 640 -> Fits 4 medium starters exactly.
@@ -131,7 +126,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             set
             {
                 SetProperty(ref _resizingInProgress, value);
-                ResizeSessionValues();
+                ResizeMapTemplateValues();
             }
         }
         private bool _resizingInProgress = false;
@@ -140,31 +135,31 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public override void OnDragged(Vector2 newPosition)
         {
             //This limits movement so that the minimum Margin is always remaining.
-            Vector2 newPos = newPosition.Clamp(MinMarginVector, new Vector2(Session.Size.X - PlayableSize - MinMargin, Session.Size.Y - PlayableSize - MinMargin));
+            Vector2 newPos = newPosition.Clamp(MinMarginVector, new Vector2(MapTemplate.Size.X - PlayableSize - MinMargin, MapTemplate.Size.Y - PlayableSize - MinMargin));
             PosX = newPos.X;
             PosY = newPos.Y;
 
-            ResizeSessionValues();
+            ResizeMapTemplateValues();
         }
 
         private void OnDragEnded(object? sender, DragEndedEventArgs args)
         {
-            ResizeSessionValues();
+            ResizeMapTemplateValues();
         }
 
         private bool LocalResizing { get; set; }
-        private void ResizeSessionValues()
+        private void ResizeMapTemplateValues()
         {
             LocalResizing = true;
             if (ResizingInProgress || IsDragging)
-                Session.ResizeSession(Session.Size.X, (PosX, PosY, PosX + PlayableSize, PosY + PlayableSize));
+                MapTemplate.ResizeMapTemplate(MapTemplate.Size.X, (PosX, PosY, PosX + PlayableSize, PosY + PlayableSize));
             else
-                Session.ResizeAndCommitSession(Session.Size.X, (PosX, PosY, PosX + PlayableSize, PosY + PlayableSize));
+                MapTemplate.ResizeAndCommitMapTemplate(MapTemplate.Size.X, (PosX, PosY, PosX + PlayableSize, PosY + PlayableSize));
 
             LocalResizing = false;
         }
 
-        private void OnSessionSizeCommitted(object? sender, EventArgs _)
+        private void OnMapTemplateSizeCommitted(object? sender, EventArgs _)
         {
             //Use this code only when the map size is resized (externally), to adapt the PlayableArea to the MapSize.
             //Everything else about the PlayableArea gets handled internally already.
@@ -173,8 +168,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                 OnPropertyChanged(nameof(MaxSize));
 
                 //The Following Min + if could be solved in one line by nesting two Mins, but that would be terrible to read.
-                int maxAllowedSizeX = Session.Size.X - PosX - MinMargin;
-                int maxAllowedSizeY = Session.Size.Y - PosY - MinMargin;
+                int maxAllowedSizeX = MapTemplate.Size.X - PosX - MinMargin;
+                int maxAllowedSizeY = MapTemplate.Size.Y - PosY - MinMargin;
                 int maxAllowedSize = Math.Min(maxAllowedSizeX, maxAllowedSizeY);
                 if(PlayableSize > maxAllowedSize)
                 {
@@ -184,8 +179,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                     }
                     else
                     {
-                        int offsetX = Math.Min(0, Session.Size.X - (MinSize + PosX + MinMargin));
-                        int offsetY = Math.Min(0, Session.Size.Y - (MinSize + PosY + MinMargin));
+                        int offsetX = Math.Min(0, MapTemplate.Size.X - (MinSize + PosX + MinMargin));
+                        int offsetY = Math.Min(0, MapTemplate.Size.Y - (MinSize + PosY + MinMargin));
 
                         PlayableSize = MinSize;
                         //+= because offset will already be negative!
@@ -193,7 +188,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                         PosY += offsetY;
                     }
                 }
-                ResizeSessionValues();
+                ResizeMapTemplateValues();
             }
         }
     }

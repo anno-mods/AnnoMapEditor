@@ -21,15 +21,15 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
             Inactive
         }
 
-        public Session? Session
+        public MapTemplate? MapTemplate
         { 
-            get => _session;
+            get => _mapTemplate;
             set
             {
-                _session = value;
-                if(_session is not null)
+                _mapTemplate = value;
+                if(_mapTemplate is not null)
                 {
-                    AllowedMapTypes = MapType.MapTypesForRegion[_session.Region];
+                    AllowedMapTypes = MapType.MapTypesForRegion[_mapTemplate.Region];
                     SelectedMapType = AllowedMapTypes.First();
                 }
                 else
@@ -37,11 +37,11 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
                     AllowedMapTypes = Enumerable.Empty<MapType>();
                     SelectedMapType = null;
                 }
-                InfoMapTypeSelection = _session is not null && _session.Region == Region.Moderate;
+                InfoMapTypeSelection = _mapTemplate is not null && _mapTemplate.Region == Region.Moderate;
                 CheckExistingMod();
             }
         }
-        Session? _session;
+        MapTemplate? _mapTemplate;
 
         public bool IsSaving
         {
@@ -144,16 +144,13 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
             if (modsFolderPath is not null)
                 modsFolderPath = Path.Combine(modsFolderPath, "mods");
 
-            if (!Directory.Exists(modsFolderPath) || Session is null)
+            if (!Directory.Exists(modsFolderPath) || MapTemplate is null)
             {
                 _logger.LogWarning("mods/ path or session not set. This shouldn't have happened.");
                 return false;
             }
 
-            Mod mod = new(Session)
-            {
-                MapType = SelectedMapType
-            };
+            Mod mod = new(MapTemplate, SelectedMapType);
 
             CheckExistingMod();
             bool result = await mod.Save(Path.Combine(modsFolderPath, ResultingFullModName), ResultingModName, ModID);
