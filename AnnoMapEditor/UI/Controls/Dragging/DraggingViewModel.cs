@@ -39,7 +39,7 @@ namespace AnnoMapEditor.UI.Controls.Dragging
         }
 
 
-        public void ContinueDrag(Point mouseOffset)
+        public virtual void ContinueDrag(Point mouseOffset)
         {
             Point delta = new(mouseOffset.X - _mouseOffset!.Value.X, mouseOffset.Y - _mouseOffset!.Value.Y);
             Move(delta);

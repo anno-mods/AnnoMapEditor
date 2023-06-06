@@ -45,6 +45,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         {
             _viewModel.IsSelected = true;
 
+            e.Handled = true;
             base.OnMouseLeftButtonDown(e);
         }
 
@@ -52,6 +53,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         {
             _viewModel.IsSelected = false;
 
+            e.Handled = true;
             base.OnMouseRightButtonUp(e);
         }
     }

@@ -42,6 +42,7 @@ namespace AnnoMapEditor.UI.Controls.Dragging
             Point mouseOffset = Mouse.GetPosition(this);
             _viewModel.BeginDrag(mouseOffset);
 
+            e.Handled = true;
             base.OnMouseLeftButtonDown(e);
         }
 
@@ -51,6 +52,8 @@ namespace AnnoMapEditor.UI.Controls.Dragging
                 _viewModel.EndDrag();
 
             ReleaseMouseCapture();
+
+            e.Handled = true;
             base.OnMouseLeftButtonUp(e);
         }
 
@@ -60,6 +63,8 @@ namespace AnnoMapEditor.UI.Controls.Dragging
             {
                 Point mouseOffset = e.GetPosition(this);
                 _viewModel.ContinueDrag(mouseOffset);
+
+                e.Handled = true;
             }
         }
     }

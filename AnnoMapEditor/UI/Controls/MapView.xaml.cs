@@ -3,6 +3,7 @@ using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.UI.Controls.AddIsland;
 using AnnoMapEditor.UI.Controls.Dragging;
 using AnnoMapEditor.UI.Controls.MapTemplates;
+using AnnoMapEditor.UI.Controls.Selection;
 using AnnoMapEditor.UI.Overlays;
 using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
@@ -34,11 +35,13 @@ namespace AnnoMapEditor.UI.Controls
 
         private Vector2? _oldSize { get; set; }
 
-        public static readonly DependencyProperty SelectedIslandProperty =
-             DependencyProperty.Register("SelectedIsland",
-                propertyType: typeof(IslandElement),
-                ownerType: typeof(MapView),
-                typeMetadata: new FrameworkPropertyMetadata(defaultValue: null));
+        #region selecting
+
+        private SelectionBoxControl? _selectionBox;
+
+        private MapElementViewModel? _selectedElement;
+
+        private HashSet<MapElementViewModel> _selectedElements = new();
 
         public IslandElement? SelectedIsland
         {
@@ -52,9 +55,16 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
-        private HashSet<MapElementViewModel> _selectedElements = new();
+        public static readonly DependencyProperty SelectedIslandProperty =
+             DependencyProperty.Register("SelectedIsland",
+                propertyType: typeof(IslandElement),
+                ownerType: typeof(MapView),
+                typeMetadata: new FrameworkPropertyMetadata(defaultValue: null));
 
-        #region EditPlayableArea DependencyProperty
+        #endregion selecting
+
+        #region playable area
+
         public static readonly DependencyProperty EditPlayableAreaProperty =
              DependencyProperty.Register("EditPlayableArea",
                 propertyType: typeof(bool),
@@ -92,9 +102,7 @@ namespace AnnoMapEditor.UI.Controls
             }
 
         }
-        #endregion
 
-        #region ShowPlayableAreaMargins DependencyProperty
         public static readonly DependencyProperty ShowPlayableAreaMarginsProperty =
              DependencyProperty.Register("ShowPlayableAreaMargins",
                 propertyType: typeof(bool),
@@ -128,9 +136,8 @@ namespace AnnoMapEditor.UI.Controls
             }
 
         }
-        #endregion
 
-        private MapElementViewModel? _selectedElement;
+        #endregion playable area
 
 
         public MapView()
@@ -142,6 +149,7 @@ namespace AnnoMapEditor.UI.Controls
 
             Settings.Instance.PropertyChanged += Settings_PropertyChanged;
         }
+
 
         private void MapView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -377,10 +385,94 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
+        #region selecting
+
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            // TODO:    base.OnMouseLeftButtonDown(e);      Handle clicking on other elements
+            if (_selectionBox != null)
+                RemoveSelectionBox();
+
+            Point start = e.GetPosition(mapTemplateCanvas);
+            SelectionBoxViewModel selectionBoxViewModel = new SelectionBoxViewModel(start);
+            _selectionBox = new()
+            {
+                DataContext = selectionBoxViewModel
+            };
+
+            mapTemplateCanvas.Children.Add(_selectionBox);
+
+            selectionBoxViewModel.BeginDrag(start);
+            selectionBoxViewModel.DragEnded += SelectionBoxViewModel_DragEnded;
+        }
+
+        private void SelectionBoxViewModel_DragEnded(object? sender, DragEndedEventArgs e)
+        {
+            SelectionBoxViewModel selectionBoxViewModel = sender as SelectionBoxViewModel
+                ?? throw new ArgumentException();
+
+            if (!Keyboard.IsKeyDown(Key.LeftShift))
+                DeselectAllMapElements();
+
+            foreach (var control in mapTemplateCanvas.Children)
+            {
+                if (control is StartingSpotControl startingSpotControl)
+                {
+                    StartingSpotViewModel startingSpotViewModel = startingSpotControl.DataContext as StartingSpotViewModel
+                        ?? throw new Exception();
+
+                    if (selectionBoxViewModel.Contains(startingSpotControl.GetPosition()))
+                        startingSpotViewModel.IsSelected = true;
+                }
+
+                else if (control is IslandControl islandControl)
+                {
+                    IslandViewModel islandViewModel = islandControl.DataContext as IslandViewModel
+                        ?? throw new Exception();
+                    int sizeInTiles = islandViewModel.Island.SizeInTiles;
+
+                    Vector2[] islandCorners = new[]
+                    {
+                        islandControl.GetPosition(),
+                        islandControl.GetPosition() + new Vector2(sizeInTiles, 0),
+                        islandControl.GetPosition() + new Vector2(0, sizeInTiles),
+                        islandControl.GetPosition() + new Vector2(sizeInTiles, sizeInTiles),
+                    };
+
+                    if (islandCorners.Any(c => selectionBoxViewModel.Contains(c)))
+                        islandViewModel.IsSelected = true;
+                }
+            }
+
+            RemoveSelectionBox();
+        }
+
+        private void RemoveSelectionBox()
+        {
+            if (_selectionBox != null)
+            {
+                SelectionBoxViewModel selectionBoxViewModel = _selectionBox.DataContext as SelectionBoxViewModel
+                    ?? throw new ArgumentException();
+                selectionBoxViewModel.DragEnded -= SelectionBoxViewModel_DragEnded;
+                mapTemplateCanvas.Children.Remove(_selectionBox);
+                _selectionBox = null;
+            }
+        }
+
+        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
+        {
+            DeselectAllMapElements();
+
+            e.Handled = true;
+            base.OnMouseRightButtonDown(e);
+        }
+
+        #endregion selecting
+
         private void OnMapElementSelected(MapElementViewModel viewModel)
         {
             // if shift is not pressed, deselect all previously selected elements
-            if (!Keyboard.IsKeyDown(Key.LeftShift))
+            if (!Keyboard.IsKeyDown(Key.LeftShift) && _selectionBox == null)
                 DeselectAllMapElements();
 
             _selectedElements.Add(viewModel);
