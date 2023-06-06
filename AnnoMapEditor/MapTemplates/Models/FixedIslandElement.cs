@@ -25,7 +25,11 @@ namespace AnnoMapEditor.MapTemplates.Models
         { 
             get => _islandAsset;
             [MemberNotNull(nameof(_islandAsset))]
-            private set => SetProperty(ref _islandAsset!, value);
+            private set
+            {
+                SetProperty(ref _islandAsset!, value);
+                SizeInTiles = _islandAsset.SizeInTiles;
+            }
         }
         private IslandAsset _islandAsset;
 
@@ -90,7 +94,7 @@ namespace AnnoMapEditor.MapTemplates.Models
         public FixedIslandElement(IslandAsset islandAsset, IslandType islandType)
             : base(islandType)
         {
-            _islandAsset = islandAsset;
+            IslandAsset = islandAsset;
 
             foreach (Slot slot in islandAsset.Slots.Values)
             {

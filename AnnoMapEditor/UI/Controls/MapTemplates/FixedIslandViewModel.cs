@@ -14,8 +14,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public override string? Label => _fixedIsland.Label;
 
-        public override int SizeInTiles => _fixedIsland.IslandAsset.SizeInTiles;
-
         public override BitmapImage? Thumbnail => _fixedIsland.IslandAsset.Thumbnail;
         
         public override int ThumbnailRotation => _thumbnailRotation ?? 90;
@@ -53,7 +51,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         private void Redraw()
         {
             OnPropertyChanged(nameof(Label));
-            OnPropertyChanged(nameof(SizeInTiles));
             OnPropertyChanged(nameof(Thumbnail));
             OnPropertyChanged(nameof(RandomizeRotation));
             UpdateThumbnailRotation();
@@ -85,7 +82,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             if (!IsOutOfBounds && _isContinentalIsland)
             {
                 Vector2 islandCenter = _fixedIsland.Position;
-                Vector2 mapCenterOffset = new((_mapTemplate.Size.X - SizeInTiles) / 2, (_mapTemplate.Size.Y - SizeInTiles) / 2);
+                Vector2 mapCenterOffset = new((_mapTemplate.Size.X - Island.SizeInTiles) / 2, (_mapTemplate.Size.Y - Island.SizeInTiles) / 2);
                 string islandFileName = System.IO.Path.GetFileNameWithoutExtension(_fixedIsland.IslandAsset.FilePath);
                 int rotationOffset = ContinentalRotationAtTop[islandFileName];
 
@@ -102,7 +99,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                     else
                     {
                         _fixedIsland.Rotation = (byte)((3 + rotationOffset) % 4);
-                        _fixedIsland.Position = new(0, _mapTemplate.Size.Y - SizeInTiles);
+                        _fixedIsland.Position = new(0, _mapTemplate.Size.Y - Island.SizeInTiles);
                     }
                 }
                 else
@@ -111,14 +108,14 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                     if (islandCenter.Y <= mapCenterOffset.Y)
                     {
                         _fixedIsland.Rotation = (byte)((1 + rotationOffset)%4);
-                        _fixedIsland.Position = new(_mapTemplate.Size.X - SizeInTiles, 0);
+                        _fixedIsland.Position = new(_mapTemplate.Size.X - Island.SizeInTiles, 0);
                     }
 
                     // top
                     else
                     {
                         _fixedIsland.Rotation = (byte)((0 + rotationOffset)%4);
-                        _fixedIsland.Position = new(_mapTemplate.Size.X - SizeInTiles, _mapTemplate.Size.Y - SizeInTiles);
+                        _fixedIsland.Position = new(_mapTemplate.Size.X - Island.SizeInTiles, _mapTemplate.Size.Y - Island.SizeInTiles);
                     }
                 }
             }

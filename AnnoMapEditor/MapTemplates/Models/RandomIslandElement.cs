@@ -9,7 +9,11 @@ namespace AnnoMapEditor.MapTemplates.Models
         public IslandSize IslandSize
         {
             get => _islandSize;
-            set => SetProperty(ref _islandSize, value);
+            set
+            {
+                SetProperty(ref _islandSize, value);
+                SizeInTiles = _islandSize.DefaultSizeInTiles;
+            }
         }
         private IslandSize _islandSize;
 
@@ -17,7 +21,7 @@ namespace AnnoMapEditor.MapTemplates.Models
         public RandomIslandElement(IslandSize islandSize, IslandType islandType)
             : base(islandType)
         {
-            _islandSize = islandSize;
+            IslandSize = islandSize;
         }
 
 
@@ -26,7 +30,7 @@ namespace AnnoMapEditor.MapTemplates.Models
         public RandomIslandElement(Element sourceElement)
             : base(sourceElement)
         {
-            _islandSize = IslandSize.FromElementValue(sourceElement.Size);
+            IslandSize = IslandSize.FromElementValue(sourceElement.Size);
         }
 
         protected override void ToTemplate(Element resultElement)

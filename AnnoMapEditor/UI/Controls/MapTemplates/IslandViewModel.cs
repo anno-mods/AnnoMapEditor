@@ -59,8 +59,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public abstract string? Label { get; }
 
-        public abstract int SizeInTiles { get; }
-
         public virtual BitmapImage? Thumbnail { get; }
 
         public virtual int ThumbnailRotation { get; }
@@ -120,7 +118,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             Vector2 vectorDelta = new(delta);
             Vector2 newPosition = Element.Position + vectorDelta;
 
-            Rect2 mapArea = new(_mapTemplate.Size - SizeInTiles + Vector2.Tile);
+            Rect2 mapArea = new(_mapTemplate.Size - Island.SizeInTiles + Vector2.Tile);
 
             if (!IsOutOfBounds && !newPosition.Within(mapArea) && vectorDelta.Length < 250)
             {
@@ -131,13 +129,13 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             }
             else
                 base.OnDragged(new(vectorDelta.X, vectorDelta.Y));
-            
+
             BoundsCheck();
         }
 
         public void BoundsCheck()
         {
-            var mapArea = new Rect2(_mapTemplate.Size - SizeInTiles + Vector2.Tile);
+            var mapArea = new Rect2(_mapTemplate.Size - Island.SizeInTiles + Vector2.Tile);
             Vector2 position = Element.Position;
             IsOutOfBounds = !position.Within(mapArea);
         }
