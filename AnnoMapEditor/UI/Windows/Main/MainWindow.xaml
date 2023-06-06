@@ -1,15 +1,15 @@
 ﻿<Window x:Class="AnnoMapEditor.UI.Windows.Main.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
-        xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
-        xmlns:validation="clr-namespace:AnnoMapEditor.UI.Controls.MapTemplates"
-        xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
         xmlns:islandProperties="clr-namespace:AnnoMapEditor.UI.Controls.IslandProperties"
-        xmlns:local="clr-namespace:AnnoMapEditor.UI.Windows.Main"
+        xmlns:validation="clr-namespace:AnnoMapEditor.UI.Controls.MapTemplates"
+        xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
         xmlns:overlays="clr-namespace:AnnoMapEditor.UI.Overlays"
+        xmlns:local="clr-namespace:AnnoMapEditor.UI.Windows.Main"
+        xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="900" Width="1440"
@@ -42,11 +42,11 @@
                 Grid.Column="1"
                 Grid.Row="0"
                 SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                EditPlayableArea="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SessionProperties.EditPlayableArea, Mode=OneWay}"
-                ShowPlayableAreaMargins="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SessionProperties.ShowPlayableAreaMargins, Mode=OneWay}"
-                DataContext="{Binding Session, Mode=OneWay}" />
+                EditPlayableArea="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.MapTemplateProperties.EditPlayableArea, Mode=OneWay}"
+                ShowPlayableAreaMargins="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.MapTemplateProperties.ShowPlayableAreaMargins, Mode=OneWay}"
+                DataContext="{Binding MapTemplate, Mode=OneWay}" />
         
-        <!-- session properties -->
+        <!-- MapTemplate properties -->
         <StackPanel Grid.Column="0"
                     Grid.Row="0"
                     Margin="16">
@@ -62,7 +62,7 @@
                     </controls:DropDownButton.Menu>
                 </controls:DropDownButton>
                 <controls:DropDownButton HorizontalAlignment="Left"
-                                         IsEnabled="{Binding SessionChecker.HasErrors, Converter={StaticResource booleanNot}}">
+                                         IsEnabled="{Binding MapTemplateChecker.HasErrors, Converter={StaticResource booleanNot}}">
                     <ContentControl Content="Save" />
                     <controls:DropDownButton.Menu>
                         <ContextMenu>
@@ -73,12 +73,12 @@
                 </controls:DropDownButton>
             </StackPanel>
             
-            <controls:SessionProperties
-                    DataContext="{Binding SessionProperties}"
+            <controls:MapTemplateProperties
+                    DataContext="{Binding MapTemplateProperties}"
                     HorizontalAlignment="Left" />
 
             <!-- validation warnings -->
-            <validation:ValidationResultList DataContext="{Binding SessionChecker}"/>
+            <validation:ValidationResultList DataContext="{Binding MapTemplateChecker}"/>
         </StackPanel>
 
         <!-- island properties -->

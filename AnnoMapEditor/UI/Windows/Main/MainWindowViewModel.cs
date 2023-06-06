@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.UI.Controls;
 using AnnoMapEditor.UI.Controls.IslandProperties;
@@ -22,33 +23,33 @@ namespace AnnoMapEditor.UI.Windows.Main
 {
     public class MainWindowViewModel : ObservableBase
     {
-        public Session? Session
+        public MapTemplate? MapTemplate
         {
-            get => _session;
+            get => _mapTemplate;
             private set
             {
-                if (value != _session)
+                if (value != _mapTemplate)
                 {
-                    SetProperty(ref _session, value);
+                    SetProperty(ref _mapTemplate, value);
                     SelectedIsland = null;
 
-                    if(SessionProperties is not null) 
-                        SessionProperties.SelectedRegionChanged -= SelectedRegionChanged;
+                    if(MapTemplateProperties is not null) 
+                        MapTemplateProperties.SelectedRegionChanged -= SelectedRegionChanged;
 
-                    SessionProperties = value is null ? null : new(value);
-                    OnPropertyChanged(nameof(SessionProperties));
+                    MapTemplateProperties = value is null ? null : new(value);
+                    OnPropertyChanged(nameof(MapTemplateProperties));
 
-                    if(SessionProperties is not null)
-                        SessionProperties.SelectedRegionChanged += SelectedRegionChanged;
+                    if(MapTemplateProperties is not null)
+                        MapTemplateProperties.SelectedRegionChanged += SelectedRegionChanged;
 
-                    SessionChecker = value is null ? null : new(value);
-                    OnPropertyChanged(nameof(SessionChecker));
+                    MapTemplateChecker = value is null ? null : new(value);
+                    OnPropertyChanged(nameof(MapTemplateChecker));
                 }
             }
         }
-        private Session? _session;
-        public SessionPropertiesViewModel? SessionProperties { get; private set; }
-        public SessionCheckerViewModel? SessionChecker { get; private set; }
+        private MapTemplate? _mapTemplate;
+        public MapTemplatePropertiesViewModel? MapTemplateProperties { get; private set; }
+        public MapTemplateCheckerViewModel? MapTemplateChecker { get; private set; }
 
         public IslandElement? SelectedIsland
         {
@@ -70,7 +71,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 else if (value is FixedIslandElement fixedIsland)
                 {
                     SelectedRandomIslandPropertiesViewModel = null;
-                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland, Session!.Region);
+                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland, MapTemplate!.Region);
                 }
             }
         }
@@ -103,12 +104,12 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         public bool ShowOverlay => SelectIslandViewModel != null;
 
-        public string? SessionFilePath
+        public string? MapTemplateFilePath
         {
-            get => _sessionFilePath;
-            private set => SetProperty(ref _sessionFilePath, value);
+            get => _mapTemplateFilePath;
+            private set => SetProperty(ref _mapTemplateFilePath, value);
         }
-        private string? _sessionFilePath;
+        private string? _mapTemplateFilePath;
 
         public DataPathStatus DataPathStatus
         {
@@ -153,23 +154,16 @@ namespace AnnoMapEditor.UI.Windows.Main
             UpdateExportStatus();
         }
 
-        public async Task OpenMap(string filePath, bool fromArchive = false)
+        public async Task OpenMap(string a7tinfoPath, bool fromArchive = false)
         {
-            SessionFilePath = Path.GetFileName(filePath);
+            MapTemplateFilePath = Path.GetFileName(a7tinfoPath);
+            MapTemplateReader mapTemplateReader = new();
 
             if (fromArchive)
-            {
-                Stream? fs = Settings?.DataArchive.OpenRead(filePath);
-                if (fs is not null)
-                    Session = await Session.FromA7tinfoAsync(fs, filePath);
-            }
+                MapTemplate = await mapTemplateReader.FromDataArchiveAsync(a7tinfoPath);
+
             else
-            {
-                if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
-                    Session = await Session.FromA7tinfoAsync(filePath);
-                else
-                    Session = await Session.FromXmlAsync(filePath);
-            }
+                MapTemplate = await mapTemplateReader.FromFileAsync(a7tinfoPath);
 
             UpdateExportStatus();
         }
@@ -179,24 +173,25 @@ namespace AnnoMapEditor.UI.Windows.Main
             const int DEFAULT_MAP_SIZE = 2560;
             const int DEFAULT_PLAYABLE_SIZE = 2160;
 
-            SessionFilePath = null;
+            MapTemplateFilePath = null;
 
-            Session = Session.FromNewMapDimensions(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, Region.Moderate);
+            MapTemplate = new MapTemplate(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, Region.Moderate);
 
             UpdateExportStatus();
         }
 
         public async Task SaveMap(string filePath)
         {
-            if (Session is null)
+            if (MapTemplate is null)
                 return;
 
-            SessionFilePath = Path.GetFileName(filePath);
+            MapTemplateFilePath = Path.GetFileName(filePath);
+            MapTemplateWriter mapTemplateWriter = new();
 
             if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
-                await Session.SaveAsync(filePath);
+                await mapTemplateWriter.ToA7tinfoAsync(MapTemplate, filePath);
             else
-                await Session.SaveToXmlAsync(filePath);
+                await mapTemplateWriter.ToXmlAsync(MapTemplate, filePath);
         }
 
         private void UpdateExportStatus()
@@ -212,7 +207,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
             else if (Settings.IsValidDataPath)
             {
-                bool supportedFormat = Mod.CanSave(Session);
+                bool supportedFormat = Mod.CanSave(MapTemplate);
                 bool archiveReady = Settings.DataArchive is RdaDataArchive;
 
                 ExportStatus = new ExportStatus()
@@ -297,8 +292,11 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         private IEnumerable<String>? LoadMapsFromAssets()
         {
+            const string assetsXmlPath = "data/config/export/main/asset/assets.xml";
+
             Stopwatch stopwatch= Stopwatch.StartNew();
-            using var assetStream = Settings.DataArchive.OpenRead("data/config/export/main/asset/assets.xml");
+            using var assetStream = Settings.DataArchive.OpenRead(assetsXmlPath)
+                ?? throw new FileNotFoundException(assetsXmlPath);
             XmlDocument doc = new XmlDocument();
             doc.Load(assetStream);
             var nodes = doc.SelectNodes("//Asset[Template='MapTemplate']/Values/MapTemplate[TemplateRegion]/*[self::TemplateFilename or self::EnlargedTemplateFilename]");

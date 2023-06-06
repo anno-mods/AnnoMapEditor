@@ -4,18 +4,18 @@ using System.Linq;
 
 namespace AnnoMapEditor.MapTemplates.Validation
 {
-    public class ContinentalIslandLimitValidator : ISessionValidator
+    public class ContinentalIslandLimitValidator : IMapTemplateValidator
     {
-        public SessionValidatorResult Validate(Session session)
+        public MapTemplateValidatorResult Validate(MapTemplate mapTemplate)
         {
-            int continentalIslandCount = session.Elements
+            int continentalIslandCount = mapTemplate.Elements
                 .Where(e => e is FixedIslandElement fixedIsland && fixedIsland.IslandAsset.IslandSize.Contains(IslandSize.Continental))
                 .Count();
             
             if (continentalIslandCount <= 1)
-                return SessionValidatorResult.Ok;
+                return MapTemplateValidatorResult.Ok;
             else
-                return new(SessionValidatorStatus.Error, $"Too many {IslandSize.Continental.Name} islands.", "More than 1 continental island per session may result in visual glitches.");
+                return new(MapTemplateValidatorStatus.Error, $"Too many {IslandSize.Continental.Name} islands.", "More than 1 continental island per session may result in visual glitches.");
         }
     }
 }

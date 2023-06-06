@@ -1,12 +1,11 @@
-﻿<UserControl x:Class="AnnoMapEditor.UI.Controls.SessionProperties"
+﻿<UserControl x:Class="AnnoMapEditor.UI.Controls.MapTemplateProperties"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
              xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
-             xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
-             d:DataContext="{d:DesignInstance Type=local:SessionPropertiesViewModel}"
+             d:DataContext="{d:DesignInstance Type=local:MapTemplatePropertiesViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="300">
     <UserControl.Resources>

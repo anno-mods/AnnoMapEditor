@@ -1,3 +1,4 @@
+using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Tests.Utils;
@@ -18,28 +19,31 @@ namespace AnnoMapEditor.Tests
             await Settings.Instance.AwaitLoadingAsync();
 
             using Stream inputXml = File.OpenRead(filePath);
-            Session? session = await Session.FromXmlAsync(inputXml, filePath);
+            Region region = Region.DetectFromPath(filePath);
 
-            Assert.NotNull(session);
+            MapTemplateReader mapTemplateReader = new();
+            MapTemplate? mapTemplate = await mapTemplateReader.FromXmlStreamAsync(region, inputXml);
 
-            var export = session!.ToTemplate();
+            Assert.NotNull(mapTemplate);
+
+            var export = mapTemplate!.ToTemplateDocument();
             Assert.NotNull(export);
 
             using (Stream a7tinfo = new MemoryStream())
             {
-                await Serializer.WriteAsync(export!, a7tinfo);
+                await FileDBSerializer.WriteAsync(export!, a7tinfo);
 
                 a7tinfo.Position = 0;
-                session = await Session.FromA7tinfoAsync(a7tinfo, filePath);
-                Assert.NotNull(session);
+                mapTemplate = await mapTemplateReader.FromBinaryStreamAsync(region, a7tinfo);
+                Assert.NotNull(mapTemplate);
             }
 
-            var template = session!.ToTemplate();
+            var template = mapTemplate!.ToTemplateDocument();
             Assert.NotNull(template);
 
             using (MemoryStream outStream = new MemoryStream())
             {
-                await Serializer.WriteToXmlAsync(template!, outStream);
+                await FileDBSerializer.WriteToXmlAsync(template!, outStream);
 
                 //Uncomment for debugging:
                 //string content = System.Text.Encoding.UTF8.GetString(outStream.ToArray());
