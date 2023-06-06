@@ -5,6 +5,8 @@ namespace AnnoMapEditor.UI.Controls.Dragging
 {
     public abstract class DraggingViewModel : ObservableBase
     {
+        public event DraggingEventHandler? Dragging;
+
         public event DragEndedEventHandler? DragEnded;
 
 
@@ -36,6 +38,16 @@ namespace AnnoMapEditor.UI.Controls.Dragging
             DragEnded?.Invoke(this, new());
         }
 
-        public abstract void OnDragged(Point delta);
+
+        public void ContinueDrag(Point mouseOffset)
+        {
+            Point delta = new(mouseOffset.X - _mouseOffset!.Value.X, mouseOffset.Y - _mouseOffset!.Value.Y);
+            Move(delta);
+        }
+
+        public virtual void Move(Point delta)
+        {
+            Dragging?.Invoke(this, new(delta));
+        }
     }
 }

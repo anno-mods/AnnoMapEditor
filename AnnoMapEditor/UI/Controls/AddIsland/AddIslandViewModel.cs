@@ -61,7 +61,7 @@ namespace AnnoMapEditor.UI.Controls.AddIsland
         }
 
 
-        public override void OnDragged(Point delta)
+        public override void Move(Point delta)
         {
             EndDrag();
 

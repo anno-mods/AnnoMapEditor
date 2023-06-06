@@ -89,8 +89,12 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         {
             if (e.PropertyName == nameof(IslandElement.IslandType))
                 UpdateBackground();
+
             else if (e.PropertyName == nameof(FixedIslandElement.RandomizeRotation))
                 UpdateRotation();
+
+            else if (e.PropertyName == nameof(MapElement.Position))
+                BoundsCheck();
         }
 
         private void UpdateBackground()
@@ -112,25 +116,19 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             OnPropertyChanged(nameof(RandomizeRotation));
         }
 
-
-        public override void OnDragged(Point delta)
+        public override void Move(Point delta)
         {
             Vector2 vectorDelta = new(delta);
             Vector2 newPosition = Element.Position + vectorDelta;
 
             Rect2 mapArea = new(_mapTemplate.Size - Island.SizeInTiles + Vector2.Tile);
 
+            // provide resistance against moving islands of the map
             if (!IsOutOfBounds && !newPosition.Within(mapArea) && vectorDelta.Length < 250)
-            {
-                Vector2 safePosition = newPosition.Clamp(mapArea);
-                Point safeDelta = new(safePosition.X - Element.Position.X, safePosition.Y - Element.Position.Y);
+                Element.Position = newPosition.Clamp(mapArea);
 
-                base.OnDragged(safeDelta);
-            }
             else
-                base.OnDragged(new(vectorDelta.X, vectorDelta.Y));
-
-            BoundsCheck();
+                Element.Position = newPosition;
         }
 
         public void BoundsCheck()

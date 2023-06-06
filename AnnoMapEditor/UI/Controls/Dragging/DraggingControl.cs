@@ -47,8 +47,10 @@ namespace AnnoMapEditor.UI.Controls.Dragging
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            _viewModel.EndDrag();
+            if (_viewModel.IsDragging)
+                _viewModel.EndDrag();
 
+            ReleaseMouseCapture();
             base.OnMouseLeftButtonUp(e);
         }
 
@@ -56,10 +58,8 @@ namespace AnnoMapEditor.UI.Controls.Dragging
         {
             if (e.LeftButton == MouseButtonState.Pressed && _viewModel.IsDragging)
             {
-                Point newMouseOffset = e.GetPosition(this);
-                Point delta = new(newMouseOffset.X - _viewModel.MouseOffset!.Value.X, newMouseOffset.Y - _viewModel.MouseOffset!.Value.Y);
-
-                _viewModel.OnDragged(delta);
+                Point mouseOffset = e.GetPosition(this);
+                _viewModel.ContinueDrag(mouseOffset);
             }
         }
     }
