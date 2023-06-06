@@ -2,6 +2,7 @@
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -113,26 +114,31 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             OnPropertyChanged(nameof(RandomizeRotation));
         }
 
-        public override void OnDragged(Vector2 newPosition)
-        {
-            var mapArea = new Rect2(_mapTemplate.Size - SizeInTiles + Vector2.Tile);
 
-            // provide resistance against moving out of bounds
-            if (Element.Position.Within(mapArea) && !newPosition.Within(mapArea))
+        public override void OnDragged(Point delta)
+        {
+            Vector2 vectorDelta = new(delta);
+            Vector2 newPosition = Element.Position + vectorDelta;
+
+            Rect2 mapArea = new(_mapTemplate.Size - SizeInTiles + Vector2.Tile);
+
+            if (!IsOutOfBounds && !newPosition.Within(mapArea) && vectorDelta.Length < 250)
             {
                 Vector2 safePosition = newPosition.Clamp(mapArea);
-                if ((safePosition - newPosition).Length < 150)
-                    newPosition = safePosition;
-            }
+                Point safeDelta = new(safePosition.X - Element.Position.X, safePosition.Y - Element.Position.Y);
 
-            BoundsCheck(newPosition);
-            base.OnDragged(newPosition);
+                base.OnDragged(safeDelta);
+            }
+            else
+                base.OnDragged(new(vectorDelta.X, vectorDelta.Y));
+            
+            BoundsCheck();
         }
 
-        public void BoundsCheck(Vector2? pos = null)
+        public void BoundsCheck()
         {
             var mapArea = new Rect2(_mapTemplate.Size - SizeInTiles + Vector2.Tile);
-            Vector2 position = pos ?? Element.Position;
+            Vector2 position = Element.Position;
             IsOutOfBounds = !position.Within(mapArea);
         }
     }

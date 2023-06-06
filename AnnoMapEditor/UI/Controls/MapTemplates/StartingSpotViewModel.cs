@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Media;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
@@ -10,7 +11,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         static readonly SolidColorBrush White  = new(Color.FromArgb(255, 255, 255, 255));
         static readonly SolidColorBrush Yellow = new(Color.FromArgb(255, 234, 224, 83));
         static readonly SolidColorBrush Red    = new(Color.FromArgb(255, 234, 83, 83));
-
+        
 
         private readonly MapTemplate _mapTemplate;
 
@@ -61,12 +62,14 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                 BackgroundBrush = _startingSpot.Index == 0 ? Yellow : Red;
         }
 
-        public override void OnDragged(Vector2 newPosition)
+        public override void OnDragged(Point delta)
         {
             // prevent moving StartingSpots outside of the MapTemplate's playable area.
-            newPosition = newPosition.Clamp(_mapTemplate.PlayableArea);
+            Vector2 newPosition = new(Element.Position.X + (int)delta.X, Element.Position.Y + (int)delta.Y);
+            Vector2 safePosition = newPosition.Clamp(_mapTemplate.PlayableArea);
+            Point safeDelta = new(safePosition.X - Element.Position.X, safePosition.Y - Element.Position.Y);
 
-            base.OnDragged(newPosition);
+            base.OnDragged(safeDelta);
         }
     }
 }

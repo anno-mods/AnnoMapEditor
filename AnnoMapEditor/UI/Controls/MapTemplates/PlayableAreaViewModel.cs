@@ -2,6 +2,7 @@
 using AnnoMapEditor.UI.Controls.Dragging;
 using AnnoMapEditor.Utilities;
 using System;
+using System.Windows;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
@@ -10,7 +11,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public PlayableAreaViewModel(MapTemplate mapTemplate)
         {
             MapTemplate = mapTemplate;
-
+            
             //Flip X/Y
             PosY = mapTemplate.PlayableArea.Position.X;
             PosX = mapTemplate.PlayableArea.Position.Y;
@@ -133,12 +134,13 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         private bool _resizingInProgress = false;
 
 
-        public override void OnDragged(Vector2 newPosition)
+        public override void OnDragged(Point delta)
         {
             //This limits movement so that the minimum Margin is always remaining.
-            Vector2 newPos = newPosition.Clamp(MinMarginVector, new Vector2(MapTemplate.Size.X - PlayableSize - MinMargin, MapTemplate.Size.Y - PlayableSize - MinMargin));
-            PosX = newPos.X;
-            PosY = newPos.Y;
+            Vector2 newPosition = new(PosX + (int)delta.X, PosY + (int)delta.Y);
+            newPosition = newPosition.Clamp(MinMarginVector, new Vector2(MapTemplate.Size.X - PlayableSize - MinMargin, MapTemplate.Size.Y - PlayableSize - MinMargin));
+            PosX = newPosition.X;
+            PosY = newPosition.Y;
 
             ResizeMapTemplateValues();
         }

@@ -1,6 +1,6 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.UI.Controls.Dragging;
-using AnnoMapEditor.Utilities;
+using System.Windows;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
@@ -22,9 +22,9 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
 
 
-        public override void OnDragged(Vector2 newPosition)
+        public override void OnDragged(Point delta)
         {
-            Element.Position = newPosition;
+            Element.Position = new(Element.Position.X + (int)delta.X, Element.Position.Y + (int)delta.Y);
         }
     }
 }

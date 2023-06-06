@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.Utilities;
+using System.Windows;
 
 namespace AnnoMapEditor.UI.Controls.Dragging
 {
@@ -14,15 +15,15 @@ namespace AnnoMapEditor.UI.Controls.Dragging
         }
         private bool _isDragging;
 
-        public Vector2? MouseOffset
+        public Point? MouseOffset
         {
             get => _mouseOffset;
             private set => SetProperty(ref _mouseOffset, value);
         }
-        private Vector2? _mouseOffset;
+        private Point? _mouseOffset;
 
 
-        public void BeginDrag(Vector2 mouseOffset)
+        public void BeginDrag(Point mouseOffset)
         {
             MouseOffset = mouseOffset;
             IsDragging = true;
@@ -35,6 +36,6 @@ namespace AnnoMapEditor.UI.Controls.Dragging
             DragEnded?.Invoke(this, new());
         }
 
-        public abstract void OnDragged(Vector2 newPosition);
+        public abstract void OnDragged(Point delta);
     }
 }

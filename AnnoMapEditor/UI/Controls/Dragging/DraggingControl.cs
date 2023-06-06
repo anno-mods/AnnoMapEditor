@@ -1,5 +1,4 @@
-﻿using AnnoMapEditor.Utilities;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -40,7 +39,7 @@ namespace AnnoMapEditor.UI.Controls.Dragging
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            Vector2 mouseOffset = new(Mouse.GetPosition(this));
+            Point mouseOffset = Mouse.GetPosition(this);
             _viewModel.BeginDrag(mouseOffset);
 
             base.OnMouseLeftButtonDown(e);
@@ -57,10 +56,10 @@ namespace AnnoMapEditor.UI.Controls.Dragging
         {
             if (e.LeftButton == MouseButtonState.Pressed && _viewModel.IsDragging)
             {
-                IInputElement parentElement = Parent as IInputElement
-                    ?? throw new Exception($"Parent of {nameof(DraggingControl)} must be an {nameof(IInputElement)}.");
-                Vector2 newPosition = new Vector2(e.GetPosition(parentElement)) - _viewModel.MouseOffset!;
-                _viewModel.OnDragged(newPosition);
+                Point newMouseOffset = e.GetPosition(this);
+                Point delta = new(newMouseOffset.X - _viewModel.MouseOffset!.Value.X, newMouseOffset.Y - _viewModel.MouseOffset!.Value.Y);
+
+                _viewModel.OnDragged(delta);
             }
         }
     }

@@ -3,6 +3,7 @@ using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
@@ -71,9 +72,9 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
 
 
-        public override void OnDragged(Vector2 newPosition)
+        public override void OnDragged(Point delta)
         {
-            base.OnDragged(newPosition);
+            base.OnDragged(delta);
             SnapContinentalIsland();
         }
 

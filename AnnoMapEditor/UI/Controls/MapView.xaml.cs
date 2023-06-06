@@ -303,14 +303,21 @@ namespace AnnoMapEditor.UI.Controls
 
         private void IslandAdded(object? sender, IslandAddedEventArgs e)
         {
-            ProtoIslandViewModel protoViewModel = new(_mapTemplate, e.MapElementType, e.IslandType, e.IslandSize, e.Position);
+            AddIslandViewModel addIslandViewModel = sender as AddIslandViewModel
+                ?? throw new ArgumentException();
+            AddIslandButton addIslandButton = _addIslands!.FirstOrDefault(b => b.DataContext == addIslandViewModel)!;
+
+            Vector2 addIslandPosition = addIslandButton.GetPosition();
+            Vector2 protoIslandPosition = new(addIslandPosition.X + (int)e.Delta.X, addIslandPosition.Y + (int)e.Delta.Y);
+
+            ProtoIslandViewModel protoViewModel = new(_mapTemplate, e.MapElementType, e.IslandType, e.IslandSize, protoIslandPosition);
             mapTemplateCanvas.Children.Add(new IslandControl()
             {
                 DataContext = protoViewModel
             });
             protoViewModel.DragEnded += ProtoIsland_DragEnded;
             protoViewModel.IsSelected = true;
-            protoViewModel.BeginDrag(Vector2.Zero);
+            protoViewModel.BeginDrag(new());
         }
 
         private void ProtoIsland_DragEnded(object? sender, DragEndedEventArgs e)
