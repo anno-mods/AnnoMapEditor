@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.UI.Controls.Dragging;
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.Windows.Media;

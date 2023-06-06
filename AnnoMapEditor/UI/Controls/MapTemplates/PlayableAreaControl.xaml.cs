@@ -1,4 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.UI.Controls.Dragging;
 using System.Windows;
 using System.Windows.Controls;
 
