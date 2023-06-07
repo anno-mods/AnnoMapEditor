@@ -1,5 +1,4 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
-using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +17,8 @@ namespace AnnoMapEditor.UI.Controls.Slots
         private static readonly Dictionary<string, int> _orderLookup;
         static SlotComparer()
         {
-            MinimapSceneAsset minimapScene = Settings.Instance.AssetRepository!.Get<MinimapSceneAsset>(MinimapSceneAsset.INSTANCE_GUID);
             int index = 0;
-            _orderLookup = minimapScene.LodesOrderSlotTypes
+            _orderLookup = MinimapSceneAsset.Instance.LodesOrderSlotTypes
                 .ToDictionary(f => f, f => index++);
         }
 

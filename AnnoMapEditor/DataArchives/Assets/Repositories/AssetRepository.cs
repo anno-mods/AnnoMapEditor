@@ -33,6 +33,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         private readonly Dictionary<long, StandardAsset> _assets = new();
 
+        private readonly List<Type> _assetTypes = new();
+
+
         public AssetRepository(IDataArchive dataArchive)
         {
             _dataArchive = dataArchive;
@@ -264,6 +267,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 resolvers.Add(resolver);
             }
 
+            _assetTypes.Add(typeof(TAsset));
+
             _logger.LogInformation($"Registered asset type '{typeof(TAsset).FullName}'.");
         }
 
@@ -295,13 +300,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 long? guid = guidProperty.GetValue(asset) as long?;
                 if (guid.HasValue)
                 {
-                    StandardAsset? referencedAsset = GetReferencedAsset((long) guid, referencedType);
+                    StandardAsset? referencedAsset = GetReferencedAsset((long)guid, referencedType);
                     if (referencedAsset != null)
                         referenceProperty.SetValue(asset, referencedAsset);
                 }
             };
         }
-
 
         private Action<object> CreateEnumerableReferenceResolver<TAsset>(PropertyInfo referenceProperty, PropertyInfo guidProperty) where TAsset : StandardAsset
         {
@@ -337,6 +341,29 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     referenceProperty.SetValue(asset, list);
                 }
             };
+        }
+
+        private void InitializeStaticAssets()
+        {
+            foreach (Type assetType in _assetTypes)
+            {
+                foreach (PropertyInfo staticProperty in assetType.GetProperties(BindingFlags.Static | BindingFlags.Public))
+                {
+                    StaticAssetAttribute? staticAssetAttribute = staticProperty.GetCustomAttribute<StaticAssetAttribute>();
+                    if (staticAssetAttribute == null)
+                        continue;
+
+                    if (TryGet(staticAssetAttribute.GUID, out StandardAsset? asset))
+                    {
+                        if (!staticProperty.PropertyType.IsAssignableFrom(asset.GetType()))
+                            throw new Exception($"Could not resolve StaticAsset {assetType.FullName}.{staticProperty.Name}. The asset's type {asset.GetType().FullName} does not match the property's type {staticProperty.PropertyType.FullName}.");
+
+                        staticProperty.SetValue(null, asset);
+                    }
+                    else
+                        throw new Exception($"Could not resolve StaticAsset {assetType.FullName}.{staticProperty.Name}. There exists no asset with GUID {staticAssetAttribute.GUID}.");
+                }
+            }
         }
     }
 }

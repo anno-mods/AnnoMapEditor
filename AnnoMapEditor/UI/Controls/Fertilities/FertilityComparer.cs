@@ -1,5 +1,4 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
-using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +17,8 @@ namespace AnnoMapEditor.UI.Controls.Fertilities
         private static readonly Dictionary<long, int> _orderLookup;
         static FertilityComparer()
         {
-            MinimapSceneAsset minimapScene = Settings.Instance.AssetRepository!.Get<MinimapSceneAsset>(MinimapSceneAsset.INSTANCE_GUID);
             int index = 0;
-            _orderLookup = minimapScene.FertilityOrderGuids
+            _orderLookup = MinimapSceneAsset.Instance.FertilityOrderGuids
                 .ToDictionary(f => f, f => index++);
         }
 
