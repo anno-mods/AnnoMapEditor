@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AnnoMapEditor.DataArchives.Assets.Attributes
+namespace AnnoMapEditor.DataArchives.Assets.Deserialization
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class AssetTemplateAttribute : Attribute

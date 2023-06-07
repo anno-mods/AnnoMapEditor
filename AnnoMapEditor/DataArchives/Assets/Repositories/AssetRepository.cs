@@ -1,4 +1,4 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
+﻿using AnnoMapEditor.DataArchives.Assets.Deserialization;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.Utilities;
 using System;
@@ -27,6 +27,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         private readonly IDataArchive _dataArchive;
 
+        private readonly GuidReferenceResolverFactory _guidReferenceResolverFactory;
+        
         private readonly Dictionary<string, Func<XElement, StandardAsset>> _deserializers = new();
 
         private readonly Dictionary<Type, List<Action<object>>> _referenceResolvers = new();
@@ -39,6 +41,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         public AssetRepository(IDataArchive dataArchive)
         {
             _dataArchive = dataArchive;
+            _guidReferenceResolverFactory = new(this);
         }
 
         private StandardAsset? ConstructAssetFrom(XElement assetElement)
@@ -238,33 +241,18 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             // prepare to resolve references
             foreach (PropertyInfo property in typeof(TAsset).GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                // determine if this property is a reference to another asset
-                AssetReferenceAttribute? referenceAttribute = property.GetCustomAttribute<AssetReferenceAttribute>();
-                if (referenceAttribute == null)
-                    continue;
-
-                // get the property containing the guid of the referenced asset
-                PropertyInfo guidProperty = typeof(TAsset).GetProperty(referenceAttribute.GuidPropertyName)
-                    ?? throw new ArgumentException($"Invalid {nameof(AssetReferenceAttribute)} on type {typeof(TAsset).FullName}. Could not find property '{referenceAttribute.GuidPropertyName}'.");
-
-                // create the resolver
-                Action<object> resolver;
-                if (guidProperty.PropertyType == typeof(long))
-                    resolver = CreateEnumerableReferenceResolver<TAsset>(property, guidProperty);
-
-                else if (guidProperty.PropertyType == typeof(IEnumerable<long>))
-                    resolver = CreateEnumerableReferenceResolver<TAsset>(property, guidProperty);
-
-                else
-                    throw new ArgumentException($"Invalid {nameof(AssetReferenceAttribute)} on type {typeof(TAsset).FullName}. Property '{referenceAttribute.GuidPropertyName}' must either be of type {typeof(long).FullName} or {typeof(IEnumerable<long>).FullName}.");
+                Action<object>? resolver = _guidReferenceResolverFactory.CreateResolver<TAsset>(property);
 
                 // keep track of all resolvers
-                if (!_referenceResolvers.TryGetValue(typeof(TAsset), out List<Action<object>>? resolvers))
+                if (resolver != null)
                 {
-                    resolvers = new();
-                    _referenceResolvers.Add(typeof(TAsset), resolvers);
+                    if (!_referenceResolvers.TryGetValue(typeof(TAsset), out List<Action<object>>? resolvers))
+                    {
+                        resolvers = new();
+                        _referenceResolvers.Add(typeof(TAsset), resolvers);
+                    }
+                    resolvers.Add(resolver);
                 }
-                resolvers.Add(resolver);
             }
 
             _assetTypes.Add(typeof(TAsset));
@@ -285,62 +273,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 _logger.LogWarning($"Could not resolve reference GUID {guid} to type {referencedType.FullName}. No asset with that GUID could be found.");
 
             return null;
-        }
-
-        private Action<object> CreateSingleReferenceResolver<TAsset>(PropertyInfo referenceProperty, PropertyInfo guidProperty) where TAsset : StandardAsset
-        {
-            // validate the reference property
-            Type referencedType = referenceProperty.PropertyType;
-            if (!typeof(StandardAsset).IsAssignableFrom(referencedType))
-                throw new ArgumentException();
-
-            // create the delegate
-            return (asset) =>
-            {
-                long? guid = guidProperty.GetValue(asset) as long?;
-                if (guid.HasValue)
-                {
-                    StandardAsset? referencedAsset = GetReferencedAsset((long)guid, referencedType);
-                    if (referencedAsset != null)
-                        referenceProperty.SetValue(asset, referencedAsset);
-                }
-            };
-        }
-
-        private Action<object> CreateEnumerableReferenceResolver<TAsset>(PropertyInfo referenceProperty, PropertyInfo guidProperty) where TAsset : StandardAsset
-        {
-            // determine the type of the referenced assets
-            if (!referenceProperty.PropertyType.IsGenericType)
-                throw new ArgumentException();
-
-            // validate the reference property
-            Type referencedType = referenceProperty.PropertyType.GenericTypeArguments[0];
-            if (!typeof(StandardAsset).IsAssignableFrom(referencedType))
-                throw new ArgumentException();
-
-            Type enumerableType = typeof(IEnumerable<>).MakeGenericType(referencedType);
-            if (referenceProperty.PropertyType != enumerableType)
-                throw new ArgumentException();
-
-            // create the delegate
-            Type listType = typeof(List<>).MakeGenericType(referencedType);
-            return (asset) =>
-            {
-                IEnumerable<long>? guids = guidProperty.GetValue(asset) as IEnumerable<long>;
-                if (guids != null)
-                {
-                    IList list = (IList)Activator.CreateInstance(listType)!;
-
-                    foreach (long guid in guids)
-                    {
-                        StandardAsset? referencedAsset = GetReferencedAsset((long)guid, referencedType);
-                        if (referencedAsset != null)
-                            list.Add(referencedAsset);
-                    }
-
-                    referenceProperty.SetValue(asset, list);
-                }
-            };
         }
 
         private void InitializeStaticAssets()

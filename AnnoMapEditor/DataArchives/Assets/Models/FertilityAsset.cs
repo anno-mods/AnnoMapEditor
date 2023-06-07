@@ -1,4 +1,4 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
+﻿using AnnoMapEditor.DataArchives.Assets.Deserialization;
 using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models

@@ -1,4 +1,4 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
+﻿using AnnoMapEditor.DataArchives.Assets.Deserialization;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,4 +1,4 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
+﻿using AnnoMapEditor.DataArchives.Assets.Deserialization;
 using AnnoMapEditor.MapTemplates.Enums;
 using System;
 using System.Collections.Generic;

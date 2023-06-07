@@ -1,4 +1,4 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
+﻿using AnnoMapEditor.DataArchives.Assets.Deserialization;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using System;
 using System.Collections.Generic;
@@ -17,6 +17,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public const long REGION_ARCTIC_GUID = 160001;
         public const long REGION_AFRICA_GUID = 114327;
 
+        public const string REGION_MODERATE_REGIONID = "Moderate";
+
+
         [StaticAsset(REGION_MODERATE_GUID)]
         public static RegionAsset Moderate { get; private set; }
 
@@ -32,15 +35,32 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public static IEnumerable<RegionAsset> SupportedRegions => new[] { Moderate, SouthAmerica, Arctic, Africa };
 
 
+        /// <summary>
+        /// Each region has its own AmbientName, which is needed when creating the .a7t. These
+        /// values are missing in assets.xml. The values seen here were reverse engineered from
+        /// existing a7t files within the game.
+        /// 
+        /// Note: Region assets do contain an attribute "Ambiente". However its value is always
+        /// "Region_map_global" and does not match the expected value for a7ts.
+        /// </summary>
+        private static readonly Dictionary<long, string> REGION_AMBIENTE_HARDCODED = new Dictionary<long, string>()
+        {
+            [REGION_MODERATE_GUID] = "Moderate_01_day_night",
+            [REGION_SOUTHAMERICA_GUID] = "south_america_caribic_01",
+            [REGION_ARCTIC_GUID] = "DLC03_01",
+            [REGION_AFRICA_GUID] = "Colony_02"
+        };
+
+
         public string DisplayName { get; init; }
 
         public string? Ambiente { get; init; }
 
-        public string? RegionID { get; init; }
+        public string RegionID { get; init; }
 
         public IEnumerable<long> AllowedFertilityGuids { get; init; }
 
-        [AssetReference(nameof(AllowedFertilityGuids))]
+        [GuidReference(nameof(AllowedFertilityGuids))]
         public IEnumerable<FertilityAsset> AllowedFertilities { get; init; }
 
 
@@ -55,8 +75,13 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 ?? "Meta";
 
             XElement regionElement = valuesXml.Element(TEMPLATE_NAME)!;
-            Ambiente = regionElement.Element("Ambiente")?.Value;
-            RegionID = regionElement.Element("RegionID")?.Value;
+
+            if (REGION_AMBIENTE_HARDCODED.ContainsKey(GUID))
+                Ambiente = REGION_AMBIENTE_HARDCODED[GUID];
+
+            // The region Moderate does not have a RegionID specified in assets.xml. All other
+            // regions have them.
+            RegionID = regionElement.Element("RegionID")?.Value ?? REGION_MODERATE_REGIONID;
 
             AllowedFertilityGuids = regionElement.Element("AllowedFertilities")?
                 .Elements("Item")?
