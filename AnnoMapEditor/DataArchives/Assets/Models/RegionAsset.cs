@@ -6,9 +6,12 @@ using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
-    [AssetTemplate("Region")]
+    [AssetTemplate(TEMPLATE_NAME)]
     public class RegionAsset : StandardAsset
     {
+        public const string TEMPLATE_NAME = "Region";
+
+
         public string DisplayName { get; init; }
 
         public string? Ambiente { get; init; }
@@ -31,7 +34,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 .Value!
                 ?? "Meta";
 
-            XElement regionElement = valuesXml.Element("Region")!;
+            XElement regionElement = valuesXml.Element(TEMPLATE_NAME)!;
             Ambiente = regionElement.Element("Ambiente")?.Value;
             RegionID = regionElement.Element("RegionID")?.Value;
 

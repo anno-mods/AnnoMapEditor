@@ -7,9 +7,11 @@ using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
-    [AssetTemplate("Slot")]
+    [AssetTemplate(TEMPLATE_NAME)]
     public class SlotAsset : StandardAsset
     {
+        public const string TEMPLATE_NAME = "Slot";
+
         public const long RANDOM_MINE_OLD_WORLD_GUID = 1000029;
         public const long RANDOM_MINE_NEW_WORLD_GUID = 614;
         public const long RANDOM_MINE_ARCTIC_GUID = 116037;
@@ -50,7 +52,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 .Element("Text")!
                 .Value!;
 
-            SlotType = valuesXml.Element("Slot")?
+            SlotType = valuesXml.Element(TEMPLATE_NAME)?
                 .Element("SlotType")?
                 .Value;
             IsRandomSlot = SlotType == "Random";

@@ -1,12 +1,14 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
-using System.Windows.Media;
 using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
-    [AssetTemplate("Fertility")]
+    [AssetTemplate(TEMPLATE_NAME)]
     public class FertilityAsset : StandardAsset
     {
+        public const string TEMPLATE_NAME = "Fertility";
+
+
         public string DisplayName { get; init; }
 
 

@@ -1,17 +1,16 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
-    [AssetTemplate("MinimapScene")]
+    [AssetTemplate(TEMPLATE_NAME)]
     public class MinimapSceneAsset : StandardAsset
     {
-        public new const long GUID = 500204;
+        public const string TEMPLATE_NAME = "MinimapScene";
+
+        public const long INSTANCE_GUID = 500204;
 
 
         public List<long> FertilityOrderGuids { get; init; }
