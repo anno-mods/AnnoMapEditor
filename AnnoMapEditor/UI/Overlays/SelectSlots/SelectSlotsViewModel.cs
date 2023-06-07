@@ -1,12 +1,10 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
-using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Data;
 
 namespace AnnoMapEditor.UI.Overlays.SelectSlots
@@ -77,11 +75,11 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
     public class SelectSlotsViewModel : ObservableBase, IOverlayViewModel
     {
         public event EventHandler<FilteredItemsChangedEventArgs<SlotAssignmentViewModel>>? FilterModified;
-        public IEnumerable<Region?> Regions { get; init; } = Region.All;
+        public IEnumerable<RegionAsset?> Regions { get; init; } = RegionAsset.SupportedRegions;
 
-        private readonly Region _initialRegion;
+        private readonly RegionAsset _initialRegion;
 
-        public Region SelectedRegion
+        public RegionAsset SelectedRegion
         {
             get => _selectedRegion;
             set
@@ -92,7 +90,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 ShowRegionWarning = _selectedRegion != _initialRegion;
             }
         }
-        private Region _selectedRegion;
+        private RegionAsset _selectedRegion;
 
         public bool ShowRegionWarning
         {
@@ -141,7 +139,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         public IEnumerable<SlotAssignmentViewModel> SlotAssignmentViewModelsRight { get; private set; }
 
 
-        public SelectSlotsViewModel(Region region, FixedIslandElement fixedIsland)
+        public SelectSlotsViewModel(RegionAsset region, FixedIslandElement fixedIsland)
         {
             _selectedRegion = _initialRegion = region;
             FixedIsland = fixedIsland;

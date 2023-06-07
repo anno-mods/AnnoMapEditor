@@ -1,4 +1,4 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Enums;
 using AnnoMapEditor.Mods.Models;
@@ -29,7 +29,7 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
                 _mapTemplate = value;
                 if(_mapTemplate is not null)
                 {
-                    AllowedMapTypes = MapType.MapTypesForRegion[_mapTemplate.Region];
+                    AllowedMapTypes = MapType.All;
                     SelectedMapType = AllowedMapTypes.First();
                 }
                 else
@@ -37,7 +37,7 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
                     AllowedMapTypes = Enumerable.Empty<MapType>();
                     SelectedMapType = null;
                 }
-                InfoMapTypeSelection = _mapTemplate is not null && _mapTemplate.Region == Region.Moderate;
+                InfoMapTypeSelection = _mapTemplate is not null && _mapTemplate.Session == SessionAsset.OldWorld;
                 CheckExistingMod();
             }
         }

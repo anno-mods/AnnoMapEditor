@@ -105,7 +105,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     FilePath = filePath,
                     DisplayName = randomIsland?.Name ?? Path.GetFileNameWithoutExtension(filePath),
                     Thumbnail = fixedIsland.Thumbnail,
-                    Region = randomIsland?.IslandRegion ?? Region.DetectFromPath(filePath),
+                    Region = randomIsland?.IslandRegion ?? RegionAsset.DetectFromPath(filePath),
                     IslandDifficulty = randomIsland?.IslandDifficulty ?? new[] { IslandDifficulty.Normal },
                     IslandType = randomIsland?.IslandType ?? new[] { DetectIslandTypeFromPath(filePath) },
                     IslandSize = new[] { islandSize },

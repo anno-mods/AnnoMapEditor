@@ -16,7 +16,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         public BitmapImage? Thumbnail { get; init; }
 
-        public Region Region { get; init; }
+        public RegionAsset Region { get; init; }
 
         public IEnumerable<IslandDifficulty> IslandDifficulty { get; init; }
 

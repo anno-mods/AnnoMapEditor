@@ -265,7 +265,7 @@ namespace AnnoMapEditor.MapTemplates.Models
                 FilePath = islandFilePath,
                 DisplayName = System.IO.Path.GetFileNameWithoutExtension(islandFilePath),
                 Thumbnail = null,
-                Region = Region.DetectFromPath(islandFilePath),
+                Region = RegionAsset.DetectFromPath(islandFilePath),
                 IslandDifficulty =  new[] { islandDifficulty },
                 IslandType = new[] { IslandRepository.DetectIslandTypeFromPath(islandFilePath) },
                 IslandSize = new[] { islandSize },

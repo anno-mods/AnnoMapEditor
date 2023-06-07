@@ -1,4 +1,5 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.UI.Controls.Fertilities;
 using AnnoMapEditor.UI.Controls.Slots;
@@ -23,7 +24,7 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         public SlotsViewModel SlotsViewModel { get; init; }
 
 
-        public FixedIslandPropertiesViewModel(FixedIslandElement fixedIsland, Region region)
+        public FixedIslandPropertiesViewModel(FixedIslandElement fixedIsland, RegionAsset region)
         {
             FixedIsland = fixedIsland;
             FertilitiesViewModel = new(fixedIsland, region);

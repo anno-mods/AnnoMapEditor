@@ -1,8 +1,7 @@
 ﻿using AnnoMapEditor.DataArchives;
-using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
-using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.UI.Controls;
 using AnnoMapEditor.UI.Controls.IslandProperties;
 using AnnoMapEditor.UI.Controls.MapTemplates;
@@ -71,7 +70,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 else if (value is FixedIslandElement fixedIsland)
                 {
                     SelectedRandomIslandPropertiesViewModel = null;
-                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland, MapTemplate!.Region);
+                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland, MapTemplate!.Session.Region);
                 }
             }
         }
@@ -175,7 +174,7 @@ namespace AnnoMapEditor.UI.Windows.Main
 
             MapTemplateFilePath = null;
 
-            MapTemplate = new MapTemplate(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, Region.Moderate);
+            MapTemplate = new MapTemplate(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, SessionAsset.OldWorld);
 
             UpdateExportStatus();
         }
@@ -207,13 +206,12 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
             else if (Settings.IsValidDataPath)
             {
-                bool supportedFormat = Mod.CanSave(MapTemplate);
                 bool archiveReady = Settings.DataArchive is RdaDataArchive;
 
                 ExportStatus = new ExportStatus()
                 {
-                    CanExportAsMod = archiveReady && supportedFormat,
-                    ExportAsModText = archiveReady ? supportedFormat ? "As playable mod..." : "As mod: only works with Old World maps currently" : "As mod: set game path to save"
+                    CanExportAsMod = archiveReady,
+                    ExportAsModText = archiveReady ? "As playable mod..." : "As mod: set game path to save"
                 };
             }
             else

@@ -1,4 +1,4 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.Mods.Enums;
@@ -46,9 +46,11 @@ namespace AnnoMapEditor.Mods.Models
 
         public async Task<bool> Save(string modPath, string modName, string? modID)
         {
+            throw new NotImplementedException($"Mod export is currently broken!");
+
             string fullModName = "[Map] " + modName;
 
-            List<string> sizes = MapTemplate.Region.GetAllSizeCombinations().ToList();
+            List<string> sizes = new List<string>(); // MapTemplate.Session.GetAllSizeCombinations().ToList();
             string size = sizes[0];
 
             try
@@ -59,9 +61,6 @@ namespace AnnoMapEditor.Mods.Models
                 if (mapTypeFileName is null || mapTypeGuid is null)
                     throw new Exception("invalid MapType");
 
-                if(!MapTemplate.Region.AllowModding)
-                    throw new Exception("not supported map region");
-
                 FileUtils.TryDeleteDirectory(modPath);
                 Directory.CreateDirectory(modPath);
 
@@ -70,23 +69,24 @@ namespace AnnoMapEditor.Mods.Models
                     await WriteLanguageXml(modPath, modName, mapTypeGuid);
 
                 // write meta JSON, assets XML, .a7tinfo, .a7t and .a7te
-                string mapFilePath = Path.Combine(AME_POOL_PATH, MapTemplate.Region.PoolFolderName, mapTypeFileName);
+                string poolFolderName = Regex.Replace(MapTemplate.Session.DisplayName, @"\s+", "_");
+                string mapFilePath = Path.Combine(AME_POOL_PATH, poolFolderName, mapTypeFileName);
                 string a7tBasePath = Path.Combine(modPath, $"{mapFilePath}");
                 string a7tInfoPath = a7tBasePath + $"_{size}.a7tinfo";
                 string a7tPath     = a7tBasePath + $"_{size}.a7t";
                 string a7tePath    = a7tBasePath + $"_{size}.a7te";
 
                 await WriteMetaJson(modPath, modName, modID);
-                await WriteAssetsXml(modPath, fullModName, mapFilePath, MapTemplate.Region, MapType);
+                await WriteAssetsXml(modPath, mapFilePath, MapTemplate.Session.Region, MapType);
 
                 MapTemplateWriter mapTemplateWriter = new();
                 await mapTemplateWriter.ToA7tinfoAsync(MapTemplate, a7tBasePath + $"_{size}.a7tinfo");
 
                 (int x, int y, int size) playableArea = (MapTemplate.PlayableArea.X, MapTemplate.PlayableArea.Y, MapTemplate.PlayableArea.Width);
-                await Task.Run(() => new A7tExporter(MapTemplate.Size.X, playableArea, MapTemplate.Region).ExportA7T(a7tPath));
+                await Task.Run(() => new A7tExporter(MapTemplate.Size.X, playableArea, MapTemplate.Session.Region).ExportA7T(a7tPath));
                 await Task.Run(() => new A7teExporter(MapTemplate.Size.X).ExportA7te(a7tePath));
 
-                if (MapTemplate.Region.HasMapExtension)
+                if (MapTemplate.Session == SessionAsset.NewWorld)
                 {
                     File.Copy(a7tInfoPath, a7tBasePath + $"_{size}_enlarged.a7tinfo");
                     File.Copy(a7tPath,     a7tBasePath + $"_{size}_enlarged.a7t");
@@ -102,7 +102,7 @@ namespace AnnoMapEditor.Mods.Models
                     File.Copy(a7tPath,     a7tBasePath + $"_{size}.a7t");
                     File.Copy(a7tePath,    a7tBasePath + $"_{size}.a7te");
 
-                    if (MapTemplate.Region.HasMapExtension)
+                    if (MapTemplate.Session == SessionAsset.NewWorld)
                     {
                         File.Copy(a7tInfoPath, a7tBasePath + $"_{size}_enlarged.a7tinfo");
                         File.Copy(a7tPath,     a7tBasePath + $"_{size}_enlarged.a7t");
@@ -122,15 +122,6 @@ namespace AnnoMapEditor.Mods.Models
             }
 
             return true;
-        }
-
-
-        public static bool CanSave(MapTemplate? mapTemplate)
-        {
-            if (mapTemplate is null)
-                return false;
-
-            return mapTemplate.Region.AllowModding;
         }
 
         private static async Task WriteMetaJson(string modPath, string modName, string? modID)
@@ -192,7 +183,7 @@ namespace AnnoMapEditor.Mods.Models
             }
         }
 
-        private static async Task WriteAssetsXml(string modPath, string fullModName, string mapFilePath, Region region, MapType mapType)
+        private static async Task WriteAssetsXml(string modPath, string mapFilePath, RegionAsset region, MapType mapType)
         {
             string assetsXmlPath = Path.Combine(modPath, @"data\config\export\main\asset\assets.xml");
             string? assetsXmlDir = Path.GetDirectoryName(assetsXmlPath);
@@ -205,51 +196,53 @@ namespace AnnoMapEditor.Mods.Models
             await writer.WriteAsync(content);
         }
 
-        public static string CreateAssetsModOps(Region region, MapType mapType, string fullMapPath)
+        public static string CreateAssetsModOps(RegionAsset region, MapType mapType, string fullMapPath)
         {
-            IEnumerable<string> sizes = region.MapSizes;
-            // some maps have updates sizes, but make sure to only replace one
-            IEnumerable<string> subSizes = region.MapSizeIndices;
+            throw new NotImplementedException($"Mod export is currently broken!");
 
-            static string MakeXPath(string mapTypeName, string size, string subsize)
-            {
-                if (string.IsNullOrEmpty(subsize))
-                    return $"../Standard/Name='{mapTypeName}{size}'";
-                else
-                    return $"../Standard/Name='{mapTypeName}{size}_{subsize}'";
-            }
-            
-            string content = "<ModOps>\n";
-
-            if (region.UsesAllSizeIndices)
-            {
-                //Single ModOp for all Sub-Sizes
-                foreach (var size in sizes)
-                {
-                    foreach(var subsize in subSizes)
-                    {
-                        content += CreateModOp(
-                            new string[] { MakeXPath(mapType.ToName(), size, subsize) },
-                            fullMapPath,
-                            $"{size}_{subsize}",
-                            region.HasMapExtension);
-                    }
-                }
-            }
-            else
-            {
-                //XPath OR
-                foreach (var size in sizes)
-                {
-                    var xpaths = subSizes.Select(x => MakeXPath(mapType.ToName(), size, x));
-
-                    content += CreateModOp(xpaths, fullMapPath, size, region.HasMapExtension);
-                }
-            }
-
-            
-            content += "</ModOps>\n";
-            return content;
+//            IEnumerable<string> sizes = region.MapSizes;
+//            // some maps have updates sizes, but make sure to only replace one
+//            IEnumerable<string> subSizes = region.MapSizeIndices;
+//
+//            static string MakeXPath(string mapTypeName, string size, string subsize)
+//            {
+//                if (string.IsNullOrEmpty(subsize))
+//                    return $"../Standard/Name='{mapTypeName}{size}'";
+//                else
+//                    return $"../Standard/Name='{mapTypeName}{size}_{subsize}'";
+//            }
+//            
+//            string content = "<ModOps>\n";
+//
+//            if (region.UsesAllSizeIndices)
+//            {
+//                //Single ModOp for all Sub-Sizes
+//                foreach (var size in sizes)
+//                {
+//                    foreach(var subsize in subSizes)
+//                    {
+//                        content += CreateModOp(
+//                            new string[] { MakeXPath(mapType.ToName(), size, subsize) },
+//                            fullMapPath,
+//                            $"{size}_{subsize}",
+//                            region.HasMapExtension);
+//                    }
+//                }
+//            }
+//            else
+//            {
+//                //XPath OR
+//                foreach (var size in sizes)
+//                {
+//                    var xpaths = subSizes.Select(x => MakeXPath(mapType.ToName(), size, x));
+//
+//                    content += CreateModOp(xpaths, fullMapPath, size, region.HasMapExtension);
+//                }
+//            }
+//
+//            
+//            content += "</ModOps>\n";
+//            return content;
         }
 
         private static string CreateModOp(IEnumerable<string> xPaths, string basePath, string size, bool extension)

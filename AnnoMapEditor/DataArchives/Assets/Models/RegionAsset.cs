@@ -61,7 +61,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public IEnumerable<long> AllowedFertilityGuids { get; init; }
 
         [GuidReference(nameof(AllowedFertilityGuids))]
-        public IEnumerable<FertilityAsset> AllowedFertilities { get; init; }
+        public ICollection<FertilityAsset> AllowedFertilities { get; init; }
 
 
         public RegionAsset(XElement valuesXml)
@@ -89,5 +89,21 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 .ToArray()
                 ?? Array.Empty<long>();
         }
+
+
+        public static RegionAsset DetectFromPath(string filePath)
+        {
+            if (filePath.Contains("colony01") || filePath.Contains("ggj") || filePath.Contains("scenario03"))
+                return SouthAmerica;
+            else if (filePath.Contains("dlc03") || filePath.Contains("colony_03"))
+                return Arctic;
+            else if (filePath.Contains("dlc06") || filePath.Contains("colony02") || filePath.Contains("scenario02"))
+                return Africa;
+            else
+                return Moderate;
+        }
+
+
+        public override string ToString() => DisplayName;
     }
 }

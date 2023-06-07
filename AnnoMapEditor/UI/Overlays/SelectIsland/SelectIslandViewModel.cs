@@ -27,11 +27,11 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
         }
         private string? _pathFilter;
 
-        public IEnumerable<Region?> Regions { get; init; } = Region.All;
+        public IEnumerable<RegionAsset?> Regions { get; init; } = RegionAsset.SupportedRegions;
 
-        private readonly Region _initialRegion;
+        private readonly RegionAsset _initialRegion;
 
-        public Region? SelectedRegion
+        public RegionAsset? SelectedRegion
         {
             get => _selectedRegion;
             set
@@ -42,7 +42,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
                 ShowRegionWarning = _selectedRegion != _initialRegion;
             }
         }
-        private Region? _selectedRegion;
+        private RegionAsset? _selectedRegion;
 
         public IEnumerable<IslandType?> IslandTypes { get; init; } = IslandType.All;
 
@@ -106,7 +106,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
         private bool _showRegionWarning = false;
 
 
-        public SelectIslandViewModel(Region region, IslandType? islandType = null, IslandSize? islandSize = null)
+        public SelectIslandViewModel(RegionAsset region, IslandType? islandType = null, IslandSize? islandSize = null)
         {
             SelectedRegion = _initialRegion = region;
             SelectedIslandType = islandType;

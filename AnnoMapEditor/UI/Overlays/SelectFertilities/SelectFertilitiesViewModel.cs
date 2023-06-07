@@ -1,9 +1,7 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
-using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -27,11 +25,11 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
         }
         private string? _nameFilter;
 
-        public IEnumerable<Region?> Regions { get; init; } = Region.All;
+        public IEnumerable<RegionAsset?> Regions { get; init; } = RegionAsset.SupportedRegions;
 
-        private readonly Region _initialRegion;
+        private readonly RegionAsset _initialRegion;
 
-        public Region SelectedRegion
+        public RegionAsset SelectedRegion
         {
             get => _selectedRegion;
             set
@@ -42,7 +40,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
                 ShowRegionWarning = _selectedRegion != _initialRegion;
             }
         }
-        private Region _selectedRegion;
+        private RegionAsset _selectedRegion;
 
         public bool ShowRegionWarning
         {
@@ -54,7 +52,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
         public ObservableCollection<SelectFertilityItem> FertilityItems { get; init; }
 
 
-        public SelectFertilitiesViewModel(Region region, FixedIslandElement fixedIsland)
+        public SelectFertilitiesViewModel(RegionAsset region, FixedIslandElement fixedIsland)
         {
             // TODO: Should this happen here?
             AssetRepository assetRepository = Settings.Instance.AssetRepository!;
@@ -102,17 +100,10 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
 
             FertilityAsset fertilityAsset = fertilityItem.FertilityAsset;
 
-            if (SelectedRegion != null)
-            {
-                // TODO: Should this happen here?
-                AssetRepository assetRepository = Settings.Instance.AssetRepository!;
-                RegionAsset regionAsset = assetRepository.Get<RegionAsset>(SelectedRegion.AssetGuid);
-
-                if (!regionAsset.AllowedFertilities.Contains(fertilityAsset))
-                    return false;
-            }
-
-            if (!string.IsNullOrEmpty(_nameFilter))
+            if (SelectedRegion != null && !SelectedRegion.AllowedFertilities.Contains(fertilityAsset))
+                return false;
+            
+            else if (!string.IsNullOrEmpty(_nameFilter))
             {
                 string filter = _nameFilter.ToLower();
                 if (fertilityAsset.Name?.ToLower().Contains(filter) != true && !fertilityAsset.DisplayName.ToLower().Contains(filter))

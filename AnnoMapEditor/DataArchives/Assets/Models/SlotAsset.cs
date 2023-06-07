@@ -1,5 +1,5 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Deserialization;
-using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.DataArchives.Assets.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +19,22 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public const long RANDOM_OIL_GUID = 100849;
 
 
+        [StaticAsset(RANDOM_MINE_OLD_WORLD_GUID)]
+        public static SlotAsset RandomMineOldWorld { get; private set; }
+
+        [StaticAsset(RANDOM_MINE_NEW_WORLD_GUID)]
+        public static SlotAsset RandomMineNewWorld { get; private set; }
+
+        [StaticAsset(RANDOM_MINE_ARCTIC_GUID)]
+        public static SlotAsset RandomMineArctic { get; private set; }
+
+        [StaticAsset(RANDOM_CLAY_GUID)]
+        public static SlotAsset RandomClay { get; private set; }
+
+        [StaticAsset(RANDOM_OIL_GUID)]
+        public static SlotAsset RandomOil { get; private set; }
+
+
         public string DisplayName { get; init; }
 
         public string? SlotType { get; init; }
@@ -30,15 +46,18 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         [GuidReference(nameof(ReplacementGuids))]
         public ICollection<SlotAsset> ReplacementSlotAssets { get; set; }
 
-        public IEnumerable<Region> AssociatedRegions { get; init; }
+        public IEnumerable<string> AssociatedRegionIds { get; init; }
+
+        [RegionIdReference(nameof(AssociatedRegionIds))]
+        public ICollection<RegionAsset> AssociatedRegions { get; set; }
 
 
         public SlotAsset() : base()
         {
             DisplayName = "";
             ReplacementGuids = Enumerable.Empty<long>();
-            ReplacementSlotAssets = new SlotAsset[0];
-            AssociatedRegions = Enumerable.Empty<Region>();
+            ReplacementSlotAssets = Array.Empty<SlotAsset>();
+            AssociatedRegions = Array.Empty<RegionAsset>();
         }
 
 
@@ -73,13 +92,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
             ReplacementGuids = replacementGuids ?? dlcReplacementGuids ?? Array.Empty<long>();
 
-            AssociatedRegions = valuesXml.Element("Building")?
+            AssociatedRegionIds = valuesXml.Element("Building")?
                 .Element("AssociatedRegions")?
                 .Value?
                 .Split(';')
-                .Select(id => Region.FromRegionId(id))
                 .ToArray()
-                ?? Array.Empty<Region>();
+                ?? Array.Empty<string>();
         }
     }
 }

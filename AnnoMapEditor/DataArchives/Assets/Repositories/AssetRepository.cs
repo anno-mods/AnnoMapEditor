@@ -2,7 +2,6 @@
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -19,16 +18,19 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
     public class AssetRepository : Repository
     {
+        private const string ASSETS_XML_PATH = "data/config/export/main/asset/assets.xml";
+
+
         private static readonly Logger<AssetRepository> _logger = new();
 
-        private const string AssetsXmlPath = "data/config/export/main/asset/assets.xml";
         private const string CachedAssetsXml = "assets.cached.xml";
-
 
         private readonly IDataArchive _dataArchive;
 
         private readonly GuidReferenceResolverFactory _guidReferenceResolverFactory;
-        
+
+        private readonly RegionIdReferenceResolverFactory _regionIdReferenceResolverFactory;
+
         private readonly Dictionary<string, Func<XElement, StandardAsset>> _deserializers = new();
 
         private readonly Dictionary<Type, List<Action<object>>> _referenceResolvers = new();
@@ -42,6 +44,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         {
             _dataArchive = dataArchive;
             _guidReferenceResolverFactory = new(this);
+            _regionIdReferenceResolverFactory = new(this);
         }
 
         private StandardAsset? ConstructAssetFrom(XElement assetElement)
@@ -107,7 +110,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             // load assets.xml
             Stopwatch watch = Stopwatch.StartNew();
 
-            Stream assetsXmlStream = _dataArchive.OpenRead(AssetsXmlPath)
+            Stream assetsXmlStream = _dataArchive.OpenRead(ASSETS_XML_PATH)
                 ?? throw new Exception($"Could not locate assets.xml.");
 
             using var hasher = SHA256.Create();
@@ -229,19 +232,20 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         {
             AssetTemplateAttribute assetTemplateAttribute = typeof(TAsset).GetCustomAttribute<AssetTemplateAttribute>()
                 ?? throw new Exception($"Cannot register type '{typeof(TAsset).FullName}' as an asset model, because it lacks the {nameof(AssetTemplateAttribute)}.");
-            string templateName = assetTemplateAttribute.TemplateName;
-
+            
             // get the deserializer
             ConstructorInfo deserializerConstructor = typeof(TAsset).GetConstructor(new[] { typeof(XElement) })
                 ?? throw new Exception($"Type {typeof(TAsset).FullName} is not a valid asset model. Asset models must have a deserialization constructor.");
             Func<XElement, TAsset> deserializer = (x) => (TAsset)deserializerConstructor.Invoke(new[] { x });
 
-            _deserializers.Add(templateName, deserializer);
+            foreach (string templateName in assetTemplateAttribute.TemplateNames)
+                _deserializers.Add(templateName, deserializer);
 
             // prepare to resolve references
             foreach (PropertyInfo property in typeof(TAsset).GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                Action<object>? resolver = _guidReferenceResolverFactory.CreateResolver<TAsset>(property);
+                Action<object>? resolver = _guidReferenceResolverFactory.CreateResolver<TAsset>(property)
+                    ?? _regionIdReferenceResolverFactory.CreateResolver<TAsset>(property);
 
                 // keep track of all resolvers
                 if (resolver != null)

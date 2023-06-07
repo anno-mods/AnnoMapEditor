@@ -5,12 +5,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Deserialization
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class AssetTemplateAttribute : Attribute
     {
-        public string TemplateName { get; init; }
+        public string[] TemplateNames { get; init; }
 
 
-        public AssetTemplateAttribute(string templateName)
+        public AssetTemplateAttribute(params string[] templateNames)
         {
-            TemplateName = templateName;
+            TemplateNames = templateNames;
         }
     }
 }
