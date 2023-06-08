@@ -188,9 +188,9 @@ namespace AnnoMapEditor.UI.Windows.Main
             MapTemplateWriter mapTemplateWriter = new();
 
             if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
-                await mapTemplateWriter.ToA7tinfoAsync(MapTemplate, filePath);
+                await mapTemplateWriter.WriteA7tinfoAsync(MapTemplate, filePath);
             else
-                await mapTemplateWriter.ToXmlAsync(MapTemplate, filePath);
+                await mapTemplateWriter.WriteXmlAsync(MapTemplate, filePath);
         }
 
         private void UpdateExportStatus()

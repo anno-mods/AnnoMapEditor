@@ -29,7 +29,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public static SessionAsset NewWorld { get; private set; }
 
         [StaticAsset(SESSION_SUNKENTREASURES_GUID)]
-        public static SessionAsset SunkenTreasures { get; private set; }
+        public static SessionAsset CapeTrelawney { get; private set; }
 
         [StaticAsset(SESSION_ARCTIC_GUID)]
         public static SessionAsset Arctic { get; private set; }
@@ -37,7 +37,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         [StaticAsset(SESSION_ENBESA_GUID)]
         public static SessionAsset Enbesa { get; private set; }
 
-        public static IEnumerable<SessionAsset> SupportedSessions => new[] { OldWorld, NewWorld, SunkenTreasures, Arctic, Enbesa };
+        public static IEnumerable<SessionAsset> SupportedSessions => new[] { OldWorld, NewWorld, CapeTrelawney, Arctic, Enbesa };
 
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
             else if (filePath.Contains("dlc06") || filePath.Contains("colony02") || filePath.Contains("scenario02"))
                 return Enbesa;
             else if (filePath.Contains("sunken_treasures"))
-                return SunkenTreasures;
+                return CapeTrelawney;
             else
                 return OldWorld;
         }

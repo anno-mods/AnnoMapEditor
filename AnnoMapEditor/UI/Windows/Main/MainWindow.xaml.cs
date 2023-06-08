@@ -172,10 +172,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             if (ViewModel.MapTemplate is null)
                 return;
 
-            OverlayService.Instance.Show(new ExportAsModViewModel()
-            {
-                MapTemplate = ViewModel.MapTemplate
-            });
+            OverlayService.Instance.Show(new ExportAsModViewModel(ViewModel.MapTemplate));
         }
 
         private void NewMapFile_Click(object sender, RoutedEventArgs e)

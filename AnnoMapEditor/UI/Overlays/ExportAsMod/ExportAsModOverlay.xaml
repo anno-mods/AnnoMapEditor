@@ -33,6 +33,7 @@
                     <LineBreak />
                     <Run>Works only with new save games.</Run>
             </TextBlock>
+            
             <Grid HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -42,28 +43,49 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Replace:" />
-                <ComboBox Grid.Row="0" Grid.Column="1" IsReadOnly="True"
-                              ItemsSource="{Binding AllowedMapTypes}"
-                              SelectedItem="{Binding SelectedMapType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Mod Name:" />
-                <controls:HintTextBox Grid.Row="1" Grid.Column="1"
+
+                <!-- session -->
+                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Session:" />
+                <StackPanel Grid.Row="0" Grid.Column="1"
+                            Orientation="Horizontal">
+                    <Image Source="{Binding MapTemplate.Session.Icon}"
+                           MaxHeight="20" />
+                    <TextBlock Text="{Binding MapTemplate.Session.DisplayName}"
+                               Style="{StaticResource DefaultLabelStyle}"
+                               Margin="8 2 0 0" />
+                </StackPanel>
+
+                <!-- map type -->
+                <TextBlock Visibility="{Binding ShowMapTypeSelection, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"
+                           Grid.Row="1" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Replace:" />
+                <ComboBox Visibility="{Binding ShowMapTypeSelection, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"
+                          Grid.Row="1" Grid.Column="1" IsReadOnly="True"
+                          ItemsSource="{Binding AllowedMapTypes}"
+                          SelectedItem="{Binding SelectedMapType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- mod Name -->
+                <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Mod Name:" />
+                <controls:HintTextBox Grid.Row="2" Grid.Column="1"
                                           x:Name="nameInput"
                                           Label="[Map] " Hint="enter mod name"
                                           Text="{Binding ModName, UpdateSourceTrigger=PropertyChanged}"
                                           PreviewTextInput="HintTextBox_PreviewTextInput"
                                           DataObject.Pasting="HintTextBox_Pasting"
                                           MaxTextWidth="50" />
+
+                <!-- mod id -->
                 <!--<TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Mod ID:" />
                     <controls:HintTextBox Grid.Row="2" Grid.Column="1" Hint="leave empty to auto generate" Text="{Binding ModID, UpdateSourceTrigger=PropertyChanged}" />-->
             </Grid>
+            
             <emoji:TextBlock Grid.Row="1" Grid.Column="1" 
                                  Text="{Binding ModExistsWarning, UpdateSourceTrigger=PropertyChanged}" 
                                  HorizontalAlignment="Right" />
 
             <!-- Informational Messages -->
-            <StackPanel Visibility="{Binding InfoMapTypeSelection, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel Visibility="{Binding ShowMapTypeSelection, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
                 <TextBlock Style="{StaticResource MutedLabelStyle}">
                         <Run>Select the following map type in Sandbox mode:</Run>
                 </TextBlock>
@@ -79,10 +101,10 @@
                 </Grid>
             </StackPanel>
             <TextBlock Style="{StaticResource MutedLabelStyle}" TextWrapping="Wrap" 
-                           Visibility="{Binding InfoMapTypeSelection, Mode=OneWay, Converter={StaticResource InvertedBoolToVisibility}}">
-                    <Run>The map mod will automatically apply to the selected region.</Run>
+                           Visibility="{Binding ShowMapTypeSelection, Mode=OneWay, Converter={StaticResource InvertedBoolToVisibility}}">
+                    <Run>The map mod will automatically apply to the selected session.</Run>
                     <LineBreak/>
-                    <Run>Please make sure that only one Map Mod per non-moderate Region is active.</Run>
+                    <Run>Please make sure that at most one Map Mod per session is active.</Run>
             </TextBlock>
 
             <Grid Margin="0,16,0,0">
