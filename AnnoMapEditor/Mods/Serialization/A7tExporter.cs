@@ -14,12 +14,12 @@ namespace AnnoMapEditor.Mods.Serialization
     {
         private readonly int _mapSize;
 
-        private readonly int _playableArea;
+        private readonly (int x, int y, int size) _playableArea;
 
         private readonly Region _mapRegion;
 
 
-        public A7tExporter(int mapSize, int playableArea, Region mapRegion)
+        public A7tExporter(int mapSize, (int x, int y, int size) playableArea, Region mapRegion)
         {
             _mapSize = mapSize;
             _playableArea = playableArea;
