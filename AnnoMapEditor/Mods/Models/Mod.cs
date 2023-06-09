@@ -82,7 +82,9 @@ namespace AnnoMapEditor.Mods.Models
                 MapTemplateWriter mapTemplateWriter = new();
                 await mapTemplateWriter.ToA7tinfoAsync(MapTemplate, a7tBasePath + $"_{size}.a7tinfo");
 
-                await Task.Run(() => new A7tExporter(MapTemplate.Size.X, MapTemplate.PlayableArea.Width, MapTemplate.Region).ExportA7T(a7tPath));
+                (int x, int y, int size) playableArea = (MapTemplate.PlayableArea.X, MapTemplate.PlayableArea.Y, MapTemplate.PlayableArea.Width);
+                await Task.Run(() => new A7tExporter(MapTemplate.Size.X, playableArea, MapTemplate.Region).ExportA7T(a7tPath));
+
                 await Task.Run(() => new A7teExporter(MapTemplate.Size.X).ExportA7te(a7tePath));
 
                 if (MapTemplate.Region.HasMapExtension)
