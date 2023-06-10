@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -31,105 +32,125 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         public FixedIslandRepository(IDataArchive dataArchive)
         {
             _dataArchive = dataArchive;
-
             LoadAsync();
         }
 
 
-        protected override Task DoLoad()
+        protected override async Task DoLoad()
         {
             _logger.LogInformation($"Begin loading fixed islands.");
+            Stopwatch watch = Stopwatch.StartNew();
 
-            foreach (string mapFilePath in _dataArchive.Find("*.a7m"))
+            var mapFilePaths = _dataArchive.Find("*.a7m");
+
+            var tasks = mapFilePaths.Select(mapFilePath => 
             {
-                // thumbnail
-                string thumbnailPath = Path.Combine(
-                    Path.GetDirectoryName(mapFilePath)!,
-                    "_gamedata",
-                    Path.GetFileNameWithoutExtension(mapFilePath),
-                    "mapimage.png");
-                BitmapImage thumbnail = _dataArchive.TryLoadPng(thumbnailPath)
-                    ?? throw new Exception($"Could not load island thumbnail '{thumbnailPath}'.");
+                return Task.Run(() => LoadIslandAsset(mapFilePath));
+            });
 
-                // open a7minfo
-                string infoFilePath = mapFilePath + "info";
+            var islandAssets = await Task.WhenAll(tasks);
 
-                IFileDBDocument infoDoc = ReadFileDB(infoFilePath)
-                    ?? throw new Exception($"Could not load a7minfo '{infoFilePath}'.");
-
-                FileDBDocumentDeserializer<IslandTemplateDocument> deserializer = new(
-                    new FileDBSerializerOptions() { IgnoreMissingProperties = true }
-                );
-                IslandTemplateDocument islandTemplate = deserializer.GetObjectStructureFromFileDBDocument(infoDoc) 
-                    ?? throw new Exception($"Could not interpret a7minfo '{infoFilePath}'.");
-
-                // get the island's size in tiles
-                int sizeInTiles = islandTemplate.MapSize?[0] ?? IslandSize.Default.DefaultSizeInTiles;
-
-                // get slots
-                // The list of slots is found at <ObjectMetaInfo><SlotObjects> within the
-                // a7mfile. It has two kinds of elements.
-                //
-                // First there are lists with a single item of the following form. They denote the
-                // slot group the following slots belong to.
-                //   <None>
-                //     <value>
-                //       <id>{byte[2]}</id>
-                //     </value>
-                //   </None>.
-                //
-                // The actual lists of slots look like this:
-                //   <None>
-                //     <None>
-                //       <ObjectId>{long}</ObjectId>
-                //       <ObjectGuid>{long}</ObjectGuid>
-                //       <Position>{float[3]}</Position>
-                //     <None>
-                //   <None>
-                Dictionary<long, Slot> mineSlots = new();
-                if(islandTemplate.ObjectMetaInfo?.SlotObjects is not null)
-                {
-                    foreach ((ShortIdValueWrapper id, List<ObjectItem> items) in islandTemplate.ObjectMetaInfo.SlotObjects)
-                    {
-                        short slotGroupId = id?.value?.id ?? 0;
-                        foreach (ObjectItem item in items)
-                        {
-                            if (item?.ObjectId is null || item?.ObjectGuid is null || 
-                                item?.Position is null || item?.Position.Length != 3)
-                                continue;
-
-                            long index = item.ObjectId.Value;
-
-                            Slot mineSlot = new()
-                            {
-                                GroupId = slotGroupId,
-                                ObjectId = index,
-                                ObjectGuid = item.ObjectGuid.Value,
-                                //Position is stored as xyz, and we need x and z
-                                Position = new((int)item.Position[0], (int)item.Position[2])
-                            };
-
-                            mineSlots.Add(index, mineSlot);
-                        }
-                    }
-                }
-
-                FixedIslandAsset fixedIsland = new()
-                {
-                    FilePath = mapFilePath,
-                    SizeInTiles = sizeInTiles,
-                    Thumbnail = thumbnail,
-                    Slots = mineSlots
-                };
-
-                Add(fixedIsland);
+            foreach (var islandAsset in islandAssets)
+            {
+                _islands.Add(islandAsset);
             }
 
-            _logger.LogInformation($"Finished loading fixed islands. Loaded {_islands.Count} islands.");
-
-            return Task.CompletedTask;
+            watch.Stop();
+            _logger.LogInformation($"Finished loading fixed islands. Loaded {_islands.Count} islands in {watch.Elapsed.TotalMilliseconds} ms.");
         }
 
+        public FixedIslandAsset LoadIslandAsset(String mapFilePath)
+        {
+            // thumbnail
+            string thumbnailPath = Path.Combine(
+                Path.GetDirectoryName(mapFilePath)!,
+                "_gamedata",
+                Path.GetFileNameWithoutExtension(mapFilePath),
+                "mapimage.png");
+            BitmapImage thumbnail = _dataArchive.TryLoadPng(thumbnailPath)
+                ?? throw new Exception($"Could not load island thumbnail '{thumbnailPath}'.");
+
+            // open a7minfo
+            string infoFilePath = mapFilePath + "info";
+
+            IslandTemplateDocument? islandTemplate;
+            try
+            {
+                using (var datastream = _dataArchive.OpenRead(infoFilePath))
+                using (var memoryAccStream = new MemoryStream())
+                {
+                    if (datastream is null)
+                        throw new Exception($"Could not load a7minfo '{infoFilePath}'.");
+                    datastream.CopyTo(memoryAccStream);
+                    memoryAccStream.Seek(0, SeekOrigin.Begin);
+                    islandTemplate = FileDBConvert.DeserializeObject<IslandTemplateDocument>(memoryAccStream, new FileDBSerializerOptions() { IgnoreMissingProperties = true });
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Could not load a7minfo '{infoFilePath}'.");
+            }
+
+            // get the island's size in tiles
+            int sizeInTiles = islandTemplate?.MapSize?[0] ?? IslandSize.Default.DefaultSizeInTiles;
+
+            // get slots
+            // The list of slots is found at <ObjectMetaInfo><SlotObjects> within the
+            // a7mfile. It has two kinds of elements.
+            //
+            // First there are lists with a single item of the following form. They denote the
+            // slot group the following slots belong to.
+            //   <None>
+            //     <value>
+            //       <id>{byte[2]}</id>
+            //     </value>
+            //   </None>.
+            //
+            // The actual lists of slots look like this:
+            //   <None>
+            //     <None>
+            //       <ObjectId>{long}</ObjectId>
+            //       <ObjectGuid>{long}</ObjectGuid>
+            //       <Position>{float[3]}</Position>
+            //     <None>
+            //   <None>
+            Dictionary<long, Slot> mineSlots = new();
+            if (islandTemplate.ObjectMetaInfo?.SlotObjects is not null)
+            {
+                foreach ((ShortIdValueWrapper id, List<ObjectItem> items) in islandTemplate.ObjectMetaInfo.SlotObjects)
+                {
+                    short slotGroupId = id?.value?.id ?? 0;
+                    foreach (ObjectItem item in items)
+                    {
+                        if (item?.ObjectId is null || item?.ObjectGuid is null ||
+                            item?.Position is null || item?.Position.Length != 3)
+                            continue;
+
+                        long index = item.ObjectId.Value;
+
+                        Slot mineSlot = new()
+                        {
+                            GroupId = slotGroupId,
+                            ObjectId = index,
+                            ObjectGuid = item.ObjectGuid.Value,
+                            //Position is stored as xyz, and we need x and z
+                            Position = new((int)item.Position[0], (int)item.Position[2])
+                        };
+
+                        mineSlots.Add(index, mineSlot);
+                    }
+                }
+            }
+
+            FixedIslandAsset fixedIsland = new()
+            {
+                FilePath = mapFilePath,
+                SizeInTiles = sizeInTiles,
+                Thumbnail = thumbnail,
+                Slots = mineSlots
+            };
+            return fixedIsland;
+        }
 
         public void Add(FixedIslandAsset fixedIsland)
         {
