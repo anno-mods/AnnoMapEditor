@@ -4,12 +4,16 @@ using AnnoMapEditor.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
@@ -18,6 +22,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         private static readonly Logger<AssetRepository> _logger = new();
 
         private const string AssetsXmlPath = "data/config/export/main/asset/assets.xml";
+        private const string CachedAssetsXml = "assets.cached.xml";
 
 
         private readonly IDataArchive _dataArchive;
@@ -28,55 +33,126 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         private readonly Dictionary<long, StandardAsset> _assets = new();
 
-
         public AssetRepository(IDataArchive dataArchive)
         {
             _dataArchive = dataArchive;
         }
 
+        private StandardAsset? ConstructAssetFrom(XElement assetElement)
+        {
+            // determine the type of template
+            string? templateName = assetElement.Element("Template")?.Value;
+            StandardAsset? asset = null;
+            // deserialize the asset
+            if (templateName != null && _deserializers.TryGetValue(templateName, out var deserializer))
+            {
+                // deserialize the asset
+                XElement valuesElement = assetElement.Element("Values")!;
 
-        protected override Task DoLoad()
+                try
+                {
+                    asset = deserializer(valuesElement);
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+
+                // load icons
+                if (asset.IconFilename != null)
+                    asset.Icon = _dataArchive.TryLoadIcon(asset.IconFilename);
+            }
+            return asset;
+        }
+
+        private String GetXpath()
+        {
+            StringBuilder builder = new StringBuilder();
+            bool first = true;
+            builder.Append("//Asset[");
+            foreach (var template in _deserializers.Keys)
+            {
+                if (!first)
+                    builder.Append(" or");
+                builder.Append($" Template = '{template}'");
+                first = false; 
+            }
+            builder.Append("]");
+            return builder.ToString(); 
+        }
+
+        private void RenewCache(IEnumerable<XElement> assets)
+        {
+            _logger.LogInformation("Recreating Cache...");
+            XDocument doc = new XDocument();
+            var root = new XElement("DummyRoot");
+            foreach (var asset in assets) 
+            {
+                root.Add(asset);
+            }
+            doc.AddFirst(root);
+            doc.Save(File.Create(CachedAssetsXml));
+        }
+
+        protected override async Task DoLoad()
         {
             _logger.LogInformation($"Loading assets...");
 
             // load assets.xml
-            using Stream assetsXmlStream = _dataArchive.OpenRead(AssetsXmlPath)
+            Stopwatch watch = Stopwatch.StartNew();
+
+            Stream assetsXmlStream = _dataArchive.OpenRead(AssetsXmlPath)
                 ?? throw new Exception($"Could not locate assets.xml.");
-            XDocument assetsXml = XDocument.Load(assetsXmlStream);
 
-            // get all assets
-            List<XElement> assetElements = assetsXml.Descendants("Asset").ToList();
+            using var hasher = SHA256.Create();
+            var hash = hasher.ComputeHash(assetsXmlStream);
+            var hashB64 = Convert.ToBase64String(hash);
+            assetsXmlStream.Seek(0, SeekOrigin.Begin);
+            bool validCache = UserSettings.Default.AssetsHash == hashB64;
+            _logger.LogInformation($"Computed Hash at {watch.Elapsed.TotalMilliseconds} ms");
 
-            foreach (XElement assetElement in assetsXml.Descendants("Asset"))
+            if (validCache)
             {
-                // determine the type of template
-                string? templateName = assetElement.Element("Template")?.Value;
-
-                // deserialize the asset
-                if (templateName != null && _deserializers.TryGetValue(templateName, out var deserializer))
+                try
                 {
-                    // deserialize the asset
-                    XElement valuesElement = assetElement.Element("Values")!;
+                    assetsXmlStream = File.OpenRead(CachedAssetsXml);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError($"Cache inaccessible. Falling back to slow loading: {e.Message}");
+                    validCache = false; 
+                }
+            }
 
-                    StandardAsset asset;
-                    try
-                    {
-                        asset = deserializer(valuesElement);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Could not deserialize asset of template '{templateName}'.", ex);
-                        continue;
-                    }
+            var Xml = XDocument.Load(assetsXmlStream);
+            var xpath = GetXpath();
+            var assets = Xml.XPathSelectElements(xpath);
 
-                    // load icons
-                    if (asset.IconFilename != null)
-                        asset.Icon = _dataArchive.TryLoadIcon(asset.IconFilename);
+            if (!validCache)
+            {
+                UserSettings.Default.AssetsHash = hashB64;
+                UserSettings.Default.Save();
+                assetsXmlStream.Dispose();
+                RenewCache(assets);
+            }
 
+            var convertAssetTasks = assets.Select(assetElement =>
+            {
+                return Task.Run(() => {
+                    return ConstructAssetFrom(assetElement);
+                });
+            });
+            var assetList = await Task.WhenAll(convertAssetTasks);
+
+            foreach (var asset in assetList)
+            {
+                if (asset is not null)
+                {
                     _assets.Add(asset.GUID, asset);
                 }
             }
 
+            _logger.LogInformation($"Finished Deserialising at {watch.Elapsed.TotalMilliseconds} ms");
             _logger.LogInformation($"Resolving asset references...");
 
             // resolve references
@@ -87,8 +163,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                         resolver(asset);
             }
 
-            _logger.LogInformation($"Finished loading {_assets.Count} assets.");
-            return Task.CompletedTask;
+            watch.Stop();
+            _logger.LogInformation($"Finished loading {_assets.Count} assets at {watch.Elapsed.TotalMilliseconds} ms.");
+            assetsXmlStream.Dispose(); 
         }
 
         public TAsset Get<TAsset>(long guid)
