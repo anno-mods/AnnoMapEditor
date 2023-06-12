@@ -1,46 +1,14 @@
-﻿using AnnoMapEditor.Utilities;
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
-    public abstract class Repository : ObservableBase
+    public abstract class Repository
     {
-        private Task? _loadingTask;
-
-        public bool IsLoaded
-        {
-            get => _isLoading;
-            private set => SetProperty(ref _isLoading, value);
-        }
-        private bool _isLoading = false;
-
-
         public Repository()
         {
         }
 
 
-        public Task LoadAsync()
-        {
-            if (_loadingTask != null)
-                throw new InvalidOperationException();
-
-            _loadingTask = Task.Run(async () => {
-                await DoLoad();
-                IsLoaded = true;
-            });
-            return _loadingTask;
-        }
-
-        protected abstract Task DoLoad();
-
-        public async Task AwaitLoadingAsync()
-        {
-            if (_loadingTask != null)
-                await _loadingTask;
-            else
-                throw new Exception($"LoadAsync has not been called.");
-        }
+        public abstract Task Initialize();
     }
 }

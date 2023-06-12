@@ -6,7 +6,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -14,36 +13,24 @@ namespace AnnoMapEditor.DataArchives
 {
     public abstract class DataArchive : ObservableBase, IDataArchive
     {
-        public static readonly IDataArchive Default = new InvalidDataArchive("");
-
-
-        public abstract bool IsValid { get; protected set; }
-
-        public abstract string DataPath { get; }
-
-
-        public static async Task<IDataArchive> OpenAsync(string? dataPath)
-        {
-            if (dataPath is null)
-                return Default;
-
-            IDataArchive archive;
-            if (File.Exists(Path.Combine(dataPath, "data0.rda")))
-            {
-                RdaDataArchive rdaArchive = new RdaDataArchive(dataPath);
-                await rdaArchive.LoadAsync();
-                archive = rdaArchive;
-            }
-            else
-                archive = new FolderDataArchive(dataPath);
-
-            return archive;
-        }
-
-
         public abstract Stream? OpenRead(string path);
 
         public abstract IEnumerable<string> Find(string pattern);
+
+        private static string? AdjustDataPath(string? path)
+        {
+            if (path is null)
+                return null;
+            if (File.Exists(Path.Combine(path, "maindata/data0.rda")))
+                return path;
+            if (File.Exists(Path.Combine(path, "data0.rda")))
+                return Path.GetDirectoryName(path);
+            if (Directory.Exists(Path.Combine(path, "data/dlc01")))
+                return path;
+            if (Directory.Exists(Path.Combine(path, "dlc01")))
+                return Path.GetDirectoryName(path);
+            return null;
+        }
 
         public ImageSource? TryLoadIcon(string iconPath, Point? desiredSize = null)
         {

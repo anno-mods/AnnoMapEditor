@@ -16,13 +16,16 @@ namespace AnnoMapEditor.UI.Windows.Main
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindowViewModel ViewModel { get; } = new MainWindowViewModel(Settings.Instance);
+        private MainWindowViewModel _viewModel => DataContext as MainWindowViewModel
+            ?? throw new Exception();
+
         private readonly string title;
+
 
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = ViewModel;
+            DataContext = _viewModel;
 
             var exePath = Path.Join(AppContext.BaseDirectory, "AnnoMapEditor.exe");
             var productVersion = "";
@@ -37,9 +40,9 @@ namespace AnnoMapEditor.UI.Windows.Main
             title = $"{App.Title} {productVersion}";
             Title = title;
 
-            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+            _viewModel.PropertyChanged += ViewModel_PropertyChanged;
 
-            CreateImportMenu(openMapMenu, ViewModel?.Maps);
+            CreateImportMenu(openMapMenu, _viewModel.Maps!);
         }
 
         private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -47,14 +50,14 @@ namespace AnnoMapEditor.UI.Windows.Main
             switch (e.PropertyName)
             {
                 case nameof(MainWindowViewModel.MapTemplate):
-                    if (ViewModel?.MapTemplate is not null)
-                        Title = $"{title} - {Path.GetFileName(ViewModel.MapTemplateFilePath)}";
+                    if (_viewModel?.MapTemplate is not null)
+                        Title = $"{title} - {Path.GetFileName(_viewModel.MapTemplateFilePath)}";
                     else
                         Title = title;
                     break;
 
                 case nameof(MainWindowViewModel.Maps):
-                    CreateImportMenu(openMapMenu, ViewModel?.Maps);
+                    CreateImportMenu(openMapMenu, _viewModel.Maps!);
                     break;
             }
         }
@@ -68,16 +71,13 @@ namespace AnnoMapEditor.UI.Windows.Main
 
             if (true == picker.ShowDialog())
             {
-                if (!Settings.Instance.IsValidGamePath)
-                {
-                    int end = picker.FileName.IndexOf(@"\data\session");
-                    if (end == -1)
-                        end = picker.FileName.IndexOf(@"\data\dlc");
-                    if (end != -1)
-                        Settings.Instance.GamePath = picker.FileName[..end];
-                }
+                int end = picker.FileName.IndexOf(@"\data\session");
+                if (end == -1)
+                    end = picker.FileName.IndexOf(@"\data\dlc");
+                if (end != -1)
+                    Settings.Instance.GamePath = picker.FileName[..end];
 
-                await ViewModel.OpenMap(picker.FileName);
+                await _viewModel.OpenMap(picker.FileName);
             }
         }
 
@@ -103,7 +103,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             Settings.Instance.GamePath = Settings.GetInstallDirFromRegistry();
         }
 
-        private void CreateImportMenu(ContextMenu parentMenu, List<MapGroup>? mapGroups)
+        private void CreateImportMenu(ContextMenu parentMenu, List<MapGroup> mapGroups)
         {
             parentMenu.Items.Clear();
 
@@ -117,14 +117,8 @@ namespace AnnoMapEditor.UI.Windows.Main
             parentMenu.Items.Add(newFile);
             parentMenu.Items.Add(new Separator());
 
-            if (mapGroups is null || mapGroups.Count == 0)
-            {
-                parentMenu.Items.Add(new MenuItem() {
-                    Header = Settings.Instance.IsLoading ? "(loading RDA...)" : "Set game/RDA path to import",
-                    IsEnabled = false
-                });
-                return;
-            }
+            if (mapGroups.Count == 0)
+                throw new Exception($"Could not locate any maps.");
 
             foreach (var group in mapGroups)
             {
@@ -146,7 +140,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             MapInfo? mapInfo = (sender as MenuItem)?.DataContext as MapInfo;
             if (mapInfo?.FileName is not null)
             {
-                await ViewModel.OpenMap(mapInfo.FileName, true);
+                await _viewModel.OpenMap(mapInfo.FileName, true);
             }
         }
 
@@ -156,28 +150,28 @@ namespace AnnoMapEditor.UI.Windows.Main
             {
                 DefaultExt = ".a7tinfo",
                 Filter = "Map template (*.a7tinfo)|*.a7tinfo|XML map template (*.xml)|*.xml",
-                FilterIndex = Path.GetExtension(ViewModel.MapTemplateFilePath)?.ToLower() == ".xml" ? 2 : 1,
-                FileName = Path.GetFileName(ViewModel.MapTemplateFilePath),
+                FilterIndex = Path.GetExtension(_viewModel.MapTemplateFilePath)?.ToLower() == ".xml" ? 2 : 1,
+                FileName = Path.GetFileName(_viewModel.MapTemplateFilePath),
                 OverwritePrompt = true
             };
 
             if (true == picker.ShowDialog() && picker.FileName is not null)
             {
-                await ViewModel.SaveMap(picker.FileName);
+                await _viewModel.SaveMap(picker.FileName);
             }
         }
 
         private void ExportMod_Click(object sender, RoutedEventArgs e)
         {
-            if (ViewModel.MapTemplate is null)
+            if (_viewModel.MapTemplate is null)
                 return;
 
-            OverlayService.Instance.Show(new ExportAsModViewModel(ViewModel.MapTemplate));
+            OverlayService.Instance.Show(new ExportAsModViewModel(_viewModel.MapTemplate));
         }
 
         private void NewMapFile_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.CreateNewMap();
+            _viewModel.CreateNewMap();
         }
 
         private void Hyperlink_OpenBrowser(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)

@@ -103,7 +103,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             doc.Save(File.Create(CachedAssetsXml));
         }
 
-        protected override async Task DoLoad()
+        public override async Task Initialize()
         {
             _logger.LogInformation($"Loading assets...");
 
@@ -161,7 +161,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 }
             }
 
-            _logger.LogInformation($"Finished Deserialising at {watch.Elapsed.TotalMilliseconds} ms");
+            _logger.LogInformation($"Finished Deserialising at {watch.Elapsed.TotalMilliseconds} ms.");
             _logger.LogInformation($"Resolving asset references...");
 
             // resolve references
