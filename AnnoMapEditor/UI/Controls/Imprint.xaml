@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="AnnoMapEditor.UI.Controls.Imprint"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary Source="../Resources/Styles.xaml" />
+    </UserControl.Resources>
+
+    <TextBlock Style="{StaticResource MutedLabelStyle}"
+                   VerticalAlignment="Bottom"
+                   HorizontalAlignment="Right"
+                   TextAlignment="Right">
+                <Run>The editor is work in progress.</Run>
+                <LineBreak />
+                <Run>Visit GitHub for </Run>
+                <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor#roadmap" RequestNavigate="Hyperlink_OpenBrowser">roadmap</Hyperlink>
+                <Run>and</Run>
+                <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
+    </TextBlock>
+</UserControl>

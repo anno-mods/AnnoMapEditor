@@ -103,19 +103,7 @@
             <Button Click="AutoDetect_Click" HorizontalAlignment="Left"
                         Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}">Auto detect</Button>
         </StackPanel>
-        <TextBlock Grid.Column="2"
-                   Grid.Row="1"
-                   Style="{StaticResource MutedLabelStyle}"
-                   VerticalAlignment="Bottom"
-                   HorizontalAlignment="Right"
-                   TextAlignment="Right">
-                <Run>The editor is work in progress.</Run>
-                <LineBreak />
-                <Run>Visit GitHub for </Run>
-                <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor#roadmap" RequestNavigate="Hyperlink_OpenBrowser">roadmap</Hyperlink>
-                <Run>and</Run>
-                <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
-        </TextBlock>
+        <controls:Imprint Grid.Row="1" Grid.Column="2" />
 
         <!-- Overlays -->
         <overlays:OverlayContainer Grid.ColumnSpan="3"
