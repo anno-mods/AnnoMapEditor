@@ -66,8 +66,8 @@
                     <ContentControl Content="Save" />
                     <controls:DropDownButton.Menu>
                         <ContextMenu>
-                            <MenuItem Header="As map template..." Click="ExportMap_Click"/>
-                            <MenuItem Header="{Binding ExportStatus.ExportAsModText, UpdateSourceTrigger=PropertyChanged}" Click="ExportMod_Click" IsEnabled="{Binding ExportStatus.CanExportAsMod, UpdateSourceTrigger=PropertyChanged}" />
+                            <MenuItem Header="As map template" Click="ExportMap_Click"/>
+                            <MenuItem Header="As playable mod" Click="ExportMod_Click"/>
                         </ContextMenu>
                     </controls:DropDownButton.Menu>
                 </controls:DropDownButton>

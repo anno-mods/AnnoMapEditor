@@ -1,4 +1,5 @@
 ﻿using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates.Serializing;
@@ -34,8 +35,7 @@ namespace AnnoMapEditor.Mods.Serialization
         public ModWriter()
         {
             _mapTemplateWriter = new();
-            _assetRepository = Settings.Instance.AssetRepository
-                ?? throw new Exception($"AssetRepository has not been initialized.");
+            _assetRepository = DataManager.Instance.AssetRepository;
         }
 
 

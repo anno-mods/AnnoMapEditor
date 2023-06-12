@@ -1,4 +1,5 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Models;
+﻿using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
@@ -55,7 +56,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
         public SelectFertilitiesViewModel(RegionAsset region, FixedIslandElement fixedIsland)
         {
             // TODO: Should this happen here?
-            AssetRepository assetRepository = Settings.Instance.AssetRepository!;
+            AssetRepository assetRepository = DataManager.Instance.AssetRepository;
             FertilityItems = new(assetRepository.GetAll<RegionAsset>()
                 .SelectMany(r => r.AllowedFertilities)
                 .Distinct()

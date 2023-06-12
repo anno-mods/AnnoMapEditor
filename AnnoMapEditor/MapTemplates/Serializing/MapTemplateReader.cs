@@ -1,4 +1,5 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.Utilities;
 using System;
@@ -13,7 +14,7 @@ namespace AnnoMapEditor.MapTemplates.Serializing
         public async Task<MapTemplate> FromDataArchiveAsync(string a7tinfoPath)
         {
             SessionAsset session = SessionAsset.DetectFromPath(a7tinfoPath);
-            Stream a7tinfoStream = Settings.Instance!.DataArchive.OpenRead(a7tinfoPath)
+            Stream a7tinfoStream = DataManager.Instance.DataArchive.OpenRead(a7tinfoPath)
                 ?? throw new FileNotFoundException($"Could not find file \"{a7tinfoPath}\" in DataArchive.");
 
             return await FromBinaryStreamAsync(session, a7tinfoStream);

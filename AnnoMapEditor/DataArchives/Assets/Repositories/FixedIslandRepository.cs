@@ -32,11 +32,10 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         public FixedIslandRepository(IDataArchive dataArchive)
         {
             _dataArchive = dataArchive;
-            LoadAsync();
         }
 
 
-        protected override async Task DoLoad()
+        public override async Task Initialize()
         {
             _logger.LogInformation($"Begin loading fixed islands.");
             Stopwatch watch = Stopwatch.StartNew();
@@ -88,7 +87,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             }
             catch (Exception e)
             {
-                throw new Exception($"Could not load a7minfo '{infoFilePath}'.");
+                throw new Exception($"Could not load a7minfo '{infoFilePath}'.", e);
             }
 
             // get the island's size in tiles
@@ -142,14 +141,13 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 }
             }
 
-            FixedIslandAsset fixedIsland = new()
+            return new()
             {
                 FilePath = mapFilePath,
                 SizeInTiles = sizeInTiles,
                 Thumbnail = thumbnail,
                 Slots = mineSlots
             };
-            return fixedIsland;
         }
 
         public void Add(FixedIslandAsset fixedIsland)
@@ -171,19 +169,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 #pragma warning disable CS8762 // Parameter must have a non-null value when exiting in some condition.
             return fixedIslandAsset != null;
 #pragma warning restore CS8762 // Parameter must have a non-null value when exiting in some condition.
-        }
-
-
-        private int ReadSizeInTiles(string mapFilePath)
-        {
-            string infoFilePath = mapFilePath + "info";
-            
-            IFileDBDocument? infoDoc = ReadFileDB(infoFilePath);
-            if (infoDoc?.Roots.FirstOrDefault(x => x.Name == "MapSize" && x.NodeType == FileDBNodeType.Attrib) is not Attrib mapSize)
-                return 0;
-
-            int sizeInTiles = BitConverter.ToInt32(new ReadOnlySpan<byte>(mapSize.Content, 0, 4));
-            return sizeInTiles;
         }
 
         public IFileDBDocument? ReadFileDB(string mapFilePath)
@@ -208,31 +193,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 _logger.LogError($"Could not read FileDB from '{mapFilePath}'.", ex);
                 return null;
             }
-        }
-
-        private BitmapImage? ReadThumbnail(string mapFilePath)
-        {
-            string thumbnailPath = Path.Combine(
-                Path.GetDirectoryName(mapFilePath)!,
-                "_gamedata",
-                Path.GetFileNameWithoutExtension(mapFilePath),
-                "mapimage.png");
-
-            using Stream? stream = _dataArchive?.OpenRead(thumbnailPath);
-            if (stream == null)
-            {
-                _logger.LogWarning($"Could not load island thumbnail from '{mapFilePath}'. The file could not be found.");
-                return null;
-            }
-
-            BitmapImage thumbnail = new();
-            thumbnail.BeginInit();
-            thumbnail.StreamSource = stream;
-            thumbnail.CacheOption = BitmapCacheOption.OnLoad;
-            thumbnail.EndInit();
-            thumbnail.Freeze();
-
-            return thumbnail;
         }
 
 

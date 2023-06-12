@@ -1,4 +1,5 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Models;
+﻿using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.Utilities;
@@ -14,7 +15,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
         public event IslandSelectedEventHandler? IslandSelected;
 
 
-        public IslandRepository Islands { get; } = Settings.Instance.IslandRepository!;
+        public IslandRepository Islands { get; } = DataManager.Instance.IslandRepository;
 
         public string? PathFilter 
         { 
