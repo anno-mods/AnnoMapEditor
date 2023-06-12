@@ -10,6 +10,10 @@
         xmlns:islandProperties="clr-namespace:AnnoMapEditor.UI.Controls.IslandProperties"
         xmlns:local="clr-namespace:AnnoMapEditor.UI.Windows.Main"
         xmlns:overlays="clr-namespace:AnnoMapEditor.UI.Overlays"
+        xmlns:lex="http://wpflocalizeextension.codeplex.com"
+        lex:LocalizeDictionary.DesignCulture="en"
+        lex:ResxLocalizationProvider.DefaultAssembly="AnnoMapEditor"
+        lex:ResxLocalizationProvider.DefaultDictionary="Texts"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="900" Width="1440"
@@ -53,21 +57,21 @@
             <TextBlock
                     Style="{StaticResource HeaderLabelStyle}"
                     HorizontalAlignment="Left"
-                    Text="Session"/>
+                    Text="{lex:Loc Key=Session}"/>
             <StackPanel Margin="0,0,0,4" VerticalAlignment="Top" Orientation="Horizontal">
                 <controls:DropDownButton HorizontalAlignment="Left">
-                    <ContentControl Content="Open" />
+                    <ContentControl Content="{lex:Loc Key=OpenFile}" />
                     <controls:DropDownButton.Menu>
                         <ContextMenu Name="openMapMenu" />
                     </controls:DropDownButton.Menu>
                 </controls:DropDownButton>
                 <controls:DropDownButton HorizontalAlignment="Left"
                                          IsEnabled="{Binding SessionChecker.HasErrors, Converter={StaticResource booleanNot}}">
-                    <ContentControl Content="Save" />
+                    <ContentControl Content="{lex:Loc Key=SaveFile}" />
                     <controls:DropDownButton.Menu>
                         <ContextMenu>
-                            <MenuItem Header="As map template..." Click="ExportMap_Click"/>
-                            <MenuItem Header="{Binding ExportStatus.ExportAsModText, UpdateSourceTrigger=PropertyChanged}" Click="ExportMod_Click" IsEnabled="{Binding ExportStatus.CanExportAsMod, UpdateSourceTrigger=PropertyChanged}" />
+                            <MenuItem Header="{lex:Loc Key=SaveAsMapTemplate}" Click="ExportMap_Click"/>
+                            <MenuItem Header="{lex:Loc {Binding Path=ExportStatus.TextStatus, UpdateSourceTrigger=PropertyChanged, Converter={lex:PrependTypeConverter}}}" Click="ExportMod_Click" IsEnabled="{Binding ExportStatus.CanExportAsMod, UpdateSourceTrigger=PropertyChanged}" />
                         </ContextMenu>
                     </controls:DropDownButton.Menu>
                 </controls:DropDownButton>
@@ -94,14 +98,16 @@
                     Orientation="Horizontal"
                     VerticalAlignment="Bottom" 
                     Margin="8,0,0,0">
-            <emoji:TextBlock Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"
+            <emoji:TextBlock Text="{lex:Loc {Binding Path=DataPathStatus.StatusType, UpdateSourceTrigger=PropertyChanged, Converter={lex:PrependTypeConverter}}}"
                                  ToolTip="{Binding DataPathStatus.ToolTip, UpdateSourceTrigger=PropertyChanged}" />
             <Button Click="Configure_Click" HorizontalAlignment="Left"
                         Visibility="{Binding DataPathStatus.Configure, UpdateSourceTrigger=PropertyChanged}">
-                <TextBlock Text="{Binding DataPathStatus.ConfigureText, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="{lex:Loc {Binding DataPathStatus.ConfigureType, UpdateSourceTrigger=PropertyChanged, Converter={lex:PrependTypeConverter}}}"/>
             </Button>
-            <Button Click="AutoDetect_Click" HorizontalAlignment="Left"
-                        Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}">Auto detect</Button>
+            <Button Click="AutoDetect_Click"
+                    HorizontalAlignment="Left"
+                    Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}"
+                    Content="{lex:Loc Key=AutoDetect}"></Button>
         </StackPanel>
         <TextBlock Grid.Column="2"
                    Grid.Row="1"

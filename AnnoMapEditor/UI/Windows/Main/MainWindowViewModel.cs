@@ -207,7 +207,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 ExportStatus = new ExportStatus()
                 {
                     CanExportAsMod = false,
-                    ExportAsModText = "(loading RDA...)"
+                    TextStatus = ExportAsModStatus.LoadingRDA
                 };
             }
             else if (Settings.IsValidDataPath)
@@ -218,14 +218,14 @@ namespace AnnoMapEditor.UI.Windows.Main
                 ExportStatus = new ExportStatus()
                 {
                     CanExportAsMod = archiveReady && supportedFormat,
-                    ExportAsModText = archiveReady ? supportedFormat ? "As playable mod..." : "As mod: only works with Old World maps currently" : "As mod: set game path to save"
+                    TextStatus = archiveReady ? supportedFormat ? ExportAsModStatus.AsPlayableMod : ExportAsModStatus.ExportOnlyOldWorld : ExportAsModStatus.SetGamePath
                 };
             }
             else
             {
                 ExportStatus = new ExportStatus()
                 {
-                    ExportAsModText = "As mod: set game path to save",
+                    TextStatus = ExportAsModStatus.SetGamePath,
                     CanExportAsMod = false
                 };
             }
@@ -238,7 +238,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 // still loading
                 DataPathStatus = new DataPathStatus()
                 {
-                    Status = "loading RDA...",
+                    StatusType = DataPathStatusType.LoadingRDA,
                     ToolTip = "",
                     Configure = Visibility.Collapsed,
                     AutoDetect = Visibility.Collapsed,
@@ -248,9 +248,9 @@ namespace AnnoMapEditor.UI.Windows.Main
             {
                 DataPathStatus = new DataPathStatus()
                 {
-                    Status = Settings.DataArchive is RdaDataArchive ? "Game path set ✔" : "Extracted RDA path set ✔",
+                    StatusType = Settings.DataArchive is RdaDataArchive ? DataPathStatusType.GamePathSet : DataPathStatusType.ExtractedRdaPathSet,
                     ToolTip = Settings.DataArchive.DataPath,
-                    ConfigureText = "Change...",
+                    ConfigureType = ConfigureType.Change,
                     AutoDetect = Settings.DataArchive is RdaDataArchive ? Visibility.Collapsed : Visibility.Visible,
                 };
 
@@ -283,9 +283,9 @@ namespace AnnoMapEditor.UI.Windows.Main
             {
                 DataPathStatus = new DataPathStatus()
                 {
-                    Status = "⚠ Game or RDA path not valid.",
+                    StatusType = DataPathStatusType.GamePathInvalid,
                     ToolTip = null,
-                    ConfigureText = "Select...",
+                    ConfigureType = ConfigureType.Select,
                     AutoDetect = Visibility.Visible,
                 };
 
