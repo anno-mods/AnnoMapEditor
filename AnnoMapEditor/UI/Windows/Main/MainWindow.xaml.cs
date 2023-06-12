@@ -46,14 +46,14 @@ namespace AnnoMapEditor.UI.Windows.Main
         {
             switch (e.PropertyName)
             {
-                case "MapTemplate":
+                case nameof(MainWindowViewModel.MapTemplate):
                     if (ViewModel?.MapTemplate is not null)
                         Title = $"{title} - {Path.GetFileName(ViewModel.MapTemplateFilePath)}";
                     else
                         Title = title;
                     break;
-                case "Maps":
-                case "IsValidDataPath":
+
+                case nameof(MainWindowViewModel.Maps):
                     CreateImportMenu(openMapMenu, ViewModel?.Maps);
                     break;
             }
@@ -68,13 +68,13 @@ namespace AnnoMapEditor.UI.Windows.Main
 
             if (true == picker.ShowDialog())
             {
-                if (!Settings.Instance.IsValidDataPath)
+                if (!Settings.Instance.IsValidGamePath)
                 {
                     int end = picker.FileName.IndexOf(@"\data\session");
                     if (end == -1)
                         end = picker.FileName.IndexOf(@"\data\dlc");
                     if (end != -1)
-                        Settings.Instance.DataPath = picker.FileName[..end];
+                        Settings.Instance.GamePath = picker.FileName[..end];
                 }
 
                 await ViewModel.OpenMap(picker.FileName);
@@ -89,18 +89,18 @@ namespace AnnoMapEditor.UI.Windows.Main
                 Description = "Select your game (i.e. \"Anno 1800/\") folder or a folder where all .rda files are extracted into"
             };
 
-            if (Settings.Instance.DataPath != null)
-                picker.SelectedPath = Settings.Instance.DataPath;
+            if (Settings.Instance.GamePath != null)
+                picker.SelectedPath = Settings.Instance.GamePath;
 
             if (true == picker.ShowDialog())
             {
-                Settings.Instance.DataPath = picker.SelectedPath;
+                Settings.Instance.GamePath = picker.SelectedPath;
             }
         }
 
         private void AutoDetect_Click(object _, RoutedEventArgs _1)
         {
-            Settings.Instance.DataPath = Settings.GetInstallDirFromRegistry();
+            Settings.Instance.GamePath = Settings.GetInstallDirFromRegistry();
         }
 
         private void CreateImportMenu(ContextMenu parentMenu, List<MapGroup>? mapGroups)

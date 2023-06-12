@@ -4,6 +4,7 @@ using AnnoMapEditor.DataArchives.Assets.Repositories;
 using Microsoft.Win32;
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace AnnoMapEditor.Utilities
                 if (_dataArchive is System.IDisposable disposable)
                     disposable.Dispose();
                 SetProperty(ref _dataArchive, value);
-                OnPropertyChanged(nameof(DataPath));
+                OnPropertyChanged(nameof(GamePath));
             }
         }
 
@@ -51,28 +52,59 @@ namespace AnnoMapEditor.Utilities
         private AssetRepository? _assetRepository;
 
 
-        public string? DataPath 
+        public string? GamePath 
         {
-            get => _dataArchive.DataPath;
+            get => UserSettings.Default.GamePath;
             set
             {
-                if (value != DataPath)
+                if (value != GamePath)
                 {
-                    LoadDataPath(value);
-                    UserSettings.Default.DataPath = DataArchive.DataPath;
+                    UserSettings.Default.GamePath = value;
                     UserSettings.Default.Save();
-                    OnPropertyChanged(nameof(DataPath));
-                    OnPropertyChanged(nameof(IsValidDataPath));
+
+                    DataPath = value != null ? Path.Combine(value, "maindata") : null;
+                    ModsPath = value != null ? Path.Combine(value, "mods") : null;
                 }
             }
         }
 
-        public bool IsValidDataPath
+        public string? DataPath
         {
-            get => _isValidDataPath;
-            private set => SetProperty(ref _isValidDataPath, value);
+            get => UserSettings.Default.DataPath;
+            set
+            {
+                if (value != DataPath)
+                {
+                    UserSettings.Default.DataPath = value;
+                    UserSettings.Default.Save();
+                    OnPropertyChanged(nameof(DataPath));
+
+                    LoadDataPath(value);
+                }
+            }
         }
-        private bool _isValidDataPath = false;
+
+        public string? ModsPath
+        {
+            get => UserSettings.Default.ModsPath;
+            set
+            {
+                if (value != ModsPath)
+                {
+                    UserSettings.Default.ModsPath = value;
+                    UserSettings.Default.Save();
+                    OnPropertyChanged(nameof(ModsPath));
+                }
+            }
+        }
+
+
+        public bool IsValidGamePath
+        {
+            get => _isValidGamePath;
+            private set => SetProperty(ref _isValidGamePath, value);
+        }
+        private bool _isValidGamePath = false;
 
         public bool IsLoading 
         { 
@@ -94,6 +126,8 @@ namespace AnnoMapEditor.Utilities
         /// </summary>
         private Settings()
         {
+
+
             //We set the LoadingDoneTrigger as Reset by default, so anything that waits for the setup to finish
             //has to actually wait for the SetupAsync called in Initialize to finish.
             LoadingDoneTrigger = new ManualResetEvent(false);
@@ -113,8 +147,8 @@ namespace AnnoMapEditor.Utilities
         }
 
         /// <summary>
-        /// This avoids direct writes to the DataPath Property that would run
-        /// its setter on the thread pool, making proper awaiting of the setup impossible.
+        /// This avoids direct writes to the path properties that would run their
+        /// setters on the thread pool, making proper awaiting of the setup impossible.
         /// </summary>
         /// <param name="updateInvalidUserSettings">If the UserSettings should be overwritten by a valid result.</param>
         /// <returns></returns>
@@ -138,8 +172,7 @@ namespace AnnoMapEditor.Utilities
 
             if (DataArchive?.IsValid == true && updateInvalidUserSettings)
             {
-                UserSettings.Default.DataPath = DataArchive.DataPath;
-                UserSettings.Default.Save();
+                DataPath = DataArchive.DataPath;
             }
 
             LoadingDoneTrigger.Set();
@@ -149,22 +182,22 @@ namespace AnnoMapEditor.Utilities
         /// Used to set DataPath with a synchronous method call
         /// by running the actual async code on the tread pool.
         /// </summary>
-        /// <param name="path">The DataPath to load.</param>
-        private void LoadDataPath(string? path)
+        /// <param name="dataPath">The DataPath to load.</param>
+        private void LoadDataPath(string? dataPath)
         {
             IsLoading = true;
 
             _loadingTask = Task.Run(async () => {
-                await LoadDataPathAsync(path);
+                await LoadDataPathAsync(dataPath);
             });
         }
 
         /// <summary>
         /// Asynchronously sets the DataPath and reads all the Repositories.
         /// </summary>
-        /// <param name="path">The DataPath to load.</param>
+        /// <param name="dataPath">The DataPath to load.</param>
         /// <returns></returns>
-        private async Task LoadDataPathAsync(string? path)
+        private async Task LoadDataPathAsync(string? dataPath)
         {
             //Only use the LoadingDoneTrigger, if it is not already Reset.
             //A reset LoadingDoneTrigger here means, that the Setup is using it.
@@ -180,7 +213,7 @@ namespace AnnoMapEditor.Utilities
                 IsLoading = true;
             });
     
-            var archive = await DataArchives.DataArchive.OpenAsync(path);
+            var archive = await DataArchives.DataArchive.OpenAsync(dataPath);
 
             try
             {
@@ -205,7 +238,7 @@ namespace AnnoMapEditor.Utilities
                     DataArchive = archive;
                     AssetRepository = assetRepository;
                     IslandRepository = islandRepository;
-                    IsValidDataPath = true;
+                    IsValidGamePath = true;
                 });
             }
             catch (Exception ex)
@@ -213,7 +246,7 @@ namespace AnnoMapEditor.Utilities
                 _logger.LogError($"An error occured during setup.", ex);
                 Dispatch(() =>
                 {
-                    IsValidDataPath = false;
+                    IsValidGamePath = false;
                 });
             }
             finally
@@ -248,7 +281,18 @@ namespace AnnoMapEditor.Utilities
         {
             string installDirKey = @"SOFTWARE\WOW6432Node\Ubisoft\Anno 1800";
             using RegistryKey? key = Registry.LocalMachine.OpenSubKey(installDirKey);
-            return key?.GetValue("InstallDir") as string;
+
+            string? installDir = key?.GetValue("InstallDir") as string;
+            if (installDir == null)
+                return null;
+
+            if (!installDir.Contains(Path.DirectorySeparatorChar))
+            {
+                char wrongSeparator = Path.DirectorySeparatorChar == '/' ? '\\' : '/';
+                return installDir.Replace(wrongSeparator, Path.DirectorySeparatorChar);
+            }
+            else
+                return installDir;
         }
 
         /// <summary>

@@ -48,7 +48,7 @@ namespace AnnoMapEditor.DataArchives
             IsValid = false;
             _logger.LogInformation($"Discovering RDA archives at '{DataPath}'.");
             var builder = FileSystemBuilder.Create()
-                .FromPath(System.IO.Path.Combine(DataPath, "maindata"))
+                .FromPath(DataPath)
                 .OnlyArchivesMatchingWildcard("data*.rda")
                 .WithDefaultSorting()
                 .ConfigureLoadZeroByteFiles(false)
@@ -70,7 +70,7 @@ namespace AnnoMapEditor.DataArchives
             var loadedCount = builder.ArchiveFileNames.Count();
             if (loadedCount == 0)
             {
-                _logger.LogWarning($"No .rda files found at {System.IO.Path.Combine(DataPath, "maindata")}");
+                _logger.LogWarning($"No .rda files found at {DataPath}");
                 MessageBox.Show($"Something went wrong opening the RDA files.\n\nDo you have another Editor or the RDAExplorer open by any chance?\n\nLog file: {Log.LogFilePath}", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
             _logger.LogInformation($"Loaded {loadedCount} RDAs.");

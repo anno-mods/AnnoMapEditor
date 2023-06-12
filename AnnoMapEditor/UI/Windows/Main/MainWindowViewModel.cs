@@ -110,12 +110,12 @@ namespace AnnoMapEditor.UI.Windows.Main
         }
         private string? _mapTemplateFilePath;
 
-        public DataPathStatus DataPathStatus
+        public GamePathStatus GamePathStatus
         {
-            get => _dataPathStatus;
-            private set => SetProperty(ref _dataPathStatus, value);
+            get => _gamePathStatus;
+            private set => SetProperty(ref _gamePathStatus, value);
         }
-        private DataPathStatus _dataPathStatus = new();
+        private GamePathStatus _gamePathStatus = new();
 
         public ExportStatus ExportStatus
         {
@@ -204,7 +204,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                     ExportAsModText = "(loading RDA...)"
                 };
             }
-            else if (Settings.IsValidDataPath)
+            else if (Settings.IsValidGamePath)
             {
                 bool archiveReady = Settings.DataArchive is RdaDataArchive;
 
@@ -229,7 +229,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             if (Settings.IsLoading)
             {
                 // still loading
-                DataPathStatus = new DataPathStatus()
+                GamePathStatus = new GamePathStatus()
                 {
                     Status = "loading RDA...",
                     ToolTip = "",
@@ -237,9 +237,9 @@ namespace AnnoMapEditor.UI.Windows.Main
                     AutoDetect = Visibility.Collapsed,
                 };
             }
-            else if (Settings.IsValidDataPath)
+            else if (Settings.IsValidGamePath)
             {
-                DataPathStatus = new DataPathStatus()
+                GamePathStatus = new GamePathStatus()
                 {
                     Status = Settings.DataArchive is RdaDataArchive ? "Game path set ✔" : "Extracted RDA path set ✔",
                     ToolTip = Settings.DataArchive.DataPath,
@@ -274,7 +274,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
             else
             {
-                DataPathStatus = new DataPathStatus()
+                GamePathStatus = new GamePathStatus()
                 {
                     Status = "⚠ Game or RDA path not valid.",
                     ToolTip = null,

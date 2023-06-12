@@ -94,14 +94,14 @@
                     Orientation="Horizontal"
                     VerticalAlignment="Bottom" 
                     Margin="8,0,0,0">
-            <emoji:TextBlock Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"
-                                 ToolTip="{Binding DataPathStatus.ToolTip, UpdateSourceTrigger=PropertyChanged}" />
+            <emoji:TextBlock Text="{Binding GamePathStatus.Status, UpdateSourceTrigger=PropertyChanged}"
+                                 ToolTip="{Binding GamePathStatus.ToolTip, UpdateSourceTrigger=PropertyChanged}" />
             <Button Click="Configure_Click" HorizontalAlignment="Left"
-                        Visibility="{Binding DataPathStatus.Configure, UpdateSourceTrigger=PropertyChanged}">
-                <TextBlock Text="{Binding DataPathStatus.ConfigureText, UpdateSourceTrigger=PropertyChanged}"/>
+                        Visibility="{Binding GamePathStatus.Configure, UpdateSourceTrigger=PropertyChanged}">
+                <TextBlock Text="{Binding GamePathStatus.ConfigureText, UpdateSourceTrigger=PropertyChanged}"/>
             </Button>
             <Button Click="AutoDetect_Click" HorizontalAlignment="Left"
-                        Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}">Auto detect</Button>
+                        Visibility="{Binding GamePathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}">Auto detect</Button>
         </StackPanel>
         <controls:Imprint Grid.Row="1" Grid.Column="2" />
 

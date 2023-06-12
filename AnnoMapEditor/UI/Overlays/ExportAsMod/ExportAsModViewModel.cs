@@ -100,28 +100,24 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
 
         private static ModStatus ModExists(string modName)
         {
-            if (Settings.Instance.DataPath is null)
+            if (Settings.Instance.GamePath is null)
                 return ModStatus.NotFound;
 
-            string activeModPath = Path.Combine(Settings.Instance.DataPath, "mods", modName);
+            string activeModPath = Path.Combine(Settings.Instance.ModsPath!, modName);
             if (Directory.Exists(activeModPath))
                 return ModStatus.Active;
 
-            string inactiveModPath = Path.Combine(Settings.Instance.DataPath, "mods", "-" + modName);
+            string inactiveModPath = Path.Combine(Settings.Instance.ModsPath!, "-" + modName);
             return Directory.Exists(inactiveModPath) ? ModStatus.Inactive : ModStatus.NotFound;
         }
 
         public async Task<bool> Save()
         {
-            string? modsFolderPath = Settings.Instance.DataPath;
-            if (modsFolderPath is not null)
-                modsFolderPath = Path.Combine(modsFolderPath, "mods");
+            string modsFolderPath = Settings.Instance.ModsPath
+                ?? throw new Exception($"ModsPath is not set.");
 
             if (!Directory.Exists(modsFolderPath))
-            {
-                _logger.LogWarning("mods/ path not set. This shouldn't have happened.");
-                return false;
-            }
+                throw new Exception($"Mods directory '{modsFolderPath}' does not exist.");
 
             Mod mod = new(ResultingModName, ModID, MapTemplate, SelectedMapType);
 
