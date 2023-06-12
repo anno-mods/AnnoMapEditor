@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Globalization;
+using System.Windows;
+using WPFLocalizeExtension.Engine;
+using WPFLocalizeExtension.Providers;
 
 namespace AnnoMapEditor
 {
@@ -6,5 +10,18 @@ namespace AnnoMapEditor
     {
         public readonly static string TitleShort = "Community Map Editor";
         public readonly static string Title = $"{TitleShort} for Anno 1800";
+
+        public App() {
+            ResxLocalizationProvider provider = ResxLocalizationProvider.Instance;
+
+            provider.SearchCultures = new List<System.Globalization.CultureInfo>()
+            {
+                System.Globalization.CultureInfo.GetCultureInfo("en"),
+                System.Globalization.CultureInfo.GetCultureInfo("de"),
+            };
+            LocalizeDictionary.Instance.Culture = CultureInfo.GetCultureInfo("en");
+
+            int i = 0;
+        }
     }
 }
