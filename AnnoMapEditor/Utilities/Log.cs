@@ -22,6 +22,8 @@ namespace AnnoMapEditor.Utilities
         private static string? _logFilePath;
         private static bool firstStart = true;
 
+        private static object _lock = new object();
+
         public static void PrintLine(string message)
         {
             if (LogFilePath is null)
@@ -34,7 +36,10 @@ namespace AnnoMapEditor.Utilities
                 firstStart = false;
             }
 
-            File.AppendAllText(LogFilePath, message + "\n");
+            lock (_lock)
+            {
+                File.AppendAllText(LogFilePath, message + "\n");
+            }
             Trace.WriteLine(message);
         }
     }
