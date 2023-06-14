@@ -113,11 +113,13 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             Stream assetsXmlStream = _dataArchive.OpenRead(ASSETS_XML_PATH)
                 ?? throw new Exception($"Could not locate assets.xml.");
 
+            var xpath = GetXpath();
+
             using var hasher = SHA256.Create();
             var hash = hasher.ComputeHash(assetsXmlStream);
             var hashB64 = Convert.ToBase64String(hash);
             assetsXmlStream.Seek(0, SeekOrigin.Begin);
-            bool validCache = UserSettings.Default.AssetsHash == hashB64;
+            bool validCache = UserSettings.Default.AssetsHash == hashB64 && UserSettings.Default.Xpath == xpath;
             _logger.LogInformation($"Computed Hash at {watch.Elapsed.TotalMilliseconds} ms");
 
             if (validCache)
@@ -134,12 +136,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             }
 
             var Xml = XDocument.Load(assetsXmlStream);
-            var xpath = GetXpath();
             var assets = Xml.XPathSelectElements(xpath);
 
             if (!validCache)
             {
                 UserSettings.Default.AssetsHash = hashB64;
+                UserSettings.Default.Xpath = xpath; 
                 UserSettings.Default.Save();
                 assetsXmlStream.Dispose();
                 RenewCache(assets);

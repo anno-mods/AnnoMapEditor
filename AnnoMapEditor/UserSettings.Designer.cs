@@ -82,5 +82,17 @@ namespace AnnoMapEditor {
                 this["AssetsHash"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Xpath {
+            get {
+                return ((string)(this["Xpath"]));
+            }
+            set {
+                this["Xpath"] = value;
+            }
+        }
     }
 }
