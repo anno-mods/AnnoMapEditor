@@ -2,8 +2,8 @@
 {
     public class MapInfo
     {
-        public string? Name;
+        public string Name;
 
-        public string? FileName;
+        public string FileName;
     }
 }

@@ -37,6 +37,8 @@ namespace AnnoMapEditor.DataArchives
         }
         private string? _errorMessage;
 
+        public bool HasError => _errorMessage != null;
+
 
         public IDataArchive DataArchive => _isInitialized && _dataArchive != null ? _dataArchive : throw new Exception(NOT_INITIALIZED_MESSAGE);
         private IDataArchive? _dataArchive;
@@ -49,6 +51,9 @@ namespace AnnoMapEditor.DataArchives
 
         public IslandRepository IslandRepository => _isInitialized && _islandRepository != null ? _islandRepository : throw new Exception(NOT_INITIALIZED_MESSAGE);
         private IslandRepository? _islandRepository;
+
+        public MapGroupRepository MapGroupRepository => _isInitialized && _mapGroupRepository != null ? _mapGroupRepository : throw new Exception(NOT_INITIALIZED_MESSAGE);
+        private MapGroupRepository? _mapGroupRepository;
 
 
         private DataManager()
@@ -75,13 +80,16 @@ namespace AnnoMapEditor.DataArchives
                 _assetRepository.Register<MinimapSceneAsset>();
                 _assetRepository.Register<SessionAsset>();
                 _assetRepository.Register<MapTemplateAsset>();
-                await _assetRepository.Initialize();
+                await _assetRepository.InitializeAsync();
 
                 _fixedIslandRepository = new FixedIslandRepository(_dataArchive);
-                await _fixedIslandRepository.Initialize();
+                await _fixedIslandRepository.InitializeAsync();
 
                 _islandRepository = new IslandRepository(_fixedIslandRepository, _assetRepository);
-                await _islandRepository.Initialize();
+                await _islandRepository.InitializeAsync();
+
+                _mapGroupRepository = new MapGroupRepository(_dataArchive);
+                _mapGroupRepository.InitializeAsync();
             }
             catch (Exception ex)
             {
@@ -110,6 +118,7 @@ namespace AnnoMapEditor.DataArchives
                 IsInitializing = isInitializing;
                 IsInitialized = isInitialized;
                 ErrorMessage = errorMessage;
+                OnPropertyChanged(nameof(HasError));
             });
         }
     }

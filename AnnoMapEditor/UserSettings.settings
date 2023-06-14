@@ -11,6 +11,9 @@
     <Setting Name="ModsPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="EnableExpertMode" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
     <Setting Name="AssetsHash" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>

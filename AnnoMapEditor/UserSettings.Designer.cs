@@ -61,6 +61,18 @@ namespace AnnoMapEditor {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EnableExpertMode {
+            get {
+                return ((bool)(this["EnableExpertMode"]));
+            }
+            set {
+                this["EnableExpertMode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string AssetsHash {
             get {

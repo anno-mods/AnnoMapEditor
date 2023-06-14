@@ -1,21 +1,10 @@
-﻿using AnnoMapEditor.DataArchives;
-using AnnoMapEditor.DataArchives.Assets.Models;
-using AnnoMapEditor.DataArchives.Assets.Repositories;
-using Microsoft.Win32;
-using System;
-using System.ComponentModel;
+﻿using Microsoft.Win32;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace AnnoMapEditor.Utilities
 {
     public class Settings : ObservableBase
     {
-        private readonly Logger<Settings> _logger = new();
-
         public static Settings Instance { get; } = new();
 
 
@@ -29,8 +18,16 @@ namespace AnnoMapEditor.Utilities
                     UserSettings.Default.GamePath = value;
                     UserSettings.Default.Save();
 
-                    DataPath = value != null ? Path.Combine(value, "maindata") : null;
-                    ModsPath = value != null ? Path.Combine(value, "mods") : null;
+                    if (value != null)
+                    {
+                        if (DataPath == null || !EnableExpertMode)
+                            DataPath = Path.Combine(value, "maindata");
+
+                        if (ModsPath == null || !EnableExpertMode)
+                            ModsPath = Path.Combine(value, "mods");
+                    }
+
+                    OnPropertyChanged(nameof(GamePath));
                 }
             }
         }
@@ -59,6 +56,20 @@ namespace AnnoMapEditor.Utilities
                     UserSettings.Default.ModsPath = value;
                     UserSettings.Default.Save();
                     OnPropertyChanged(nameof(ModsPath));
+                }
+            }
+        }
+
+        public bool EnableExpertMode
+        {
+            get => UserSettings.Default.EnableExpertMode;
+            set
+            {
+                if (value != EnableExpertMode)
+                {
+                    UserSettings.Default.EnableExpertMode = value;
+                    UserSettings.Default.Save();
+                    OnPropertyChanged(nameof(EnableExpertMode));
                 }
             }
         }
