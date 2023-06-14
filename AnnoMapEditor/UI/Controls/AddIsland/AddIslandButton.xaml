@@ -1,21 +1,22 @@
-﻿<controls:DraggingControl x:Class="AnnoMapEditor.UI.Controls.AddIsland.AddIslandButton"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
-             xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls.AddIsland"
-             xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
-             mc:Ignorable="d"
+﻿<dragging:DraggingControl x:Class="AnnoMapEditor.UI.Controls.AddIsland.AddIslandButton"
+                          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                          xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
+                          xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls.AddIsland"
+                          xmlns:dragging="clr-namespace:AnnoMapEditor.UI.Controls.Dragging"
+                          xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
+                          mc:Ignorable="d"
              d:DesignWidth="800"
              d:DesignHeight="450"
              d:DataContext="{d:DesignInstance Type=local:AddIslandViewModel}"
              Width="{Binding IslandSize.DefaultSizeInTiles}"
              Height="{Binding IslandSize.DefaultSizeInTiles}">
 
-    <controls:DraggingControl.Resources>
+    <dragging:DraggingControl.Resources>
         <converters:NegateDoubleConverter x:Key="negateDoubleConverter" />
-    </controls:DraggingControl.Resources>
+    </dragging:DraggingControl.Resources>
 
     <Grid> 
 
@@ -45,4 +46,4 @@
         </Border>
 
     </Grid>
-</controls:DraggingControl>
+</dragging:DraggingControl>

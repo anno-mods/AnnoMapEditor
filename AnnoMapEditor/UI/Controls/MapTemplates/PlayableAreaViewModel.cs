@@ -1,6 +1,8 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
+using AnnoMapEditor.UI.Controls.Dragging;
 using AnnoMapEditor.Utilities;
 using System;
+using System.Windows;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
@@ -65,8 +67,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         /// <summary>
         /// Used for automatic font scaling to avoid clipping.
         /// </summary>
-        public double MarginFontSize 
-        { 
+        public double MarginFontSize
+        {
             get
             {
                 const int FONTSIZE_CUTOFF = 880;
@@ -74,8 +76,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                     return 100.0;
                 else
                     //100 - 40xNormalized value below cutoff, as Fontsize 60 is safe even with 4-Figure margin
-                    return 100.0 - 40.0*(1.0 - ((PlayableSize - MinSize)/(double)(FONTSIZE_CUTOFF - MinSize)));
-            } 
+                    return 100.0 - 40.0 * (1.0 - ((PlayableSize - MinSize) / (double)(FONTSIZE_CUTOFF - MinSize)));
+            }
         }
 
         public int MarginLeftTop
@@ -132,12 +134,15 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         private bool _resizingInProgress = false;
 
 
-        public override void OnDragged(Vector2 newPosition)
+        public override void Move(Point delta)
         {
+            base.Move(delta);
+
             //This limits movement so that the minimum Margin is always remaining.
-            Vector2 newPos = newPosition.Clamp(MinMarginVector, new Vector2(MapTemplate.Size.X - PlayableSize - MinMargin, MapTemplate.Size.Y - PlayableSize - MinMargin));
-            PosX = newPos.X;
-            PosY = newPos.Y;
+            Vector2 newPosition = new(PosX + (int)delta.X, PosY + (int)delta.Y);
+            newPosition = newPosition.Clamp(MinMarginVector, new Vector2(MapTemplate.Size.X - PlayableSize - MinMargin, MapTemplate.Size.Y - PlayableSize - MinMargin));
+            PosX = newPosition.X;
+            PosY = newPosition.Y;
 
             ResizeMapTemplateValues();
         }
@@ -163,7 +168,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         {
             //Use this code only when the map size is resized (externally), to adapt the PlayableArea to the MapSize.
             //Everything else about the PlayableArea gets handled internally already.
-            if(!LocalResizing)
+            if (!LocalResizing)
             {
                 OnPropertyChanged(nameof(MaxSize));
 
@@ -171,7 +176,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                 int maxAllowedSizeX = MapTemplate.Size.X - PosX - MinMargin;
                 int maxAllowedSizeY = MapTemplate.Size.Y - PosY - MinMargin;
                 int maxAllowedSize = Math.Min(maxAllowedSizeX, maxAllowedSizeY);
-                if(PlayableSize > maxAllowedSize)
+                if (PlayableSize > maxAllowedSize)
                 {
                     if (maxAllowedSize >= MinSize)
                     {

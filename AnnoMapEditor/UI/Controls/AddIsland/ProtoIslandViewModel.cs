@@ -15,8 +15,6 @@ namespace AnnoMapEditor.UI.Controls.AddIsland
         
         public IslandSize IslandSize { get; init; }
 
-        public override int SizeInTiles => IslandSize.DefaultSizeInTiles;
-
         public override BitmapImage? Thumbnail => null;
 
         public override int ThumbnailRotation => 0;
@@ -44,6 +42,7 @@ namespace AnnoMapEditor.UI.Controls.AddIsland
                 : base(islandType)
             {
                 IslandSize = islandSize;
+                SizeInTiles = islandSize.DefaultSizeInTiles;
             }
         }
     }
