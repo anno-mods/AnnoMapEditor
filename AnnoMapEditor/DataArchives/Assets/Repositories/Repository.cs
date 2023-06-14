@@ -1,14 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using AnnoMapEditor.Utilities;
+using System.Threading.Tasks;
 
 namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
-    public abstract class Repository
+    public abstract class Repository : ObservableBase
     {
         public Repository()
         {
         }
 
 
-        public abstract Task Initialize();
+        public abstract Task InitializeAsync();
     }
 }

@@ -7,10 +7,10 @@ using AnnoMapEditor.UI.Controls.IslandProperties;
 using AnnoMapEditor.UI.Controls.MapTemplates;
 using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
-using System.Collections.Generic;
+using Microsoft.Win32;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
@@ -108,28 +108,17 @@ namespace AnnoMapEditor.UI.Windows.Main
         }
         private string? _mapTemplateFilePath;
 
-        public GamePathStatus GamePathStatus
-        {
-            get => _gamePathStatus;
-            private set => SetProperty(ref _gamePathStatus, value);
-        }
-        private GamePathStatus _gamePathStatus = new();
-
-        public List<MapGroup>? Maps
-        {
-            get => _maps;
-            private set => SetProperty(ref _maps, value);
-        }
-        private List<MapGroup>? _maps;
-
-        public Settings Settings { get; private set; }
 
         public MainWindowViewModel(MapTemplate mapTemplate)
         {
             MapTemplate = mapTemplate;
-
-            UpdateStatusAndMenus();
         }
+
+        public MainWindowViewModel()
+        {
+            CreateNewMap();
+        }
+
 
         public async Task OpenMap(string a7tinfoPath, bool fromArchive = false)
         {
@@ -149,7 +138,6 @@ namespace AnnoMapEditor.UI.Windows.Main
             const int DEFAULT_PLAYABLE_SIZE = 2160;
 
             MapTemplateFilePath = null;
-
             MapTemplate = new MapTemplate(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, SessionAsset.OldWorld);
         }
 
@@ -167,25 +155,52 @@ namespace AnnoMapEditor.UI.Windows.Main
                 await mapTemplateWriter.WriteXmlAsync(MapTemplate, filePath);
         }
 
-        private void UpdateStatusAndMenus()
+        public void PopulateOpenMapMenu(ContextMenu menu)
         {
-            // TODO: load from assets instead.
-            var mapTemplates = DataManager.Instance.DataArchive.Find("*.a7tinfo");
+            menu.Items.Clear();
 
-            Maps = new()
+            MenuItem openMapFile = new() { Header = "Open file..." };
+            openMapFile.Click += (_, _) => OpenMapFileDialog();
+            menu.Items.Add(openMapFile);
+            menu.Items.Add(new Separator());
+
+            MenuItem newFile = new() { Header = "New Map file" };
+            newFile.Click += (_, _) => CreateNewMap();
+            menu.Items.Add(newFile);
+            menu.Items.Add(new Separator());
+
+            foreach (MapGroup group in DataManager.Instance.MapGroupRepository.MapGroups)
             {
-                new MapGroup("Campaign", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/campaign")), new(@"\/campaign_([^\/]+)\.")),
-                new MapGroup("Moderate, Archipelago", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_archipel")), new(@"\/([^\/]+)\.")),
-                new MapGroup("Moderate, Atoll", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_atoll")), new(@"\/([^\/]+)\.")),
-                new MapGroup("Moderate, Corners", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_corners")), new(@"\/([^\/]+)\.")),
-                new MapGroup("Moderate, Island Arc", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_islandarc")), new(@"\/([^\/]+)\.")),
-                new MapGroup("Moderate, Snowflake", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_snowflake")), new(@"\/([^\/]+)\.")),
-                new MapGroup("New World, Large", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_l_")), new(@"\/([^\/]+)\.")),
-                new MapGroup("New World, Medium", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_m_")), new(@"\/([^\/]+)\.")),
-                new MapGroup("New World, Small", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_s_")), new(@"\/([^\/]+)\.")),
-                new MapGroup("DLCs", mapTemplates.Where(x => !x.StartsWith(@"data/sessions/")), new(@"data\/([^\/]+)\/.+\/maps\/([^\/]+)"))
-                //new MapGroup("Moderate", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate")), new(@"\/([^\/]+)\."))
+                MenuItem groupMenu = new() { Header = group.Name };
+
+                foreach (MapInfo map in group.Maps)
+                {
+                    MenuItem mapMenu = new() { Header = map.Name, DataContext = map };
+                    mapMenu.Click += (_, _) => _ = OpenMap(map.FileName!, true);
+                    groupMenu.Items.Add(mapMenu);
+                }
+
+                menu.Items.Add(groupMenu);
+            }
+        }
+
+        public async void OpenMapFileDialog()
+        {
+            var picker = new OpenFileDialog
+            {
+                Filter = "Map templates (*.a7tinfo, *.xml)|*.a7tinfo;*.xml"
             };
+
+            if (true == picker.ShowDialog())
+            {
+                int end = picker.FileName.IndexOf(@"\data\session");
+                if (end == -1)
+                    end = picker.FileName.IndexOf(@"\data\dlc");
+                if (end != -1)
+                    Settings.Instance.GamePath = picker.FileName[..end];
+
+                await OpenMap(picker.FileName);
+            }
         }
     }
 }

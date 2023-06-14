@@ -35,7 +35,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         }
 
 
-        public override async Task Initialize()
+        public override async Task InitializeAsync()
         {
             _logger.LogInformation($"Begin loading fixed islands.");
             Stopwatch watch = Stopwatch.StartNew();

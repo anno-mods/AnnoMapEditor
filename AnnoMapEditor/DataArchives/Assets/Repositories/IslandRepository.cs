@@ -65,7 +65,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             => _byFilePath.TryGetValue(mapFilePath, out islandAsset);
 #pragma warning restore CS8762 // Parameter must have a non-null value when exiting in some condition.
 
-        public override Task Initialize()
+        public override Task InitializeAsync()
         {
             _logger.LogInformation($"Begin loading islands.");
 
