@@ -21,6 +21,7 @@ namespace AnnoMapEditor.UI.Windows.Main
         public MainWindow(MainWindowViewModel viewModel)
         {
             _viewModel = viewModel;
+            DataContext= _viewModel;
 
             InitializeComponent();
 
