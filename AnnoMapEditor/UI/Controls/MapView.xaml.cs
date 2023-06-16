@@ -224,6 +224,11 @@ namespace AnnoMapEditor.UI.Controls
                             viewModel = new FixedIslandViewModel(mapTemplate, fixedIsland);
                             control = new IslandControl();
                         }
+                        else if (element is GameObjectElement gameObject)
+                        {
+                            viewModel = new GameObjectViewModel(gameObject);
+                            control = new GameObjectControl();
+                        }
                         else
                             throw new NotImplementedException();
 
@@ -441,6 +446,15 @@ namespace AnnoMapEditor.UI.Controls
 
                     if (islandCorners.Any(c => selectionBoxViewModel.Contains(c)))
                         islandViewModel.IsSelected = true;
+                }
+
+                else if (control is GameObjectControl gameObjectControl)
+                {
+                    GameObjectViewModel gameObjectViewModel = gameObjectControl.DataContext as GameObjectViewModel
+                        ?? throw new Exception();
+
+                    if (selectionBoxViewModel.Contains(gameObjectControl.GetPosition()))
+                        gameObjectViewModel.IsSelected = true;
                 }
             }
 
@@ -730,6 +744,7 @@ namespace AnnoMapEditor.UI.Controls
                     _mapTemplate.Elements.Remove(islandViewModel.Element);
 
                     // deselect the island if it was selected
+                    _selectedElements.Remove(islandViewModel);
                     if (islandViewModel == _selectedElement)
                     {
                         _selectedElement = null;

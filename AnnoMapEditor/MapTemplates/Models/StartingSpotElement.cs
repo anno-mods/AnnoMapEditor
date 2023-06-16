@@ -2,7 +2,7 @@
 
 namespace AnnoMapEditor.MapTemplates.Models
 {
-    public class StartingSpotElement : MapElement 
+    public class StartingSpotElement : MapTemplateElement 
     {
         // TODO: The StartingSpot's index is implicit based on its position in mapTemplate.Elements. It
         //       must be set from the outside.

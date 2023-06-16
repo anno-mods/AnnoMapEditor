@@ -93,7 +93,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             else if (e.PropertyName == nameof(FixedIslandElement.RandomizeRotation))
                 UpdateRotation();
 
-            else if (e.PropertyName == nameof(MapElement.Position))
+            else if (e.PropertyName == nameof(MapTemplateElement.Position))
                 BoundsCheck();
         }
 

@@ -1,4 +1,7 @@
-﻿using Anno.FileDBModels.Anno1800.MapTemplate;
+﻿using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared;
+using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared.AreaManagerData;
+using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared.AreaManagerData.GameObjectStructure;
+using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.Utilities;
 using System;
@@ -50,13 +53,7 @@ namespace AnnoMapEditor.MapTemplates.Models
         public string MapSizeText => $"Size: {Size.X}, Playable: {PlayableArea.Width}";
 
 
-        public MapTemplate(SessionAsset session)
-        {
-            _session = session;
-            _templateDocument = new MapTemplateDocument();
-        }
-
-        public MapTemplate(MapTemplateDocument document, SessionAsset session)
+        public MapTemplate(SessionAsset session, MapTemplateDocument document, Gamedata? gamedata)
         {
             _session = session;
             _size = new Vector2(document.MapTemplate?.Size);
@@ -67,12 +64,36 @@ namespace AnnoMapEditor.MapTemplates.Models
             int startingSpotCounter = 0;
             foreach (TemplateElement elementTemplate in document.MapTemplate!.TemplateElement!)
             {
-                MapElement element = MapElement.FromTemplate(elementTemplate);
+                MapTemplateElement element = MapTemplateElement.FromTemplate(elementTemplate);
 
                 if (element is StartingSpotElement startingSpot)
                     startingSpot.Index = startingSpotCounter++;
 
                 Elements.Add(element);
+            }
+
+            // add GameObjects and EditorObjects
+            if (gamedata?.GameSessionManager?.AreaManagerData?.Count > 0)
+            {
+                if (gamedata.GameSessionManager.AreaManagerData.Count != 1)
+                    throw new ArgumentException($"Expected 1 AreaManagerData in .a7t GameSessionManager but got {gamedata.GameSessionManager.AreaManagerData.Count}.");
+
+                AreaManagerDataItem areaManagerData = gamedata.GameSessionManager.AreaManagerData[0].Item2;
+                areaManagerData.DecompressData();
+                DataContent areaManagerContent = areaManagerData.GetDecompressedData()
+                    ?? throw new Exception("Could not decompress AreaManagerDataItem.");
+
+                foreach (GameObject gameObject in areaManagerContent.AreaObjectManager!.GameObject!.objects!)
+                {
+                    GameObjectElement element = GameObjectElement.FromGameObject(gameObject);
+                    Elements.Add(element);
+                }
+
+                foreach (GameObject editorObject in areaManagerContent.AreaObjectManager!.EditorObject!.objects!)
+                {
+                    GameObjectElement element = GameObjectElement.FromGameObject(editorObject);
+                    Elements.Add(element);
+                }
             }
 
             // clear links in the original
@@ -179,7 +200,11 @@ namespace AnnoMapEditor.MapTemplates.Models
             if (_templateDocument.MapTemplate?.Size is null || _templateDocument.MapTemplate?.PlayableArea is null)
                 return null;
 
-            _templateDocument.MapTemplate.TemplateElement = new List<TemplateElement>(Elements.Select(x => x.ToTemplate()).Where(x => x is not null)!);
+            _templateDocument.MapTemplate.TemplateElement = Elements
+                .Where(x => x is MapTemplateElement)
+                .Select(x => ((MapTemplateElement) x).ToTemplate())
+                .Where(x => x is not null)
+                .ToList();
             _templateDocument.MapTemplate.ElementCount = _templateDocument.MapTemplate.TemplateElement.Count;
 
             if (Session == SessionAsset.NewWorld)

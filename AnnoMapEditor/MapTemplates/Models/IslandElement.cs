@@ -5,7 +5,7 @@ using IslandType = AnnoMapEditor.MapTemplates.Enums.IslandType;
 
 namespace AnnoMapEditor.MapTemplates.Models
 {
-    public abstract class IslandElement : MapElement
+    public abstract class IslandElement : MapTemplateElement
     {
         public string? Label
         { 

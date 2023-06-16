@@ -9,7 +9,7 @@ namespace AnnoMapEditor.DataArchives
     {
         private static readonly Logger<DataArchiveFactory> _logger = new();
 
-        private static readonly string[] EXTENSION_WHITELIST = new[] { "*.a7tinfo", "*.png", "*.a7minfo", "*.a7t", "*.a7te", "assets.xml", "*.a7m", "*.dds" };
+        private static readonly string[] EXTENSION_WHITELIST = new[] { "*.a7tinfo", "*.png", "*.a7minfo", "*.a7t", "*.a7te", "assets.xml", "*.a7m", "*.dds", "*.data" };
 
 
         public IDataArchive CreateDataArchive(string dataPath)

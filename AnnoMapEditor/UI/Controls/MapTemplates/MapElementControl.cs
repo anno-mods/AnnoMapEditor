@@ -35,7 +35,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         private void Element_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(MapElement.Position))
+            if (e.PropertyName == nameof(MapTemplateElement.Position))
             {
                 this.SetPosition(_viewModel.Element.Position);
             }
