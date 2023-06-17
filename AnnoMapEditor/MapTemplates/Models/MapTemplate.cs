@@ -2,8 +2,11 @@
 using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared.AreaManagerData;
 using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared.AreaManagerData.GameObjectStructure;
 using Anno.FileDBModels.Anno1800.MapTemplate;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.Utilities;
+using FileDBSerializing.EncodingAwareStrings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -46,6 +49,8 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         private MapTemplateDocument _templateDocument = new();
 
+        public Gamedata? Gamedata { get; init; }
+
         public event EventHandler<MapTemplateResizeEventArgs>? MapSizeConfigChanged;
 
         public event EventHandler? MapSizeConfigCommitted;
@@ -59,6 +64,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             _size = new Vector2(document.MapTemplate?.Size);
             _playableAea = new Rect2(document.MapTemplate?.PlayableArea);
             _templateDocument = document;
+            Gamedata = gamedata;
 
             // TODO: Allow empty templates?
             int startingSpotCounter = 0;
@@ -83,22 +89,39 @@ namespace AnnoMapEditor.MapTemplates.Models
                 DataContent areaManagerContent = areaManagerData.GetDecompressedData()
                     ?? throw new Exception("Could not decompress AreaManagerDataItem.");
 
-                foreach (GameObject gameObject in areaManagerContent.AreaObjectManager!.GameObject!.objects!)
+                // load labels for GameObjects and EditorObjects
+                Dictionary<long, UTF8String> gameObjectLabelMap = new();
+                List<Tuple<UTF8String, long>>? gameObjectLabels = gamedata.GameSessionManager?.GameObjectManager?.GameObjectLabelMap;
+                if (gameObjectLabels != null)
                 {
-                    GameObjectElement element = GameObjectElement.FromGameObject(gameObject);
-                    Elements.Add(element);
+                    foreach (Tuple<UTF8String, long> entry in gameObjectLabels)
+                        gameObjectLabelMap.Add(entry.Item2, entry.Item1);
                 }
 
+                // load GameObjects
+                foreach (GameObject gameObject in areaManagerContent.AreaObjectManager!.GameObject!.objects!)
+                    AddGameObject(gameObject, gameObjectLabelMap);
+
+                // load EditorObjects
                 foreach (GameObject editorObject in areaManagerContent.AreaObjectManager!.EditorObject!.objects!)
-                {
-                    GameObjectElement element = GameObjectElement.FromGameObject(editorObject);
-                    Elements.Add(element);
-                }
+                    AddGameObject(editorObject, gameObjectLabelMap);
             }
 
             // clear links in the original
             if (_templateDocument.MapTemplate is not null)
                 _templateDocument.MapTemplate.TemplateElement = null;
+        }
+
+        private void AddGameObject(GameObject gameObject, Dictionary<long, UTF8String> labelMap)
+        {
+            long gameObjectId = (long)gameObject.ID!;
+
+            labelMap.TryGetValue(gameObjectId, out UTF8String? label);
+            DataManager.Instance.AssetRepository.TryGet(gameObject.guid ?? -1, out StandardAsset? asset);
+
+            GameObjectElement element = GameObjectElement.FromGameObject(gameObject, asset, label);
+
+            Elements.Add(element);
         }
 
         public MapTemplate(int mapSize, int playableSize, SessionAsset session)

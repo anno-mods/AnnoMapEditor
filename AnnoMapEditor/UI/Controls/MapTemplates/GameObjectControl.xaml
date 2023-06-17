@@ -27,7 +27,8 @@
                 CornerRadius="{Binding Source={x:Static local:GameObjectControl.MAP_PIN_BORDER}}"
                 Background="{Binding BackgroundBrush}"
                 VerticalAlignment="Center"
-                HorizontalAlignment="Center">
+                HorizontalAlignment="Center"
+                ToolTip="{Binding Label}">
         </Border>
 
     </Grid>

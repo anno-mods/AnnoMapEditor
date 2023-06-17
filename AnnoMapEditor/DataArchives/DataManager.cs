@@ -80,6 +80,9 @@ namespace AnnoMapEditor.DataArchives
                 _assetRepository.Register<MinimapSceneAsset>();
                 _assetRepository.Register<SessionAsset>();
                 _assetRepository.Register<MapTemplateAsset>();
+                _assetRepository.Register<PositionMarker>();
+                _assetRepository.Register<VisualObject>();
+                _assetRepository.Register<AmbientArea>();
                 await _assetRepository.InitializeAsync();
 
                 _fixedIslandRepository = new FixedIslandRepository(_dataArchive);
@@ -89,7 +92,7 @@ namespace AnnoMapEditor.DataArchives
                 await _islandRepository.InitializeAsync();
 
                 _mapGroupRepository = new MapGroupRepository(_dataArchive);
-                _mapGroupRepository.InitializeAsync();
+                await _mapGroupRepository.InitializeAsync();
             }
             catch (Exception ex)
             {

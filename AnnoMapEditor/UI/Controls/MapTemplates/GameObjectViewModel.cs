@@ -17,11 +17,15 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
         private SolidColorBrush _backgroundBrush = White;
 
+        public string? Label { get; init; }
+
 
         public GameObjectViewModel(GameObjectElement element) 
             : base(element)
         {
             UpdateBackground();
+
+            Label = element.Label?.ToString() ?? element.Asset?.Name;
 
             PropertyChanged += This_PropertyChanged;
         }

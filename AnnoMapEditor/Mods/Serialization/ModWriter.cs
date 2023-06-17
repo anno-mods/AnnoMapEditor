@@ -1,4 +1,5 @@
 ﻿using Anno.FileDBModels.Anno1800.Gamedata.Models.Shared;
+using Anno.FileDBModels.Anno1800.Shared.Grids;
 using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
@@ -240,11 +241,30 @@ namespace AnnoMapEditor.Mods.Serialization
 
             // If the session has existing Gamedata, it must be updated to reflect all changes made within the AME.
             (int x, int y, int size) playableArea = (mod.MapTemplate.PlayableArea.X, mod.MapTemplate.PlayableArea.Y, mod.MapTemplate.PlayableArea.Width);
-            Gamedata gameDataItem = new(mod.MapTemplate.Size.X, playableArea, mod.MapTemplate.Session.Region.Ambiente!, true);
+            Gamedata gamedata;
+            if (mod.MapTemplate.Gamedata != null)
+            {
+                gamedata = mod.MapTemplate.Gamedata;
+
+                GameSessionManager gameSessionManager = gamedata.GameSessionManager!;
+
+                // recompress the AreaManagerData
+                gameSessionManager.AreaManagerData[0].Item2.CompressData();
+
+                // resize WorldManager
+                WorldManager worldManager = new WorldManager(mod.MapTemplate.Size.X);
+                gameSessionManager.WorldManager = worldManager;
+
+                gameSessionManager.TerrainManager!.WorldSize = new[] { mod.MapTemplate.Size.Y, mod.MapTemplate.Size.X };
+
+                gameSessionManager.AreaIDs = new ShortGrid(mod.MapTemplate.Size.X, false);
+            }
+            else
+                gamedata = new(mod.MapTemplate.Size.X, playableArea, mod.MapTemplate.Session.Region.Ambiente!, true);
 
             //Create actual a7t File
             FileDBDocumentSerializer serializer = new(new() { Version = FileDBDocumentVersion.Version1 });
-            IFileDBDocument generatedFileDB = serializer.WriteObjectStructureToFileDBDocument(gameDataItem);
+            IFileDBDocument generatedFileDB = serializer.WriteObjectStructureToFileDBDocument(gamedata);
 
             using MemoryStream fileDbStream = new();
 
