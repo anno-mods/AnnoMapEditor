@@ -1,6 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
-using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Imaging;
@@ -20,16 +19,15 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public override bool RandomizeRotation => _fixedIsland.RandomizeRotation;
 
-        private readonly bool _isContinentalIsland;
+        public readonly bool IsContinentalIsland;
 
 
         public FixedIslandViewModel(MapTemplate mapTemplate, FixedIslandElement fixedIsland)
             : base(mapTemplate, fixedIsland)
         {
             _fixedIsland = fixedIsland;
-            _isContinentalIsland = _fixedIsland.IslandAsset.IslandSize.FirstOrDefault() == IslandSize.Continental;
+            IsContinentalIsland = _fixedIsland.IslandAsset.IslandSize.FirstOrDefault() == IslandSize.Continental;
 
-            SnapContinentalIsland();
             UpdateThumbnailRotation();
 
             fixedIsland.PropertyChanged += FixedIsland_PropertyChanged;
@@ -45,9 +43,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
             if (e.PropertyName == nameof(FixedIslandElement.IslandAsset))
                 Redraw();
-
-            if (e.PropertyName == nameof(FixedIslandElement.Position))
-                SnapContinentalIsland();
         }
 
         private void Redraw()
@@ -70,57 +65,5 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             OnPropertyChanged(nameof(ThumbnailRotation));
         }
 
-        // Rotates and snaps continental islands to the corners of the map.
-        // If a continental island is placed elswhere, it would result in graphical glitches.
-        private void SnapContinentalIsland()
-        {
-            if (!IsOutOfBounds && _isContinentalIsland)
-            {
-                Vector2 islandCenter = _fixedIsland.Position;
-                Vector2 mapCenterOffset = new((_mapTemplate.Size.X - Island.SizeInTiles) / 2, (_mapTemplate.Size.Y - Island.SizeInTiles) / 2);
-                string islandFileName = System.IO.Path.GetFileNameWithoutExtension(_fixedIsland.IslandAsset.FilePath);
-                int rotationOffset = ContinentalRotationAtTop[islandFileName];
-
-                if (islandCenter.X <= mapCenterOffset.X)
-                {
-                    // bottom
-                    if (islandCenter.Y <= mapCenterOffset.Y)
-                    {
-                        _fixedIsland.Rotation = (byte)((2 + rotationOffset) % 4);
-                        _fixedIsland.Position = new(0, 0);
-                    }
-
-                    // right
-                    else
-                    {
-                        _fixedIsland.Rotation = (byte)((3 + rotationOffset) % 4);
-                        _fixedIsland.Position = new(0, _mapTemplate.Size.Y - Island.SizeInTiles);
-                    }
-                }
-                else
-                {
-                    // left
-                    if (islandCenter.Y <= mapCenterOffset.Y)
-                    {
-                        _fixedIsland.Rotation = (byte)((1 + rotationOffset) % 4);
-                        _fixedIsland.Position = new(_mapTemplate.Size.X - Island.SizeInTiles, 0);
-                    }
-
-                    // top
-                    else
-                    {
-                        _fixedIsland.Rotation = (byte)((0 + rotationOffset) % 4);
-                        _fixedIsland.Position = new(_mapTemplate.Size.X - Island.SizeInTiles, _mapTemplate.Size.Y - Island.SizeInTiles);
-                    }
-                }
-            }
-        }
-
-        private static readonly Dictionary<string, int> ContinentalRotationAtTop = new Dictionary<string, int>()
-        {
-            { "colony01_c_01", 0 },
-            { "moderate_c_01", 1},
-            { "colony03_a03_01", 2}
-        };
     }
 }

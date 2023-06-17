@@ -1,6 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.UI.Controls.Dragging;
-using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
@@ -61,7 +60,7 @@ namespace AnnoMapEditor.UI.Controls.AddIsland
         }
 
 
-        public override void Move(Point delta)
+        protected override void OnDragging(Point delta)
         {
             EndDrag();
 

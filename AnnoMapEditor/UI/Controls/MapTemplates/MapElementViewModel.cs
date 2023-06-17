@@ -22,7 +22,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
 
 
-        public virtual void Move(Point delta)
+        public void Move(Point delta)
         {
             Element.Position = new(Element.Position.X + (int)delta.X, Element.Position.Y + (int)delta.Y);
         }

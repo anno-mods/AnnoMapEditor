@@ -99,6 +99,6 @@ namespace AnnoMapEditor.Utilities
             return X >= area.X && Y >= area.Y && X < area.X + area.Width && Y < area.Y + area.Height;
         }
 
-        private static int Normalize(int x) => (x + 4) / 8 * 8;
+        private static int Normalize(int x) => (int) Math.Round(x / 8d, MidpointRounding.AwayFromZero) * 8;
     }
 }

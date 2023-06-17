@@ -134,9 +134,9 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         private bool _resizingInProgress = false;
 
 
-        public override void Move(Point delta)
+        protected override void OnDragging(Point delta)
         {
-            base.Move(delta);
+            base.OnDragging(delta);
 
             //This limits movement so that the minimum Margin is always remaining.
             Vector2 newPosition = new(PosX + (int)delta.X, PosY + (int)delta.Y);

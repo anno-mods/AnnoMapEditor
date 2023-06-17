@@ -2,7 +2,6 @@
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -114,21 +113,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         private void UpdateRotation()
         {
             OnPropertyChanged(nameof(RandomizeRotation));
-        }
-
-        public override void Move(Point delta)
-        {
-            Vector2 vectorDelta = new(delta);
-            Vector2 newPosition = Element.Position + vectorDelta;
-
-            Rect2 mapArea = new(_mapTemplate.Size - Island.SizeInTiles + Vector2.Tile);
-
-            // provide resistance against moving islands of the map
-            if (!IsOutOfBounds && !newPosition.Within(mapArea) && vectorDelta.Length < 250)
-                Element.Position = newPosition.Clamp(mapArea);
-
-            else
-                Element.Position = newPosition;
         }
 
         public void BoundsCheck()

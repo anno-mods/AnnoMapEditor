@@ -548,24 +548,20 @@ namespace AnnoMapEditor.UI.Controls
                 else
                     DeselectMapElement(mapElementViewModel);
             }
+        }
 
-            // handle removal of islands
-            else if (e.PropertyName == nameof(IslandViewModel.IsOutOfBounds) || e.PropertyName == nameof(DraggingViewModel.IsDragging))
+        private void RemoveElement(MapElementViewModel viewModel)
+        {
+            _mapTemplate!.Elements.Remove(viewModel.Element);
+
+            // deselect the island if it was selected
+            _selectedElements.Remove(viewModel);
+            viewModel.Dragging -= MapElementViewModel_Dragging;
+            viewModel.DragEnded -= MapElementViewModel_DragEnded;
+            if (viewModel == _selectedElement)
             {
-                if (sender is IslandViewModel viewModel)
-                {
-                    if (viewModel.IsOutOfBounds && !viewModel.IsDragging && !_mapTemplate.ResizingInProgress)
-                    {
-                        _mapTemplate.Elements.Remove(viewModel.Element);
-
-                        // deselect the island if it was selected
-                        if (viewModel == _selectedElement)
-                        {
-                            _selectedElement = null;
-                            SelectedIsland = null;
-                        }
-                    }
-                }
+                _selectedElement = null;
+                SelectedIsland = null;
             }
         }
 
@@ -582,6 +578,84 @@ namespace AnnoMapEditor.UI.Controls
                 }
             }
         }
+
+
+//        public override void MoveIslandElement(Point delta)
+//        {
+//            Vector2 vectorDelta = new(delta);
+//            Vector2 newPosition = Element.Position + vectorDelta;
+//
+//            Rect2 mapArea = new(_mapTemplate.Size - Island.SizeInTiles + Vector2.Tile);
+//
+//            // provide resistance against moving islands of the map
+//            if (!IsOutOfBounds && !newPosition.Within(mapArea) && vectorDelta.Length < 250)
+//                Element.Position = newPosition.Clamp(mapArea);
+//
+//            else
+//                Element.Position = newPosition;
+//        }
+
+//        public void MoveStartingSpotElement(Point delta)
+//        {
+//            // prevent moving StartingSpots outside of the MapTemplate's playable area.
+//            Vector2 vectorDelta = new(delta);
+//            Vector2 newPosition = Element.Position + vectorDelta;
+//
+//            Element.Position = newPosition.Clamp(_mapTemplate.PlayableArea);
+//        }
+
+//        private static readonly Dictionary<string, int> ContinentalRotationAtTop = new Dictionary<string, int>()
+//        {
+//            { "colony01_c_01", 0 },
+//            { "moderate_c_01", 1},
+//            { "colony03_a03_01", 2}
+//        };
+
+//        // Rotates and snaps continental islands to the corners of the map.
+//        // If a continental island is placed elswhere, it would result in graphical glitches.
+//        private void SnapContinentalIsland()
+//        {
+//            if (!IsOutOfBounds && _isContinentalIsland)
+//            {
+//                Vector2 islandCenter = _fixedIsland.Position;
+//                Vector2 mapCenterOffset = new((_mapTemplate.Size.X - Island.SizeInTiles) / 2, (_mapTemplate.Size.Y - Island.SizeInTiles) / 2);
+//                string islandFileName = System.IO.Path.GetFileNameWithoutExtension(_fixedIsland.IslandAsset.FilePath);
+//                int rotationOffset = ContinentalRotationAtTop[islandFileName];
+//
+//                if (islandCenter.X <= mapCenterOffset.X)
+//                {
+//                    // bottom
+//                    if (islandCenter.Y <= mapCenterOffset.Y)
+//                    {
+//                        _fixedIsland.Rotation = (byte)((2 + rotationOffset) % 4);
+//                        _fixedIsland.Position = new(0, 0);
+//                    }
+//
+//                    // right
+//                    else
+//                    {
+//                        _fixedIsland.Rotation = (byte)((3 + rotationOffset) % 4);
+//                        _fixedIsland.Position = new(0, _mapTemplate.Size.Y - Island.SizeInTiles);
+//                    }
+//                }
+//                else
+//                {
+//                    // left
+//                    if (islandCenter.Y <= mapCenterOffset.Y)
+//                    {
+//                        _fixedIsland.Rotation = (byte)((1 + rotationOffset) % 4);
+//                        _fixedIsland.Position = new(_mapTemplate.Size.X - Island.SizeInTiles, 0);
+//                    }
+//
+//                    // top
+//                    else
+//                    {
+//                        _fixedIsland.Rotation = (byte)((0 + rotationOffset) % 4);
+//                        _fixedIsland.Position = new(_mapTemplate.Size.X - Island.SizeInTiles, _mapTemplate.Size.Y - Island.SizeInTiles);
+//                    }
+//                }
+//            }
+//        }
 
         private void MapElementViewModel_DragEnded(object? sender, DragEndedEventArgs e)
         {
@@ -741,15 +815,7 @@ namespace AnnoMapEditor.UI.Controls
             {
                 if (item is IslandControl mapIsland && mapIsland.DataContext is IslandViewModel islandViewModel && islandViewModel.IsOutOfBounds)
                 {
-                    _mapTemplate.Elements.Remove(islandViewModel.Element);
-
-                    // deselect the island if it was selected
-                    _selectedElements.Remove(islandViewModel);
-                    if (islandViewModel == _selectedElement)
-                    {
-                        _selectedElement = null;
-                        SelectedIsland = null;
-                    }
+                    RemoveElement(islandViewModel);
                 }
             }
         }

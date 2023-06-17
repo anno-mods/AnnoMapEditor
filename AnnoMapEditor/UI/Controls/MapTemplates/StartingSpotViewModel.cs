@@ -1,7 +1,5 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
-using AnnoMapEditor.Utilities;
 using System.ComponentModel;
-using System.Windows;
 using System.Windows.Media;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
@@ -59,15 +57,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
             else
                 BackgroundBrush = _startingSpot.Index == 0 ? Yellow : Red;
-        }
-
-        public override void Move(Point delta)
-        {
-            // prevent moving StartingSpots outside of the MapTemplate's playable area.
-            Vector2 vectorDelta = new(delta);
-            Vector2 newPosition = Element.Position + vectorDelta;
-
-            Element.Position = newPosition.Clamp(_mapTemplate.PlayableArea);
         }
     }
 }
