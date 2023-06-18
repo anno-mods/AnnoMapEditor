@@ -23,9 +23,9 @@ namespace AnnoMapEditor.MapTemplates.Serializing
         public async Task<MapTemplate> FromFileAsync(string filePath)
         {
             string extension = Path.GetExtension(filePath);
-            if (extension == "a7tinfo")
+            if (extension == ".a7tinfo")
                 return await FromBinaryFileAsync(filePath);
-            else if (extension == "xml")
+            else if (extension == ".xml")
                 return await FromXmlFileAsync(filePath);
             else
                 throw new ArgumentException($"Unsupported extension {extension}. Expected either a7tinfo or xml.", nameof(filePath));

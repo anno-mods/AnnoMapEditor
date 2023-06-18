@@ -45,7 +45,7 @@ namespace AnnoMapEditor.UI.Windows.Start
                 mapTemplate = await mapTemplateReader.FromDataArchiveAsync(a7tinfoPath);
 
             else
-                mapTemplate = await mapTemplateReader.FromDataArchiveAsync(a7tinfoPath);
+                mapTemplate = await mapTemplateReader.FromFileAsync(a7tinfoPath);
 
             MainWindow mainWindow = new(new MainWindowViewModel(mapTemplate));
 
