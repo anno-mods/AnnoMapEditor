@@ -2,7 +2,7 @@
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
-    public class DataPathStatus
+    public class GamePathStatus
     {
         public string Status { get; set; } = string.Empty;
 

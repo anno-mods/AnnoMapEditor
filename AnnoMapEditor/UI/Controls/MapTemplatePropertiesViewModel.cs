@@ -1,7 +1,8 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System;
+using System.Collections.Generic;
 
 namespace AnnoMapEditor.UI.Controls
 {
@@ -19,20 +20,20 @@ namespace AnnoMapEditor.UI.Controls
         }
         private string _mapSizeText = "";
 
-        public Region SelectedRegion
+        public SessionAsset SelectedSession
         {
-            get => _selectedRegion;
+            get => _selectedSession;
             set
             {
-                if (value != _selectedRegion)
+                if (value != _selectedSession)
                 {
-                    _selectedRegion = value;
-                    _mapTemplate.Region = value;
+                    _selectedSession = value;
+                    _mapTemplate.Session = value;
                     OnSelectedRegionChanged();
                 }
             }
         }
-        private Region _selectedRegion;
+        private SessionAsset _selectedSession;
 
         public event EventHandler? SelectedRegionChanged;
 
@@ -63,7 +64,7 @@ namespace AnnoMapEditor.UI.Controls
                 _mapTemplate.PlayableArea.Y + _mapTemplate.PlayableArea.Height);
         }
 
-        public Region[] Regions { get; } = Region.All;
+        public IEnumerable<SessionAsset> SupportedSessions { get; } = SessionAsset.SupportedSessions;
 
         public int MapSize
         {
@@ -117,7 +118,7 @@ namespace AnnoMapEditor.UI.Controls
             _mapTemplate = mapTemplate;
             _mapTemplate.MapSizeConfigCommitted += HandleMapTemplateSizeCommitted;
 
-            _selectedRegion = _mapTemplate.Region;
+            _selectedSession = _mapTemplate.Session;
 
             MapSize = mapTemplate.Size.X;
 

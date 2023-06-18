@@ -26,7 +26,7 @@ namespace AnnoMapEditor.MapTemplates.Validation
                 }
             }
 
-            int maxPoolSize = Pool.GetPool(mapTemplate.Region, _islandSize).Size;
+            int maxPoolSize = Pool.GetPool(mapTemplate.Session.Region, _islandSize).Size;
             if (islandCount <= maxPoolSize)
                 return MapTemplateValidatorResult.Ok;
             else

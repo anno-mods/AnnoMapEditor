@@ -1,5 +1,5 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
-using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.DataArchives.Assets.Deserialization;
+using AnnoMapEditor.DataArchives.Assets.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,14 +7,32 @@ using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
-    [AssetTemplate("Slot")]
+    [AssetTemplate(TEMPLATE_NAME)]
     public class SlotAsset : StandardAsset
     {
+        public const string TEMPLATE_NAME = "Slot";
+
         public const long RANDOM_MINE_OLD_WORLD_GUID = 1000029;
         public const long RANDOM_MINE_NEW_WORLD_GUID = 614;
         public const long RANDOM_MINE_ARCTIC_GUID = 116037;
         public const long RANDOM_CLAY_GUID = 100417;
         public const long RANDOM_OIL_GUID = 100849;
+
+
+        [StaticAsset(RANDOM_MINE_OLD_WORLD_GUID)]
+        public static SlotAsset RandomMineOldWorld { get; private set; }
+
+        [StaticAsset(RANDOM_MINE_NEW_WORLD_GUID)]
+        public static SlotAsset RandomMineNewWorld { get; private set; }
+
+        [StaticAsset(RANDOM_MINE_ARCTIC_GUID)]
+        public static SlotAsset RandomMineArctic { get; private set; }
+
+        [StaticAsset(RANDOM_CLAY_GUID)]
+        public static SlotAsset RandomClay { get; private set; }
+
+        [StaticAsset(RANDOM_OIL_GUID)]
+        public static SlotAsset RandomOil { get; private set; }
 
 
         public string DisplayName { get; init; }
@@ -25,18 +43,21 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         public IEnumerable<long> ReplacementGuids { get; init; }
 
-        [AssetReference(nameof(ReplacementGuids))]
-        public IEnumerable<SlotAsset> ReplacementSlotAssets { get; set; }
+        [GuidReference(nameof(ReplacementGuids))]
+        public ICollection<SlotAsset> ReplacementSlotAssets { get; set; }
 
-        public IEnumerable<Region> AssociatedRegions { get; init; }
+        public IEnumerable<string> AssociatedRegionIds { get; init; }
+
+        [RegionIdReference(nameof(AssociatedRegionIds))]
+        public ICollection<RegionAsset> AssociatedRegions { get; set; }
 
 
         public SlotAsset() : base()
         {
             DisplayName = "";
             ReplacementGuids = Enumerable.Empty<long>();
-            ReplacementSlotAssets = Enumerable.Empty<SlotAsset>();
-            AssociatedRegions = Enumerable.Empty<Region>();
+            ReplacementSlotAssets = Array.Empty<SlotAsset>();
+            AssociatedRegions = Array.Empty<RegionAsset>();
         }
 
 
@@ -50,7 +71,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 .Element("Text")!
                 .Value!;
 
-            SlotType = valuesXml.Element("Slot")?
+            SlotType = valuesXml.Element(TEMPLATE_NAME)?
                 .Element("SlotType")?
                 .Value;
             IsRandomSlot = SlotType == "Random";
@@ -71,15 +92,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
             ReplacementGuids = replacementGuids ?? dlcReplacementGuids ?? Array.Empty<long>();
 
-            AssociatedRegions = valuesXml.Element("Building")?
+            AssociatedRegionIds = valuesXml.Element("Building")?
                 .Element("AssociatedRegions")?
                 .Value?
                 .Split(';')
-                .Select(id => Region.FromRegionId(id))
                 .ToArray()
-                ?? Array.Empty<Region>();
-
-            ReplacementSlotAssets = Enumerable.Empty<SlotAsset>();
+                ?? Array.Empty<string>();
         }
     }
 }

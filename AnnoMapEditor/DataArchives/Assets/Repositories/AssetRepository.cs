@@ -1,8 +1,7 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
+﻿using AnnoMapEditor.DataArchives.Assets.Deserialization;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -19,13 +18,18 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
     public class AssetRepository : Repository
     {
+        private const string ASSETS_XML_PATH = "data/config/export/main/asset/assets.xml";
+
+
         private static readonly Logger<AssetRepository> _logger = new();
 
-        private const string AssetsXmlPath = "data/config/export/main/asset/assets.xml";
         private const string CachedAssetsXml = "assets.cached.xml";
 
-
         private readonly IDataArchive _dataArchive;
+
+        private readonly GuidReferenceResolverFactory _guidReferenceResolverFactory;
+
+        private readonly RegionIdReferenceResolverFactory _regionIdReferenceResolverFactory;
 
         private readonly Dictionary<string, Func<XElement, StandardAsset>> _deserializers = new();
 
@@ -33,9 +37,14 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         private readonly Dictionary<long, StandardAsset> _assets = new();
 
+        private readonly List<Type> _assetTypes = new();
+
+
         public AssetRepository(IDataArchive dataArchive)
         {
             _dataArchive = dataArchive;
+            _guidReferenceResolverFactory = new(this);
+            _regionIdReferenceResolverFactory = new(this);
         }
 
         private StandardAsset? ConstructAssetFrom(XElement assetElement)
@@ -94,21 +103,23 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             doc.Save(File.Create(CachedAssetsXml));
         }
 
-        protected override async Task DoLoad()
+        public override async Task InitializeAsync()
         {
             _logger.LogInformation($"Loading assets...");
 
             // load assets.xml
             Stopwatch watch = Stopwatch.StartNew();
 
-            Stream assetsXmlStream = _dataArchive.OpenRead(AssetsXmlPath)
+            Stream assetsXmlStream = _dataArchive.OpenRead(ASSETS_XML_PATH)
                 ?? throw new Exception($"Could not locate assets.xml.");
+
+            var xpath = GetXpath();
 
             using var hasher = SHA256.Create();
             var hash = hasher.ComputeHash(assetsXmlStream);
             var hashB64 = Convert.ToBase64String(hash);
             assetsXmlStream.Seek(0, SeekOrigin.Begin);
-            bool validCache = UserSettings.Default.AssetsHash == hashB64;
+            bool validCache = UserSettings.Default.AssetsHash == hashB64 && UserSettings.Default.Xpath == xpath;
             _logger.LogInformation($"Computed Hash at {watch.Elapsed.TotalMilliseconds} ms");
 
             if (validCache)
@@ -125,12 +136,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             }
 
             var Xml = XDocument.Load(assetsXmlStream);
-            var xpath = GetXpath();
             var assets = Xml.XPathSelectElements(xpath);
 
             if (!validCache)
             {
                 UserSettings.Default.AssetsHash = hashB64;
+                UserSettings.Default.Xpath = xpath; 
                 UserSettings.Default.Save();
                 assetsXmlStream.Dispose();
                 RenewCache(assets);
@@ -152,7 +163,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 }
             }
 
-            _logger.LogInformation($"Finished Deserialising at {watch.Elapsed.TotalMilliseconds} ms");
+            _logger.LogInformation($"Finished Deserialising at {watch.Elapsed.TotalMilliseconds} ms.");
             _logger.LogInformation($"Resolving asset references...");
 
             // resolve references
@@ -162,6 +173,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     foreach (Action<object> resolver in resolvers)
                         resolver(asset);
             }
+
+            InitializeStaticAssets();
 
             watch.Stop();
             _logger.LogInformation($"Finished loading {_assets.Count} assets at {watch.Elapsed.TotalMilliseconds} ms.");
@@ -223,46 +236,34 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         {
             AssetTemplateAttribute assetTemplateAttribute = typeof(TAsset).GetCustomAttribute<AssetTemplateAttribute>()
                 ?? throw new Exception($"Cannot register type '{typeof(TAsset).FullName}' as an asset model, because it lacks the {nameof(AssetTemplateAttribute)}.");
-            string templateName = assetTemplateAttribute.TemplateName;
-
+            
             // get the deserializer
             ConstructorInfo deserializerConstructor = typeof(TAsset).GetConstructor(new[] { typeof(XElement) })
                 ?? throw new Exception($"Type {typeof(TAsset).FullName} is not a valid asset model. Asset models must have a deserialization constructor.");
             Func<XElement, TAsset> deserializer = (x) => (TAsset)deserializerConstructor.Invoke(new[] { x });
 
-            _deserializers.Add(templateName, deserializer);
+            foreach (string templateName in assetTemplateAttribute.TemplateNames)
+                _deserializers.Add(templateName, deserializer);
 
             // prepare to resolve references
             foreach (PropertyInfo property in typeof(TAsset).GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                // determine if this property is a reference to another asset
-                AssetReferenceAttribute? referenceAttribute = property.GetCustomAttribute<AssetReferenceAttribute>();
-                if (referenceAttribute == null)
-                    continue;
-
-                // get the property containing the guid of the referenced asset
-                PropertyInfo guidProperty = typeof(TAsset).GetProperty(referenceAttribute.GuidPropertyName)
-                    ?? throw new ArgumentException($"Invalid {nameof(AssetReferenceAttribute)} on type {typeof(TAsset).FullName}. Could not find property '{referenceAttribute.GuidPropertyName}'.");
-
-                // create the resolver
-                Action<object> resolver;
-                if (guidProperty.PropertyType == typeof(long))
-                    resolver = CreateEnumerableReferenceResolver<TAsset>(property, guidProperty);
-
-                else if (guidProperty.PropertyType == typeof(IEnumerable<long>))
-                    resolver = CreateEnumerableReferenceResolver<TAsset>(property, guidProperty);
-
-                else
-                    throw new ArgumentException($"Invalid {nameof(AssetReferenceAttribute)} on type {typeof(TAsset).FullName}. Property '{referenceAttribute.GuidPropertyName}' must either be of type {typeof(long).FullName} or {typeof(IEnumerable<long>).FullName}.");
+                Action<object>? resolver = _guidReferenceResolverFactory.CreateResolver<TAsset>(property)
+                    ?? _regionIdReferenceResolverFactory.CreateResolver<TAsset>(property);
 
                 // keep track of all resolvers
-                if (!_referenceResolvers.TryGetValue(typeof(TAsset), out List<Action<object>>? resolvers))
+                if (resolver != null)
                 {
-                    resolvers = new();
-                    _referenceResolvers.Add(typeof(TAsset), resolvers);
+                    if (!_referenceResolvers.TryGetValue(typeof(TAsset), out List<Action<object>>? resolvers))
+                    {
+                        resolvers = new();
+                        _referenceResolvers.Add(typeof(TAsset), resolvers);
+                    }
+                    resolvers.Add(resolver);
                 }
-                resolvers.Add(resolver);
             }
+
+            _assetTypes.Add(typeof(TAsset));
 
             _logger.LogInformation($"Registered asset type '{typeof(TAsset).FullName}'.");
         }
@@ -282,61 +283,27 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             return null;
         }
 
-        private Action<object> CreateSingleReferenceResolver<TAsset>(PropertyInfo referenceProperty, PropertyInfo guidProperty) where TAsset : StandardAsset
+        private void InitializeStaticAssets()
         {
-            // validate the reference property
-            Type referencedType = referenceProperty.PropertyType;
-            if (!typeof(StandardAsset).IsAssignableFrom(referencedType))
-                throw new ArgumentException();
-
-            // create the delegate
-            return (asset) =>
+            foreach (Type assetType in _assetTypes)
             {
-                long? guid = guidProperty.GetValue(asset) as long?;
-                if (guid.HasValue)
+                foreach (PropertyInfo staticProperty in assetType.GetProperties(BindingFlags.Static | BindingFlags.Public))
                 {
-                    StandardAsset? referencedAsset = GetReferencedAsset((long) guid, referencedType);
-                    if (referencedAsset != null)
-                        referenceProperty.SetValue(asset, referencedAsset);
-                }
-            };
-        }
+                    StaticAssetAttribute? staticAssetAttribute = staticProperty.GetCustomAttribute<StaticAssetAttribute>();
+                    if (staticAssetAttribute == null)
+                        continue;
 
-
-        private Action<object> CreateEnumerableReferenceResolver<TAsset>(PropertyInfo referenceProperty, PropertyInfo guidProperty) where TAsset : StandardAsset
-        {
-            // determine the type of the referenced assets
-            if (!referenceProperty.PropertyType.IsGenericType)
-                throw new ArgumentException();
-
-            // validate the reference property
-            Type referencedType = referenceProperty.PropertyType.GenericTypeArguments[0];
-            if (!typeof(StandardAsset).IsAssignableFrom(referencedType))
-                throw new ArgumentException();
-
-            Type enumerableType = typeof(IEnumerable<>).MakeGenericType(referencedType);
-            if (referenceProperty.PropertyType != enumerableType)
-                throw new ArgumentException();
-
-            // create the delegate
-            Type listType = typeof(List<>).MakeGenericType(referencedType);
-            return (asset) =>
-            {
-                IEnumerable<long>? guids = guidProperty.GetValue(asset) as IEnumerable<long>;
-                if (guids != null)
-                {
-                    IList list = (IList)Activator.CreateInstance(listType)!;
-
-                    foreach (long guid in guids)
+                    if (TryGet(staticAssetAttribute.GUID, out StandardAsset? asset))
                     {
-                        StandardAsset? referencedAsset = GetReferencedAsset((long)guid, referencedType);
-                        if (referencedAsset != null)
-                            list.Add(referencedAsset);
-                    }
+                        if (!staticProperty.PropertyType.IsAssignableFrom(asset.GetType()))
+                            throw new Exception($"Could not resolve StaticAsset {assetType.FullName}.{staticProperty.Name}. The asset's type {asset.GetType().FullName} does not match the property's type {staticProperty.PropertyType.FullName}.");
 
-                    referenceProperty.SetValue(asset, list);
+                        staticProperty.SetValue(null, asset);
+                    }
+                    else
+                        throw new Exception($"Could not resolve StaticAsset {assetType.FullName}.{staticProperty.Name}. There exists no asset with GUID {staticAssetAttribute.GUID}.");
                 }
-            };
+            }
         }
     }
 }

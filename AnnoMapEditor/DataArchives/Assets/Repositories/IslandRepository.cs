@@ -45,8 +45,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         {
             _fixedIslandRepository = fixedIslandRepository;
             _assetRepository = assetRepository;
-
-            LoadAsync();
         }
 
 
@@ -67,17 +65,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             => _byFilePath.TryGetValue(mapFilePath, out islandAsset);
 #pragma warning restore CS8762 // Parameter must have a non-null value when exiting in some condition.
 
-        protected override async Task DoLoad()
+        public override Task InitializeAsync()
         {
             _logger.LogInformation($"Begin loading islands.");
-            _logger.LogInformation($"Waiting for random and fixed islands to be loaded.");
-
-            // wait for both the random and fixed island repositories to be loaded
-            // TODO: BUG In theory both randomIslandRepositoryand fixedIslandRepository should be
-            //       able to initialize at the same time. However, there occurs a deadlock when
-            //       doing so.
-            await _assetRepository.AwaitLoadingAsync();
-            await _fixedIslandRepository.AwaitLoadingAsync();
 
             Dictionary<string, RandomIslandAsset> randomByFilePath = _assetRepository
                 .GetAll<RandomIslandAsset>()
@@ -92,7 +82,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 randomByFilePath.TryGetValue(filePath, out RandomIslandAsset? randomIsland);
 
                 IslandSize islandSize = IslandSize.All.FirstOrDefault(s => fixedIsland.SizeInTiles <= s.DefaultSizeInTiles)!;
-                
+
                 // resolve slot guids to assets ignoring WorkAreas
                 foreach (Slot slot in fixedIsland.Slots.Values)
                 {
@@ -105,7 +95,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     FilePath = filePath,
                     DisplayName = randomIsland?.Name ?? Path.GetFileNameWithoutExtension(filePath),
                     Thumbnail = fixedIsland.Thumbnail,
-                    Region = randomIsland?.IslandRegion ?? Region.DetectFromPath(filePath),
+                    Region = randomIsland?.IslandRegion ?? RegionAsset.DetectFromPath(filePath),
                     IslandDifficulty = randomIsland?.IslandDifficulty ?? new[] { IslandDifficulty.Normal },
                     IslandType = randomIsland?.IslandType ?? new[] { DetectIslandTypeFromPath(filePath) },
                     IslandSize = new[] { islandSize },
@@ -115,6 +105,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             }
 
             _logger.LogInformation($"Finished loading {_fixedIslandRepository.Count()} islands.");
+            return Task.CompletedTask;
         }
 
 

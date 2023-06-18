@@ -1,5 +1,5 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
-using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
@@ -27,12 +27,12 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
         private Rect2 _playableAea = new();
 
-        public Region Region 
+        public SessionAsset Session 
         { 
-            get => _region;
-            set => SetProperty(ref _region, value);
+            get => _session;
+            set => SetProperty(ref _session, value);
         }
-        private Region _region;
+        private SessionAsset _session;
 
         public bool ResizingInProgress
         {
@@ -50,15 +50,15 @@ namespace AnnoMapEditor.MapTemplates.Models
         public string MapSizeText => $"Size: {Size.X}, Playable: {PlayableArea.Width}";
 
 
-        public MapTemplate(Region region)
+        public MapTemplate(SessionAsset session)
         {
-            _region = region;
+            _session = session;
             _templateDocument = new MapTemplateDocument();
         }
 
-        public MapTemplate(MapTemplateDocument document, Region region)
+        public MapTemplate(MapTemplateDocument document, SessionAsset session)
         {
-            _region = region;
+            _session = session;
             _size = new Vector2(document.MapTemplate?.Size);
             _playableAea = new Rect2(document.MapTemplate?.PlayableArea);
             _templateDocument = document;
@@ -80,7 +80,7 @@ namespace AnnoMapEditor.MapTemplates.Models
                 _templateDocument.MapTemplate.TemplateElement = null;
         }
 
-        public MapTemplate(int mapSize, int playableSize, Region region)
+        public MapTemplate(int mapSize, int playableSize, SessionAsset session)
         {
             int margin = (mapSize - playableSize) / 2;
 
@@ -94,7 +94,7 @@ namespace AnnoMapEditor.MapTemplates.Models
                 }
             };
 
-            _region = region;
+            _session = session;
             _size = new Vector2(_templateDocument.MapTemplate.Size);
             _playableAea = new Rect2(_templateDocument.MapTemplate.PlayableArea);
 
@@ -182,7 +182,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             _templateDocument.MapTemplate.TemplateElement = new List<TemplateElement>(Elements.Select(x => x.ToTemplate()).Where(x => x is not null)!);
             _templateDocument.MapTemplate.ElementCount = _templateDocument.MapTemplate.TemplateElement.Count;
 
-            if (Region.HasMapExtension && writeInitialArea)
+            if (Session == SessionAsset.NewWorld)
                 _templateDocument.MapTemplate.InitialPlayableArea = _templateDocument.MapTemplate.PlayableArea;
             else
                 _templateDocument.MapTemplate.InitialPlayableArea = null;

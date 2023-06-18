@@ -33,22 +33,19 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition />
-            <RowDefinition x:Name="Footer" Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <!-- map view -->
         <controls:MapView
                 x:Name="Map"
                 Grid.Column="1"
-                Grid.Row="0"
                 SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 EditPlayableArea="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.MapTemplateProperties.EditPlayableArea, Mode=OneWay}"
                 ShowPlayableAreaMargins="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.MapTemplateProperties.ShowPlayableAreaMargins, Mode=OneWay}"
-                DataContext="{Binding MapTemplate, Mode=OneWay}" />
+                DataContext="{Binding MapTemplate, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
         
         <!-- MapTemplate properties -->
         <StackPanel Grid.Column="0"
-                    Grid.Row="0"
                     Margin="16">
             <TextBlock
                     Style="{StaticResource HeaderLabelStyle}"
@@ -66,8 +63,8 @@
                     <ContentControl Content="Save" />
                     <controls:DropDownButton.Menu>
                         <ContextMenu>
-                            <MenuItem Header="As map template..." Click="ExportMap_Click"/>
-                            <MenuItem Header="{Binding ExportStatus.ExportAsModText, UpdateSourceTrigger=PropertyChanged}" Click="ExportMod_Click" IsEnabled="{Binding ExportStatus.CanExportAsMod, UpdateSourceTrigger=PropertyChanged}" />
+                            <MenuItem Header="As map template" Click="ExportMap_Click"/>
+                            <MenuItem Header="As playable mod" Click="ExportMod_Click"/>
                         </ContextMenu>
                     </controls:DropDownButton.Menu>
                 </controls:DropDownButton>
@@ -82,43 +79,16 @@
         </StackPanel>
 
         <!-- island properties -->
-        <StackPanel Grid.Column="2"
-                    Grid.Row="0">
+        <StackPanel Grid.Column="2">
             <islandProperties:RandomIslandProperties DataContext="{Binding SelectedRandomIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
             <islandProperties:FixedIslandProperties DataContext="{Binding SelectedFixedIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
 
         <!-- footer -->
-        <StackPanel Grid.Column="0" 
-                    Grid.Row="1"
-                    Orientation="Horizontal"
-                    VerticalAlignment="Bottom" 
-                    Margin="8,0,0,0">
-            <emoji:TextBlock Text="{Binding DataPathStatus.Status, UpdateSourceTrigger=PropertyChanged}"
-                                 ToolTip="{Binding DataPathStatus.ToolTip, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Click="Configure_Click" HorizontalAlignment="Left"
-                        Visibility="{Binding DataPathStatus.Configure, UpdateSourceTrigger=PropertyChanged}">
-                <TextBlock Text="{Binding DataPathStatus.ConfigureText, UpdateSourceTrigger=PropertyChanged}"/>
-            </Button>
-            <Button Click="AutoDetect_Click" HorizontalAlignment="Left"
-                        Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}">Auto detect</Button>
-        </StackPanel>
-        <TextBlock Grid.Column="2"
-                   Grid.Row="1"
-                   Style="{StaticResource MutedLabelStyle}"
-                   VerticalAlignment="Bottom"
-                   HorizontalAlignment="Right"
-                   TextAlignment="Right">
-                <Run>The editor is work in progress.</Run>
-                <LineBreak />
-                <Run>Visit GitHub for </Run>
-                <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor#roadmap" RequestNavigate="Hyperlink_OpenBrowser">roadmap</Hyperlink>
-                <Run>and</Run>
-                <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
-        </TextBlock>
+        <controls:Imprint Grid.Column="2"
+                          VerticalAlignment="Bottom"/>
 
         <!-- Overlays -->
-        <overlays:OverlayContainer Grid.ColumnSpan="3"
-                                   Grid.RowSpan="2" />
+        <overlays:OverlayContainer Grid.ColumnSpan="3" />
     </Grid>
 </Window>

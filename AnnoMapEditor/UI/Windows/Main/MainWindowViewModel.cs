@@ -1,29 +1,22 @@
 ﻿using AnnoMapEditor.DataArchives;
-using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
-using AnnoMapEditor.Mods.Models;
 using AnnoMapEditor.UI.Controls;
 using AnnoMapEditor.UI.Controls.IslandProperties;
 using AnnoMapEditor.UI.Controls.MapTemplates;
 using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
+using Microsoft.Win32;
 using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Xml;
+using System.Windows.Controls;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
     public class MainWindowViewModel : ObservableBase
     {
-        public MapTemplate? MapTemplate
+        public MapTemplate MapTemplate
         {
             get => _mapTemplate;
             private set
@@ -33,23 +26,27 @@ namespace AnnoMapEditor.UI.Windows.Main
                     SetProperty(ref _mapTemplate, value);
                     SelectedIsland = null;
 
-                    if(MapTemplateProperties is not null) 
-                        MapTemplateProperties.SelectedRegionChanged -= SelectedRegionChanged;
-
-                    MapTemplateProperties = value is null ? null : new(value);
-                    OnPropertyChanged(nameof(MapTemplateProperties));
-
-                    if(MapTemplateProperties is not null)
-                        MapTemplateProperties.SelectedRegionChanged += SelectedRegionChanged;
-
-                    MapTemplateChecker = value is null ? null : new(value);
-                    OnPropertyChanged(nameof(MapTemplateChecker));
+                    MapTemplateProperties = new(value);
+                    MapTemplateChecker = new(value);
                 }
             }
         }
-        private MapTemplate? _mapTemplate;
-        public MapTemplatePropertiesViewModel? MapTemplateProperties { get; private set; }
-        public MapTemplateCheckerViewModel? MapTemplateChecker { get; private set; }
+        private MapTemplate _mapTemplate;
+
+        public MapTemplatePropertiesViewModel MapTemplateProperties 
+        { 
+            get => _mapTemplateProperties; 
+            private set => SetProperty(ref _mapTemplateProperties, value); 
+        }
+        private MapTemplatePropertiesViewModel _mapTemplateProperties;
+
+        public MapTemplateCheckerViewModel MapTemplateChecker
+        {
+            get => _mapTemplateChecker;
+            private set => SetProperty(ref _mapTemplateChecker, value);
+        }
+        private MapTemplateCheckerViewModel _mapTemplateChecker;
+
 
         public IslandElement? SelectedIsland
         {
@@ -71,7 +68,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 else if (value is FixedIslandElement fixedIsland)
                 {
                     SelectedRandomIslandPropertiesViewModel = null;
-                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland, MapTemplate!.Region);
+                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland, MapTemplate!.Session.Region);
                 }
             }
         }
@@ -111,48 +108,17 @@ namespace AnnoMapEditor.UI.Windows.Main
         }
         private string? _mapTemplateFilePath;
 
-        public DataPathStatus DataPathStatus
+
+        public MainWindowViewModel(MapTemplate mapTemplate)
         {
-            get => _dataPathStatus;
-            private set => SetProperty(ref _dataPathStatus, value);
-        }
-        private DataPathStatus _dataPathStatus = new();
-
-        public ExportStatus ExportStatus
-        {
-            get => _exportStatus;
-            private set => SetProperty(ref _exportStatus, value);
-        }
-        private ExportStatus _exportStatus = new();
-
-        public List<MapGroup>? Maps
-        {
-            get => _maps;
-            private set => SetProperty(ref _maps, value);
-        }
-        private List<MapGroup>? _maps;
-
-        public Settings Settings { get; private set; }
-
-        public MainWindowViewModel(Settings settings)
-        {
-            Settings = settings;
-            Settings.PropertyChanged += Settings_PropertyChanged;
-
-
-            UpdateStatusAndMenus();
+            MapTemplate = mapTemplate;
         }
 
-        private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        public MainWindowViewModel()
         {
-            if (e.PropertyName == nameof(Settings.IsLoading))
-                UpdateStatusAndMenus();
+            CreateNewMap();
         }
 
-        private void SelectedRegionChanged(object? sender, EventArgs _)
-        {
-            UpdateExportStatus();
-        }
 
         public async Task OpenMap(string a7tinfoPath, bool fromArchive = false)
         {
@@ -164,8 +130,6 @@ namespace AnnoMapEditor.UI.Windows.Main
 
             else
                 MapTemplate = await mapTemplateReader.FromFileAsync(a7tinfoPath);
-
-            UpdateExportStatus();
         }
 
         public void CreateNewMap()
@@ -174,10 +138,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             const int DEFAULT_PLAYABLE_SIZE = 2160;
 
             MapTemplateFilePath = null;
-
-            MapTemplate = new MapTemplate(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, Region.Moderate);
-
-            UpdateExportStatus();
+            MapTemplate = new MapTemplate(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, SessionAsset.OldWorld);
         }
 
         public async Task SaveMap(string filePath)
@@ -189,120 +150,57 @@ namespace AnnoMapEditor.UI.Windows.Main
             MapTemplateWriter mapTemplateWriter = new();
 
             if (Path.GetExtension(filePath).ToLower() == ".a7tinfo")
-                await mapTemplateWriter.ToA7tinfoAsync(MapTemplate, filePath);
+                await mapTemplateWriter.WriteA7tinfoAsync(MapTemplate, filePath);
             else
-                await mapTemplateWriter.ToXmlAsync(MapTemplate, filePath);
+                await mapTemplateWriter.WriteXmlAsync(MapTemplate, filePath);
         }
 
-        private void UpdateExportStatus()
+        public void PopulateOpenMapMenu(ContextMenu menu)
         {
-            if (Settings.IsLoading)
-            {
-                // still loading
-                ExportStatus = new ExportStatus()
-                {
-                    CanExportAsMod = false,
-                    ExportAsModText = "(loading RDA...)"
-                };
-            }
-            else if (Settings.IsValidDataPath)
-            {
-                bool supportedFormat = Mod.CanSave(MapTemplate);
-                bool archiveReady = Settings.DataArchive is RdaDataArchive;
+            menu.Items.Clear();
 
-                ExportStatus = new ExportStatus()
-                {
-                    CanExportAsMod = archiveReady && supportedFormat,
-                    ExportAsModText = archiveReady ? supportedFormat ? "As playable mod..." : "As mod: only works with Old World maps currently" : "As mod: set game path to save"
-                };
-            }
-            else
+            MenuItem openMapFile = new() { Header = "Open file..." };
+            openMapFile.Click += (_, _) => OpenMapFileDialog();
+            menu.Items.Add(openMapFile);
+            menu.Items.Add(new Separator());
+
+            MenuItem newFile = new() { Header = "New Map file" };
+            newFile.Click += (_, _) => CreateNewMap();
+            menu.Items.Add(newFile);
+            menu.Items.Add(new Separator());
+
+            foreach (MapGroup group in DataManager.Instance.MapGroupRepository.MapGroups)
             {
-                ExportStatus = new ExportStatus()
+                MenuItem groupMenu = new() { Header = group.Name };
+
+                foreach (MapInfo map in group.Maps)
                 {
-                    ExportAsModText = "As mod: set game path to save",
-                    CanExportAsMod = false
-                };
+                    MenuItem mapMenu = new() { Header = map.Name, DataContext = map };
+                    mapMenu.Click += (_, _) => _ = OpenMap(map.FileName!, true);
+                    groupMenu.Items.Add(mapMenu);
+                }
+
+                menu.Items.Add(groupMenu);
             }
         }
 
-        private void UpdateStatusAndMenus()
+        public async void OpenMapFileDialog()
         {
-            if (Settings.IsLoading)
+            var picker = new OpenFileDialog
             {
-                // still loading
-                DataPathStatus = new DataPathStatus()
-                {
-                    Status = "loading RDA...",
-                    ToolTip = "",
-                    Configure = Visibility.Collapsed,
-                    AutoDetect = Visibility.Collapsed,
-                };
-            }
-            else if (Settings.IsValidDataPath)
+                Filter = "Map templates (*.a7tinfo, *.xml)|*.a7tinfo;*.xml"
+            };
+
+            if (true == picker.ShowDialog())
             {
-                DataPathStatus = new DataPathStatus()
-                {
-                    Status = Settings.DataArchive is RdaDataArchive ? "Game path set ✔" : "Extracted RDA path set ✔",
-                    ToolTip = Settings.DataArchive.DataPath,
-                    ConfigureText = "Change...",
-                    AutoDetect = Settings.DataArchive is RdaDataArchive ? Visibility.Collapsed : Visibility.Visible,
-                };
+                int end = picker.FileName.IndexOf(@"\data\session");
+                if (end == -1)
+                    end = picker.FileName.IndexOf(@"\data\dlc");
+                if (end != -1)
+                    Settings.Instance.GamePath = picker.FileName[..end];
 
-                Dictionary<string, Regex> templateGroups = new()
-                {
-                    ["DLCs"] = new(@"data\/(?!=sessions\/)([^\/]+)"),
-                    ["Moderate"] = new(@"data\/sessions\/.+moderate"),
-                    ["New World"] = new(@"data\/sessions\/.+colony01")
-                };
-
-                //load from assets instead.
-                var mapTemplates = Settings.DataArchive.Find("*.a7tinfo");
-
-                Maps = new()
-                {
-                    new MapGroup("Campaign", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/campaign")), new(@"\/campaign_([^\/]+)\.")),
-                    new MapGroup("Moderate, Archipelago", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_archipel")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("Moderate, Atoll", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_atoll")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("Moderate, Corners", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_corners")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("Moderate, Island Arc", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_islandarc")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("Moderate, Snowflake", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate/moderate_snowflake")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("New World, Large", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_l_")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("New World, Medium", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_m_")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("New World, Small", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/colony01/colony01_s_")), new(@"\/([^\/]+)\.")),
-                    new MapGroup("DLCs", mapTemplates.Where(x => !x.StartsWith(@"data/sessions/")), new(@"data\/([^\/]+)\/.+\/maps\/([^\/]+)"))
-                    //new MapGroup("Moderate", mapTemplates.Where(x => x.StartsWith(@"data/sessions/maps/pool/moderate")), new(@"\/([^\/]+)\."))
-                };
+                await OpenMap(picker.FileName);
             }
-            else
-            {
-                DataPathStatus = new DataPathStatus()
-                {
-                    Status = "⚠ Game or RDA path not valid.",
-                    ToolTip = null,
-                    ConfigureText = "Select...",
-                    AutoDetect = Visibility.Visible,
-                };
-
-                Maps = new();
-            }
-
-            UpdateExportStatus();
-        }
-
-        private IEnumerable<String>? LoadMapsFromAssets()
-        {
-            const string assetsXmlPath = "data/config/export/main/asset/assets.xml";
-
-            Stopwatch stopwatch= Stopwatch.StartNew();
-            using var assetStream = Settings.DataArchive.OpenRead(assetsXmlPath)
-                ?? throw new FileNotFoundException(assetsXmlPath);
-            XmlDocument doc = new XmlDocument();
-            doc.Load(assetStream);
-            var nodes = doc.SelectNodes("//Asset[Template='MapTemplate']/Values/MapTemplate[TemplateRegion]/*[self::TemplateFilename or self::EnlargedTemplateFilename]");
-            stopwatch.Stop();
-            double i = stopwatch.Elapsed.TotalMilliseconds;
-            return nodes?.Cast<XmlNode>().Select(x => Path.ChangeExtension(x.InnerText, "a7tinfo"));
         }
     }
 }

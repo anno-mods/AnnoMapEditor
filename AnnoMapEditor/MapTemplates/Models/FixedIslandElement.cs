@@ -1,4 +1,5 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates.Enums;
@@ -75,21 +76,6 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public Dictionary<long, SlotAssignment> SlotAssignments { get; init; } = new();
 
-        /// <summary>
-        /// For tracking if the island needs yet to be loaded.
-        /// </summary>
-        public bool DelayedLoading
-        {
-            get => _delayedLoading;
-            private set => SetProperty(ref _delayedLoading, value);
-        }
-        private bool _delayedLoading = false;
-
-        /// <summary>
-        /// Used for tracking the original label during delayed loading.
-        /// </summary>
-        private string? prevLabel;
-
 
         public FixedIslandElement(IslandAsset islandAsset, IslandType islandType)
             : base(islandType)
@@ -124,24 +110,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             _randomizeFertilities = sourceElement.RandomizeFertilities != false;
             _randomizeSlots = sourceElement.MineSlotMapping == null || sourceElement.MineSlotMapping.Count == 0;
 
-            if (Settings.Instance.IsLoading)
-            {
-                DelayedLoading = true;
-                //Show island file if not labelled, while still loading
-                prevLabel = Label;
-                if (string.IsNullOrEmpty(Label))
-                {
-                    Label = System.IO.Path.GetFileNameWithoutExtension(islandFilePath);
-                }
-                SetDummyAsset(sourceElement);
-                System.Diagnostics.Debug.WriteLine($"Queueing item {sourceElement!.MapFilePath} for LoadingFinished.");
-                Settings.Instance.LoadingFinished += DelayedLoadAssetData;
-            }
-            else
-            {
-                LoadIslandDataFromRepository(sourceElement, false);
-            }
-            
+            LoadIslandDataFromRepository(sourceElement);
         }
 
         /// <summary>
@@ -149,19 +118,15 @@ namespace AnnoMapEditor.MapTemplates.Models
         /// Should only be called when the IslandRepository is actually loaded, errors otherwise.
         /// </summary>
         /// <param name="sourceElement">The element from the template.</param>
-        /// <param name="delayed">Whether this is a delayed loading call (which means cleanup needs to be done after loading).</param>
         /// <exception cref="ArgumentException">The sourceElement does not have a MapFilePath. This is forbidden on FixedIslands.</exception>
-        /// <exception cref="Exception">The IslandRepository either does not exist or has not finished loading yet.</exception>
         /// <exception cref="NullReferenceException">The given MapFilePath does not match any islands in the IslandRepository.</exception>
         [MemberNotNull(nameof(_islandAsset))]
-        private void LoadIslandDataFromRepository(Element sourceElement, bool delayed)
+        private void LoadIslandDataFromRepository(Element sourceElement)
         {
             string islandFilePath = sourceElement.MapFilePath
                 ?? throw new ArgumentException($"Missing property '{nameof(Element.MapFilePath)}'.");
-            IslandRepository islandRepository = Settings.Instance.IslandRepository
-                ?? throw new Exception($"No {nameof(IslandRepository)} could be found.");
-            if (!islandRepository.IsLoaded)
-                throw new Exception($"The {nameof(IslandRepository)} has not been loaded.");
+
+            IslandRepository islandRepository = DataManager.Instance.IslandRepository;
 
             if (!islandRepository.TryGetByFilePath(islandFilePath, out var islandAsset))
                 throw new NullReferenceException($"Unknown island '{islandFilePath}'.");
@@ -169,8 +134,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             IslandAsset = islandAsset;
             //Rotation is not asset bound, thus loaded in constructor
 
-            AssetRepository assetRepository = Settings.Instance.AssetRepository
-                ?? throw new Exception($"The {nameof(AssetRepository)} has not been loaded.");
+            AssetRepository assetRepository = DataManager.Instance.AssetRepository;
 
             // fertilities
             //  _randomizeFertilities is loaded in constructor.
@@ -230,19 +194,6 @@ namespace AnnoMapEditor.MapTemplates.Models
                     });
                 }
             }
-
-            //Deregister when delayed loading
-            if (delayed)
-            {
-                Settings.Instance.LoadingFinished -= DelayedLoadAssetData;
-
-                if(Label != prevLabel)
-                {
-                    Label = prevLabel;
-                }
-
-                DelayedLoading = false;
-            }
         }
 
         /// <summary>
@@ -265,7 +216,7 @@ namespace AnnoMapEditor.MapTemplates.Models
                 FilePath = islandFilePath,
                 DisplayName = System.IO.Path.GetFileNameWithoutExtension(islandFilePath),
                 Thumbnail = null,
-                Region = Region.DetectFromPath(islandFilePath),
+                Region = RegionAsset.DetectFromPath(islandFilePath),
                 IslandDifficulty =  new[] { islandDifficulty },
                 IslandType = new[] { IslandRepository.DetectIslandTypeFromPath(islandFilePath) },
                 IslandSize = new[] { islandSize },
@@ -274,11 +225,6 @@ namespace AnnoMapEditor.MapTemplates.Models
             };
 
             IslandAsset = dummyAsset;
-        }
-
-        private void DelayedLoadAssetData(object? sender, EventArgs _)
-        {
-            LoadIslandDataFromRepository(_sourceElement!, true);
         }
 
         protected override void ToTemplate(Element resultElement)

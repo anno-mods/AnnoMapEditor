@@ -4,6 +4,10 @@ using System.Windows.Media.Imaging;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
+    /// <summary>
+    /// Common base class for RandomIslandAsset and FixedIslandAsset. If an island does not belong
+    /// to a pool and does not require non-default properties, it may be ommitted from assets.xml.
+    /// </summary>
     public class IslandAsset
     {
         public string DisplayName { get; init; }
@@ -12,7 +16,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         public BitmapImage? Thumbnail { get; init; }
 
-        public Region Region { get; init; }
+        public RegionAsset Region { get; init; }
 
         public IEnumerable<IslandDifficulty> IslandDifficulty { get; init; }
 
