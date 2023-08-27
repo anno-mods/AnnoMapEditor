@@ -89,7 +89,7 @@
         </StackPanel>
 
         <!-- footer -->
-        <StackPanel Grid.Column="0" 
+        <!--<StackPanel Grid.Column="0" 
                     Grid.Row="1"
                     Orientation="Horizontal"
                     VerticalAlignment="Bottom" 
@@ -117,7 +117,7 @@
                 <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor#roadmap" RequestNavigate="Hyperlink_OpenBrowser">roadmap</Hyperlink>
                 <Run>and</Run>
                 <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
-        </TextBlock>
+        </TextBlock>-->
         <controls:Imprint Grid.Column="2"
                           VerticalAlignment="Bottom"/>
 
