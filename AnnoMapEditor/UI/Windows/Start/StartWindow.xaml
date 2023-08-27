@@ -109,7 +109,7 @@
 
 
             <!-- data path -->
-            <TextBlock Grid.Row="4" Grid.Column="0"
+            <!--<TextBlock Grid.Row="4" Grid.Column="0"
                        Style="{StaticResource DefaultLabelStyle}"
                        Text="Anno Data Path:"  />
             <TextBox Grid.Row="4" Grid.Column="1"
@@ -128,11 +128,11 @@
             <controls:StatusIndicator Grid.Row="4" Grid.Column="3"
                                       IsOk="{Binding DataManager.IsInitialized}"
                                       IsLoading="{Binding DataManager.IsInitializing}"
-                                      IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource objectToBool}}"/>
+                                      IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource objectToBool}}"/>-->
 
 
             <!-- mods path -->
-            <TextBlock Grid.Row="7" Grid.Column="0"
+            <!--<TextBlock Grid.Row="7" Grid.Column="0"
                        Style="{StaticResource DefaultLabelStyle}"
                        Text="Anno Mods Path:"  />
             <TextBox Grid.Row="7" Grid.Column="1"
@@ -147,10 +147,10 @@
                        TextWrapping="Wrap"
                        Margin="0 0 0 12">
                 Select the path containing mods for Anno 1800. Mods will be loaded from and saved to there.
-            </TextBlock>
+            </TextBlock>-->
 
             <!-- expert mode -->
-            <TextBlock Grid.Row="10" Grid.Column="0"
+            <!--<TextBlock Grid.Row="10" Grid.Column="0"
                        Style="{StaticResource DefaultLabelStyle}"
                        Text="Expert Mode:" />
             <controls:FancyToggle Grid.Row="10" Grid.Column="2"
@@ -160,7 +160,7 @@
                        Style="{StaticResource MutedLabelStyle}"
                        TextWrapping="Wrap">
                 Expert mode unlocks some advanced and/or dangerous features. Maps and mods may break unless you know what you are doing.
-            </TextBlock>
+            </TextBlock>-->
             
         </Grid>
 
