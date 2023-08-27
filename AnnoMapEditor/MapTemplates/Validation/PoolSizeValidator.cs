@@ -3,7 +3,7 @@ using AnnoMapEditor.MapTemplates.Models;
 
 namespace AnnoMapEditor.MapTemplates.Validation
 {
-    public class PoolSizeValidator : ISessionValidator
+    public class PoolSizeValidator : IMapTemplateValidator
     {
         private readonly IslandSize _islandSize;
 
@@ -14,11 +14,11 @@ namespace AnnoMapEditor.MapTemplates.Validation
         }
 
 
-        public SessionValidatorResult Validate(Session session)
+        public MapTemplateValidatorResult Validate(MapTemplate mapTemplate)
         {
             int islandCount = 0;
 
-            foreach (var element in session.Elements)
+            foreach (var element in mapTemplate.Elements)
             {
                 if (element is RandomIslandElement randomIsland && randomIsland.IslandSize == _islandSize)
                 {
@@ -26,11 +26,11 @@ namespace AnnoMapEditor.MapTemplates.Validation
                 }
             }
 
-            int maxPoolSize = Pool.GetPool(session.Region, _islandSize).Size;
+            int maxPoolSize = Pool.GetPool(mapTemplate.Session.Region, _islandSize).Size;
             if (islandCount <= maxPoolSize)
-                return SessionValidatorResult.Ok;
+                return MapTemplateValidatorResult.Ok;
             else
-                return new(SessionValidatorStatus.Warning, $"Too many {_islandSize.Name} random islands", $"Only the first {maxPoolSize} will be used.");
+                return new(MapTemplateValidatorStatus.Warning, $"Too many {_islandSize.Name} random islands", $"Only the first {maxPoolSize} will be used.");
         }
     }
 }

@@ -9,11 +9,11 @@ using System.ComponentModel;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
-    public class SessionCheckerViewModel : ObservableBase
+    public class MapTemplateCheckerViewModel : ObservableBase
     {
-        private readonly Session _session;
+        private readonly MapTemplate _mapTemplate;
 
-        private readonly ICollection<ISessionValidator> _validators = new ISessionValidator[]
+        private readonly ICollection<IMapTemplateValidator> _validators = new IMapTemplateValidator[]
         {
             new SmallPoolSizeValidator(),
             new PoolSizeValidator(IslandSize.Medium),
@@ -21,7 +21,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             new ContinentalIslandLimitValidator()
         };
 
-        public ObservableCollection<SessionValidatorResult> Results { get; } = new();
+        public ObservableCollection<MapTemplateValidatorResult> Results { get; } = new();
 
         public bool HasWarnings
         {
@@ -38,19 +38,19 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         private bool _hasErrors;
 
 
-        public SessionCheckerViewModel(Session session)
+        public MapTemplateCheckerViewModel(MapTemplate mapTemplate)
         {
-            _session = session;
-            _session.Elements.CollectionChanged += Session_OnIslandCollectionChanged;
+            _mapTemplate = mapTemplate;
+            _mapTemplate.Elements.CollectionChanged += MapTemplate_OnIslandCollectionChanged;
 
-            foreach (var island in session.Elements)
+            foreach (var island in mapTemplate.Elements)
                 island.PropertyChanged += Island_PropertyChanged;
 
             Update();
         }
 
 
-        private void Session_OnIslandCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        private void MapTemplate_OnIslandCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             Update();
         }
@@ -67,16 +67,16 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             bool hasWarnings = false;
             bool hasErrors = false;
 
-            foreach (ISessionValidator validator in _validators)
+            foreach (IMapTemplateValidator validator in _validators)
             {
-                SessionValidatorResult validationResult = validator.Validate(_session);
+                MapTemplateValidatorResult validationResult = validator.Validate(_mapTemplate);
 
-                if (validationResult.Status != SessionValidatorStatus.Ok)
+                if (validationResult.Status != MapTemplateValidatorStatus.Ok)
                 {
                     Results.Add(validationResult);
 
-                    hasWarnings |= validationResult.Status == SessionValidatorStatus.Warning;
-                    hasErrors |= validationResult.Status == SessionValidatorStatus.Error;
+                    hasWarnings |= validationResult.Status == MapTemplateValidatorStatus.Warning;
+                    hasErrors |= validationResult.Status == MapTemplateValidatorStatus.Error;
                 }
             }
 

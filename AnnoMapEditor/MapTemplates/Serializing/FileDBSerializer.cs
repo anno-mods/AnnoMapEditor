@@ -9,13 +9,10 @@ using System.Xml;
 
 namespace AnnoMapEditor.MapTemplates.Serializing
 {
-    internal class Serializer
+    internal class FileDBSerializer
     {
-        public static async Task<T?> ReadAsync<T>(Stream? stream) where T : class, new()
+        public static async Task<T?> ReadAsync<T>(Stream stream) where T : class, new()
         {
-            if (stream is null)
-                return null;
-
             return await Task.Run(() =>
             {
                 try
@@ -33,11 +30,8 @@ namespace AnnoMapEditor.MapTemplates.Serializing
             });
         }
 
-        public static async Task<T?> ReadFromXmlAsync<T>(Stream? stream) where T : class, new()
+        public static async Task<T?> ReadFromXmlAsync<T>(Stream stream) where T : class, new()
         {
-            if (stream is null)
-                return null;
-
             return await Task.Run(() =>
             {
                 try
@@ -67,11 +61,8 @@ namespace AnnoMapEditor.MapTemplates.Serializing
             });
         }
 
-        public static async Task WriteAsync(object data, Stream? stream)
+        public static async Task WriteAsync(object data, Stream stream)
         {
-            if (stream is null)
-                return;
-
             await Task.Run(() =>
             {
                 try
@@ -84,11 +75,8 @@ namespace AnnoMapEditor.MapTemplates.Serializing
             });
         }
 
-        public static async Task WriteToXmlAsync(object data, Stream? stream)
+        public static async Task WriteToXmlAsync(object data, Stream stream)
         {
-            if (stream is null)
-                return;
-
             await Task.Run(() =>
             {
                 try

@@ -1,22 +1,24 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
+﻿using AnnoMapEditor.DataArchives.Assets.Deserialization;
 using AnnoMapEditor.MapTemplates.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
-    [AssetTemplate("RandomIsland")]
+    [AssetTemplate(TEMPLATE_NAME)]
     public class RandomIslandAsset : StandardAsset
     {
-        public static readonly string TemplateName = "RandomIsland";
+        public const string TEMPLATE_NAME = "RandomIsland";
 
 
         public string FilePath { get; init; }
 
-        public Region? IslandRegion { get; init; }
+        public string IslandRegionId { get; init; }
+
+        [RegionIdReference(nameof(IslandRegionId))]
+        public RegionAsset IslandRegion { get; init; }
 
         public IEnumerable<IslandDifficulty> IslandDifficulty { get; init; }
 
@@ -26,12 +28,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public RandomIslandAsset(XElement valuesXml)
             : base(valuesXml)
         {
-            XElement randomIslandValues = valuesXml.Element(TemplateName)
-                ?? throw new Exception($"XML is not a valid {nameof(RandomIslandAsset)}. It does not have '{TemplateName}' section in its values.");
+            XElement randomIslandValues = valuesXml.Element(TEMPLATE_NAME)
+                ?? throw new Exception($"XML is not a valid {nameof(RandomIslandAsset)}. It does not have '{TEMPLATE_NAME}' section in its values.");
 
-            string? regionStr = randomIslandValues.Element(nameof(IslandRegion))?.Value;
-            if (regionStr != null)
-                IslandRegion = RegionFromName(regionStr);
+            // IslandRegion defaults to Moderate. If the MapTemplate belongs to another region,
+            // it must have TemplateRegion set explicitly within assets.xml.
+            IslandRegionId = randomIslandValues.Element(nameof(IslandRegion))?.Value ?? RegionAsset.REGION_MODERATE_REGIONID;
 
             FilePath = randomIslandValues.Element(nameof(FilePath))?.Value
                 ?? throw new Exception($"XML is not a valid {nameof(RandomIslandAsset)}. Required attribute '{nameof(FilePath)}' not found.");
@@ -57,19 +59,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
             }
             else
                 IslandType = Enumerable.Empty<IslandType>();
-        }
-
-
-        private static Region RegionFromName(string name)
-        {
-            return name switch
-            {
-                "Moderate" => Region.Moderate,
-                "Colony01" => Region.NewWorld,
-                "Arctic" => Region.Arctic,
-                "Africa" => Region.Enbesa,
-                _ => throw new NotImplementedException()
-            };
         }
     }
 }

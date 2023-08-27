@@ -1,12 +1,15 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Mods.Enums;
 using AnnoMapEditor.Mods.Models;
+using AnnoMapEditor.Mods.Serialization;
 using AnnoMapEditor.Utilities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace AnnoMapEditor.UI.Overlays.ExportAsMod
 {
@@ -21,27 +24,7 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
             Inactive
         }
 
-        public Session? Session
-        { 
-            get => _session;
-            set
-            {
-                _session = value;
-                if(_session is not null)
-                {
-                    AllowedMapTypes = MapType.MapTypesForRegion[_session.Region];
-                    SelectedMapType = AllowedMapTypes.First();
-                }
-                else
-                {
-                    AllowedMapTypes = Enumerable.Empty<MapType>();
-                    SelectedMapType = null;
-                }
-                InfoMapTypeSelection = _session is not null && _session.Region == Region.Moderate;
-                CheckExistingMod();
-            }
-        }
-        Session? _session;
+        public MapTemplate MapTemplate { get; init; }
 
         public bool IsSaving
         {
@@ -67,12 +50,7 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
 
         public string ModExistsWarning { get; private set; } = string.Empty;
 
-        public bool InfoMapTypeSelection
-        {
-            get => _infoMapTypeSelection;
-            set => SetProperty(ref _infoMapTypeSelection, value);
-        }
-        private bool _infoMapTypeSelection = true;
+        public bool ShowMapTypeSelection { get; init; }
 
         public string ModID
         {
@@ -92,23 +70,20 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
         }
         private MapType? _mapType = null;
 
-        public IEnumerable<MapType> AllowedMapTypes
-        {
-            get => _allowedMapTypes;
-            set => SetProperty(ref _allowedMapTypes, value);
-        }
-        private IEnumerable<MapType> _allowedMapTypes = Enumerable.Empty<MapType>();
+        public IEnumerable<MapType> AllowedMapTypes { get; init; } = MapType.All;
 
-        public ExportAsModViewModel()
+
+        public ExportAsModViewModel(MapTemplate mapTemplate)
         {
-            Settings.Instance.PropertyChanged += Settings_PropertyChanged;
+            MapTemplate = mapTemplate;
+
+            ShowMapTypeSelection = mapTemplate.Session == SessionAsset.OldWorld;
+            if (ShowMapTypeSelection)
+                SelectedMapType = AllowedMapTypes.First();
+
+            CheckExistingMod();
         }
 
-        private void Settings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(Settings.IsLoading))
-                CheckExistingMod();
-        }
 
         private void CheckExistingMod()
         {
@@ -125,43 +100,52 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
 
         private static ModStatus ModExists(string modName)
         {
-            if (Settings.Instance.DataPath is null)
+            if (Settings.Instance.GamePath is null)
                 return ModStatus.NotFound;
 
-            string activeModPath = Path.Combine(Settings.Instance.DataPath, "mods", modName);
+            string activeModPath = Path.Combine(Settings.Instance.ModsPath!, modName);
             if (Directory.Exists(activeModPath))
                 return ModStatus.Active;
 
-            string inactiveModPath = Path.Combine(Settings.Instance.DataPath, "mods", "-" + modName);
+            string inactiveModPath = Path.Combine(Settings.Instance.ModsPath!, "-" + modName);
             return Directory.Exists(inactiveModPath) ? ModStatus.Inactive : ModStatus.NotFound;
         }
 
         public async Task<bool> Save()
         {
-            IsSaving = true;
+            string modsFolderPath = Settings.Instance.ModsPath
+                ?? throw new Exception($"ModsPath is not set.");
 
-            string? modsFolderPath = Settings.Instance.DataPath;
-            if (modsFolderPath is not null)
-                modsFolderPath = Path.Combine(modsFolderPath, "mods");
+            if (!Directory.Exists(modsFolderPath))
+                throw new Exception($"Mods directory '{modsFolderPath}' does not exist.");
 
-            if (!Directory.Exists(modsFolderPath) || Session is null)
-            {
-                _logger.LogWarning("mods/ path or session not set. This shouldn't have happened.");
-                return false;
-            }
-
-            Mod mod = new(Session)
-            {
-                MapType = SelectedMapType
-            };
+            Mod mod = new(ResultingModName, ModID, MapTemplate, SelectedMapType);
 
             CheckExistingMod();
-            bool result = await mod.Save(Path.Combine(modsFolderPath, ResultingFullModName), ResultingModName, ModID);
 
-            OverlayService.Instance.Close(this);
+            try
+            {
+                IsSaving = true;
+                ModWriter modWriter = new();
+                await modWriter.WriteAsync(mod, Path.Combine(modsFolderPath, ResultingFullModName));
 
-            IsSaving = false;
-            return result;
+                OverlayService.Instance.Close(this);
+                return true;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("Failed to save the mod.\n\nIt looks like some files are locked, possibly by another application.\n\nThe mod may be broken now.", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Failed to save the mod.\n\nThe mod may be broken now.", App.TitleShort, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+            finally
+            {
+                IsSaving = false;
+            }
         }
     }
 }

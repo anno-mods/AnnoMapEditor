@@ -9,4 +9,6 @@
     <Brush x:Key="ControlBrush">#8024415F</Brush>
     <Brush x:Key="DisabledBrush">#708090</Brush>
     <Brush x:Key="DialogBrush">#ef182B3F</Brush>
+    <Brush x:Key="ErrorBrush">#ee0000</Brush>
+    <Brush x:Key="OkBrush">#00aa00</Brush>
 </ResourceDictionary>

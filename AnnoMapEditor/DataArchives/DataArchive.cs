@@ -6,7 +6,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -14,38 +13,6 @@ namespace AnnoMapEditor.DataArchives
 {
     public abstract class DataArchive : ObservableBase, IDataArchive
     {
-        public static readonly IDataArchive Default = new InvalidDataArchive("");
-
-
-        public abstract bool IsValid { get; protected set; }
-
-        public abstract string DataPath { get; }
-
-
-        public static async Task<IDataArchive> OpenAsync(string? folderPath)
-        {
-            if (folderPath is null)
-                return Default;
-
-            var adjustedPath = AdjustDataPath(folderPath);
-
-            if (adjustedPath is null)
-                return Default;
-
-            IDataArchive archive;
-            if (File.Exists(Path.Combine(adjustedPath, "maindata/data0.rda")))
-            {
-                RdaDataArchive rdaArchive = new RdaDataArchive(adjustedPath);
-                await rdaArchive.LoadAsync();
-                archive = rdaArchive;
-            }
-            else
-                archive = new FolderDataArchive(adjustedPath);
-
-            return archive;
-        }
-
-
         public abstract Stream? OpenRead(string path);
 
         public abstract IEnumerable<string> Find(string pattern);

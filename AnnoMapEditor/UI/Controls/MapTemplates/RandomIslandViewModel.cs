@@ -11,11 +11,9 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public override string? Label => _label;
         private string? _label;
 
-        public override int SizeInTiles => RandomIsland.IslandSize.DefaultSizeInTiles;
 
-
-        public RandomIslandViewModel(Session session, RandomIslandElement randomIsland)
-            : base(session, randomIsland)
+        public RandomIslandViewModel(MapTemplate mapTemplate, RandomIslandElement randomIsland)
+            : base(mapTemplate, randomIsland)
         {
             RandomIsland = randomIsland;
 
@@ -29,9 +27,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         {
             if (e.PropertyName == nameof(IslandElement.IslandType) || e.PropertyName == nameof(IslandElement.Label))
                 UpdateLabel();
-
-            if (e.PropertyName == nameof(RandomIslandElement.IslandSize))
-                OnPropertyChanged(nameof(SizeInTiles));
         }
 
 

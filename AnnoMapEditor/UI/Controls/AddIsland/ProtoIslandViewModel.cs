@@ -15,15 +15,13 @@ namespace AnnoMapEditor.UI.Controls.AddIsland
         
         public IslandSize IslandSize { get; init; }
 
-        public override int SizeInTiles => IslandSize.DefaultSizeInTiles;
-
         public override BitmapImage? Thumbnail => null;
 
         public override int ThumbnailRotation => 0;
 
 
-        public ProtoIslandViewModel(Session session, MapElementType elementType, IslandType islandType, IslandSize islandSize, Vector2 position)
-            : base(session, new ProtoIslandElement(islandType, islandSize) { Position = position })
+        public ProtoIslandViewModel(MapTemplate mapTemplate, MapElementType elementType, IslandType islandType, IslandSize islandSize, Vector2 position)
+            : base(mapTemplate, new ProtoIslandElement(islandType, islandSize) { Position = position })
         {
             string prefix = elementType == MapElementType.PoolIsland ? "Random" : "Fixed";
             string suffix = islandType == IslandType.ThirdParty || islandType == IslandType.PirateIsland 
@@ -44,6 +42,7 @@ namespace AnnoMapEditor.UI.Controls.AddIsland
                 : base(islandType)
             {
                 IslandSize = islandSize;
+                SizeInTiles = islandSize.DefaultSizeInTiles;
             }
         }
     }

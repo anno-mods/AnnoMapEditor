@@ -15,7 +15,7 @@ namespace AnnoMapEditor.UI.Windows.Main
         Select
     }
 
-    public class DataPathStatus
+    public class GamePathStatus
     {
         [Obsolete]
         public string Status { get; set; } = string.Empty;

@@ -2,6 +2,7 @@
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -31,7 +32,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         };
 
 
-        protected readonly Session _session;
+        protected readonly MapTemplate _mapTemplate;
 
         public IslandElement Island { get; init; }
 
@@ -58,8 +59,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public abstract string? Label { get; }
 
-        public abstract int SizeInTiles { get; }
-
         public virtual BitmapImage? Thumbnail { get; }
 
         public virtual int ThumbnailRotation { get; }
@@ -67,10 +66,10 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public virtual bool RandomizeRotation => true;
 
 
-        public IslandViewModel(Session session, IslandElement island)
+        public IslandViewModel(MapTemplate mapTemplate, IslandElement island)
             : base(island)
         {
-            _session = session;
+            _mapTemplate = mapTemplate;
             Island = island;
 
             UpdateBackground();
@@ -90,8 +89,12 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         {
             if (e.PropertyName == nameof(IslandElement.IslandType))
                 UpdateBackground();
+
             else if (e.PropertyName == nameof(FixedIslandElement.RandomizeRotation))
                 UpdateRotation();
+
+            else if (e.PropertyName == nameof(MapElement.Position))
+                BoundsCheck();
         }
 
         private void UpdateBackground()
@@ -113,26 +116,25 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             OnPropertyChanged(nameof(RandomizeRotation));
         }
 
-        public override void OnDragged(Vector2 newPosition)
+        public override void Move(Point delta)
         {
-            var mapArea = new Rect2(_session.Size - SizeInTiles + Vector2.Tile);
+            Vector2 vectorDelta = new(delta);
+            Vector2 newPosition = Element.Position + vectorDelta;
 
-            // provide resistance against moving out of bounds
-            if (Element.Position.Within(mapArea) && !newPosition.Within(mapArea))
-            {
-                Vector2 safePosition = newPosition.Clamp(mapArea);
-                if ((safePosition - newPosition).Length < 150)
-                    newPosition = safePosition;
-            }
+            Rect2 mapArea = new(_mapTemplate.Size - Island.SizeInTiles + Vector2.Tile);
 
-            BoundsCheck(newPosition);
-            base.OnDragged(newPosition);
+            // provide resistance against moving islands of the map
+            if (!IsOutOfBounds && !newPosition.Within(mapArea) && vectorDelta.Length < 250)
+                Element.Position = newPosition.Clamp(mapArea);
+
+            else
+                Element.Position = newPosition;
         }
 
-        public void BoundsCheck(Vector2? pos = null)
+        public void BoundsCheck()
         {
-            var mapArea = new Rect2(_session.Size - SizeInTiles + Vector2.Tile);
-            Vector2 position = pos ?? Element.Position;
+            var mapArea = new Rect2(_mapTemplate.Size - Island.SizeInTiles + Vector2.Tile);
+            Vector2 position = Element.Position;
             IsOutOfBounds = !position.Within(mapArea);
         }
     }

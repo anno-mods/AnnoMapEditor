@@ -1,5 +1,6 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.Utilities;
 using IslandType = AnnoMapEditor.MapTemplates.Enums.IslandType;
 
 namespace AnnoMapEditor.MapTemplates.Models
@@ -31,6 +32,13 @@ namespace AnnoMapEditor.MapTemplates.Models
             set => SetProperty(ref _islandDifficulty, value);
         }
         private IslandDifficulty? _islandDifficulty;
+
+        public int SizeInTiles
+        {
+            get => _sizeInTiles;
+            protected set => SetProperty(ref _sizeInTiles, value);
+        }
+        private int _sizeInTiles;
 
 
         public IslandElement(IslandType islandType)

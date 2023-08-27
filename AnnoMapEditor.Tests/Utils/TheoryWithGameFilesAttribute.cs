@@ -13,7 +13,7 @@
             Utilities.Settings.Instance.WaitForLoadingBlocking();
             waitTimer.Stop();
 
-            if (!Utilities.Settings.Instance.IsValidDataPath)
+            if (!Utilities.Settings.Instance.IsValidGamePath)
             {
                 Skip = "The curring test environment has not detected the game files required for this unit test. " +
                     $"Waited {waitTimer.ElapsedMilliseconds}ms for this information...";

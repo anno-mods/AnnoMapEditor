@@ -1,5 +1,4 @@
-﻿using AnnoMapEditor.DataArchives.Assets.Attributes;
-using AnnoMapEditor.Utilities;
+﻿using AnnoMapEditor.Utilities;
 using System;
 using System.Windows.Media;
 using System.Xml.Linq;

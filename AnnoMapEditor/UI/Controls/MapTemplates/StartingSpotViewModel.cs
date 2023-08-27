@@ -1,18 +1,19 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Media;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
     public class StartingSpotViewModel : MapElementViewModel
     {
-        static readonly SolidColorBrush White  = new(Color.FromArgb(255, 255, 255, 255));
+        static readonly SolidColorBrush White = new(Color.FromArgb(255, 255, 255, 255));
         static readonly SolidColorBrush Yellow = new(Color.FromArgb(255, 234, 224, 83));
-        static readonly SolidColorBrush Red    = new(Color.FromArgb(255, 234, 83, 83));
+        static readonly SolidColorBrush Red = new(Color.FromArgb(255, 234, 83, 83));
 
 
-        private readonly Session _session;
+        private readonly MapTemplate _mapTemplate;
 
         private readonly StartingSpotElement _startingSpot;
 
@@ -26,10 +27,10 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public string Label { get; init; }
 
 
-        public StartingSpotViewModel(Session session, StartingSpotElement startingSpot)
+        public StartingSpotViewModel(MapTemplate mapTemplate, StartingSpotElement startingSpot)
             : base(startingSpot)
         {
-            _session = session;
+            _mapTemplate = mapTemplate;
             _startingSpot = startingSpot;
 
             Label = _startingSpot.Index switch
@@ -44,7 +45,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
             PropertyChanged += This_PropertyChanged;
         }
-
 
         private void This_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
@@ -61,12 +61,13 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                 BackgroundBrush = _startingSpot.Index == 0 ? Yellow : Red;
         }
 
-        public override void OnDragged(Vector2 newPosition)
+        public override void Move(Point delta)
         {
-            // prevent moving StartingSpots outside of the Session's playable area.
-            newPosition = newPosition.Clamp(_session.PlayableArea);
+            // prevent moving StartingSpots outside of the MapTemplate's playable area.
+            Vector2 vectorDelta = new(delta);
+            Vector2 newPosition = Element.Position + vectorDelta;
 
-            base.OnDragged(newPosition);
+            Element.Position = newPosition.Clamp(_mapTemplate.PlayableArea);
         }
     }
 }

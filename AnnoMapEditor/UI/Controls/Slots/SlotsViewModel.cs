@@ -1,5 +1,4 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
-using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.UI.Overlays;
 using AnnoMapEditor.UI.Overlays.SelectSlots;
@@ -14,12 +13,12 @@ namespace AnnoMapEditor.UI.Controls.Slots
     {
         public FixedIslandElement FixedIsland { get; init; }
 
-        public Region Region { get; init; }
+        public RegionAsset Region { get; init; }
 
         public ObservableCollection<SlotCounter> SlotCounters { get; init; } = new();
 
 
-        public SlotsViewModel(FixedIslandElement fixedIsland, Region region)
+        public SlotsViewModel(FixedIslandElement fixedIsland, RegionAsset region)
         {
             FixedIsland = fixedIsland;
             Region = region;
