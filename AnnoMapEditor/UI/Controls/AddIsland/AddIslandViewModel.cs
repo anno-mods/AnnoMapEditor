@@ -1,6 +1,8 @@
 ﻿using AnnoMapEditor.MapTemplates.Enums;
+using AnnoMapEditor.UI.Controls.Dragging;
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Media;
 
 namespace AnnoMapEditor.UI.Controls.AddIsland
@@ -59,15 +61,11 @@ namespace AnnoMapEditor.UI.Controls.AddIsland
         }
 
 
-        public override void OnDragged(Vector2 newPosition)
+        public override void Move(Point delta)
         {
             EndDrag();
 
-            // TODO: Implement proper loading!
-            if (Settings.Instance.IslandRepository == null)
-                return;
-
-            IslandAdded?.Invoke(this, new(MapElementType, IslandType, IslandSize, newPosition));
+            IslandAdded?.Invoke(this, new(MapElementType, IslandType, IslandSize, delta));
         }
     }
 }

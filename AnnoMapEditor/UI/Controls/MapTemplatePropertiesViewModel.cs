@@ -1,13 +1,14 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System;
+using System.Collections.Generic;
 
 namespace AnnoMapEditor.UI.Controls
 {
-    public class SessionPropertiesViewModel : ObservableBase
+    public class MapTemplatePropertiesViewModel : ObservableBase
     {
-        internal Session _session;
+        internal MapTemplate _mapTemplate;
 
         public string MapSizeText
         {
@@ -18,20 +19,21 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
         private string _mapSizeText = "";
-        public Region SelectedRegion
+
+        public SessionAsset SelectedSession
         {
-            get => _selectedRegion;
+            get => _selectedSession;
             set
             {
-                if (value != _selectedRegion)
+                if (value != _selectedSession)
                 {
-                    _selectedRegion = value;
-                    _session.Region = value;
+                    _selectedSession = value;
+                    _mapTemplate.Session = value;
                     OnSelectedRegionChanged();
                 }
             }
         }
-        private Region _selectedRegion;
+        private SessionAsset _selectedSession;
 
         public event EventHandler? SelectedRegionChanged;
 
@@ -40,28 +42,29 @@ namespace AnnoMapEditor.UI.Controls
             SelectedRegionChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        private bool allowSessionUpdate = false;
-        private void ResizeSessionValues()
+        private bool allowMapTemplateUpdate = false;
+
+        private void ResizeMapTemplateValues()
         {
-            if (allowSessionUpdate)
+            if (allowMapTemplateUpdate)
             {
                 if (DragInProgress)
-                    _session.ResizeSession(MapSize, PlayableAreaAsTuple());
+                    _mapTemplate.ResizeMapTemplate(MapSize, PlayableAreaAsTuple());
                 else
                 {
-                    _session.ResizeAndCommitSession(MapSize, PlayableAreaAsTuple());
+                    _mapTemplate.ResizeAndCommitMapTemplate(MapSize, PlayableAreaAsTuple());
                 }
             }
         }
 
         private (int x1, int y1, int x2, int y2) PlayableAreaAsTuple()
         {
-            return (_session.PlayableArea.X, _session.PlayableArea.Y, 
-                _session.PlayableArea.X + _session.PlayableArea.Width, 
-                _session.PlayableArea.Y + _session.PlayableArea.Height);
+            return (_mapTemplate.PlayableArea.X, _mapTemplate.PlayableArea.Y, 
+                _mapTemplate.PlayableArea.X + _mapTemplate.PlayableArea.Width, 
+                _mapTemplate.PlayableArea.Y + _mapTemplate.PlayableArea.Height);
         }
 
-        public Region[] Regions { get; } = Region.All;
+        public IEnumerable<SessionAsset> SupportedSessions { get; } = SessionAsset.SupportedSessions;
 
         public int MapSize
         {
@@ -69,7 +72,7 @@ namespace AnnoMapEditor.UI.Controls
             set
             {
                 SetProperty(ref _mapSize, value);
-                ResizeSessionValues();
+                ResizeMapTemplateValues();
             }
         }
         private int _mapSize = 2560;
@@ -105,23 +108,23 @@ namespace AnnoMapEditor.UI.Controls
             set
             {
                 SetProperty(ref _dragInProgress, value);
-                ResizeSessionValues();
+                ResizeMapTemplateValues();
             }
         }
         private bool _dragInProgress = false;
 
-        public SessionPropertiesViewModel(Session session)
+        public MapTemplatePropertiesViewModel(MapTemplate mapTemplate)
         {
-            _session = session;
-            _session.MapSizeConfigCommitted += HandleSessionSizeCommitted;
+            _mapTemplate = mapTemplate;
+            _mapTemplate.MapSizeConfigCommitted += HandleMapTemplateSizeCommitted;
 
-            _selectedRegion = _session.Region;
+            _selectedSession = _mapTemplate.Session;
 
-            MapSize = session.Size.X;
+            MapSize = mapTemplate.Size.X;
 
-            allowSessionUpdate = true;
+            allowMapTemplateUpdate = true;
 
-            ResizeSessionValues();
+            ResizeMapTemplateValues();
 
             UpdateMapSizeText();
         }
@@ -129,10 +132,10 @@ namespace AnnoMapEditor.UI.Controls
 
         private void UpdateMapSizeText()
         {
-            MapSizeText = $"Size: {_session.Size.X}, Playable: {_session.PlayableArea.Width}";
+            MapSizeText = $"Size: {_mapTemplate.Size.X}, Playable: {_mapTemplate.PlayableArea.Width}";
         }
 
-        private void HandleSessionSizeCommitted(object? sender, EventArgs _)
+        private void HandleMapTemplateSizeCommitted(object? sender, EventArgs _)
         {
             UpdateMapSizeText();
         }

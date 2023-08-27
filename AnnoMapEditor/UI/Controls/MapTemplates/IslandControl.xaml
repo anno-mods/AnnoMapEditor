@@ -10,8 +10,8 @@
              d:DataContext="{d:DesignInstance Type=local:RandomIslandViewModel}"
              d:DesignWidth="192"
              d:DesignHeight="192"
-             Width="{Binding SizeInTiles}"
-             Height="{Binding SizeInTiles}">
+             Width="{Binding Island.SizeInTiles}"
+             Height="{Binding Island.SizeInTiles}">
 
     <local:MapElementControl.Resources>
         <converters:NegateDoubleConverter x:Key="negateDoubleConverter" />
@@ -30,14 +30,14 @@
             <!-- Background -->
             <Rectangle Fill="{Binding BackgroundBrush}"
                        Stroke="{Binding BorderBrush}"
-                       Width="{Binding SizeInTiles}"
-                       Height="{Binding SizeInTiles}" />
+                       Width="{Binding Island.SizeInTiles}"
+                       Height="{Binding Island.SizeInTiles}" />
             
             <!-- Thumbnail -->
             <Image Visibility="{Binding Thumbnail, Converter={StaticResource collapseOnNull}}"
                    Source="{Binding Thumbnail}"
-                   Width="{Binding SizeInTiles}"
-                   Height="{Binding SizeInTiles}">
+                   Width="{Binding Island.SizeInTiles}"
+                   Height="{Binding Island.SizeInTiles}">
             </Image>
             
             <!-- rotation indicator -->
@@ -70,14 +70,14 @@
             <Line
                 X1="0"
                 Y1="0"
-                X2="{Binding SizeInTiles}"
-                Y2="{Binding SizeInTiles}" 
+                X2="{Binding Island.SizeInTiles}"
+                Y2="{Binding Island.SizeInTiles}" 
                 Stroke="#BA0024"
                 StrokeThickness="8"/>
             <Line
                 X1="0"
-                Y1="{Binding SizeInTiles}"
-                X2="{Binding SizeInTiles}"
+                Y1="{Binding Island.SizeInTiles}"
+                X2="{Binding Island.SizeInTiles}"
                 Y2="0"
                 Stroke="#BA0024"
                 StrokeThickness="8" />

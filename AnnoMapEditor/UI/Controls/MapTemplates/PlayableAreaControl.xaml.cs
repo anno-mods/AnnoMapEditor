@@ -1,18 +1,7 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AnnoMapEditor.UI.Controls.Dragging;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AnnoMapEditor.UI.Controls.MapTemplates
 {
@@ -21,10 +10,10 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
     /// </summary>
     public partial class PlayableAreaControl : DraggingControl
     {
-        public PlayableAreaControl(Session session)
+        public PlayableAreaControl(MapTemplate mapTemplate)
         {
-            ViewModel = new PlayableAreaViewModel(session);
-            session.MapSizeConfigChanged += OnSessionResized;
+            ViewModel = new PlayableAreaViewModel(mapTemplate);
+            mapTemplate.MapSizeConfigChanged += OnMapTemplateResized;
 
             DataContext = ViewModel;
             IsEnabled = false;
@@ -61,7 +50,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             ViewModel.MarginRightTop = (int)e.NewSize.Height;
         }
 
-        private void OnSessionResized(object? sender, Session.SessionResizeEventArgs args)
+        private void OnMapTemplateResized(object? sender, MapTemplate.MapTemplateResizeEventArgs args)
         {
             PositionAndScale();
         }
@@ -69,8 +58,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         private void PositionAndScale()
         {
-            this.Width = ViewModel.ControlWidth;
-            this.Height = ViewModel.ControlHeight;
+            Width = ViewModel.ControlWidth;
+            Height = ViewModel.ControlHeight;
 
             Canvas.SetLeft(this, ViewModel.PosX);
             Canvas.SetTop(this, ViewModel.PosY);

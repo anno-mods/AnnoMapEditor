@@ -1,10 +1,8 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Models;
-using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -62,7 +60,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         }
         private Brush _backgroundBrush;
 
-        public Region SelectedRegion
+        public RegionAsset SelectedRegion
         {
             get => _selectedRegion;
             set
@@ -71,10 +69,10 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 UpdateFilter();
             }
         }
-        private Region _selectedRegion;
+        private RegionAsset _selectedRegion;
 
 
-        public SlotAssignmentViewModel(SlotAssignment slotAssignment, Region selectedRegion)
+        public SlotAssignmentViewModel(SlotAssignment slotAssignment, RegionAsset selectedRegion)
         {
             SlotAssignment = slotAssignment;
             _selectedRegion = selectedRegion;
@@ -96,11 +94,11 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 throw new ArgumentException();
 
             // Warning: Hardcoding
-            // The New World uses both random mine slots 614 and 1000029. However, none of the
+            // SouthAmerica uses both random mine slots 614 and 1000029. However, none of the
             // replacements for 1000029 contain the New World as an AssociatedRegion. Despite of
             // this, it is possible to have both 1010502 Iron Deposit and 1010507 Gold Deposit in
             // the New World.
-            if (_selectedRegion == Region.NewWorld
+            if (_selectedRegion == RegionAsset.SouthAmerica
                 && SlotAssignment.Slot.ObjectGuid == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID
                 && (slotAsset.GUID == 1010501 || slotAsset.GUID == 1010507))
                 return true;
@@ -142,13 +140,13 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             {
                 long randomSlotGuid = SlotAssignment.Slot.ObjectGuid;
 
-                if (randomSlotGuid == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID 
-                    || randomSlotGuid == SlotAsset.RANDOM_MINE_NEW_WORLD_GUID
-                    || randomSlotGuid == SlotAsset.RANDOM_MINE_ARCTIC_GUID)
+                if (randomSlotGuid == SlotAsset.RandomMineOldWorld.GUID
+                    || randomSlotGuid == SlotAsset.RandomMineNewWorld.GUID
+                    || randomSlotGuid == SlotAsset.RandomMineArctic.GUID)
                     PinBrush = Brushes.Gray;
-                else if (randomSlotGuid == SlotAsset.RANDOM_CLAY_GUID)
+                else if (randomSlotGuid == SlotAsset.RandomClay.GUID)
                     PinBrush = Brushes.SandyBrown;
-                else if (randomSlotGuid == SlotAsset.RANDOM_OIL_GUID)
+                else if (randomSlotGuid == SlotAsset.RandomOil.GUID)
                     PinBrush = Brushes.DarkSlateGray;
                 else
                     PinBrush = Brushes.Red;

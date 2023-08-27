@@ -1,4 +1,5 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
+﻿using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.MapTemplates.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -9,13 +10,13 @@ namespace AnnoMapEditor.MapTemplates
         public static readonly IEnumerable<Pool> All = new List<Pool>()
         {
             // Moderate
-            new(Region.Moderate, IslandSize.Small,
+            new(RegionAsset.Moderate, IslandSize.Small,
                 "data/sessions/islands/pool/moderate/moderate_s_{0}/moderate_s_{0}.a7m", 12
                 ),
-            new(Region.Moderate, IslandSize.Medium,
+            new(RegionAsset.Moderate, IslandSize.Medium,
                 "data/sessions/islands/pool/moderate/moderate_m_{0}/moderate_m_{0}.a7m", 9
                 ),
-            new(Region.Moderate, IslandSize.Large,
+            new(RegionAsset.Moderate, IslandSize.Large,
                 new FilePathRange[]
                 {
                     new FilePathRange("data/sessions/islands/pool/moderate/moderate_l_{0}/moderate_l_{0}.a7m", 1, 14),
@@ -23,19 +24,19 @@ namespace AnnoMapEditor.MapTemplates
                 }),
             
              // NewWorld
-            new(Region.NewWorld, IslandSize.Small,
+            new(RegionAsset.SouthAmerica, IslandSize.Small,
                 new FilePathRange[]
                 {
                     new FilePathRange("data/sessions/islands/pool/colony01/colony01_s_{0}/colony01_s_{0}.a7m", 1, 4),
                     new FilePathRange("data/dlc12/sessions/islands/pool/colony01/colony01_s_{0}/colony01_s_{0}.a7m", 5, 3)
                 }),
-            new(Region.NewWorld, IslandSize.Medium,
+            new(RegionAsset.SouthAmerica, IslandSize.Medium,
                 new FilePathRange[]
                 {
                     new FilePathRange("data/sessions/islands/pool/colony01/colony01_m_{0}/colony01_m_{0}.a7m", 1, 6),
                     new FilePathRange("data/dlc12/sessions/islands/pool/colony01/colony01_m_{0}/colony01_m_{0}.a7m", 7, 3)
                 }),
-            new(Region.NewWorld, IslandSize.Large,
+            new(RegionAsset.SouthAmerica, IslandSize.Large,
                 new FilePathRange[]
                 {
                     new FilePathRange("data/sessions/islands/pool/colony01/colony01_l_{0}/colony01_l_{0}.a7m", 1, 5),
@@ -44,17 +45,17 @@ namespace AnnoMapEditor.MapTemplates
                 }),
 
             // Arctic
-            new(Region.Arctic, IslandSize.Small,  "data/dlc03/sessions/islands/pool/colony03_a01_{0}/colony03_a01_{0}.a7m", 8),
-            new(Region.Arctic, IslandSize.Medium, "data/dlc03/sessions/islands/pool/colony03_a02_{0}/colony03_a02_{0}.a7m", 4),
-            new(Region.Arctic, IslandSize.Large,  "data/dlc03/sessions/islands/pool/moderate/moderate_l_{0}/moderate_l_{0}.a7m", 14),
+            new(RegionAsset.Arctic, IslandSize.Small,  "data/dlc03/sessions/islands/pool/colony03_a01_{0}/colony03_a01_{0}.a7m", 8),
+            new(RegionAsset.Arctic, IslandSize.Medium, "data/dlc03/sessions/islands/pool/colony03_a02_{0}/colony03_a02_{0}.a7m", 4),
+            new(RegionAsset.Arctic, IslandSize.Large,  "data/dlc03/sessions/islands/pool/moderate/moderate_l_{0}/moderate_l_{0}.a7m", 14),
 
             // Enbesa
-            new(Region.Enbesa, IslandSize.Small,  "data/dlc06/sessions/islands/pool/colony02_s_{0}/colony02_s_{0}.a7m", new int[] { 1, 2, 3, 5 }),
-            new(Region.Enbesa, IslandSize.Medium, "data/dlc06/sessions/islands/pool/colony02_m_{0}/colony02_m_{0}.a7m", new int[] { 2, 4, 5, 9 }),
-            new(Region.Enbesa, IslandSize.Large,  "data/dlc06/sessions/islands/pool/colony02_l_{0}/colony02_l_{0}.a7m", new int[] { 1, 3, 5, 6 }),
+            new(RegionAsset.Africa, IslandSize.Small,  "data/dlc06/sessions/islands/pool/colony02_s_{0}/colony02_s_{0}.a7m", new int[] { 1, 2, 3, 5 }),
+            new(RegionAsset.Africa, IslandSize.Medium, "data/dlc06/sessions/islands/pool/colony02_m_{0}/colony02_m_{0}.a7m", new int[] { 2, 4, 5, 9 }),
+            new(RegionAsset.Africa, IslandSize.Large,  "data/dlc06/sessions/islands/pool/colony02_l_{0}/colony02_l_{0}.a7m", new int[] { 1, 3, 5, 6 }),
         };
 
-        private static readonly Dictionary<(Region, IslandSize), Pool> _poolsMap;
+        private static readonly Dictionary<(RegionAsset, IslandSize), Pool> _poolsMap;
         static Pool() {
             _poolsMap = new();
             foreach (Pool pool in All)
@@ -64,17 +65,17 @@ namespace AnnoMapEditor.MapTemplates
         }
 
 
-        public readonly Region Region;
+        public readonly RegionAsset Region;
 
         public readonly IslandSize IslandSize;
 
 
-        public static Pool GetPool(Region region, IslandSize islandSize)
+        public static Pool GetPool(RegionAsset region, IslandSize islandSize)
         {
             return _poolsMap[(region, islandSize)];
         }
 
-        public static string GetRandomIslandPath(Region region, IslandSize islandSize)
+        public static string GetRandomIslandPath(RegionAsset region, IslandSize islandSize)
         {
             // use a random Small island for IslandSize.Default
             if (islandSize == IslandSize.Default)
@@ -119,14 +120,14 @@ namespace AnnoMapEditor.MapTemplates
         }
 
 
-        public Pool(Region region, IslandSize islandSize, FilePathRange[] paths)
+        public Pool(RegionAsset region, IslandSize islandSize, FilePathRange[] paths)
         {
             Region = region;
             IslandSize = islandSize;
             _paths = paths;
         }
 
-        public Pool(Region region, IslandSize islandSize, string filePath, int size)
+        public Pool(RegionAsset region, IslandSize islandSize, string filePath, int size)
             : this(region, islandSize, new FilePathRange[]
             {
                 new FilePathRange(filePath, 1, size)
@@ -134,7 +135,7 @@ namespace AnnoMapEditor.MapTemplates
         {
         }
 
-        public Pool(Region region, IslandSize islandSize, string filePath, int[] ids)
+        public Pool(RegionAsset region, IslandSize islandSize, string filePath, int[] ids)
             : this(region, islandSize, new FilePathRange[]
             {
                 new FilePathRange(filePath, ids)

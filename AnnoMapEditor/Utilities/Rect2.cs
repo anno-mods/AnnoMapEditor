@@ -28,6 +28,12 @@
             Size = Vector2.Zero;
         }
 
+        public Rect2(int x, int y, int width, int height)
+        {
+            Position = new(x, y);
+            Size = new(width, height);
+        }
+
         public Rect2(int[]? numbers)
         {
             if (numbers?.Length == 4)
