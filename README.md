@@ -53,6 +53,7 @@ It's not reliable to do so without manual editing.
 
 ### 0.5
 
+- 0.5.2: save as mod: fix not exporting when mods/ doesn't exist
 - 0.5.1: save as mod: set map name also for non-English languages
 - 0.5.1: save as mod: fix use via mod.io (relative map path)
 - Add, remove, change pool islands
