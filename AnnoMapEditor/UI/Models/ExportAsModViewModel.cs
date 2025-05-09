@@ -107,14 +107,14 @@ namespace AnnoMapEditor.UI.Models
         public async Task<bool> Save()
         {
             string? modsFolderPath = Settings.Instance.DataPath;
-            if (modsFolderPath is not null)
-                modsFolderPath = Path.Combine(modsFolderPath, "mods");
-
-            if (!Directory.Exists(modsFolderPath) || Session is null)
+            if (modsFolderPath is null || !Directory.Exists(modsFolderPath) || Session is null)
             {
                 Log.Warn("mods/ path or session not set. This shouldn't have happened.");
                 return false;
             }
+
+            modsFolderPath = Path.Combine(modsFolderPath, "mods");
+            Directory.CreateDirectory(modsFolderPath);
 
             Mods.Mod mod = new(Session)
             {
