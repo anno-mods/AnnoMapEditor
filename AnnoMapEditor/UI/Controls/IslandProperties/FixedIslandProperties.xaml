@@ -42,6 +42,24 @@
         <TextBox Margin="2"
                      Text="{Binding FixedIsland.Label, UpdateSourceTrigger=PropertyChanged}"/>
 
+        <!-- Position -->
+        <TextBlock Text="Position"
+                   Style="{StaticResource SubHeaderLabelStyle}"/>
+        <Grid HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="X" Style="{StaticResource DefaultLabelStyle}" />
+            <TextBox   VerticalAlignment="Center" Grid.Column="1" Margin="2" Text="{Binding FixedIsland.Position.X, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
+            <TextBlock VerticalAlignment="Center" Grid.Column="3" Text="Y" Style="{StaticResource DefaultLabelStyle}" />
+            <TextBox   VerticalAlignment="Center" Grid.Column="4" Margin="2" Text="{Binding FixedIsland.Position.X, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
+        </Grid>
+
+
         <!-- Rotation -->
         <TextBlock Text="Rotation"
                    Style="{StaticResource SubHeaderLabelStyle}"/>

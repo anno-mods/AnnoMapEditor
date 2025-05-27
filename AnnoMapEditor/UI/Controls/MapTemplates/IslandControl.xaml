@@ -37,7 +37,8 @@
             <Image Visibility="{Binding Thumbnail, Converter={StaticResource collapseOnNull}}"
                    Source="{Binding Thumbnail}"
                    Width="{Binding Island.SizeInTiles}"
-                   Height="{Binding Island.SizeInTiles}">
+                   Height="{Binding Island.SizeInTiles}"
+                   Opacity="0.5">
             </Image>
             
             <!-- rotation indicator -->
@@ -48,7 +49,7 @@
         </Canvas>
 
         <!-- Label -->
-        <Border Visibility="{Binding Label, Converter={StaticResource collapseOnNull}}"
+        <Border Visibility="{Binding ShowLabel, Converter={StaticResource VisibleOnTrue}}"
                 Grid.Column="0"
                 CornerRadius="10"
                 Padding="4,0,4,0"

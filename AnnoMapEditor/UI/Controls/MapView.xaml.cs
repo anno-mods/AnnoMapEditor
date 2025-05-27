@@ -139,6 +139,9 @@ namespace AnnoMapEditor.UI.Controls
 
         #endregion playable area
 
+        private float _zoomFactor = 1f;
+        private float _xTransFactor = 0.0f;
+        private float _yTransFactor = 0.0f;
 
         public MapView()
         {
@@ -578,15 +581,25 @@ namespace AnnoMapEditor.UI.Controls
         {
             if (_mapTemplate is null)
                 return;
-
-            double size = Math.Min(ActualWidth, ActualHeight);
+            
+            double size = Math.Min(canvasGrid.ActualWidth, canvasGrid.ActualHeight);
             size = Math.Sqrt((size * size) / 2);
 
             double requiredScaleX = size / _mapTemplate.Size.X;
             double requiredScaleY = size / _mapTemplate.Size.Y;
-            float scale = (float)Math.Min(requiredScaleX, requiredScaleY);
+            float scale = (float)(Math.Min(requiredScaleX, requiredScaleY));
 
-            mapTemplateCanvas.RenderTransform = new ScaleTransform(scale, scale);
+            TransformGroup mapRenderTransform = new();
+
+            double defaultTransform = size * ((_zoomFactor - 1) / -2);
+
+            double actualXTransform = defaultTransform + (_xTransFactor / 2 * (_zoomFactor - 1) * size) + (_yTransFactor / 2 * (_zoomFactor - 1) * size);
+            double actualYTransform = defaultTransform + (_yTransFactor / 2 * (_zoomFactor - 1) * size) - (_xTransFactor / 2 * (_zoomFactor - 1) * size);
+
+            mapRenderTransform.Children.Add(new ScaleTransform(scale * _zoomFactor, scale * _zoomFactor));
+            mapRenderTransform.Children.Add(new TranslateTransform(actualXTransform, actualYTransform));
+
+            mapTemplateCanvas.RenderTransform = mapRenderTransform;
             rotationCanvas.Width = scale * _mapTemplate.Size.X;
             rotationCanvas.Height = scale * _mapTemplate.Size.Y;
         }
@@ -596,12 +609,23 @@ namespace AnnoMapEditor.UI.Controls
             mapTemplate.MapSizeConfigChanged += MapElement_MapSizeConfigChanged;
             mapTemplate.MapSizeConfigCommitted += MapElement_MapSizeConfigCommitted;
             mapTemplate.Elements.CollectionChanged += MapElement_ElementsChanged;
+            mapTemplate.MapZoomConfigChanged += MapElement_MapZoomConfigChanged;
         }
         private void UnlinkMapTemplateEventHandlers(MapTemplate mapTemplate)
         {
             mapTemplate.MapSizeConfigCommitted -= MapElement_MapSizeConfigCommitted;
             mapTemplate.MapSizeConfigChanged -= MapElement_MapSizeConfigChanged;
             mapTemplate.Elements.CollectionChanged -= MapElement_ElementsChanged;
+            mapTemplate.MapZoomConfigChanged -= MapElement_MapZoomConfigChanged;
+        }
+
+        private void MapElement_MapZoomConfigChanged(object? sender, MapTemplate.MapZoomConfigEventArgs args)
+        {
+            _zoomFactor = args.ZoomFactor;
+            _xTransFactor = args.XTransFactor;
+            _yTransFactor = args.YTransFactor;
+
+            UpdateSize();
         }
 
         private void MapElement_ElementsChanged(object? sender, NotifyCollectionChangedEventArgs e)

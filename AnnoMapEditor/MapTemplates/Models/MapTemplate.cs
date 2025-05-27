@@ -47,8 +47,16 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public event EventHandler? MapSizeConfigCommitted;
 
+        public event EventHandler<MapZoomConfigEventArgs>? MapZoomConfigChanged;
+
         public string MapSizeText => $"Size: {Size.X}, Playable: {PlayableArea.Width}";
 
+        public bool ShowLabels
+        {
+            get => _showLabels;
+            set => SetProperty(ref _showLabels, value);
+        }
+        private bool _showLabels = true;
 
         public MapTemplate(SessionAsset session)
         {
@@ -100,6 +108,7 @@ namespace AnnoMapEditor.MapTemplates.Models
 
             // create starting spots in the default location
             Elements.AddRange(CreateNewStartingSpots(mapSize));
+
         }
 
 
@@ -146,6 +155,13 @@ namespace AnnoMapEditor.MapTemplates.Models
             PlayableArea = new(new int[] { playableAreaMargins.x1, playableAreaMargins.y1, playableAreaMargins.x2, playableAreaMargins.y2 });
 
             MapSizeConfigChanged?.Invoke(this, new MapTemplateResizeEventArgs(oldMapSize, oldPlayableSize));
+        }
+
+        // public float mapZoomFactor = 1.0f;
+
+        public void UpdateMapZoomConfig(float zoomFactor, float xTransFactor, float yTransFactor)
+        {
+            MapZoomConfigChanged?.Invoke(this, new MapZoomConfigEventArgs(zoomFactor, xTransFactor, yTransFactor));
         }
 
         public void ResizeAndCommitMapTemplate(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
@@ -201,6 +217,20 @@ namespace AnnoMapEditor.MapTemplates.Models
 
             public Vector2 OldMapSize { get; }
             public Vector2 OldPlayableSize { get; }
+        }
+
+        public class MapZoomConfigEventArgs : EventArgs
+        {
+            public MapZoomConfigEventArgs(float zoomFactor, float xTransFactor, float yTransFactor)
+            {
+                ZoomFactor = zoomFactor;
+                XTransFactor = xTransFactor;
+                YTransFactor = yTransFactor;
+            }
+
+            public float ZoomFactor { get; }
+            public float XTransFactor { get; }
+            public float YTransFactor { get; }
         }
     }
 }

@@ -20,7 +20,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <StackPanel Visibility="{Binding Converter={StaticResource CollapsedOnNull}, UpdateSourceTrigger=PropertyChanged}">
+    <StackPanel Visibility="{Binding Converter={StaticResource CollapsedOnNull}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch">
         <TextBlock
             Style="{StaticResource DefaultLabelStyle}"
             HorizontalAlignment="Left"
@@ -95,5 +95,63 @@
 
 
         </Expander>
+        <Grid HorizontalAlignment="Stretch" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                    Style="{StaticResource DefaultLabelStyle}"
+                    HorizontalAlignment="Left"
+                    Text="Zoom"/>
+            <Slider Grid.Row="0" Grid.Column="1"  VerticalAlignment="Center" 
+                    Minimum="100" 
+                    Maximum= "{Binding MaxMapZoom, Mode=OneTime}"
+                    Value="{Binding ZoomFactor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                    TickFrequency="1" 
+                    IsSnapToTickEnabled="True"
+                    Thumb.DragCompleted="Slider_DragCompleted"
+                    Thumb.DragStarted="Slider_DragStarted"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" VerticalAlignment="Center"
+                    Style="{StaticResource DefaultLabelStyle}"
+                    HorizontalAlignment="Left"
+                    Text="{Binding ZoomFactorPercent}"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
+                    Style="{StaticResource DefaultLabelStyle}"
+                    HorizontalAlignment="Left"
+                    Text="X"/>
+            <Slider Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"  VerticalAlignment="Center" 
+                    Minimum="-1.0" 
+                    Maximum="1.0"
+                    Value="{Binding XTransFactor}" 
+                    TickFrequency="0.01" 
+                    IsSnapToTickEnabled="True"
+                    Thumb.DragCompleted="Slider_DragCompleted"
+                    Thumb.DragStarted="Slider_DragStarted"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
+                    Style="{StaticResource DefaultLabelStyle}"
+                    HorizontalAlignment="Left"
+                    Text="Y"/>
+            <Slider Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"  VerticalAlignment="Center" 
+                    Minimum="-1" 
+                    Maximum="1"
+                    Value="{Binding YTransFactor}" 
+                    TickFrequency="0.01" 
+                    IsSnapToTickEnabled="True"
+                    Thumb.DragCompleted="Slider_DragCompleted"
+                    Thumb.DragStarted="Slider_DragStarted"/>
+            <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Click="ZoomResetButtonClicked"> 
+                <TextBlock Text="Reset"/>
+            </Button>
+        </Grid>
+        <local:FancyToggle Label="Show Labels" IsChecked="{Binding ShowLabels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
     </StackPanel>
 </UserControl>

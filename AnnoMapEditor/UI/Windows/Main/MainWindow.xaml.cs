@@ -79,5 +79,10 @@ namespace AnnoMapEditor.UI.Windows.Main
 
             OverlayService.Instance.Show(new ExportAsModViewModel(_viewModel.MapTemplate));
         }
+
+        private void OverlayContainer_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

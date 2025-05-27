@@ -50,12 +50,13 @@
         
         <!-- MapTemplate properties -->
         <StackPanel Grid.Column="0"
-                    Margin="16">
+                    Background="#7f000000">
             <TextBlock
+                    Margin="16,16,16,0"
                     Style="{StaticResource HeaderLabelStyle}"
                     HorizontalAlignment="Left"
                     Text="{lex:Loc Key=Session}"/>
-            <StackPanel Margin="0,0,0,4" VerticalAlignment="Top" Orientation="Horizontal">
+            <StackPanel Margin="16,0" VerticalAlignment="Top" Orientation="Horizontal">
                 <controls:DropDownButton HorizontalAlignment="Left">
                     <ContentControl Content="{lex:Loc Key=OpenFile}" />
                     <controls:DropDownButton.Menu>
@@ -73,17 +74,18 @@
                     </controls:DropDownButton.Menu>
                 </controls:DropDownButton>
             </StackPanel>
-            
-            <controls:MapTemplateProperties
-                    DataContext="{Binding MapTemplateProperties}"
-                    HorizontalAlignment="Left" />
 
+            <controls:MapTemplateProperties
+                    Margin="16"
+                    DataContext="{Binding MapTemplateProperties}"
+                    HorizontalAlignment="Stretch" />
+            
             <!-- validation warnings -->
             <validation:ValidationResultList DataContext="{Binding MapTemplateChecker}"/>
         </StackPanel>
 
         <!-- island properties -->
-        <StackPanel Grid.Column="2">
+        <StackPanel Grid.Column="2" Background="#7f000000">
             <islandProperties:RandomIslandProperties DataContext="{Binding SelectedRandomIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
             <islandProperties:FixedIslandProperties DataContext="{Binding SelectedFixedIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
