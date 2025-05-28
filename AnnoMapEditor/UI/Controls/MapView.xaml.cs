@@ -140,8 +140,9 @@ namespace AnnoMapEditor.UI.Controls
         #endregion playable area
 
         private float _zoomFactor = 1f;
-        private float _xTransFactor = 0.0f;
-        private float _yTransFactor = 0.0f;
+        private float _xTrans;
+        private float _yTrans;
+
 
         public MapView()
         {
@@ -174,6 +175,8 @@ namespace AnnoMapEditor.UI.Controls
 
         private void UpdateIslands(MapTemplate? mapTemplate)
         {
+            ResetZoom();
+
             //Unlink event handlers from old MapTemplate
             if (mapTemplate != _mapTemplate)
             {
@@ -193,6 +196,8 @@ namespace AnnoMapEditor.UI.Controls
 
                 if (mapTemplate is not null)
                 {
+                    ShowLabelSwitch.IsChecked = _mapTemplate.ShowLabels;
+
                     LinkMapTemplateEventHandlers(mapTemplate);
 
                     _mapRect = new Rectangle
@@ -582,20 +587,22 @@ namespace AnnoMapEditor.UI.Controls
             if (_mapTemplate is null)
                 return;
             
-            double size = Math.Min(canvasGrid.ActualWidth, canvasGrid.ActualHeight);
-            size = Math.Sqrt((size * size) / 2);
+            double canvasSize = Math.Min(canvasGrid.ActualWidth, canvasGrid.ActualHeight);
+            double size = Math.Sqrt((canvasSize * canvasSize) / 2);
 
-            double requiredScaleX = size / _mapTemplate.Size.X;
-            double requiredScaleY = size / _mapTemplate.Size.Y;
-            float scale = (float)(Math.Min(requiredScaleX, requiredScaleY));
+            float scale = (float)(Math.Min(size / _mapTemplate.Size.X, size / _mapTemplate.Size.Y));
 
-            TransformGroup mapRenderTransform = new();
+            double allowedXOffset = (Math.Min(0, (canvasGrid.ActualWidth - (canvasSize * _zoomFactor)) / 2) * -1) / _zoomFactor;
+            double allowedYOffset = (Math.Min(0, (canvasGrid.ActualHeight - (canvasSize * _zoomFactor)) / 2) * -1) / _zoomFactor;
+
+            _xTrans = (float)Math.Min(Math.Max(_xTrans, -1 * allowedXOffset), allowedXOffset);
+            _yTrans = (float)Math.Min(Math.Max(_yTrans, -1 * allowedYOffset), allowedYOffset);
 
             double defaultTransform = size * ((_zoomFactor - 1) / -2);
+            double actualXTransform = defaultTransform + (_xTrans + _yTrans) * _zoomFactor / Math.Sqrt(2);
+            double actualYTransform = defaultTransform + (_yTrans - _xTrans) * _zoomFactor / Math.Sqrt(2);
 
-            double actualXTransform = defaultTransform + (_xTransFactor / 2 * (_zoomFactor - 1) * size) + (_yTransFactor / 2 * (_zoomFactor - 1) * size);
-            double actualYTransform = defaultTransform + (_yTransFactor / 2 * (_zoomFactor - 1) * size) - (_xTransFactor / 2 * (_zoomFactor - 1) * size);
-
+            TransformGroup mapRenderTransform = new();
             mapRenderTransform.Children.Add(new ScaleTransform(scale * _zoomFactor, scale * _zoomFactor));
             mapRenderTransform.Children.Add(new TranslateTransform(actualXTransform, actualYTransform));
 
@@ -622,8 +629,8 @@ namespace AnnoMapEditor.UI.Controls
         private void MapElement_MapZoomConfigChanged(object? sender, MapTemplate.MapZoomConfigEventArgs args)
         {
             _zoomFactor = args.ZoomFactor;
-            _xTransFactor = args.XTransFactor;
-            _yTransFactor = args.YTransFactor;
+            // _xTrans = args.XTransFactor;
+            // _yTrans = args.YTransFactor;
 
             UpdateSize();
         }
@@ -774,6 +781,80 @@ namespace AnnoMapEditor.UI.Controls
                     startViewModel.Element.Position = startViewModel.Element.Position.Clamp(_mapTemplate.PlayableArea);
                 }
             }
+        }
+
+        private bool rightclickDragging = false;
+        private Point dragPoint = new Point(0, 0);
+
+        protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
+        {
+            rightclickDragging = true;
+
+            dragPoint = e.GetPosition(this);
+            Mouse.Capture(this);
+
+            e.Handled = true;
+            base.OnMouseRightButtonDown(e);
+        }
+
+        protected override void OnPreviewMouseRightButtonUp(MouseButtonEventArgs e)
+        {
+            rightclickDragging = false; 
+            Mouse.Capture(null);
+
+            ReleaseMouseCapture();
+            base.OnPreviewMouseRightButtonUp(e);
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            if (rightclickDragging)
+            {
+                Point dragOffset = e.GetPosition(this);
+
+                _xTrans += (float)((dragPoint.X - dragOffset.X)) / _zoomFactor;
+                _yTrans += (float)((dragPoint.Y - dragOffset.Y)) / _zoomFactor;
+
+                UpdateSize();
+
+                dragPoint = dragOffset;
+
+            }
+            e.Handled = true;
+            base.OnMouseMove(e);
+        }
+
+        protected override void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            Point position = e.GetPosition(this);
+
+            int divider = e.Delta < 0 ? (e.Delta * -6) : (e.Delta * 4);
+            _zoomFactor = Math.Max(1f, _zoomFactor + _zoomFactor * ((float)e.Delta / divider));
+
+            UpdateSize();
+
+            e.Handled = true;
+            base.OnMouseWheel(e);
+        }
+
+        private void ResetZoom()
+        {
+            _zoomFactor = 1f;
+            _xTrans = 0f;
+            _yTrans = 0f;
+
+            UpdateSize();
+        }
+
+        public void ResetZoomBtn_Click(Object sender, EventArgs e)
+        {
+            ResetZoom();
+        }
+
+        public void ShowLabelsSwitch_Change(Object sender, RoutedEventArgs e)
+        {
+            if (_mapTemplate != null)
+                _mapTemplate.ShowLabels = ShowLabelSwitch.IsChecked;
         }
     }
 }

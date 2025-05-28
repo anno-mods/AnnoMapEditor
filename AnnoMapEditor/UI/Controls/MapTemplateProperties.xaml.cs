@@ -16,14 +16,6 @@ namespace AnnoMapEditor.UI.Controls
         {
             
         }
-
-        private void ZoomResetButtonClicked(object sender, RoutedEventArgs e)
-        {
-            if (DataContext is MapTemplatePropertiesViewModel viewModel)
-            {
-                viewModel.ResetZoom();
-            }
-        }
         
         private void Slider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {

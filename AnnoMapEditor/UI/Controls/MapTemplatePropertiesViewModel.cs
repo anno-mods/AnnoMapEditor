@@ -20,15 +20,6 @@ namespace AnnoMapEditor.UI.Controls
         }
         private string _mapSizeText = "";
 
-        public bool ShowLabels
-        {
-            get => _mapTemplate.ShowLabels;
-            set
-            {
-                _mapTemplate.ShowLabels = value;
-            }
-        }
-
         public SessionAsset SelectedSession
         {
             get => _selectedSession;
@@ -67,11 +58,6 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
-        private void ZoomUpdate()
-        {
-            _mapTemplate.UpdateMapZoomConfig(_zoomFactor, _xTransFactor, _yTransFactor);
-        }
-
         private (int x1, int y1, int x2, int y2) PlayableAreaAsTuple()
         {
             return (_mapTemplate.PlayableArea.X, _mapTemplate.PlayableArea.Y, 
@@ -80,51 +66,6 @@ namespace AnnoMapEditor.UI.Controls
         }
 
         public IEnumerable<SessionAsset> SupportedSessions { get; } = SessionAsset.SupportedSessions;
-
-        public int ZoomFactor
-        {
-            get => (int)(_zoomFactor * 100f);
-            set
-            {
-                SetProperty(ref _zoomFactor, (float)value / 100);
-                ZoomFactorPercent = ((int)(_zoomFactor * 100f)).ToString() + "%";
-
-
-                ZoomUpdate();
-            }
-        }
-        private float _zoomFactor = 1.0f;
-
-        public string ZoomFactorPercent
-        {
-            get => _zoomFactorPercent;
-            set
-            {
-                SetProperty(ref _zoomFactorPercent, value);
-            }
-        }
-        private string _zoomFactorPercent = "100%";
-
-        public float XTransFactor
-        {
-            get => _xTransFactor;
-            set
-            {
-                SetProperty(ref _xTransFactor, value);
-                ZoomUpdate();
-            }
-        }
-        private float _xTransFactor = 0.0f;
-        public float YTransFactor
-        {
-            get => _yTransFactor;
-            set
-            {
-                SetProperty(ref _yTransFactor, value);
-                ZoomUpdate();
-            }
-        }
-        private float _yTransFactor = 0.0f;
 
         public int MapSize
         {
@@ -161,15 +102,6 @@ namespace AnnoMapEditor.UI.Controls
 
         public int MaxMapSize { get => 4096; } //Arbitrary Maximum, but larger would be absolutely useless
         public int MinMapSize { get => 704; } //Smallest playable Size with 4 reliable medium starter islands
-        public int MaxMapZoom { get => 500; }
-
-        public void ResetZoom()
-        {
-            ZoomFactor = 100;
-            XTransFactor = 0f;
-            YTransFactor = 0f;
-            ZoomUpdate();
-        }
 
         public bool DragInProgress
         {
@@ -196,8 +128,6 @@ namespace AnnoMapEditor.UI.Controls
             ResizeMapTemplateValues();
 
             UpdateMapSizeText();
-
-            ZoomUpdate();
         }
 
 
