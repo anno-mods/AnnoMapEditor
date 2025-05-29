@@ -68,6 +68,7 @@ namespace AnnoMapEditor.MapTemplates.Enums
                 case "moderate_3rdparty07_01":
                 case "moderate_3rdparty08_01":
                 case "colony03_3rdparty09_01":
+                case "colony03_d_18":
                     return ThirdParty;
                 case "moderate_3rdparty03_01":
                 case "colony01_3rdparty04_01":
@@ -85,6 +86,7 @@ namespace AnnoMapEditor.MapTemplates.Enums
                 "moderate_3rdparty02_01" => "Sir Archibald Blake",
                 "colony01_3rdparty05_01" => "Isabel Sarmento",
                 "moderate_3rdparty06_01" => "Old Nate",
+                "colony03_d_18" => "Old Nate (Arctic)",
                 "moderate_3rdparty07_01" => "Eli Bleakworth",
                 "moderate_3rdparty08_01" => "Madame Kahina",
                 "colony03_3rdparty09_01" => "Qumaq",

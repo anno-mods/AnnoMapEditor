@@ -62,10 +62,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         {
             // thumbnail
             string thumbnailPath = Path.Combine(
-                Path.GetDirectoryName(mapFilePath)!,
-                "_gamedata",
-                Path.GetFileNameWithoutExtension(mapFilePath),
-                "mapimage.png");
+                    Path.GetDirectoryName(mapFilePath)!,
+                    "_gamedata",
+                    Path.GetFileNameWithoutExtension(mapFilePath),
+                    "activemapimage.png"
+                );
+
             BitmapImage thumbnail = _dataArchive.TryLoadPng(thumbnailPath)
                 ?? throw new Exception($"Could not load island thumbnail '{thumbnailPath}'.");
 

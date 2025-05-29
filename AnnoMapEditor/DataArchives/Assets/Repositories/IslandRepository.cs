@@ -111,12 +111,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         public static IslandType DetectIslandTypeFromPath(string filePath)
         {
-            if (filePath.Contains("_d_"))
-                return IslandType.Decoration;
-            else if (filePath.Contains("_3rdparty"))
-                return IslandType.ThirdParty;
-            else
-                return IslandType.Normal;
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            return IslandType.FromIslandFileName(fileName);
         }
 
         public static IslandSize DetectDefaultIslandSizeFromPath(string filePath)

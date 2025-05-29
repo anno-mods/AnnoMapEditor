@@ -18,6 +18,7 @@
         <converters:BoolToVisibility x:Key="VisibleOnTrue" />
         <converters:BoolToVisibility x:Key="VisibleOnFalse" OnTrue="Collapsed" OnFalse="Visible" />
         <converters:ObjectToVisibility x:Key="collapseOnNull" />
+        <converters:ObjectToVisibilityInverse x:Key="showOnNull" />
     </local:MapElementControl.Resources>
 
     <Grid>
@@ -28,17 +29,20 @@
             </Canvas.RenderTransform>
 
             <!-- Background -->
-            <Rectangle Fill="{Binding BackgroundBrush}"
-                       Stroke="{Binding BorderBrush}"
+            <Rectangle Stroke="{Binding BorderBrush}"
                        Width="{Binding Island.SizeInTiles}"
                        Height="{Binding Island.SizeInTiles}" />
-            
+            <Rectangle Fill="{Binding BackgroundBrush}"
+                       
+                       Width="{Binding Island.SizeInTiles}"
+                       Height="{Binding Island.SizeInTiles}" />
+
             <!-- Thumbnail -->
             <Image Visibility="{Binding Thumbnail, Converter={StaticResource collapseOnNull}}"
                    Source="{Binding Thumbnail}"
                    Width="{Binding Island.SizeInTiles}"
                    Height="{Binding Island.SizeInTiles}"
-                   Opacity="0.5">
+                   Opacity="0.75">
             </Image>
             
             <!-- rotation indicator -->
@@ -49,24 +53,25 @@
         </Canvas>
 
         <!-- Label -->
-        <Border Visibility="{Binding ShowLabel, Converter={StaticResource VisibleOnTrue}}"
-                Grid.Column="0"
-                CornerRadius="10"
-                Padding="4,0,4,0"
-                Background="#80000000"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                RenderTransformOrigin=".5,.5">
-            <Border.RenderTransform>
-                <RotateTransform Angle="{Binding Source={x:Static controls:MapView.MAP_ROTATION_ANGLE}, Converter={StaticResource negateDoubleConverter}}" />
-            </Border.RenderTransform>
-            <Viewbox StretchDirection="DownOnly" Stretch="Uniform">
+
+        <Viewbox StretchDirection="DownOnly" Stretch="Uniform">
+            <Border Visibility="{Binding ShowLabel, Converter={StaticResource VisibleOnTrue}}"
+                    Grid.Column="0"
+                    CornerRadius="10"
+                    Padding="4,0,4,0"
+                    Background="#80000000"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    RenderTransformOrigin=".5,.5">
+                <Border.RenderTransform>
+                    <RotateTransform Angle="{Binding Source={x:Static controls:MapView.MAP_ROTATION_ANGLE}, Converter={StaticResource negateDoubleConverter}}" />
+                </Border.RenderTransform>
                 <TextBlock Foreground="White"
                        FontSize="50"
                        TextAlignment="Center"
                        Text="{Binding Label}"/>
-            </Viewbox>
-        </Border>
+            </Border>
+        </Viewbox>
 
         <!-- Cross Out -->
         <Grid Visibility="{Binding IsOutOfBounds, Converter={StaticResource VisibleOnTrue}}">
