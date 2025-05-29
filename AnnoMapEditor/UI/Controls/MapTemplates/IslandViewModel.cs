@@ -57,14 +57,10 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         }
         private bool _isOutOfBounds;
 
-        public bool ShowLabel
-        {
-            get => _showLabel;
-            set => SetProperty(ref _showLabel, value);
-        }
-        public bool _showLabel;
-
         public abstract string? Label { get; }
+
+        public bool ShowLabel => _showLabel;
+        private bool _showLabel;
 
         public virtual BitmapImage? Thumbnail { get; }
 
@@ -91,7 +87,13 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         private void This_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(IsSelected))
+            {
                 UpdateBackground();
+                UpdateLabelVisibility();
+            }
+
+            if (e.PropertyName == nameof(Label))
+                UpdateLabelVisibility();
         }
 
         private void Island_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -104,6 +106,9 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
             else if (e.PropertyName == nameof(MapElement.Position))
                 BoundsCheck();
+
+            else if (e.PropertyName == nameof(IslandElement.Label))
+                UpdateLabelVisibility();
         }
 
         private void MapTemplate_ConfigChanged(object? sender, PropertyChangedEventArgs e)
@@ -153,9 +158,10 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             IsOutOfBounds = !position.Within(mapArea);
         }
 
-        public void UpdateLabelVisibility()
+        private void UpdateLabelVisibility()
         {
-            ShowLabel = _mapTemplate.ShowLabels;
+            _showLabel = (_mapTemplate.ShowLabels || IsSelected) && Label != null;
+            OnPropertyChanged(nameof(ShowLabel));
         }
     }
 }

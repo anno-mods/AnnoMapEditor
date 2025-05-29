@@ -11,7 +11,6 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public override string? Label => _label;
         private string? _label;
 
-
         public RandomIslandViewModel(MapTemplate mapTemplate, RandomIslandElement randomIsland)
             : base(mapTemplate, randomIsland)
         {

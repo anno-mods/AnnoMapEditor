@@ -11,7 +11,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
     {
         private readonly FixedIslandElement _fixedIsland;
 
-        public override string? Label => _fixedIsland.Label;
+        public override string? Label => _fixedIsland?.Label;
 
         public override BitmapImage? Thumbnail => _fixedIsland.IslandAsset.Thumbnail;
 
