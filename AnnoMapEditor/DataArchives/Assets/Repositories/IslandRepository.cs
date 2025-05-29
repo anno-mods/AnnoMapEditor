@@ -113,7 +113,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         {
             if (filePath.Contains("_d_"))
                 return IslandType.Decoration;
-
+            else if (filePath.Contains("_3rdparty"))
+                return IslandType.ThirdParty;
             else
                 return IslandType.Normal;
         }

@@ -520,9 +520,15 @@ namespace AnnoMapEditor.UI.Controls
         private void SelectIsland_IslandSelected(object? sender, IslandSelectedEventArgs e, Vector2 position)
         {
             // add the new Island
-            // TODO: Select the correct IslandType.
-            FixedIslandElement fixedIslandElement = new(e.IslandAsset, IslandType.Normal)
+
+            string fileName = System.IO.Path.GetFileNameWithoutExtension(e.IslandAsset.FilePath);
+            System.Diagnostics.Debug.WriteLine("Island file name: " + fileName);
+
+            IslandType islandType = IslandType.FromIslandFileName(fileName);
+
+            FixedIslandElement fixedIslandElement = new(e.IslandAsset, islandType)
             {
+                Label = IslandType.DefaultIslandLabelFromFileName(fileName),
                 Position = position
             };
             _mapTemplate.Elements.Add(fixedIslandElement);

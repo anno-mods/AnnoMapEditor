@@ -60,10 +60,12 @@
             <Border.RenderTransform>
                 <RotateTransform Angle="{Binding Source={x:Static controls:MapView.MAP_ROTATION_ANGLE}, Converter={StaticResource negateDoubleConverter}}" />
             </Border.RenderTransform>
-            <TextBlock Foreground="White"
+            <Viewbox StretchDirection="DownOnly" Stretch="Uniform">
+                <TextBlock Foreground="White"
                        FontSize="50"
                        TextAlignment="Center"
                        Text="{Binding Label}"/>
+            </Viewbox>
         </Border>
 
         <!-- Cross Out -->

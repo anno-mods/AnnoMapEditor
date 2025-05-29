@@ -17,7 +17,6 @@ namespace AnnoMapEditor.MapTemplates.Enums
 
         public static readonly IEnumerable<IslandType> All = new[] { Normal, Starter, Decoration, ThirdParty, PirateIsland, Cliff };
 
-
         public readonly string Name;
 
         public readonly short? ElementValue;
@@ -58,6 +57,41 @@ namespace AnnoMapEditor.MapTemplates.Enums
             }
 
             return type;
+        }
+        public static IslandType FromIslandFileName(string fileName)
+        {
+            switch (fileName)
+            {
+                case "moderate_3rdparty02_01":
+                case "colony01_3rdparty05_01":
+                case "moderate_3rdparty06_01":
+                case "moderate_3rdparty07_01":
+                case "moderate_3rdparty08_01":
+                case "colony03_3rdparty09_01":
+                    return ThirdParty;
+                case "moderate_3rdparty03_01":
+                case "colony01_3rdparty04_01":
+                    return PirateIsland;
+                default:
+                    if (fileName.Contains("_d_")) return Decoration;
+                    return Normal;
+            }
+        }
+
+        public static string? DefaultIslandLabelFromFileName(string fileName)
+        {
+            return fileName switch
+            {
+                "moderate_3rdparty02_01" => "Sir Archibald Blake",
+                "colony01_3rdparty05_01" => "Isabel Sarmento",
+                "moderate_3rdparty06_01" => "Old Nate",
+                "moderate_3rdparty07_01" => "Eli Bleakworth",
+                "moderate_3rdparty08_01" => "Madame Kahina",
+                "colony03_3rdparty09_01" => "Qumaq",
+                "moderate_3rdparty03_01" => "Anne Harlow",
+                "colony01_3rdparty04_01" => "Jean La Fortune",
+                _ => null,
+            };
         }
 
 

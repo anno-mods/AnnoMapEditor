@@ -29,6 +29,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             _fixedIsland = fixedIsland;
             _isContinentalIsland = _fixedIsland.IslandAsset.IslandSize.FirstOrDefault() == IslandSize.Continental;
 
+            if (_fixedIsland.Label != null) OnPropertyChanged(nameof(Label));
+
             SnapContinentalIsland();
             UpdateThumbnailRotation();
 
