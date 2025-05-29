@@ -5,7 +5,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    d:DesignHeight="600" d:DesignWidth ="600">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -20,19 +21,19 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         <Grid Margin="16" Name="canvasGrid" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="#B31E2328">
-            <Canvas Name="rotationCanvas" RenderTransformOrigin="0.5, 0.5" Width="0" Height="0">
+            <Canvas Name="zoomCanvas">
                 <Canvas.RenderTransform>
-                    <TransformGroup>
-                        <RotateTransform Angle="{Binding Source={x:Static local:MapView.MAP_ROTATION_ANGLE}}"/>
-                    </TransformGroup>
-
+                    <MatrixTransform x:Name="matrixTransform"/>
                 </Canvas.RenderTransform>
-                <Canvas 
-                Name="mapTemplateCanvas"
-                Width="0"
-                Height="0" />
-                <Canvas
-                Name="addIslandCanvas" />
+                <Canvas Name="rotationCanvas" RenderTransformOrigin="0.5, 0.5" Visibility="Visible">
+                    <Canvas.RenderTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="{Binding Source={x:Static local:MapView.MAP_ROTATION_ANGLE}}"/>
+                        </TransformGroup>
+                    </Canvas.RenderTransform>
+                    <Canvas Visibility="Visible"  Name="mapTemplateCanvas" Width="0" Height="0" />
+                    <Canvas Name="addIslandCanvas" />
+                </Canvas>
             </Canvas>
         </Grid>
         <!--#B31E2328-->

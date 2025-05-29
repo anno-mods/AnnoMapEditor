@@ -139,9 +139,6 @@ namespace AnnoMapEditor.UI.Controls
 
         #endregion playable area
 
-        private float _zoomFactor = 1f;
-        private float _xTrans;
-        private float _yTrans;
 
 
         public MapView()
@@ -467,14 +464,6 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
-        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
-        {
-            DeselectAllMapElements();
-
-            e.Handled = true;
-            base.OnMouseRightButtonDown(e);
-        }
-
         #endregion selecting
 
         private void OnMapElementSelected(MapElementViewModel viewModel)
@@ -593,28 +582,20 @@ namespace AnnoMapEditor.UI.Controls
             if (_mapTemplate is null)
                 return;
             
-            double canvasSize = Math.Min(canvasGrid.ActualWidth, canvasGrid.ActualHeight);
+            double canvasSize = Math.Min(zoomCanvas.ActualWidth, zoomCanvas.ActualHeight);
             double size = Math.Sqrt((canvasSize * canvasSize) / 2);
+
+            rotationCanvas.Width = size;
+            rotationCanvas.Height = size;
 
             float scale = (float)(Math.Min(size / _mapTemplate.Size.X, size / _mapTemplate.Size.Y));
 
-            double allowedXOffset = (Math.Min(0, (canvasGrid.ActualWidth - (canvasSize * _zoomFactor)) / 2) * -1) / _zoomFactor;
-            double allowedYOffset = (Math.Min(0, (canvasGrid.ActualHeight - (canvasSize * _zoomFactor)) / 2) * -1) / _zoomFactor;
-
-            _xTrans = (float)Math.Min(Math.Max(_xTrans, -1 * allowedXOffset), allowedXOffset);
-            _yTrans = (float)Math.Min(Math.Max(_yTrans, -1 * allowedYOffset), allowedYOffset);
-
-            double defaultTransform = size * ((_zoomFactor - 1) / -2);
-            double actualXTransform = defaultTransform + (_xTrans + _yTrans) * _zoomFactor / Math.Sqrt(2);
-            double actualYTransform = defaultTransform + (_yTrans - _xTrans) * _zoomFactor / Math.Sqrt(2);
+            mapTemplateCanvas.RenderTransform = new ScaleTransform(scale, scale);
 
             TransformGroup mapRenderTransform = new();
-            mapRenderTransform.Children.Add(new ScaleTransform(scale * _zoomFactor, scale * _zoomFactor));
-            mapRenderTransform.Children.Add(new TranslateTransform(actualXTransform, actualYTransform));
-
-            mapTemplateCanvas.RenderTransform = mapRenderTransform;
-            rotationCanvas.Width = scale * _mapTemplate.Size.X;
-            rotationCanvas.Height = scale * _mapTemplate.Size.Y;
+            mapRenderTransform.Children.Add(new RotateTransform(MAP_ROTATION_ANGLE));
+            mapRenderTransform.Children.Add(new TranslateTransform((zoomCanvas.ActualWidth - size) / 2, (zoomCanvas.ActualHeight - size) / 2));
+            rotationCanvas.RenderTransform = mapRenderTransform;
         }
 
         private void LinkMapTemplateEventHandlers(MapTemplate mapTemplate)
@@ -634,9 +615,12 @@ namespace AnnoMapEditor.UI.Controls
 
         private void MapElement_MapZoomConfigChanged(object? sender, MapTemplate.MapZoomConfigEventArgs args)
         {
-            _zoomFactor = args.ZoomFactor;
-            // _xTrans = args.XTransFactor;
-            // _yTrans = args.YTransFactor;
+            Matrix matrix = matrixTransform.Matrix;
+            matrix.M11 = Math.Max(1, args.ZoomFactor);
+            matrix.M22 = matrix.M11;
+            matrix.OffsetX = Math.Min(0, Math.Max(matrix.OffsetX, -1 * (zoomCanvas.ActualWidth * (matrix.M11 - 1))));
+            matrix.OffsetY = Math.Min(0, Math.Max(matrix.OffsetY, -1 * (zoomCanvas.ActualHeight * (matrix.M11 - 1))));
+            matrixTransform.Matrix = matrix;
 
             UpdateSize();
         }
@@ -795,7 +779,6 @@ namespace AnnoMapEditor.UI.Controls
         protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
         {
             rightclickDragging = true;
-
             dragPoint = e.GetPosition(this);
             Mouse.Capture(this);
 
@@ -803,13 +786,12 @@ namespace AnnoMapEditor.UI.Controls
             base.OnMouseRightButtonDown(e);
         }
 
-        protected override void OnPreviewMouseRightButtonUp(MouseButtonEventArgs e)
+        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
         {
             rightclickDragging = false; 
             Mouse.Capture(null);
-
             ReleaseMouseCapture();
-            base.OnPreviewMouseRightButtonUp(e);
+            base.OnMouseRightButtonUp(e);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -818,13 +800,12 @@ namespace AnnoMapEditor.UI.Controls
             {
                 Point dragOffset = e.GetPosition(this);
 
-                _xTrans += (float)((dragPoint.X - dragOffset.X)) / _zoomFactor;
-                _yTrans += (float)((dragPoint.Y - dragOffset.Y)) / _zoomFactor;
-
-                UpdateSize();
-
+                Matrix matrix = matrixTransform.Matrix;
+                matrix.Translate(dragOffset.X -dragPoint.X, dragOffset.Y - dragPoint.Y);
+                matrix.OffsetX = Math.Min(0, Math.Max(matrix.OffsetX, -1 * (zoomCanvas.ActualWidth * (matrix.M11 - 1))));
+                matrix.OffsetY = Math.Min(0, Math.Max(matrix.OffsetY, -1 * (zoomCanvas.ActualHeight * (matrix.M11 - 1))));
+                matrixTransform.Matrix = matrix;
                 dragPoint = dragOffset;
-
             }
             e.Handled = true;
             base.OnMouseMove(e);
@@ -832,12 +813,16 @@ namespace AnnoMapEditor.UI.Controls
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
-            Point position = e.GetPosition(this);
+            Matrix matrix = matrixTransform.Matrix;
+            double scale = e.Delta > 0 ? 1.1 : 1 / 1.1;
+            Point pos = e.GetPosition(this);
 
-            int divider = e.Delta < 0 ? (e.Delta * -6) : (e.Delta * 4);
-            _zoomFactor = Math.Max(1f, _zoomFactor + _zoomFactor * ((float)e.Delta / divider));
-
-            UpdateSize();
+            matrix.ScaleAt(scale, scale, pos.X, pos.Y);
+            matrix.M11 = Math.Max(1, matrix.M11);
+            matrix.M22 = matrix.M11;
+            matrix.OffsetX = Math.Min(0, Math.Max(matrix.OffsetX, -1 * (zoomCanvas.ActualWidth * (matrix.M11 - 1))));
+            matrix.OffsetY = Math.Min(0, Math.Max(matrix.OffsetY, -1 * (zoomCanvas.ActualHeight * (matrix.M11 - 1))));
+            matrixTransform.Matrix = matrix;
 
             e.Handled = true;
             base.OnMouseWheel(e);
@@ -845,10 +830,7 @@ namespace AnnoMapEditor.UI.Controls
 
         private void ResetZoom()
         {
-            _zoomFactor = 1f;
-            _xTrans = 0f;
-            _yTrans = 0f;
-
+            matrixTransform.Matrix = new Matrix(1,0,0,1,0,0);
             UpdateSize();
         }
 
