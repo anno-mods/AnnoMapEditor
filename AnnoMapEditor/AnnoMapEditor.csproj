@@ -31,7 +31,7 @@
     <None Remove="Assets\maptype.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\app.ico" />
+    <Resource Include="Assets\app.ico" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Mods\Serialization\a7tinfo.xml">

@@ -9,6 +9,7 @@
         xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
         xmlns:overlays="clr-namespace:AnnoMapEditor.UI.Overlays"
         xmlns:lex="http://wpflocalizeextension.codeplex.com"
+        xmlns:draw="clr-namespace:System.Drawing;assembly=System.Drawing"
         lex:LocalizeDictionary.DesignCulture="en"
         lex:ResxLocalizationProvider.DefaultAssembly="AnnoMapEditor"
         lex:ResxLocalizationProvider.DefaultDictionary="Texts"
@@ -17,113 +18,156 @@
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="900" Width="1440"
-        Background="{StaticResource BackgroundBrush}">
+        WindowStyle="SingleBorderWindow"
+        Background="{StaticResource BackgroundBrush}" >
     <Window.Resources>
-        <ResourceDictionary Source="../../Resources/Styles.xaml" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Resources/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
-    <Grid VerticalAlignment="Stretch">
-        
-        <Grid.Resources>
-            <converters:VisibilityToBool x:Key="FalseOnVisible" OnVisible="False" />
-            <converters:BoolToVisibility x:Key="collapseOnFalse" />
-            <converters:BooleaNotConverter x:Key="booleanNot" />
-        </Grid.Resources>
-        
-        <!-- layout -->
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="LeftSidebar" MaxWidth="300" />
-            <ColumnDefinition />
-            <ColumnDefinition x:Name="RightSidebar" MaxWidth="300" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition />
-        </Grid.RowDefinitions>
 
-        <!-- map view -->
-        <controls:MapView
-                x:Name="Map"
-                Grid.Column="1"
-                SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                EditPlayableArea="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.MapTemplateProperties.EditPlayableArea, Mode=OneWay}"
-                ShowPlayableAreaMargins="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.MapTemplateProperties.ShowPlayableAreaMargins, Mode=OneWay}"
-                DataContext="{Binding MapTemplate, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
-        
-        <!-- MapTemplate properties -->
-        <StackPanel Grid.Column="0"
-                    Background="#7f000000">
-            <TextBlock
-                    Margin="16,16,16,0"
-                    Style="{StaticResource HeaderLabelStyle}"
-                    HorizontalAlignment="Left"
-                    Text="{lex:Loc Key=Session}"/>
-            <StackPanel Margin="16,0" VerticalAlignment="Top" Orientation="Horizontal">
-                <controls:DropDownButton HorizontalAlignment="Left">
-                    <ContentControl Content="{lex:Loc Key=OpenFile}" />
-                    <controls:DropDownButton.Menu>
-                        <ContextMenu Name="openMapMenu" />
-                    </controls:DropDownButton.Menu>
-                </controls:DropDownButton>
-                <controls:DropDownButton HorizontalAlignment="Left"
-                                         IsEnabled="{Binding MapTemplateChecker.HasErrors, Converter={StaticResource booleanNot}}">
-                    <ContentControl Content="Save" />
-                    <controls:DropDownButton.Menu>
-                        <ContextMenu>
-                            <MenuItem Header="{lex:Loc Key=SaveAsMapTemplate}" Click="ExportMap_Click"/>
-                            <MenuItem Header="{lex:Loc {Binding Path=ExportStatus.TextStatus, UpdateSourceTrigger=PropertyChanged, Converter={lex:PrependTypeConverter}}}" Click="ExportMod_Click"/>
-                        </ContextMenu>
-                    </controls:DropDownButton.Menu>
-                </controls:DropDownButton>
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            GlassFrameThickness="0"
+            CornerRadius="0"
+            CaptionHeight="27"
+            UseAeroCaptionButtons="False"
+            ResizeBorderThickness="5"/>
+    </WindowChrome.WindowChrome>
+
+    <Border BorderBrush="{StaticResource BackgroundBrush}" BorderThickness="1">
+        <Grid Name="mainWindowGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Height="auto" 
+              Panel.ZIndex="999"
+              Background="#7f000000"
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Image Name="titleIcon" VerticalAlignment="Center" Height="24" Margin="12,0" Source="/Assets/app.ico"/>
+                <TextBlock Name="titleText" Grid.Column="1" VerticalAlignment="Center" Margin="0" Foreground="#f0f0f0"/>
+                <Button Name="minimizeButton" Grid.Column="2" Content="&#xe921;" Style="{StaticResource WindowControlDefault}" Click="minimizeBtn_Click">
+
+                </Button>
+                <Button Name="maximizeButton" Grid.Column="3" Content="&#xe922;" Style="{StaticResource WindowControlDefault}" Click="maximizeBtn_Click"/>
+                <Button Name="closeButton" Grid.Column="4" Content="&#xe8bb;" Style="{StaticResource WindowControlRed}" Click="CloseBtn_Click"/>
+            </Grid>
+            <Grid Grid.Row="1" VerticalAlignment="Stretch">
+
+                <Grid.Resources>
+                    <converters:VisibilityToBool x:Key="FalseOnVisible" OnVisible="False" />
+                    <converters:BoolToVisibility x:Key="collapseOnFalse" />
+                    <converters:BooleaNotConverter x:Key="booleanNot" />
+                </Grid.Resources>
+
+                <!-- layout -->
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="LeftSidebar" MaxWidth="300" />
+                    <ColumnDefinition />
+                    <ColumnDefinition x:Name="RightSidebar" MaxWidth="300" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <!-- map view -->
+                <controls:MapView
+                    x:Name="Map"
+                    Grid.Column="1"
+                    SelectedIsland="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SelectedIsland, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    EditPlayableArea="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.MapTemplateProperties.EditPlayableArea, Mode=OneWay}"
+                    ShowPlayableAreaMargins="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.MapTemplateProperties.ShowPlayableAreaMargins, Mode=OneWay}"
+                    DataContext="{Binding MapTemplate, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
+
+                <!-- MapTemplate properties -->
+                <StackPanel Grid.Column="0"
+                        Background="#7f000000">
+                    <TextBlock
+                        Margin="16,16,16,0"
+                        Style="{StaticResource HeaderLabelStyle}"
+                        HorizontalAlignment="Left"
+                        Text="{lex:Loc Key=Session}"/>
+                    <StackPanel Margin="16,0" VerticalAlignment="Top" Orientation="Horizontal">
+                        <controls:DropDownButton HorizontalAlignment="Left">
+                            <ContentControl Content="{lex:Loc Key=OpenFile}" />
+                            <controls:DropDownButton.Menu>
+                                <ContextMenu Name="openMapMenu" />
+                            </controls:DropDownButton.Menu>
+                        </controls:DropDownButton>
+                        <controls:DropDownButton HorizontalAlignment="Left"
+                                             IsEnabled="{Binding MapTemplateChecker.HasErrors, Converter={StaticResource booleanNot}}">
+                            <ContentControl Content="Save" />
+                            <controls:DropDownButton.Menu>
+                                <ContextMenu>
+                                    <MenuItem Header="{lex:Loc Key=SaveAsMapTemplate}" Click="ExportMap_Click"/>
+                                    <MenuItem Header="{lex:Loc {Binding Path=ExportStatus.TextStatus, UpdateSourceTrigger=PropertyChanged, Converter={lex:PrependTypeConverter}}}" Click="ExportMod_Click"/>
+                                </ContextMenu>
+                            </controls:DropDownButton.Menu>
+                        </controls:DropDownButton>
+                    </StackPanel>
+
+                    <controls:MapTemplateProperties
+                        Margin="16"
+                        DataContext="{Binding MapTemplateProperties}"
+                        HorizontalAlignment="Stretch" />
+
+                    <!-- validation warnings -->
+                    <validation:ValidationResultList DataContext="{Binding MapTemplateChecker}"/>
+                </StackPanel>
+
+                <!-- island properties -->
+                <StackPanel Grid.Column="2" Background="#7f000000">
+                    <islandProperties:RandomIslandProperties DataContext="{Binding SelectedRandomIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
+                    <islandProperties:FixedIslandProperties DataContext="{Binding SelectedFixedIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+
+                <!-- footer -->
+                <!--<StackPanel Grid.Column="0" 
+                        Grid.Row="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Bottom" 
+                        Margin="8,0,0,0">
+                <emoji:TextBlock Text="{lex:Loc {Binding Path=DataPathStatus.StatusType, UpdateSourceTrigger=PropertyChanged, Converter={lex:PrependTypeConverter}}}"
+                                     ToolTip="{Binding DataPathStatus.ToolTip, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Click="Configure_Click" HorizontalAlignment="Left"
+                            Visibility="{Binding DataPathStatus.Configure, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBlock Text="{lex:Loc {Binding DataPathStatus.ConfigureType, UpdateSourceTrigger=PropertyChanged, Converter={lex:PrependTypeConverter}}}"/>
+                </Button>
+                <Button Click="AutoDetect_Click"
+                        HorizontalAlignment="Left"
+                        Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}"
+                        Content="{lex:Loc Key=AutoDetect}"></Button>
             </StackPanel>
+            <TextBlock Grid.Column="2"
+                       Grid.Row="1"
+                       Style="{StaticResource MutedLabelStyle}"
+                       VerticalAlignment="Bottom"
+                       HorizontalAlignment="Right"
+                       TextAlignment="Right">
+                    <Run>The editor is work in progress.</Run>
+                    <LineBreak />
+                    <Run>Visit GitHub for </Run>
+                    <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor#roadmap" RequestNavigate="Hyperlink_OpenBrowser">roadmap</Hyperlink>
+                    <Run>and</Run>
+                    <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
+            </TextBlock>-->
+                <controls:Imprint Grid.Column="2"
+                              VerticalAlignment="Bottom"/>
 
-            <controls:MapTemplateProperties
-                    Margin="16"
-                    DataContext="{Binding MapTemplateProperties}"
-                    HorizontalAlignment="Stretch" />
-            
-            <!-- validation warnings -->
-            <validation:ValidationResultList DataContext="{Binding MapTemplateChecker}"/>
-        </StackPanel>
+                <!-- Overlays -->
+                <overlays:OverlayContainer Grid.ColumnSpan="3" />
+            </Grid>
 
-        <!-- island properties -->
-        <StackPanel Grid.Column="2" Background="#7f000000">
-            <islandProperties:RandomIslandProperties DataContext="{Binding SelectedRandomIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
-            <islandProperties:FixedIslandProperties DataContext="{Binding SelectedFixedIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
-        </StackPanel>
-
-        <!-- footer -->
-        <!--<StackPanel Grid.Column="0" 
-                    Grid.Row="1"
-                    Orientation="Horizontal"
-                    VerticalAlignment="Bottom" 
-                    Margin="8,0,0,0">
-            <emoji:TextBlock Text="{lex:Loc {Binding Path=DataPathStatus.StatusType, UpdateSourceTrigger=PropertyChanged, Converter={lex:PrependTypeConverter}}}"
-                                 ToolTip="{Binding DataPathStatus.ToolTip, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Click="Configure_Click" HorizontalAlignment="Left"
-                        Visibility="{Binding DataPathStatus.Configure, UpdateSourceTrigger=PropertyChanged}">
-                <TextBlock Text="{lex:Loc {Binding DataPathStatus.ConfigureType, UpdateSourceTrigger=PropertyChanged, Converter={lex:PrependTypeConverter}}}"/>
-            </Button>
-            <Button Click="AutoDetect_Click"
-                    HorizontalAlignment="Left"
-                    Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}"
-                    Content="{lex:Loc Key=AutoDetect}"></Button>
-        </StackPanel>
-        <TextBlock Grid.Column="2"
-                   Grid.Row="1"
-                   Style="{StaticResource MutedLabelStyle}"
-                   VerticalAlignment="Bottom"
-                   HorizontalAlignment="Right"
-                   TextAlignment="Right">
-                <Run>The editor is work in progress.</Run>
-                <LineBreak />
-                <Run>Visit GitHub for </Run>
-                <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor#roadmap" RequestNavigate="Hyperlink_OpenBrowser">roadmap</Hyperlink>
-                <Run>and</Run>
-                <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
-        </TextBlock>-->
-        <controls:Imprint Grid.Column="2"
-                          VerticalAlignment="Bottom"/>
-
-        <!-- Overlays -->
-        <overlays:OverlayContainer Grid.ColumnSpan="3" />
-    </Grid>
+        </Grid>
+    </Border>
 </Window>

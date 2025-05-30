@@ -56,7 +56,7 @@
             <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="X" Style="{StaticResource DefaultLabelStyle}" />
             <TextBox   VerticalAlignment="Center" Grid.Column="1" Margin="2" Text="{Binding FixedIsland.Position.X, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
             <TextBlock VerticalAlignment="Center" Grid.Column="3" Text="Y" Style="{StaticResource DefaultLabelStyle}" />
-            <TextBox   VerticalAlignment="Center" Grid.Column="4" Margin="2" Text="{Binding FixedIsland.Position.X, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
+            <TextBox   VerticalAlignment="Center" Grid.Column="4" Margin="2" Text="{Binding FixedIsland.Position.Y, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
         </Grid>
 
 

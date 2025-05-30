@@ -29,11 +29,7 @@
             </Canvas.RenderTransform>
 
             <!-- Background -->
-            <Rectangle Stroke="{Binding BorderBrush}"
-                       Width="{Binding Island.SizeInTiles}"
-                       Height="{Binding Island.SizeInTiles}" />
             <Rectangle Fill="{Binding BackgroundBrush}"
-                       
                        Width="{Binding Island.SizeInTiles}"
                        Height="{Binding Island.SizeInTiles}" />
 
@@ -44,6 +40,10 @@
                    Height="{Binding Island.SizeInTiles}"
                    Opacity="0.75">
             </Image>
+            <!-- Border -->
+            <Rectangle Stroke="{Binding BorderBrush}"
+                       Width="{Binding Island.SizeInTiles}"
+                       Height="{Binding Island.SizeInTiles}" />
             
             <!-- rotation indicator -->
             <Polygon Stroke="DarkGoldenrod"

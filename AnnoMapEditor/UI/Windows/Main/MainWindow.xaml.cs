@@ -1,10 +1,11 @@
 ﻿using AnnoMapEditor.UI.Overlays;
 using AnnoMapEditor.UI.Overlays.ExportAsMod;
-using Microsoft.Win32;
+using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Shell;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
@@ -25,6 +26,10 @@ namespace AnnoMapEditor.UI.Windows.Main
 
             InitializeComponent();
 
+            WindowChrome.SetIsHitTestVisibleInChrome(closeButton, true);
+            WindowChrome.SetIsHitTestVisibleInChrome(minimizeButton, true);
+            WindowChrome.SetIsHitTestVisibleInChrome(maximizeButton, true);
+
             var exePath = Path.Join(AppContext.BaseDirectory, "AnnoMapEditor.exe");
             var productVersion = "";
             if (File.Exists(exePath))
@@ -37,9 +42,12 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
             title = $"{App.Title} {productVersion}";
             Title = title;
+            titleText.Text = App.Title;
 
             _viewModel.PropertyChanged += ViewModel_PropertyChanged;
             _viewModel.PopulateOpenMapMenu(openMapMenu);
+
+            StateChanged += new EventHandler(Window_StateChanged);
         }
 
         private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -83,6 +91,49 @@ namespace AnnoMapEditor.UI.Windows.Main
         private void OverlayContainer_Loaded(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            // DragMove();
+        }
+
+        private void CloseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void maximizeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (WindowState == WindowState.Maximized)
+            { 
+                WindowState = WindowState.Normal;
+                // Margin = new(0);
+            }
+            else
+            {
+                WindowState = WindowState.Maximized;
+                // Margin = new(0);
+            }
+                
+        }
+        private void minimizeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void Window_StateChanged(object? sender, EventArgs e)
+        {
+            if (WindowState != WindowState.Maximized)
+            {
+                mainWindowGrid.Margin = new(0);
+                maximizeButton.Content = (char)0xe922; // "&#xe922;";
+            }
+            else
+            {
+                mainWindowGrid.Margin = new(5);
+                maximizeButton.Content = (char)0xe923; // "&#xe923;";
+            }
         }
     }
 }
