@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Shell;
+using System.Windows.Media;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
@@ -48,6 +49,8 @@ namespace AnnoMapEditor.UI.Windows.Main
             _viewModel.PopulateOpenMapMenu(openMapMenu);
 
             StateChanged += new EventHandler(Window_StateChanged);
+            Activated += new EventHandler(Window_StateChanged);
+            Deactivated += new EventHandler(Window_StateChanged);
         }
 
         private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -93,11 +96,6 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         }
 
-        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            // DragMove();
-        }
-
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
             Close();
@@ -131,9 +129,14 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
             else
             {
-                mainWindowGrid.Margin = new(5);
+                mainWindowGrid.Margin = new(6);
                 maximizeButton.Content = (char)0xe923; // "&#xe923;";
             }
+
+            if (IsActive)
+                windowBorder.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#2C6593");
+            else
+                windowBorder.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#39434C");
         }
     }
 }

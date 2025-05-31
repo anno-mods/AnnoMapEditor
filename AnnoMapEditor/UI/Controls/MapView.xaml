@@ -36,10 +36,10 @@
                 </Canvas>
             </Canvas>
         </Grid>
-        <!--#B31E2328-->
-        <Grid Grid.Row="1" HorizontalAlignment="Stretch" Height="auto" Background="#7f000000">
-            <Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="Reset Zoom" Click="ResetZoomBtn_Click"/>
-            <local:FancyToggle x:Name="ShowLabelSwitch" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="8,0" Label="Show Labels" ValueChanged="ShowLabelsSwitch_Change"/>
+        <Border Grid.Row="1" Background="#7f000000" RenderOptions.EdgeMode="Aliased"></Border>
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch" Height="auto">
+            <Button VerticalAlignment="Center" HorizontalAlignment="Right" Content="Reset Zoom" Click="ResetZoomBtn_Click"/>
+            <local:FancyToggle x:Name="ShowLabelSwitch" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="8,0" Label="Show Labels" ValueChanged="ShowLabelsSwitch_Change"/>
         </Grid>
     </Grid>
 </UserControl>

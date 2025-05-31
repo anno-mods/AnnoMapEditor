@@ -595,7 +595,14 @@ namespace AnnoMapEditor.UI.Controls
             TransformGroup mapRenderTransform = new();
             mapRenderTransform.Children.Add(new RotateTransform(MAP_ROTATION_ANGLE));
             mapRenderTransform.Children.Add(new TranslateTransform((zoomCanvas.ActualWidth - size) / 2, (zoomCanvas.ActualHeight - size) / 2));
-            rotationCanvas.RenderTransform = mapRenderTransform;
+            rotationCanvas.RenderTransform = mapRenderTransform; 
+            
+            Matrix matrix = matrixTransform.Matrix;
+            matrix.M11 = Math.Max(1, matrix.M11);
+            matrix.M22 = matrix.M11;
+            matrix.OffsetX = Math.Min(0, Math.Max(matrix.OffsetX, -1 * (zoomCanvas.ActualWidth * (matrix.M11 - 1))));
+            matrix.OffsetY = Math.Min(0, Math.Max(matrix.OffsetY, -1 * (zoomCanvas.ActualHeight * (matrix.M11 - 1))));
+            matrixTransform.Matrix = matrix;
         }
 
         private void LinkMapTemplateEventHandlers(MapTemplate mapTemplate)
