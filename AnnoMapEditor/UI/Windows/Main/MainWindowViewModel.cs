@@ -155,19 +155,22 @@ namespace AnnoMapEditor.UI.Windows.Main
                 await mapTemplateWriter.WriteXmlAsync(MapTemplate, filePath);
         }
 
-        public void PopulateOpenMapMenu(ContextMenu menu)
+        public void PopulateOpenMapMenu(ContextMenu menu, bool import_only = false)
         {
             menu.Items.Clear();
 
-            MenuItem openMapFile = new() { Header = "Open file..." };
-            openMapFile.Click += (_, _) => OpenMapFileDialog();
-            menu.Items.Add(openMapFile);
-            menu.Items.Add(new Separator());
+            if (!import_only) 
+            { 
+                MenuItem openMapFile = new() { Header = "Open file..." };
+                openMapFile.Click += (_, _) => OpenMapFileDialog();
+                menu.Items.Add(openMapFile);
+                menu.Items.Add(new Separator());
 
-            MenuItem newFile = new() { Header = "New Map file" };
-            newFile.Click += (_, _) => CreateNewMap();
-            menu.Items.Add(newFile);
-            menu.Items.Add(new Separator());
+                MenuItem newFile = new() { Header = "New Map file" };
+                newFile.Click += (_, _) => CreateNewMap();
+                menu.Items.Add(newFile);
+                menu.Items.Add(new Separator());
+            }
 
             foreach (MapGroup group in DataManager.Instance.MapGroupRepository.MapGroups)
             {

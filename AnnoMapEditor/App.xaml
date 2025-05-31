@@ -4,6 +4,20 @@
              xmlns:local="clr-namespace:AnnoMapEditor"
              StartupUri="UI/Windows/Start/StartWindow.xaml">
     <Application.Resources>
-        <ResourceDictionary Source="UI/Resources/Styles/Colors.xaml" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="UI/Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/Button.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/ToggleButton.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/TextBox.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/HintTextBox.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/Label.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/ComboBox.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/DropDownButton.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/FancyToggle.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/WindowControlButton.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/ToolbarButton.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

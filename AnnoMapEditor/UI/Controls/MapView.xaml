@@ -15,7 +15,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
@@ -36,10 +36,9 @@
                 </Canvas>
             </Canvas>
         </Grid>
-        <Border Grid.Row="1" Background="#7f000000" RenderOptions.EdgeMode="Aliased"></Border>
-        <Grid Grid.Row="1" HorizontalAlignment="Stretch" Height="auto">
-            <Button VerticalAlignment="Center" HorizontalAlignment="Right" Content="Reset Zoom" Click="ResetZoomBtn_Click"/>
-            <local:FancyToggle x:Name="ShowLabelSwitch" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="8,0" Label="Show Labels" ValueChanged="ShowLabelsSwitch_Change"/>
+        <Border Grid.Row="1" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased"></Border>
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch" Height="32">
+            <!-- Bottom Bar -->
         </Grid>
     </Grid>
 </UserControl>

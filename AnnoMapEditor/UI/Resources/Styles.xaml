@@ -9,6 +9,7 @@
         <ResourceDictionary Source="Styles/ComboBox.xaml" />
         <ResourceDictionary Source="Styles/DropDownButton.xaml" />
         <ResourceDictionary Source="Styles/FancyToggle.xaml" />
-        <ResourceDictionary Source="/UI/Resources/Styles/WindowControlButton.xaml" />
+        <ResourceDictionary Source="Styles/WindowControlButton.xaml" />
+        <ResourceDictionary Source="Styles/ToolbarButton.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

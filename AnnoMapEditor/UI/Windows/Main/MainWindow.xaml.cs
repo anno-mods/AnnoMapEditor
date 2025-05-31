@@ -7,6 +7,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Shell;
 using System.Windows.Media;
+using System.Windows.Controls;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
@@ -30,6 +31,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             WindowChrome.SetIsHitTestVisibleInChrome(closeButton, true);
             WindowChrome.SetIsHitTestVisibleInChrome(minimizeButton, true);
             WindowChrome.SetIsHitTestVisibleInChrome(maximizeButton, true);
+            WindowChrome.SetIsHitTestVisibleInChrome(toolbarStackPanel, true);
 
             var exePath = Path.Join(AppContext.BaseDirectory, "AnnoMapEditor.exe");
             var productVersion = "";
@@ -46,7 +48,8 @@ namespace AnnoMapEditor.UI.Windows.Main
             titleText.Text = App.Title;
 
             _viewModel.PropertyChanged += ViewModel_PropertyChanged;
-            _viewModel.PopulateOpenMapMenu(openMapMenu);
+            // _viewModel.PopulateOpenMapMenu(openMapMenu);
+            _viewModel.PopulateOpenMapMenu(toolbarImportContextMenu, true);
 
             StateChanged += new EventHandler(Window_StateChanged);
             Activated += new EventHandler(Window_IsActiveChanged);
@@ -91,6 +94,31 @@ namespace AnnoMapEditor.UI.Windows.Main
             OverlayService.Instance.Show(new ExportAsModViewModel(_viewModel.MapTemplate));
         }
 
+        private void ImportMap_Click(object sender, RoutedEventArgs e)
+        {
+            toolbarImportContextMenu.PlacementTarget = sender as Panel;
+            toolbarImportContextMenu.IsOpen = true;
+        }
+
+        private void OpenFile_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.OpenMapFileDialog();
+        }
+
+        private void NewFile_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.CreateNewMap();
+        }
+        private void ShowLabels_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.MapTemplate.ShowLabels = !_viewModel.MapTemplate.ShowLabels;
+        }
+
+        private void ResetZoom_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.MapTemplate.UpdateMapZoomConfig(1f, 0f, 0f);
+        }
+
         private void OverlayContainer_Loaded(object sender, RoutedEventArgs e)
         {
 
@@ -103,17 +131,7 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         private void maximizeBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (WindowState == WindowState.Maximized)
-            { 
-                WindowState = WindowState.Normal;
-                // Margin = new(0);
-            }
-            else
-            {
-                WindowState = WindowState.Maximized;
-                // Margin = new(0);
-            }
-                
+            WindowState = (WindowState == WindowState.Maximized) ? WindowState.Normal : WindowState.Maximized;
         }
         private void minimizeBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -125,12 +143,12 @@ namespace AnnoMapEditor.UI.Windows.Main
             if (WindowState != WindowState.Maximized)
             {
                 mainWindowGrid.Margin = new(0);
-                maximizeButton.Content = (char)0xe922; // "&#xe922;";
+                maximizeButton.Content = (char)0xe922;
             }
             else
             {
-                mainWindowGrid.Margin = new(6);
-                maximizeButton.Content = (char)0xe923; // "&#xe923;";
+                mainWindowGrid.Margin = new(5);
+                maximizeButton.Content = (char)0xe923;
             }
         }
 

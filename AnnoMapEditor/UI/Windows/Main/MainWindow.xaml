@@ -24,6 +24,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../Resources/Styles.xaml" />
+                <ResourceDictionary>
+                    <converters:IsActiveToToolbarButtonStyle x:Key="isActiveToToolbarButtonStyle"/>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -32,7 +35,7 @@
         <WindowChrome
             GlassFrameThickness="0"
             CornerRadius="0"
-            CaptionHeight="27"
+            CaptionHeight="60"
             UseAeroCaptionButtons="False"
             ResizeBorderThickness="5"/>
     </WindowChrome.WindowChrome>
@@ -40,11 +43,15 @@
     <Grid Name="mainWindowGrid" ClipToBounds="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Border Name="windowBorder" Grid.RowSpan="2" Canvas.ZIndex="1100" BorderBrush="#224F75" BorderThickness="1" RenderOptions.EdgeMode="Aliased"/>
-        <Grid Height="auto" Panel.ZIndex="999" RenderOptions.EdgeMode="Aliased" Background="#7f000000">
+        <Border Name="windowBorder" Grid.RowSpan="3" Panel.ZIndex="1" BorderBrush="#224F75" BorderThickness="1" SnapsToDevicePixels="True"/>
+        
+        <!-- Title Bar -->
+        <Grid Height="auto" RenderOptions.EdgeMode="Aliased" Background="{StaticResource DarkBackgroundBrush}">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
@@ -53,14 +60,46 @@
             </Grid.ColumnDefinitions>
             <Image Name="titleIcon" VerticalAlignment="Center" Height="24" Margin="12,0" Source="/Assets/app.ico"/>
             <TextBlock Name="titleText" Grid.Column="1" VerticalAlignment="Center" Margin="0" Foreground="#f0f0f0" FontSize="14" FontWeight="UltraLight"/>
-            <Button Name="minimizeButton" Grid.Column="2" Content="&#xe921;" Style="{StaticResource WindowControlDefault}" Click="minimizeBtn_Click">
-
-            </Button>
-            <Button Name="maximizeButton" Grid.Column="3" Content="&#xe922;" Style="{StaticResource WindowControlDefault}" Click="maximizeBtn_Click"/>
-            <Button Name="closeButton" Grid.Column="4" Content="&#xe8bb;" Style="{StaticResource WindowControlRed}" Click="CloseBtn_Click"/>
+            <!--<StackPanel Grid.Column="2" Orientation="Horizontal" Margin="30,0" VerticalAlignment="Center">
+            </StackPanel>-->
+            <Button Name="minimizeButton" Grid.Column="3" Content="&#xe921;" Style="{StaticResource WindowControlDefault}" Click="minimizeBtn_Click"/>
+            <Button Name="maximizeButton" Grid.Column="4" Content="&#xe922;" Style="{StaticResource WindowControlDefault}" Click="maximizeBtn_Click"/>
+            <Button Name="closeButton" Grid.Column="5" Content="&#xe8bb;" Style="{StaticResource WindowControlRed}" Click="CloseBtn_Click"/>
         </Grid>
-        <Grid Grid.Row="1" VerticalAlignment="Stretch">
 
+        <Border Grid.Row="1" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased"/>
+        <StackPanel Grid.Row="1" HorizontalAlignment="Left" Name="toolbarStackPanel" Orientation="Horizontal" Background="{StaticResource DarkBackgroundBrush}">
+            <Button IsEnabled="False" Margin="10,0,0,0" Style="{StaticResource ToolbarButton}" Content="&#xe7a7;"/>
+            <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe7a6;"/>
+            <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
+            <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe8a5;" Click="NewFile_Click" ToolTip="New map template"/>
+            <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe838;" Click="OpenFile_Click" ToolTip="Load map template file"/>
+            <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe896;" Click="ImportMap_Click" ToolTip="Import map template from game">
+                <Button.ContextMenu>
+                    <ContextMenu Name="toolbarImportContextMenu"/>
+                </Button.ContextMenu>
+            </Button>
+            <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe74e;"/>
+            <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe792;" Click="ExportMap_Click" ToolTip="Save as"/>
+            <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe898;" Click="ExportMod_Click" ToolTip="Export as Mod"/>
+            <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
+            <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe710;"/>
+            <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe74d;"/>
+            <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe8c8;"/>
+            <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe77f;"/>
+            <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe8c6;"/>
+            <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
+            <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe73f;" Click="ResetZoom_Click" ToolTip="Reset map zoom"/>
+            <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe8a3;"/>
+            <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe71f;"/>
+            <Button IsEnabled="True" Style="{Binding MapTemplate.ShowLabels, Converter={StaticResource isActiveToToolbarButtonStyle}}" Content="&#xe8ec;" Click="ShowLabels_Click" ToolTip="Show island labels"/>
+            <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
+            <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe897;"/>
+            <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe713;"/>
+        </StackPanel>
+
+        <!-- Content Grid -->
+        <Grid Grid.Row="2" VerticalAlignment="Stretch">
             <Grid.Resources>
                 <converters:VisibilityToBool x:Key="FalseOnVisible" OnVisible="False" />
                 <converters:BoolToVisibility x:Key="collapseOnFalse" />
@@ -87,14 +126,15 @@
                 DataContext="{Binding MapTemplate, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
 
             <!-- MapTemplate properties -->
-            <Border Grid.Column="0" Background="#7f000000" RenderOptions.EdgeMode="Aliased"></Border>
+            <Border Grid.Column="0" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased"></Border>
             <StackPanel Grid.Column="0">
                 <TextBlock
                     Margin="16,16,16,0"
                     Style="{StaticResource HeaderLabelStyle}"
                     HorizontalAlignment="Left"
                     Text="{lex:Loc Key=Session}"/>
-                <StackPanel Margin="16,0" VerticalAlignment="Top" Orientation="Horizontal">
+                
+                <!--<StackPanel Margin="16,0" VerticalAlignment="Top" Orientation="Horizontal">
                     <controls:DropDownButton HorizontalAlignment="Left">
                         <ContentControl Content="{lex:Loc Key=OpenFile}" />
                         <controls:DropDownButton.Menu>
@@ -111,7 +151,7 @@
                             </ContextMenu>
                         </controls:DropDownButton.Menu>
                     </controls:DropDownButton>
-                </StackPanel>
+                </StackPanel>-->
 
                 <controls:MapTemplateProperties
                     Margin="16"
@@ -123,42 +163,12 @@
             </StackPanel>
 
             <!-- island properties -->
-            <Border Grid.Column="2" Background="#7f000000" RenderOptions.EdgeMode="Aliased"></Border>
+            <Border Grid.Column="2" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased"></Border>
             <StackPanel Grid.Column="2">
                 <islandProperties:RandomIslandProperties DataContext="{Binding SelectedRandomIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
                 <islandProperties:FixedIslandProperties DataContext="{Binding SelectedFixedIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
-
-            <!-- footer -->
-            <!--<StackPanel Grid.Column="0" 
-                    Grid.Row="1"
-                    Orientation="Horizontal"
-                    VerticalAlignment="Bottom" 
-                    Margin="8,0,0,0">
-            <emoji:TextBlock Text="{lex:Loc {Binding Path=DataPathStatus.StatusType, UpdateSourceTrigger=PropertyChanged, Converter={lex:PrependTypeConverter}}}"
-                                 ToolTip="{Binding DataPathStatus.ToolTip, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Click="Configure_Click" HorizontalAlignment="Left"
-                        Visibility="{Binding DataPathStatus.Configure, UpdateSourceTrigger=PropertyChanged}">
-                <TextBlock Text="{lex:Loc {Binding DataPathStatus.ConfigureType, UpdateSourceTrigger=PropertyChanged, Converter={lex:PrependTypeConverter}}}"/>
-            </Button>
-            <Button Click="AutoDetect_Click"
-                    HorizontalAlignment="Left"
-                    Visibility="{Binding DataPathStatus.AutoDetect, UpdateSourceTrigger=PropertyChanged}"
-                    Content="{lex:Loc Key=AutoDetect}"></Button>
-        </StackPanel>
-        <TextBlock Grid.Column="2"
-                   Grid.Row="1"
-                   Style="{StaticResource MutedLabelStyle}"
-                   VerticalAlignment="Bottom"
-                   HorizontalAlignment="Right"
-                   TextAlignment="Right">
-                <Run>The editor is work in progress.</Run>
-                <LineBreak />
-                <Run>Visit GitHub for </Run>
-                <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor#roadmap" RequestNavigate="Hyperlink_OpenBrowser">roadmap</Hyperlink>
-                <Run>and</Run>
-                <Hyperlink NavigateUri="https://github.com/anno-mods/AnnoMapEditor/issues" RequestNavigate="Hyperlink_OpenBrowser">issue reporting</Hyperlink><Run>.</Run>
-        </TextBlock>-->
+            
             <controls:Imprint Grid.Column="2"
                           VerticalAlignment="Bottom"/>
 

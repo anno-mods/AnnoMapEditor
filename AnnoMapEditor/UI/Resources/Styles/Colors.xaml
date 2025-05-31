@@ -6,6 +6,8 @@
     <Brush x:Key="HighlightBrush">#007ACC</Brush>
     <Brush x:Key="HighlightLightBrush">#1C97EA</Brush>
     <Brush x:Key="BackgroundBrush">#1E2328</Brush>
+    <Brush x:Key="DarkBackgroundBrush">#0F1214</Brush>
+    <Brush x:Key="TransparentBackgroundBrush">#7f000000</Brush>
     <Brush x:Key="ControlBrush">#8024415F</Brush>
     <Brush x:Key="DisabledBrush">#708090</Brush>
     <Brush x:Key="DialogBrush">#ef182B3F</Brush>

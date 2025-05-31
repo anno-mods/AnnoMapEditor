@@ -193,7 +193,7 @@ namespace AnnoMapEditor.UI.Controls
 
                 if (mapTemplate is not null)
                 {
-                    ShowLabelSwitch.IsChecked = _mapTemplate.ShowLabels;
+                    // ShowLabelSwitch.IsChecked = _mapTemplate.ShowLabels;
 
                     LinkMapTemplateEventHandlers(mapTemplate);
 
@@ -844,12 +844,6 @@ namespace AnnoMapEditor.UI.Controls
         public void ResetZoomBtn_Click(Object sender, EventArgs e)
         {
             ResetZoom();
-        }
-
-        public void ShowLabelsSwitch_Change(Object sender, RoutedEventArgs e)
-        {
-            if (_mapTemplate != null)
-                _mapTemplate.ShowLabels = ShowLabelSwitch.IsChecked;
         }
     }
 }
