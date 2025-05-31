@@ -49,8 +49,8 @@ namespace AnnoMapEditor.UI.Windows.Main
             _viewModel.PopulateOpenMapMenu(openMapMenu);
 
             StateChanged += new EventHandler(Window_StateChanged);
-            Activated += new EventHandler(Window_StateChanged);
-            Deactivated += new EventHandler(Window_StateChanged);
+            Activated += new EventHandler(Window_IsActiveChanged);
+            Deactivated += new EventHandler(Window_IsActiveChanged);
         }
 
         private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -132,11 +132,11 @@ namespace AnnoMapEditor.UI.Windows.Main
                 mainWindowGrid.Margin = new(6);
                 maximizeButton.Content = (char)0xe923; // "&#xe923;";
             }
+        }
 
-            if (IsActive)
-                windowBorder.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#2C6593");
-            else
-                windowBorder.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#39434C");
+        private void Window_IsActiveChanged(object? sender, EventArgs e)
+        {
+            windowBorder.BorderBrush = (SolidColorBrush)Resources[IsActive ? "ActiveWindowBorderBrush" : "InactiveWindowBorderBrush"];
         }
     }
 }

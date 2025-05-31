@@ -2,6 +2,7 @@
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Media.Imaging;
 
@@ -20,7 +21,11 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public override bool RandomizeRotation => _fixedIsland.RandomizeRotation;
 
+        public bool RandomizeSlots => _fixedIsland.RandomizeSlots;
+
         private readonly bool _isContinentalIsland;
+
+        public override ObservableCollection<SlotAssignment> SlotAssignments { get; protected set; }
 
 
         public FixedIslandViewModel(MapTemplate mapTemplate, FixedIslandElement fixedIsland)
@@ -28,6 +33,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         {
             _fixedIsland = fixedIsland;
             _isContinentalIsland = _fixedIsland.IslandAsset.IslandSize.FirstOrDefault() == IslandSize.Continental;
+
+            SlotAssignments = new(_fixedIsland.SlotAssignments.Values.Where(s => s.Slot.SlotAsset != null));
 
             if (_fixedIsland.Label != null) OnPropertyChanged(nameof(Label));
 
@@ -50,6 +57,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
             if (e.PropertyName == nameof(FixedIslandElement.Position))
                 SnapContinentalIsland();
+            if (e.PropertyName == nameof(FixedIslandElement.SlotAssignments))
+                SlotAssignments = new(_fixedIsland.SlotAssignments.Values.Where(s => s.Slot.SlotAsset != null));
         }
 
         private void Redraw()

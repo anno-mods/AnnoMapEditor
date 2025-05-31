@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
@@ -67,6 +68,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
         public virtual int ThumbnailRotation { get; }
 
         public virtual bool RandomizeRotation => true;
+
+        public virtual ObservableCollection<SlotAssignment>? SlotAssignments { get; protected set; }
 
 
         public IslandViewModel(MapTemplate mapTemplate, IslandElement island)
@@ -160,7 +163,9 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         private void UpdateLabelVisibility()
         {
-            _showLabel = (_mapTemplate.ShowLabels || IsSelected) && Label != null;
+            _showLabel = _mapTemplate.ShowLabels && (Label != null);
+            // if (IsSelected && Island is FixedIslandElement)
+            //     _showLabel = false;
             OnPropertyChanged(nameof(ShowLabel));
         }
     }

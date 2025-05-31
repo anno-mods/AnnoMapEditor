@@ -2,7 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls.MapTemplates"
              xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
              xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
@@ -19,6 +19,7 @@
         <converters:BoolToVisibility x:Key="VisibleOnFalse" OnTrue="Collapsed" OnFalse="Visible" />
         <converters:ObjectToVisibility x:Key="collapseOnNull" />
         <converters:ObjectToVisibilityInverse x:Key="showOnNull" />
+        <converters:ThumbailToSlotRotation x:Key="thumbnailToSlotRotation" />
     </local:MapElementControl.Resources>
 
     <Grid>
@@ -48,30 +49,67 @@
             <!-- rotation indicator -->
             <Polygon Stroke="DarkGoldenrod"
                      Fill="Gold"
-                     Points="0,0 40,0 0,40"
+                     Points="0,0 20,0 0,20"
                      Visibility="{Binding RandomizeRotation, Converter={StaticResource VisibleOnFalse}, FallbackValue=Hidden}"/>
+            
+            <!-- Slots -->
+            <ItemsControl Name="slotListBox" 
+                     Visibility="{Binding Island.RandomizeSlots, Converter={StaticResource VisibleOnFalse}}"
+                     Width="{Binding Island.SizeInTiles}" 
+                     Height="{Binding Island.SizeInTiles}" 
+                     ItemsSource="{Binding SlotAssignments}" 
+                     Background="Transparent"
+                     RenderTransformOrigin="0.5,0.5">
+
+                <ItemsControl.RenderTransform>
+                    <RotateTransform Angle="90"/>
+                </ItemsControl.RenderTransform>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Canvas Height="6" Width="6" Background="#7f000000">
+                            <Image Canvas.Left="-2" Canvas.Top="-2" Height="10" Width="10"  RenderTransformOrigin="0.5, 0.5" Source="{Binding AssignedSlot.Icon}">
+                                <Image.RenderTransform>
+                                    <RotateTransform Angle="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ThumbnailRotation, Converter={StaticResource thumbnailToSlotRotation}}"></RotateTransform>
+                                </Image.RenderTransform>
+                            </Image>
+                        </Canvas>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Right" Value="{Binding Slot.Position.Y}" />
+                        <Setter Property="Canvas.Bottom" Value="{Binding Slot.Position.X}" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas IsItemsHost="True"></Canvas>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl >
         </Canvas>
 
         <!-- Label -->
-
-        <Viewbox StretchDirection="DownOnly" Stretch="Uniform">
-            <Border Visibility="{Binding ShowLabel, Converter={StaticResource VisibleOnTrue}}"
-                    Grid.Column="0"
+        <Grid RenderTransformOrigin="0.5,0.5">
+            <Grid.RenderTransform>
+                <RotateTransform Angle="90"/>
+            </Grid.RenderTransform>
+            <Viewbox VerticalAlignment="Top" HorizontalAlignment="Left" StretchDirection="DownOnly" Stretch="Uniform" Width="auto" Height="auto">
+                <Border Visibility="{Binding ShowLabel, Converter={StaticResource VisibleOnTrue}}"
                     CornerRadius="10"
                     Padding="4,0,4,0"
                     Background="#80000000"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
                     RenderTransformOrigin=".5,.5">
-                <Border.RenderTransform>
-                    <RotateTransform Angle="{Binding Source={x:Static controls:MapView.MAP_ROTATION_ANGLE}, Converter={StaticResource negateDoubleConverter}}" />
-                </Border.RenderTransform>
-                <TextBlock Foreground="White"
-                       FontSize="50"
+                    <TextBlock Foreground="White"
+                       FontSize="40"
                        TextAlignment="Center"
                        Text="{Binding Label}"/>
-            </Border>
-        </Viewbox>
+                </Border>
+            </Viewbox>
+        </Grid>
 
         <!-- Cross Out -->
         <Grid Visibility="{Binding IsOutOfBounds, Converter={StaticResource VisibleOnTrue}}">

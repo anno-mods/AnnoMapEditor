@@ -11,4 +11,6 @@
     <Brush x:Key="DialogBrush">#ef182B3F</Brush>
     <Brush x:Key="ErrorBrush">#ee0000</Brush>
     <Brush x:Key="OkBrush">#00aa00</Brush>
+    <Brush x:Key="ActiveWindowBorderBrush">#2C6593</Brush>
+    <Brush x:Key="InactiveWindowBorderBrush">#39434C</Brush>
 </ResourceDictionary>
