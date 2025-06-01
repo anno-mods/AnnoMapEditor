@@ -11,7 +11,8 @@
              d:DesignWidth="192"
              d:DesignHeight="192"
              Width="{Binding Island.SizeInTiles}"
-             Height="{Binding Island.SizeInTiles}">
+             Height="{Binding Island.SizeInTiles}"
+             Canvas.ZIndex="{Binding IsSelected, Converter={converters:IsSelectedToZLevel}}">
 
     <local:MapElementControl.Resources>
         <converters:NegateDoubleConverter x:Key="negateDoubleConverter" />
