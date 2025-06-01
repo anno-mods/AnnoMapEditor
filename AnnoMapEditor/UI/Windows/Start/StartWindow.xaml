@@ -12,7 +12,8 @@
         Title="StartWindow" 
         Width="700" Height="450"
         ResizeMode="NoResize"
-        Background="{StaticResource DarkBackgroundBrush}">
+        Background="{StaticResource DarkBackgroundBrush}"
+        WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <ResourceDictionary>

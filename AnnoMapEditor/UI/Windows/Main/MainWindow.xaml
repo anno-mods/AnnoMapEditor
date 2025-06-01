@@ -20,7 +20,9 @@
         Name="mainWindow"
         Title="MainWindow" Height="900" Width="1440"
         WindowStyle="SingleBorderWindow"
-        Background="{StaticResource BackgroundBrush}" >
+        Background="{StaticResource BackgroundBrush}" 
+        WindowStartupLocation="CenterScreen">
+    
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
