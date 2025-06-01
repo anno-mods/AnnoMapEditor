@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.DataArchives;
 using System;
 using System.Windows;
+using System.Windows.Shell;
 
 namespace AnnoMapEditor.UI.Windows.Start
 {
@@ -21,6 +22,8 @@ namespace AnnoMapEditor.UI.Windows.Start
             DataContext = viewModel;
 
             InitializeComponent();
+
+            WindowChrome.SetIsHitTestVisibleInChrome(closeButton, true);
         }
 
 
@@ -47,6 +50,11 @@ namespace AnnoMapEditor.UI.Windows.Start
         public void OpenMap_Click(object? sender, RoutedEventArgs args)
         {
             openMapMenu.IsOpen = true;
+        }
+
+        public void CloseBtn_Click(object? sender, RoutedEventArgs args)
+        {
+            Close();
         }
     }
 }

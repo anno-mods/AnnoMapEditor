@@ -8,9 +8,11 @@
         xmlns:local="clr-namespace:AnnoMapEditor.UI.Windows.Start"
         d:DataContext="{d:DesignInstance Type=local:StartWindowViewModel}"
         mc:Ignorable="d"
+        Name="startWindow"
         Title="StartWindow" 
-        Width="1440" Height="900"
-        Background="{StaticResource BackgroundBrush}">
+        Width="700" Height="450"
+        ResizeMode="NoResize"
+        Background="{StaticResource DarkBackgroundBrush}">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -27,16 +29,40 @@
                     <converters:ObjectToBool x:Key="objectToBool" />
                     <converters:ObjectToVisibility x:Key="collapseOnNull" />
                     <converters:ObjectToVisibility x:Key="hideOnNull" OnNull="Hidden" />
+                    <converters:BoolToStyle x:Key="isActiveToWindowFrameStyle" OnTrue="{StaticResource ActiveWindowBorder}" OnFalse="{StaticResource InactiveWindowBorder}"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    
-    <Grid>
 
-        <Grid HorizontalAlignment="Center"
-              VerticalAlignment="Center"
-              Width="400">
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            GlassFrameThickness="0"
+            CornerRadius="0"
+            CaptionHeight="60"
+            UseAeroCaptionButtons="False"
+            ResizeBorderThickness="5"/>
+    </WindowChrome.WindowChrome>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border Grid.RowSpan="2" Style="{Binding ElementName=startWindow, Path=IsActive, Converter={StaticResource isActiveToWindowFrameStyle}}"/>
+
+        <Button Name="closeButton" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource WindowControlRed}" Content="&#xe8bb;" Click="CloseBtn_Click"/>
+
+        <StackPanel Margin="32" Grid.Row="0" Orientation="Horizontal" Height="auto">
+            <Image Source="/Assets/app.ico" Height="50"/>
+            <TextBlock Margin="20,0,0,0" VerticalAlignment="Center" Text="Community Map Editor for Anno 1800" Foreground="{StaticResource TextBrush}" FontSize="20" FontWeight="UltraLight"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="100,0"
+              Width="500"
+              Height="300"
+              VerticalAlignment="Top" 
+              HorizontalAlignment="Center">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
@@ -45,21 +71,21 @@
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="{Binding Settings.EnableExpertMode, Converter={StaticResource hideRowOnTrue}}"/>
-                <RowDefinition Height="{Binding Settings.EnableExpertMode, Converter={StaticResource hideRowOnTrue}}"/>
-                <RowDefinition Height="{Binding Settings.EnableExpertMode, Converter={StaticResource hideRowOnTrue}}"/>
-                <RowDefinition Height="{Binding Settings.EnableExpertMode, Converter={StaticResource hideRowOnFalse}}"/>
-                <RowDefinition Height="{Binding Settings.EnableExpertMode, Converter={StaticResource hideRowOnFalse}}"/>
-                <RowDefinition Height="{Binding Settings.EnableExpertMode, Converter={StaticResource hideRowOnFalse}}"/>
-                <RowDefinition Height="{Binding Settings.EnableExpertMode, Converter={StaticResource hideRowOnFalse}}"/>
-                <RowDefinition Height="{Binding Settings.EnableExpertMode, Converter={StaticResource hideRowOnFalse}}"/>
-                <RowDefinition Height="{Binding Settings.EnableExpertMode, Converter={StaticResource hideRowOnFalse}}"/>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            
+
             <!-- main buttons -->
             <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
                   Margin="0 0 0 20">
@@ -84,73 +110,87 @@
                 </Button>
             </Grid>
 
-            
+
             <!-- game path  -->
             <TextBlock Grid.Row="1" Grid.Column="0"
+                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
                        Style="{StaticResource DefaultLabelStyle}"
                        Text="Anno Game Path:"  />
             <TextBox Grid.Row="1" Grid.Column="1"
+                     Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
                      Text="{Binding Settings.GamePath}"
                      IsEnabled="False" />
             <Button Grid.Row="1" Grid.Column="2"
+                    Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
                     Content="Select"
                     Click="SelectGamePath_Click"
                     IsEnabled="{Binding DataManager.IsInitializing, Converter={StaticResource booleanNot}}" />
             <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
+                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
                        Style="{StaticResource MutedLabelStyle}"
                        TextWrapping="Wrap"
                        Margin="0 0 0 12">
                 The Anno Map Editor requires the game's files to function. Select the game's installation directory.
             </TextBlock>
             <controls:StatusIndicator Grid.Row="1" Grid.Column="3"
+                                      Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
                                       IsOk="{Binding DataManager.IsInitialized}"
                                       IsLoading="{Binding DataManager.IsInitializing}"
                                       IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource objectToBool}}"/>
 
 
             <!-- data path -->
-            <!--<TextBlock Grid.Row="4" Grid.Column="0"
+            <TextBlock Grid.Row="4" Grid.Column="0"
+                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnFalse}}"
                        Style="{StaticResource DefaultLabelStyle}"
                        Text="Anno Data Path:"  />
             <TextBox Grid.Row="4" Grid.Column="1"
+                     Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnFalse}}"
                      Text="{Binding Settings.DataPath}"
                      IsEnabled="False" />
             <Button Grid.Row="4" Grid.Column="2"
+                    Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnFalse}}"
                     Content="Select"
                     Click="SelectDataPath_Click"
                     IsEnabled="{Binding DataManager.IsInitializing, Converter={StaticResource booleanNot}}" />
             <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3"
+                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnFalse}}"
                        Style="{StaticResource MutedLabelStyle}"
                        TextWrapping="Wrap"
                        Margin="0 0 0 12">
                 Select the directory containing the game's .rda files or their extracted contents. The Anno Map Editor requires the game's assets to function.
             </TextBlock>
             <controls:StatusIndicator Grid.Row="4" Grid.Column="3"
+                                      Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnFalse}}"
                                       IsOk="{Binding DataManager.IsInitialized}"
                                       IsLoading="{Binding DataManager.IsInitializing}"
-                                      IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource objectToBool}}"/>-->
+                                      IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource objectToBool}}"/>
 
 
             <!-- mods path -->
-            <!--<TextBlock Grid.Row="7" Grid.Column="0"
+            <TextBlock Grid.Row="7" Grid.Column="0"
+                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnFalse}}"
                        Style="{StaticResource DefaultLabelStyle}"
                        Text="Anno Mods Path:"  />
             <TextBox Grid.Row="7" Grid.Column="1"
+                     Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnFalse}}"
                      Text="{Binding Settings.ModsPath}"
                      IsEnabled="False" />
             <Button Grid.Row="7" Grid.Column="2"
+                    Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnFalse}}"
                     Content="Select"
                     Click="SelectModsPath_Click"
                     IsEnabled="{Binding DataManager.IsInitializing, Converter={StaticResource booleanNot}}" />
             <TextBlock Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="3"
+                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnFalse}}"
                        Style="{StaticResource MutedLabelStyle}"
                        TextWrapping="Wrap"
                        Margin="0 0 0 12">
                 Select the path containing mods for Anno 1800. Mods will be loaded from and saved to there.
-            </TextBlock>-->
+            </TextBlock>
 
             <!-- expert mode -->
-            <!--<TextBlock Grid.Row="10" Grid.Column="0"
+            <TextBlock Grid.Row="10" Grid.Column="0"
                        Style="{StaticResource DefaultLabelStyle}"
                        Text="Expert Mode:" />
             <controls:FancyToggle Grid.Row="10" Grid.Column="2"
@@ -160,11 +200,11 @@
                        Style="{StaticResource MutedLabelStyle}"
                        TextWrapping="Wrap">
                 Expert mode unlocks some advanced and/or dangerous features. Maps and mods may break unless you know what you are doing.
-            </TextBlock>-->
-            
+            </TextBlock>
+
         </Grid>
 
-        <controls:Imprint HorizontalAlignment="Right" 
+        <controls:Imprint Grid.RowSpan="2" HorizontalAlignment="Right" 
                           VerticalAlignment="Bottom" />
 
     </Grid>

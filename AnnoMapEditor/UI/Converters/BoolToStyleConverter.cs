@@ -9,13 +9,22 @@ using System.Windows.Data;
 
 namespace AnnoMapEditor.UI.Converters
 {
-    class IsActiveToToolbarButtonStyle : IValueConverter
+    [ValueConversion(typeof(bool), typeof(Style))]
+    class BoolToStyle : IValueConverter
     {
+        public Style OnTrue { get; set; }
+        public Style OnFalse { get; set; }
+
+        public BoolToStyle() {
+            OnTrue = new Style();
+            OnFalse = new Style();
+        }
+
         public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool isActive)
             {
-                return Application.Current.FindResource(isActive ? "ToolbarButtonActive" : "ToolbarButton") as Style;
+                return isActive ? OnTrue : OnFalse;
             }
             else
                 throw new ArgumentException($"Illegal argument for {nameof(NegateDoubleConverter)}. Argument must be of type bool, but got {value.GetType()} instead.");

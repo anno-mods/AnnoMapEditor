@@ -17,6 +17,7 @@
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
+        Name="mainWindow"
         Title="MainWindow" Height="900" Width="1440"
         WindowStyle="SingleBorderWindow"
         Background="{StaticResource BackgroundBrush}" >
@@ -25,7 +26,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../Resources/Styles.xaml" />
                 <ResourceDictionary>
-                    <converters:IsActiveToToolbarButtonStyle x:Key="isActiveToToolbarButtonStyle"/>
+                    <converters:BoolToStyle x:Key="isActiveToToolbarButtonStyle" OnFalse="{StaticResource ToolbarButton}" OnTrue="{StaticResource ToolbarButtonActive}"/>
+                    <converters:BoolToStyle x:Key="isActiveToWindowFrameStyle" OnFalse="{StaticResource InactiveWindowBorder}" OnTrue="{StaticResource ActiveWindowBorder}"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -46,7 +48,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Border Name="windowBorder" Grid.RowSpan="3" Panel.ZIndex="1" BorderBrush="#224F75" BorderThickness="1" SnapsToDevicePixels="True"/>
+        <Border Grid.RowSpan="3" Style="{Binding ElementName=mainWindow, Path=IsActive, Converter={StaticResource isActiveToWindowFrameStyle}}"/>
         
         <!-- Title Bar -->
         <Grid Height="auto" RenderOptions.EdgeMode="Aliased" Background="{StaticResource DarkBackgroundBrush}">
