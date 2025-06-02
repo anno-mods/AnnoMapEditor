@@ -29,15 +29,16 @@ namespace AnnoMapEditor.UI.Windows.Start
             if (Settings.DataPath != null && Settings.DataPath.Length > 0)
             {
                 // _pathConfigured = true;
-                DataManager.TryInitializeAsync(Settings.DataPath).ContinueWith(t => throw t.Exception, TaskContinuationOptions.OnlyOnFaulted);
+                Task.Run(() => DataManager.TryInitializeAsync(Settings.DataPath).ContinueWith(t => throw t.Exception, TaskContinuationOptions.OnlyOnFaulted));
             }
         }
-
 
         private void Settings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Settings.DataPath) && Settings.DataPath != null)
-                DataManager.TryInitializeAsync(Settings.DataPath).ContinueWith(t => throw t.Exception, TaskContinuationOptions.OnlyOnFaulted);
+            {
+                Task.Run(() => DataManager.TryInitializeAsync(Settings.DataPath).ContinueWith(t => throw t.Exception, TaskContinuationOptions.OnlyOnFaulted));
+            }
         }
 
         private void DataManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

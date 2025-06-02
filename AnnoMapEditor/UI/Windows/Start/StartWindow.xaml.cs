@@ -26,7 +26,6 @@ namespace AnnoMapEditor.UI.Windows.Start
             WindowChrome.SetIsHitTestVisibleInChrome(closeButton, true);
         }
 
-
         private void DataManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(DataManager.IsInitialized) && _viewModel.DataManager.IsInitialized)
