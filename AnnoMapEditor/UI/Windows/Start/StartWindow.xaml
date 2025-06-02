@@ -141,6 +141,21 @@
                                       IsLoading="{Binding DataManager.IsInitializing}"
                                       IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource objectToBool}}"/>
 
+            <StackPanel Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Bottom"
+                        Height="40"
+                        Margin="0,0,50,0"
+                        HorizontalAlignment="right">
+                <TextBlock Text="Go to Editor directly on next startup"
+                           VerticalAlignment="Center"
+                           Foreground="{StaticResource ForegroundBrush}"/>
+                <controls:FancyToggle IsChecked="{Binding Settings.Quickstart, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      VerticalAlignment="Center" 
+                                      Margin="0"
+                                      OnText="" 
+                                      OffText=""/>
+            </StackPanel>
             <Button Grid.Row="12" Grid.Column="2" Grid.ColumnSpan="2"
                     Margin="0,30,0,0"
                     Height="40"

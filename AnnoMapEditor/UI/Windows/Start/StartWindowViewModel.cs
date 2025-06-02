@@ -28,7 +28,7 @@ namespace AnnoMapEditor.UI.Windows.Start
 
             if (Settings.DataPath != null && Settings.DataPath.Length > 0)
             {
-                // _pathConfigured = true;
+                _pathConfigured = true;
                 Task.Run(() => DataManager.TryInitializeAsync(Settings.DataPath).ContinueWith(t => throw t.Exception, TaskContinuationOptions.OnlyOnFaulted));
             }
         }
@@ -45,7 +45,7 @@ namespace AnnoMapEditor.UI.Windows.Start
         {
             if (e.PropertyName == nameof(DataManager.IsInitialized)) 
             {
-                if (_pathConfigured)
+                if (_pathConfigured && Settings.Quickstart)
                     ContinueToMainWindow();
             }
         }
