@@ -27,7 +27,7 @@
             Text="{Binding MapSizeText}"/>
         <ComboBox
             Margin="0"
-            HorizontalAlignment="Left"
+            HorizontalAlignment="Stretch"
             ItemsSource="{Binding SupportedSessions}"
             SelectedItem="{Binding SelectedSession}">
             <ComboBox.ItemTemplate>
@@ -36,6 +36,7 @@
                         <Image Source="{Binding Icon}" 
                                MaxHeight="20" />
                         <TextBlock Text="{Binding DisplayName}"
+                                   VerticalAlignment="Center"
                                    Margin="8 0 0 0" />
                     </StackPanel>
                 </DataTemplate>

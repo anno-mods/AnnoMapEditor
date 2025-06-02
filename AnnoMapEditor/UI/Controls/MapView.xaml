@@ -16,10 +16,6 @@
     </UserControl.Resources>
 
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="auto" />
-        </Grid.RowDefinitions>
         <Grid Margin="16" Name="canvasGrid" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <Canvas Name="zoomCanvas">
                 <Canvas.RenderTransform>

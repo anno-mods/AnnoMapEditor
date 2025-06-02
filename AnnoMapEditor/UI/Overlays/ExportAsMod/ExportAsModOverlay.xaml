@@ -18,7 +18,7 @@
         <ResourceDictionary Source="../../Resources/Styles.xaml" />
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource DialogBrush}">
+    <Grid Background="{StaticResource MediumBackgroundBrush}">
         <StackPanel VerticalAlignment="Center"
                     MaxWidth="400">
             <StackPanel.Resources>

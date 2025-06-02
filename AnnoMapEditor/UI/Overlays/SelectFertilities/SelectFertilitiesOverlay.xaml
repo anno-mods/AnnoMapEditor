@@ -17,14 +17,14 @@
         <ResourceDictionary Source="../../Resources/Styles.xaml" />
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource DialogBrush}">
+    <Grid Background="{StaticResource MediumBackgroundBrush}">
         <Grid.Resources>
             <converters:BoolToVisibility x:Key="boolToVisibility" OnTrue="Visible" OnFalse="Collapsed" />
         </Grid.Resources>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="32"/>
-            <RowDefinition Height="32"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition>
                 <RowDefinition.Style>
                     <Style TargetType="{x:Type RowDefinition}">

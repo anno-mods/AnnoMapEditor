@@ -6,7 +6,7 @@
         <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="#f0f0f0" />
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="Width" Value="28" />
         <Setter Property="Height" Value="28" />
@@ -22,11 +22,11 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderBrush" Value="#73ffffff"/>
-                <Setter Property="Background" Value="#23ffffff"/>
+                <Setter Property="BorderBrush" Value="{StaticResource MouseoverBorderBrush}"/>
+                <Setter Property="Background" Value="{StaticResource MouseoverBackgroundBrush}"/>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="#1dffffff"/>
+                <Setter Property="Background" Value="{StaticResource PressedBackgroundBrush}"/>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.3"/>
@@ -36,12 +36,12 @@
     
     <Style TargetType="{x:Type Button}" x:Key="ToolbarButtonActive" BasedOn="{StaticResource ToolbarButton}">
         <Setter Property="FontWeight" Value="UltraBold" />
-        <Setter Property="Background" Value="#231C97EA"/>
-        <Setter Property="Foreground" Value="{StaticResource HighlightLightBrush}" />
-        <Setter Property="BorderBrush" Value="#731C97EA" />
+        <Setter Property="Background" Value="{StaticResource SelectedBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource SelectedForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource SelectedBorderBrush}" />
         <Style.Triggers>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="#1dffffff"/>
+                <Setter Property="Background" Value="{StaticResource PressedBackgroundBrush}"/>
             </Trigger>
         </Style.Triggers>
     </Style>

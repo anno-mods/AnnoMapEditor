@@ -185,6 +185,15 @@ namespace AnnoMapEditor.UI.Windows.Main
                 menu.Items.Add(newFile);
                 menu.Items.Add(new Separator());
             }
+            else 
+            {
+                menu.Items.Add(new MenuItem()
+                {
+                    Header = "Load map template from game...",
+                    IsEnabled = false
+                }); 
+                menu.Items.Add(new Separator());
+            }
 
             foreach (MapGroup group in DataManager.Instance.MapGroupRepository.MapGroups)
             {
