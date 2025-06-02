@@ -20,7 +20,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <Grid Margin="16" Name="canvasGrid" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="#B31E2328">
+        <Grid Margin="16" Name="canvasGrid" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <Canvas Name="zoomCanvas">
                 <Canvas.RenderTransform>
                     <MatrixTransform x:Name="matrixTransform"/>
@@ -35,10 +35,6 @@
                     <Canvas Name="addIslandCanvas" />
                 </Canvas>
             </Canvas>
-        </Grid>
-        <Border Grid.Row="1" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased"></Border>
-        <Grid Grid.Row="1" HorizontalAlignment="Stretch" Height="32">
-            <!-- Bottom Bar -->
         </Grid>
     </Grid>
 </UserControl>

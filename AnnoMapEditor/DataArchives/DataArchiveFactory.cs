@@ -2,6 +2,7 @@
 using AnnoRDA;
 using AnnoRDA.Builder;
 using System;
+using System.Threading.Tasks;
 
 namespace AnnoMapEditor.DataArchives
 {
@@ -11,6 +12,11 @@ namespace AnnoMapEditor.DataArchives
 
         private static readonly string[] EXTENSION_WHITELIST = new[] { "*.a7tinfo", "*.png", "*.a7minfo", "*.a7t", "*.a7te", "assets.xml", "*.a7m", "*.dds" };
 
+
+        public async Task<IDataArchive> CreateDataArchiveAsync(string dataPath)
+        {
+            return await Task.Run(() => CreateDataArchive(dataPath));
+         }
 
         public IDataArchive CreateDataArchive(string dataPath)
         {

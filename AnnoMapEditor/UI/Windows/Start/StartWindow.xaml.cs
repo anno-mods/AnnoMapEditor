@@ -31,7 +31,7 @@ namespace AnnoMapEditor.UI.Windows.Start
         {
             if (e.PropertyName == nameof(DataManager.IsInitialized) && _viewModel.DataManager.IsInitialized)
             {
-                _viewModel.PopulateOpenMapMenu(openMapMenu);
+                // _viewModel.PopulateOpenMapMenu(openMapMenu);
             }
         }
 
@@ -49,12 +49,13 @@ namespace AnnoMapEditor.UI.Windows.Start
 
         public void OpenMap_Click(object? sender, RoutedEventArgs args)
         {
-            openMapMenu.IsOpen = true;
+            // openMapMenu.IsOpen = true;
         }
 
         public void CloseBtn_Click(object? sender, RoutedEventArgs args)
         {
             Close();
+            App.Current.Shutdown();
         }
     }
 }

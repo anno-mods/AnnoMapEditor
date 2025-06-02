@@ -30,6 +30,7 @@
                 <ResourceDictionary>
                     <converters:BoolToStyle x:Key="isActiveToToolbarButtonStyle" OnFalse="{StaticResource ToolbarButton}" OnTrue="{StaticResource ToolbarButtonActive}"/>
                     <converters:BoolToStyle x:Key="isActiveToWindowFrameStyle" OnFalse="{StaticResource InactiveWindowBorder}" OnTrue="{StaticResource ActiveWindowBorder}"/>
+                    <converters:ObjectToBool x:Key="objectToBool" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -49,8 +50,9 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <Border Grid.RowSpan="3" Style="{Binding ElementName=mainWindow, Path=IsActive, Converter={StaticResource isActiveToWindowFrameStyle}}"/>
+        <Border Grid.RowSpan="4" Style="{Binding ElementName=mainWindow, Path=IsActive, Converter={StaticResource isActiveToWindowFrameStyle}}"/>
         
         <!-- Title Bar -->
         <Grid Height="auto" RenderOptions.EdgeMode="Aliased" Background="{StaticResource DarkBackgroundBrush}">
@@ -179,6 +181,16 @@
             <!-- Overlays -->
             <overlays:OverlayContainer Grid.ColumnSpan="3" />
         </Grid>
-
+        <Grid Name="statusBar" Grid.Row="3" Height="28">
+            <Border Background="{StaticResource WaterBlueBrush}" BorderBrush="{StaticResource DarkBackgroundBrush}" BorderThickness="0,4,0,0" RenderOptions.EdgeMode="Aliased"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Margin="10,0" Style="{StaticResource DefaultLabelStyle}" Text="{Binding Status}"/>
+                <controls:StatusIndicator 
+                    Visibility="Visible"
+                    IsOk="{Binding DataManager.IsInitialized}"
+                    IsLoading="{Binding DataManager.IsInitializing}"
+                    IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource objectToBool}}"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

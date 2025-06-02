@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Shell;
-using System.Windows.Media;
 using System.Windows.Controls;
 
 namespace AnnoMapEditor.UI.Windows.Main
@@ -19,7 +18,6 @@ namespace AnnoMapEditor.UI.Windows.Main
         private readonly MainWindowViewModel _viewModel;
 
         private readonly string title;
-
 
         public MainWindow(MainWindowViewModel viewModel)
         {
@@ -125,6 +123,7 @@ namespace AnnoMapEditor.UI.Windows.Main
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
             Close();
+            App.Current.Shutdown();
         }
 
         private void maximizeBtn_Click(object sender, RoutedEventArgs e)

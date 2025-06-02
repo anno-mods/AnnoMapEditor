@@ -16,6 +16,7 @@ namespace AnnoMapEditor.UI.Windows.Main
 {
     public class MainWindowViewModel : ObservableBase
     {
+        public DataManager DataManager => DataManager.Instance;
         public MapTemplate MapTemplate
         {
             get => _mapTemplate;
@@ -47,6 +48,15 @@ namespace AnnoMapEditor.UI.Windows.Main
         }
         private MapTemplateCheckerViewModel _mapTemplateChecker;
 
+        public string Status { 
+            get => _status; 
+            set 
+            { 
+                OnPropertyChanged(nameof(Status)); 
+                _status = value;
+            } 
+        }
+        private string _status = "Unknown Status";
 
         public IslandElement? SelectedIsland
         {
@@ -112,11 +122,15 @@ namespace AnnoMapEditor.UI.Windows.Main
         public MainWindowViewModel(MapTemplate mapTemplate)
         {
             MapTemplate = mapTemplate;
+            if (Settings.Instance.DataPath != null)
+                Status = $"Game Path: {Settings.Instance.GamePath}";
         }
 
         public MainWindowViewModel()
         {
             CreateNewMap();
+            if (Settings.Instance.DataPath != null)
+                Status = $"Game Path: {Settings.Instance.GamePath}" ;
         }
 
 

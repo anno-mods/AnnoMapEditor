@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         Name="startWindow"
         Title="StartWindow" 
-        Width="700" Height="450"
+        Width="700" Height="360"
         ResizeMode="NoResize"
         Background="{StaticResource DarkBackgroundBrush}"
         WindowStartupLocation="CenterScreen">
@@ -40,7 +40,7 @@
         <WindowChrome
             GlassFrameThickness="0"
             CornerRadius="0"
-            CaptionHeight="60"
+            CaptionHeight="32"
             UseAeroCaptionButtons="False"
             ResizeBorderThickness="5"/>
     </WindowChrome.WindowChrome>
@@ -56,7 +56,7 @@
 
         <StackPanel Margin="32" Grid.Row="0" Orientation="Horizontal" Height="auto">
             <Image Source="/Assets/app.ico" Height="50"/>
-            <TextBlock Margin="20,0,0,0" VerticalAlignment="Center" Text="Community Map Editor for Anno 1800" Foreground="{StaticResource TextBrush}" FontSize="20" FontWeight="UltraLight"/>
+            <TextBlock Margin="20,0,0,0" VerticalAlignment="Center" Text="Community Map Editor for Anno 1800" Foreground="{StaticResource TextBrush}" FontSize="23" FontWeight="Light"/>
         </StackPanel>
 
         <Grid Grid.Row="1" Margin="100,0"
@@ -69,7 +69,7 @@
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="20" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
@@ -88,6 +88,7 @@
             </Grid.RowDefinitions>
 
             <!-- main buttons -->
+            <!--
             <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
                   Margin="0 0 0 20">
                 <Grid.ColumnDefinitions>
@@ -110,6 +111,7 @@
                     </Button.ContextMenu>
                 </Button>
             </Grid>
+            -->
 
 
             <!-- game path  -->
@@ -133,14 +135,20 @@
                        Margin="0 0 0 12">
                 The Anno Map Editor requires the game's files to function. Select the game's installation directory.
             </TextBlock>
-            <controls:StatusIndicator Grid.Row="1" Grid.Column="3"
+            <controls:StatusIndicator Grid.Row="1" Grid.Column="3" HorizontalAlignment="Right"
                                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
                                       IsOk="{Binding DataManager.IsInitialized}"
                                       IsLoading="{Binding DataManager.IsInitializing}"
                                       IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource objectToBool}}"/>
 
-
+            <Button Grid.Row="12" Grid.Column="2" Grid.ColumnSpan="2"
+                    Margin="0,30,0,0"
+                    Height="40"
+                    Content="Continue"
+                    Click="NewMap_Click"
+                    IsEnabled="{Binding DataManager.IsInitialized}"/>
             <!-- data path -->
+            <!--
             <TextBlock Grid.Row="4" Grid.Column="0"
                        Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnFalse}}"
                        Style="{StaticResource DefaultLabelStyle}"
@@ -167,8 +175,9 @@
                                       IsLoading="{Binding DataManager.IsInitializing}"
                                       IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource objectToBool}}"/>
 
-
+            -->
             <!-- mods path -->
+            <!--
             <TextBlock Grid.Row="7" Grid.Column="0"
                        Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnFalse}}"
                        Style="{StaticResource DefaultLabelStyle}"
@@ -189,8 +198,10 @@
                        Margin="0 0 0 12">
                 Select the path containing mods for Anno 1800. Mods will be loaded from and saved to there.
             </TextBlock>
+            -->
 
             <!-- expert mode -->
+            <!--
             <TextBlock Grid.Row="10" Grid.Column="0"
                        Style="{StaticResource DefaultLabelStyle}"
                        Text="Expert Mode:" />
@@ -202,6 +213,7 @@
                        TextWrapping="Wrap">
                 Expert mode unlocks some advanced and/or dangerous features. Maps and mods may break unless you know what you are doing.
             </TextBlock>
+            -->
 
         </Grid>
 

@@ -6,7 +6,7 @@
     <Brush x:Key="HighlightBrush">#007ACC</Brush>
     <Brush x:Key="HighlightLightBrush">#1C97EA</Brush>
     <Brush x:Key="BackgroundBrush">#1E2328</Brush>
-    <Brush x:Key="DarkBackgroundBrush">#0F1214</Brush>
+    <Brush x:Key="DarkBackgroundBrush">#111416</Brush>
     <Brush x:Key="TransparentBackgroundBrush">#7f000000</Brush>
     <Brush x:Key="ControlBrush">#8024415F</Brush>
     <Brush x:Key="DisabledBrush">#708090</Brush>
@@ -15,4 +15,5 @@
     <Brush x:Key="OkBrush">#00aa00</Brush>
     <Brush x:Key="ActiveWindowBorderBrush">#2C6593</Brush>
     <Brush x:Key="InactiveWindowBorderBrush">#39434C</Brush>
+    <Brush x:Key="WaterBlueBrush">#0D1F2E</Brush>
 </ResourceDictionary>
