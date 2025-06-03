@@ -1,16 +1,18 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Styles/Colors.xaml" />
-        <ResourceDictionary Source="Styles/Button.xaml" />
-        <ResourceDictionary Source="Styles/ToggleButton.xaml" />
-        <ResourceDictionary Source="Styles/TextBox.xaml" />
-        <ResourceDictionary Source="Styles/HintTextBox.xaml" />
-        <ResourceDictionary Source="Styles/Label.xaml" />
-        <ResourceDictionary Source="Styles/ComboBox.xaml" />
-        <ResourceDictionary Source="Styles/DropDownButton.xaml" />
-        <ResourceDictionary Source="Styles/FancyToggle.xaml" />
-        <ResourceDictionary Source="Styles/WindowControlButton.xaml" />
-        <ResourceDictionary Source="Styles/WindowBorder.xaml" />
-        <ResourceDictionary Source="Styles/ToolbarButton.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/Colors.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/Button.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/ToggleButton.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/TextBox.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/HintTextBox.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/Label.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/ComboBox.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/DropDownButton.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/FancyToggle.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/WindowControlButton.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/WindowBorder.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/ToolbarButton.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/ContextMenu.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/ToolTip.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

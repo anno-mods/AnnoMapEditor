@@ -17,6 +17,8 @@
                 <ResourceDictionary Source="UI/Resources/Styles/FancyToggle.xaml" />
                 <ResourceDictionary Source="UI/Resources/Styles/WindowControlButton.xaml" />
                 <ResourceDictionary Source="UI/Resources/Styles/ToolbarButton.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/ContextMenu.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/ToolTip.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

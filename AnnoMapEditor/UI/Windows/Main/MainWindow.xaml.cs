@@ -92,7 +92,7 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         private void ImportMap_Click(object sender, RoutedEventArgs e)
         {
-            toolbarImportContextMenu.PlacementTarget = sender as Panel;
+            // toolbarImportContextMenu.PlacementTarget = sender as Panel;
             toolbarImportContextMenu.IsOpen = true;
         }
 

@@ -95,7 +95,38 @@
             <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe77f;"/>
             <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe8c6;"/>
             <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
-            <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe73f;" Click="ResetZoom_Click" ToolTip="Reset map zoom"/>
+            <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe73f;" Click="ResetZoom_Click" ToolTip="Reset map zoom">
+                <!-- Kontext Menu for testing layout style -->
+                <!--<Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Label Nr. 1" IsChecked="True"/>
+                        <MenuItem Header="Label Nr. 2" IsEnabled="False"/>
+                        <MenuItem Header="Label Nr. 3" IsCheckable="True"/>
+                        <MenuItem Header="Label Nr. 4" InputGestureText="Bla">
+                            <MenuItem.Icon>
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xe713;" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Label Nr. 5"/>
+                        <Separator/>
+                        <MenuItem Header="Label Nr. 1"/>
+                        <MenuItem Header="Label Nr. 2">
+                            <MenuItem Header="Label Nr. 1"/>
+                            <MenuItem Header="Label Nr. 2"/>
+                            <Separator />
+                            <MenuItem Header="Label Nr. 3">
+                                <MenuItem Header="Label Nr. 1"/>
+                                <MenuItem Header="Label Nr. 2"/>
+                                <Separator />
+                                <MenuItem Header="Label Nr. 3"/>
+                            </MenuItem>
+                            <MenuItem Header="Label Nr. 4"/>
+                        </MenuItem>
+                        <MenuItem Header="Label Nr. 3"/>
+                        <MenuItem Header="Label Nr. 4"/>
+                    </ContextMenu>
+                </Button.ContextMenu>-->
+            </Button>
             <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe8a3;"/>
             <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe71f;"/>
             <Button IsEnabled="True" Style="{Binding MapTemplate.ShowLabels, Converter={StaticResource isActiveToToolbarButtonStyle}}" Content="&#xe8ec;" Click="ShowLabels_Click" ToolTip="Show island labels"/>
