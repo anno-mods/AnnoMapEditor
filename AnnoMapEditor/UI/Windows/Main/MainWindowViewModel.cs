@@ -1,4 +1,5 @@
-﻿using AnnoMapEditor.DataArchives;
+﻿using Anno.FileDBModels.Anno1800.MapTemplate;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
@@ -7,10 +8,13 @@ using AnnoMapEditor.UI.Controls.IslandProperties;
 using AnnoMapEditor.UI.Controls.MapTemplates;
 using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
+using FileDBSerializing.ObjectSerializer;
 using Microsoft.Win32;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using MapTemplate = AnnoMapEditor.MapTemplates.Models.MapTemplate;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
@@ -133,6 +137,10 @@ namespace AnnoMapEditor.UI.Windows.Main
                 Status = $"Game Path: {Settings.Instance.GamePath}" ;
         }
 
+        private FileDBDocumentSerializer _serializer = new(new FileDBSerializerOptions());
+        private FileDBDocumentDeserializer<MapTemplateDocument> _deserializer = new(new FileDBSerializerOptions() { IgnoreMissingProperties = true });
+        private Stack<UndoRedoStackEntry> _undoStack = new();
+
 
         public async Task OpenMap(string a7tinfoPath, bool fromArchive = false)
         {
@@ -144,6 +152,8 @@ namespace AnnoMapEditor.UI.Windows.Main
 
             else
                 MapTemplate = await mapTemplateReader.FromFileAsync(a7tinfoPath);
+
+            MapTemplate.UpdateMapZoomConfig(1f, 0f, 0f);
         }
 
         public void CreateNewMap()
@@ -152,7 +162,8 @@ namespace AnnoMapEditor.UI.Windows.Main
             const int DEFAULT_PLAYABLE_SIZE = 2160;
 
             MapTemplateFilePath = null;
-            MapTemplate = new MapTemplate(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, SessionAsset.OldWorld);
+            MapTemplate = new MapTemplate(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, SessionAsset.OldWorld); 
+            MapTemplate.UpdateMapZoomConfig(1f, 0f, 0f);
         }
 
         public async Task SaveMap(string filePath)
@@ -227,6 +238,35 @@ namespace AnnoMapEditor.UI.Windows.Main
 
                 await OpenMap(picker.FileName);
             }
+        }
+
+        public void CreateSnapshot()
+        {
+            try
+            {
+                UndoRedoStackEntry template = new(_serializer.WriteObjectStructureToFileDBDocument(_mapTemplate.ToTemplateDocument()), _mapTemplate.Session, UndoRedoStackEntry.ActionType.Manual);
+
+                _undoStack.Push(template);
+                System.Diagnostics.Debug.WriteLine($"Undo Stack now contains {_undoStack.Count} entries.");
+            } 
+            catch
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to push to undo stack!");
+            }
+
+        }
+
+        public void RestoreSnapshot()
+        {
+            if (_undoStack.Count <= 0) return;
+
+            UndoRedoStackEntry template  = _undoStack.Pop();
+
+            if (template != null)
+                MapTemplate = new MapTemplate(_deserializer.GetObjectStructureFromFileDBDocument(template.doc), SessionAsset.DetectFromGuid(template.sessionGuid));
+
+            System.Diagnostics.Debug.WriteLine($"Undo Stack now contains {_undoStack.Count} entries.");
+
         }
     }
 }

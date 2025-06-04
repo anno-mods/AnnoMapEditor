@@ -172,7 +172,7 @@ namespace AnnoMapEditor.UI.Controls
 
         private void UpdateIslands(MapTemplate? mapTemplate)
         {
-            ResetZoom();
+            // ResetZoom();
 
             //Unlink event handlers from old MapTemplate
             if (mapTemplate != _mapTemplate)

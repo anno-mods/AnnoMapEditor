@@ -148,5 +148,15 @@ namespace AnnoMapEditor.UI.Windows.Main
                 maximizeButton.Content = (char)0xe923;
             }
         }
+
+        private void Redo_Click(object?  sender, RoutedEventArgs e)
+        {
+            _viewModel.CreateSnapshot();
+        }
+
+        private void Undo_Click(object? sender, RoutedEventArgs e)
+        {
+            _viewModel.RestoreSnapshot();
+        }
     }
 }

@@ -131,6 +131,15 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 return OldWorld;
         }
 
+        public static SessionAsset DetectFromGuid(long guid)
+        {
+            if (guid == SESSION_SUNKENTREASURES_GUID) return CapeTrelawney;
+            if (guid == SESSION_ARCTIC_GUID) return Arctic;
+            if (guid == SESSION_NEWWORLD_GUID) return NewWorld;
+            if (guid == SESSION_ENBESA_GUID) return Enbesa;
+            else return OldWorld;
+        }
+
 
         public override string ToString() => DisplayName;
     }
