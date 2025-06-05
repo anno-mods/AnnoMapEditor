@@ -151,12 +151,12 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         private void Redo_Click(object?  sender, RoutedEventArgs e)
         {
-            _viewModel.CreateSnapshot();
+            _viewModel.Redo();
         }
 
         private void Undo_Click(object? sender, RoutedEventArgs e)
         {
-            _viewModel.RestoreSnapshot();
+            _viewModel.Undo();
         }
     }
 }

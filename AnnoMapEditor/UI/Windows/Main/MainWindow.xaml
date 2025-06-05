@@ -75,8 +75,8 @@
 
         <Border Grid.Row="1" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased"/>
         <StackPanel Grid.Row="1" HorizontalAlignment="Left" Name="toolbarStackPanel" Orientation="Horizontal" Background="{StaticResource DarkBackgroundBrush}">
-            <Button IsEnabled="True" Margin="10,0,0,0" Style="{StaticResource ToolbarButton}" Content="&#xe7a7;" Click="Undo_Click"/>
-            <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe7a6;" Click="Redo_Click"/>
+            <Button IsEnabled="{Binding UndoRedoStack.UndoStackAvailable}" Margin="10,0,0,0" Style="{StaticResource ToolbarButton}" Content="&#xe7a7;" Click="Undo_Click" ToolTip="Undo"/>
+            <Button IsEnabled="{Binding UndoRedoStack.RedoStackAvailable}" Style="{StaticResource ToolbarButton}" Content="&#xe7a6;" Click="Redo_Click" ToolTip="Redo"/>
             <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
             <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe8a5;" Click="NewFile_Click" ToolTip="New map template"/>
             <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe838;" Click="OpenFile_Click" ToolTip="Load map template file"/>

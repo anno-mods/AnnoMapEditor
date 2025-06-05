@@ -8,9 +8,7 @@ using AnnoMapEditor.UI.Controls.IslandProperties;
 using AnnoMapEditor.UI.Controls.MapTemplates;
 using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
-using FileDBSerializing.ObjectSerializer;
 using Microsoft.Win32;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -21,6 +19,7 @@ namespace AnnoMapEditor.UI.Windows.Main
     public class MainWindowViewModel : ObservableBase
     {
         public DataManager DataManager => DataManager.Instance;
+        public UndoRedoStack UndoRedoStack => UndoRedoStack.Instance;
         public MapTemplate MapTemplate
         {
             get => _mapTemplate;
@@ -122,7 +121,6 @@ namespace AnnoMapEditor.UI.Windows.Main
         }
         private string? _mapTemplateFilePath;
 
-
         public MainWindowViewModel(MapTemplate mapTemplate)
         {
             MapTemplate = mapTemplate;
@@ -136,11 +134,6 @@ namespace AnnoMapEditor.UI.Windows.Main
             if (Settings.Instance.DataPath != null)
                 Status = $"Game Path: {Settings.Instance.GamePath}" ;
         }
-
-        private FileDBDocumentSerializer _serializer = new(new FileDBSerializerOptions());
-        private FileDBDocumentDeserializer<MapTemplateDocument> _deserializer = new(new FileDBSerializerOptions() { IgnoreMissingProperties = true });
-        private Stack<UndoRedoStackEntry> _undoStack = new();
-
 
         public async Task OpenMap(string a7tinfoPath, bool fromArchive = false)
         {
@@ -240,33 +233,14 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
         }
 
-        public void CreateSnapshot()
+        public void Undo()
         {
-            try
-            {
-                UndoRedoStackEntry template = new(_serializer.WriteObjectStructureToFileDBDocument(_mapTemplate.ToTemplateDocument()), _mapTemplate.Session, UndoRedoStackEntry.ActionType.Manual);
-
-                _undoStack.Push(template);
-                System.Diagnostics.Debug.WriteLine($"Undo Stack now contains {_undoStack.Count} entries.");
-            } 
-            catch
-            {
-                System.Diagnostics.Debug.WriteLine($"Failed to push to undo stack!");
-            }
-
+            UndoRedoStack.Instance.Undo();
         }
 
-        public void RestoreSnapshot()
+        public void Redo()
         {
-            if (_undoStack.Count <= 0) return;
-
-            UndoRedoStackEntry template  = _undoStack.Pop();
-
-            if (template != null)
-                MapTemplate = new MapTemplate(_deserializer.GetObjectStructureFromFileDBDocument(template.doc), SessionAsset.DetectFromGuid(template.sessionGuid));
-
-            System.Diagnostics.Debug.WriteLine($"Undo Stack now contains {_undoStack.Count} entries.");
-
+            UndoRedoStack.Instance.Redo();
         }
     }
 }
