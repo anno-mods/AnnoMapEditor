@@ -79,6 +79,11 @@ namespace AnnoMapEditor.Utilities
             return new Vector2(a.X - b, a.Y - b);
         }
 
+        public static bool Equals(Vector2 a, Vector2 b)
+        {
+            return a.X == b.X && a.Y == b.Y;
+        }
+
         public Vector2 Clamp(Rect2 area)
         {
             return new Vector2(Math.Clamp(X, area.X, area.Max.X - Tile.X), Math.Clamp(Y, area.Y, area.Max.Y - Tile.Y));

@@ -7,6 +7,7 @@ using AnnoMapEditor.UI.Controls.Selection;
 using AnnoMapEditor.UI.Overlays;
 using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
+using AnnoMapEditor.Utilities.UndoRedo;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -373,6 +374,9 @@ namespace AnnoMapEditor.UI.Controls
                             Position = protoIslandViewModel.Island.Position
                         };
                         _mapTemplate!.Elements.Add(islandElement);
+
+                        // Add random island to Undo Stack
+                        UndoRedoStack.Instance.Do(new IslandAddStackEntry(islandElement, _mapTemplate));
                     }
                     else
                         throw new NotImplementedException();
@@ -521,6 +525,9 @@ namespace AnnoMapEditor.UI.Controls
                 Position = position
             };
             _mapTemplate.Elements.Add(fixedIslandElement);
+
+            // Add fixed island to Undo Stack
+            UndoRedoStack.Instance.Do(new IslandAddStackEntry(fixedIslandElement, _mapTemplate));
         }
 
         private void MapElementViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -546,6 +553,8 @@ namespace AnnoMapEditor.UI.Controls
                     if (viewModel.IsOutOfBounds && !viewModel.IsDragging && !_mapTemplate.ResizingInProgress)
                     {
                         _mapTemplate.Elements.Remove(viewModel.Element);
+                        viewModel.Element.Position = viewModel.DragStartPosition;
+                        UndoRedoStack.Instance.Do(new IslandRemoveStackEntry(viewModel.Element as IslandElement, _mapTemplate));
 
                         // deselect the island if it was selected
                         if (viewModel == _selectedElement)

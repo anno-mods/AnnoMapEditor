@@ -19,7 +19,9 @@ namespace AnnoMapEditor.UI.Windows.Main
     public class MainWindowViewModel : ObservableBase
     {
         public DataManager DataManager => DataManager.Instance;
+
         public UndoRedoStack UndoRedoStack => UndoRedoStack.Instance;
+
         public MapTemplate MapTemplate
         {
             get => _mapTemplate;
@@ -32,6 +34,9 @@ namespace AnnoMapEditor.UI.Windows.Main
 
                     MapTemplateProperties = new(value);
                     MapTemplateChecker = new(value);
+
+                    // A new map has been loaded or created. Clear Stack
+                    UndoRedoStack.ClearStacks();
                 }
             }
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AnnoMapEditor.Utilities.UndoRedo;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,20 +11,8 @@ namespace AnnoMapEditor.Utilities
     {
         public static UndoRedoStack Instance { get; } = new();
 
-        public enum ActionType
-        {
-            MapElementTransform
-        }
-
-        private Stack<IStackEntry> UndoStack { get; } = new Stack<IStackEntry>();
-        private Stack<IStackEntry> RedoStack { get; } = new Stack<IStackEntry>();
-
-        public interface IStackEntry
-        {
-            public ActionType ActionType { get; init; } 
-            public abstract void Undo();
-            public abstract void Redo();
-        }
+        private readonly Stack<IUndoRedoStackEntry> undoStack = new();
+        private readonly Stack<IUndoRedoStackEntry> redoStack = new();
 
         public bool UndoStackAvailable
         {
@@ -49,44 +38,51 @@ namespace AnnoMapEditor.Utilities
 
         public void Undo()
         {
-            if (UndoStack.Count > 0)
+            if (undoStack.Count > 0)
             {
-                var stackEntry = UndoStack.Pop();
+                var stackEntry = undoStack.Pop();
                 stackEntry.Undo();
-                RedoStack.Push(stackEntry);
+                redoStack.Push(stackEntry);
             }
             UpdateAvailabilities();
         }
 
         public void Redo()
         {
-            if (RedoStack.Count > 0)
+            if (redoStack.Count > 0)
             {
-                var stackEntry = RedoStack.Pop();
+                var stackEntry = redoStack.Pop();
                 stackEntry.Redo();
-                UndoStack.Push(stackEntry);
+                undoStack.Push(stackEntry);
             }
             UpdateAvailabilities();
         }
 
-        public void Do(IStackEntry stackEntry)
+        /**
+         * <summary>
+         * Place a stack entry on the undo stack.
+         * The Redo stack will be cleared.
+         * </summary>
+         * <param name="stackEntry">Stack entry that implements `IStackEntry`, containint information on what to do on Undo and Redo.</param>
+         */
+        public void Do(IUndoRedoStackEntry stackEntry)
         {
-            UndoStack.Push(stackEntry);
-            RedoStack.Clear();
+            undoStack.Push(stackEntry);
+            redoStack.Clear();
             UpdateAvailabilities();
         }
 
         public void ClearStacks()
         {
-            UndoStack.Clear();
-            RedoStack.Clear();
+            undoStack.Clear();
+            redoStack.Clear();
             UpdateAvailabilities();
         }
 
         private void UpdateAvailabilities()
         {
-            UndoStackAvailable = (UndoStack.Count > 0);
-            RedoStackAvailable = (RedoStack.Count > 0);
+            UndoStackAvailable = (undoStack.Count > 0);
+            RedoStackAvailable = (redoStack.Count > 0);
         }
     }
 }
