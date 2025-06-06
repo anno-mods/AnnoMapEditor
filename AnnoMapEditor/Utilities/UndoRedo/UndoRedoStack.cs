@@ -7,7 +7,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AnnoMapEditor.Utilities
+namespace AnnoMapEditor.Utilities.UndoRedo
 {
     public class UndoRedoStack : ObservableBase
     {
@@ -30,8 +30,8 @@ namespace AnnoMapEditor.Utilities
 
         public static UndoRedoStack Instance { get; } = new();
 
-        private readonly Stack<IUndoRedoStackEntry> undoStack = new();
-        private readonly Stack<IUndoRedoStackEntry> redoStack = new();
+        private readonly Stack<IUndoRedoStackEntry> _undoStack = new();
+        private readonly Stack<IUndoRedoStackEntry> _redoStack = new();
 
         public ObservableCollection<HistoryEntry> UndoHistory { get; protected set; }
 
@@ -51,11 +51,11 @@ namespace AnnoMapEditor.Utilities
 
         public void Undo()
         {
-            if (undoStack.Count > 0)
+            if (_undoStack.Count > 0)
             {
-                var stackEntry = undoStack.Pop();
+                var stackEntry = _undoStack.Pop();
                 stackEntry.Undo();
-                redoStack.Push(stackEntry);
+                _redoStack.Push(stackEntry);
                 UndoHistory.Remove(UndoHistory.Last());
             }
             UpdateAvailabilities();
@@ -63,12 +63,12 @@ namespace AnnoMapEditor.Utilities
 
         public void Redo()
         {
-            if (redoStack.Count > 0)
+            if (_redoStack.Count > 0)
             {
-                var stackEntry = redoStack.Pop();
+                var stackEntry = _redoStack.Pop();
                 stackEntry.Redo();
-                undoStack.Push(stackEntry);
-                UndoHistory.Insert(0, new HistoryEntry(stackEntry.ActionType.ToString(), undoStack.Count - 1));
+                _undoStack.Push(stackEntry);
+                UndoHistory.Insert(0, new HistoryEntry(stackEntry.ActionType.ToString(), _undoStack.Count - 1));
             }
             UpdateAvailabilities();
         }
@@ -82,24 +82,24 @@ namespace AnnoMapEditor.Utilities
          */
         public void Do(IUndoRedoStackEntry stackEntry)
         {
-            undoStack.Push(stackEntry);
-            redoStack.Clear();
-            UndoHistory.Insert(0, new HistoryEntry(stackEntry.ActionType.ToString(), undoStack.Count - 1));
+            _undoStack.Push(stackEntry);
+            _redoStack.Clear();
+            UndoHistory.Insert(0, new HistoryEntry(stackEntry.ActionType.ToString(), _undoStack.Count - 1));
             UpdateAvailabilities();
         }
 
         public void ClearStacks()
         {
-            undoStack.Clear();
-            redoStack.Clear();
+            _undoStack.Clear();
+            _redoStack.Clear();
             UndoHistory.Clear();
             UpdateAvailabilities();
         }
 
         private void UpdateAvailabilities()
         {
-            UndoStackAvailable = (undoStack.Count > 0);
-            RedoStackAvailable = (redoStack.Count > 0);
+            UndoStackAvailable = (_undoStack.Count > 0);
+            RedoStackAvailable = (_redoStack.Count > 0);
             OnPropertyChanged(nameof(UndoHistory));
         }
     }

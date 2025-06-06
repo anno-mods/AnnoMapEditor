@@ -8,6 +8,7 @@ using AnnoMapEditor.UI.Controls.IslandProperties;
 using AnnoMapEditor.UI.Controls.MapTemplates;
 using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
+using AnnoMapEditor.Utilities.UndoRedo;
 using Microsoft.Win32;
 using System.IO;
 using System.Threading.Tasks;

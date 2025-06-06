@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static AnnoMapEditor.Utilities.UndoRedoStack;
+using static AnnoMapEditor.Utilities.UndoRedo.UndoRedoStack;
 
 namespace AnnoMapEditor.Utilities.UndoRedo
 {
