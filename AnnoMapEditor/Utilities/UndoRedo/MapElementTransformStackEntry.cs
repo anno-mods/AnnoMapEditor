@@ -9,27 +9,40 @@ namespace AnnoMapEditor.Utilities.UndoRedo
 {
     record MapElementTransformStackEntry : IUndoRedoStackEntry
     {
-        public MapElementTransformStackEntry(MapElement element, Vector2 oldPosition, Vector2 newPosition)
-        {
-            this.oldPosition = new(oldPosition);
-            this.newPosition = new(newPosition);
-            this.element = element;
+        public MapElementTransformStackEntry(
+            MapElement element, 
+            Vector2 oldPosition, 
+            Vector2 newPosition,
+            byte? oldRotation = null,
+            byte? newRotation = null
+        ) {
+            _oldPosition = new(oldPosition);
+            _newPosition = new(newPosition);
+            _oldRotation = oldRotation;
+            _newRotation = newRotation;
+            _element = element;
         }
 
         public ActionType ActionType => ActionType.MapElementTransform;
 
-        private readonly Vector2 oldPosition;
-        private readonly Vector2 newPosition;
-        private readonly MapElement element;
+        private readonly Vector2 _oldPosition;
+        private readonly Vector2 _newPosition;
+        private readonly byte? _oldRotation;
+        private readonly byte? _newRotation;
+        private readonly MapElement _element;
 
         public void Redo()
         {
-            element.Position = new(newPosition);
+            _element.Position = new(_newPosition);
+            if (_element is FixedIslandElement fixedIslandElement && _newRotation != null)
+                fixedIslandElement.Rotation = _newRotation;
         }
 
         public void Undo()
         {
-            element.Position = new(oldPosition);
+            _element.Position = new(_oldPosition);
+            if (_element is FixedIslandElement fixedIslandElement && _oldRotation != null)
+                fixedIslandElement.Rotation = _oldRotation;
         }
     }
 }

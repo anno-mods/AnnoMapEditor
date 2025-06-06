@@ -31,19 +31,17 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
 
         private void OnRotateRandom(object sender, RoutedEventArgs args)
         {
-            _viewModel.FixedIsland.Rotation = null;
+            _viewModel.SetIslandRotationRandom();
         }
 
         private void OnRotateClockwise(object sender, RoutedEventArgs args)
         {
-            byte islandRotation = _viewModel.FixedIsland.Rotation ?? 0;
-            _viewModel.FixedIsland.Rotation = (byte)((islandRotation - 1) % 4);
+            _viewModel.RotateIsland(true);
         }
 
         private void OnRotateCounterClockwise(object sender, RoutedEventArgs args)
         {
-            byte islandRotation = _viewModel.FixedIsland.Rotation ?? 0;
-            _viewModel.FixedIsland.Rotation = (byte)((islandRotation + 1) % 4);
+            _viewModel.RotateIsland(false);
         }
     }
 }

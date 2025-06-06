@@ -16,8 +16,8 @@ namespace AnnoMapEditor.Utilities.UndoRedo
             _mapTemplate = mapTemplate;
         }
 
-        private IslandElement _islandElement;
-        private MapTemplate _mapTemplate;
+        private readonly IslandElement _islandElement;
+        private readonly MapTemplate _mapTemplate;
 
         public ActionType ActionType => ActionType.IslandRemove;
 

@@ -10,6 +10,7 @@ namespace AnnoMapEditor.Utilities.UndoRedo
     {
         MapElementTransform,
         IslandAdd,
-        IslandRemove
+        IslandRemove,
+        IslandProperties,
     }
 }

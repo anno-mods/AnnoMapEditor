@@ -6,6 +6,7 @@ using AnnoMapEditor.UI.Controls.Slots;
 using AnnoMapEditor.Utilities;
 using System.Collections.ObjectModel;
 using System.Linq;
+using AnnoMapEditor.Utilities.UndoRedo;
 
 namespace AnnoMapEditor.UI.Controls.IslandProperties
 {
@@ -33,6 +34,28 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
 
             IslandTypeItems.AddRange(FixedIsland.IslandAsset.IslandType);
             ShowIslandTypeItems = IslandTypeItems.Count > 1;
+        }
+
+        public void RotateIsland(bool clockwise)
+        {
+            byte islandRotation = FixedIsland.Rotation ?? 0;
+            if (clockwise)
+                FixedIsland.Rotation = (byte)((islandRotation - 1) % 4);
+            else 
+                FixedIsland.Rotation = (byte)((islandRotation + 1) % 4);
+            
+            UndoRedoStack.Instance.Do(
+                new MapElementTransformStackEntry(
+                    FixedIsland, 
+                    FixedIsland.Position, FixedIsland.Position,
+                    islandRotation, FixedIsland.Rotation
+                )
+            );
+        }
+
+        public void SetIslandRotationRandom()
+        {
+            FixedIsland.Rotation = null;
         }
     }
 }

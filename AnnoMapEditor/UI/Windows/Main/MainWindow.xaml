@@ -250,11 +250,11 @@
             <!-- Overlays -->
             <overlays:OverlayContainer Grid.ColumnSpan="3" />
         </Grid>
-        <Grid Name="statusBar" Grid.Row="3" Height="32">
-            <Border Background="{StaticResource WaterBlueBrush}" BorderBrush="{StaticResource DarkBackgroundBrush}" BorderThickness="0,4,0,0" RenderOptions.EdgeMode="Aliased"/>
+        <Grid Name="statusBar" Grid.Row="3" Height="28">
+            <Border Background="{StaticResource WaterBlueBrush}" BorderBrush="{StaticResource BrightBorderBrush}" BorderThickness="0,1,0,0" RenderOptions.EdgeMode="Aliased"/>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Name="versionStatusText" VerticalAlignment="Center" Margin="10,0" Style="{StaticResource DefaultLabelStyle}" />
-                <Border BorderBrush="{StaticResource DisabledBrush}" Width="1" BorderThickness="1" Margin="0,8,0,4"/>
+                <Border BorderBrush="{StaticResource DisabledBrush}" Width="1" BorderThickness="1" Margin="0,4,0,4"/>
                 <TextBlock VerticalAlignment="Center" Margin="10,0" Style="{StaticResource DefaultLabelStyle}" Text="{Binding Status}"/>
                 <controls:StatusIndicator 
                     Visibility="Visible"
