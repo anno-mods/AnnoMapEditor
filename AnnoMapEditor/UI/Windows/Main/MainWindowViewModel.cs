@@ -12,6 +12,7 @@ using Microsoft.Win32;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Input;
 using MapTemplate = AnnoMapEditor.MapTemplates.Models.MapTemplate;
 
 namespace AnnoMapEditor.UI.Windows.Main
@@ -247,5 +248,8 @@ namespace AnnoMapEditor.UI.Windows.Main
         {
             UndoRedoStack.Instance.Redo();
         }
+
+        public ICommand UndoCommand => new ActionCommand(Undo);
+        public ICommand RedoCommand => new ActionCommand(Redo);
     }
 }

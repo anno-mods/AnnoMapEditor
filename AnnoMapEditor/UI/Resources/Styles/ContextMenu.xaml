@@ -336,7 +336,7 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    
+
     <Style x:Key="DarkContextMenu" TargetType="{x:Type ContextMenu}">
         <Setter Property="SnapsToDevicePixels"  Value="True" />
         <Setter Property="Grid.IsSharedSizeScope" Value="true" />

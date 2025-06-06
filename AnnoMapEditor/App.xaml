@@ -19,6 +19,7 @@
                 <ResourceDictionary Source="UI/Resources/Styles/ToolbarButton.xaml" />
                 <ResourceDictionary Source="UI/Resources/Styles/ContextMenu.xaml" />
                 <ResourceDictionary Source="UI/Resources/Styles/ToolTip.xaml" />
+                <ResourceDictionary Source="/UI/Resources/Styles/Scrollbar.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

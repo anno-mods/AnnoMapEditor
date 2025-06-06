@@ -22,6 +22,11 @@
         WindowStyle="SingleBorderWindow"
         Background="{StaticResource BackgroundBrush}" 
         WindowStartupLocation="CenterScreen">
+
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="Z" Command="{Binding UndoCommand}" />
+        <KeyBinding Modifiers="Ctrl" Key="Y" Command="{Binding RedoCommand}" />
+    </Window.InputBindings>
     
     <Window.Resources>
         <ResourceDictionary>
@@ -75,7 +80,40 @@
 
         <Border Grid.Row="1" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased"/>
         <StackPanel Grid.Row="1" HorizontalAlignment="Left" Name="toolbarStackPanel" Orientation="Horizontal" Background="{StaticResource DarkBackgroundBrush}">
+
+            <Popup Name="undoHistoryPopup" 
+                   PlacementTarget="{Binding ElementName=undoDropdown}" 
+                   StaysOpen="False"
+                   AllowsTransparency="True">
+                <Grid Background="{StaticResource MediumBackgroundBrush}" Width="300" MaxHeight="400" MinHeight="100">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Border BorderBrush="{StaticResource BrightBorderBrush}"
+                            BorderThickness="1"
+                            Grid.RowSpan="2"/>
+                    <TextBlock Style="{StaticResource DefaultLabelStyle}" Text="Action History:" Margin="10,0"/>
+                    <Border BorderBrush="{StaticResource BrightBorderBrush}" BorderThickness="0,0,0,1" />
+                    <ScrollViewer Grid.Row="1" Margin="1">
+                        <ItemsControl ItemsSource="{Binding UndoRedoStack.UndoHistory}" Margin="10,0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel IsItemsHost="True"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Label}" Style="{StaticResource DefaultLabelStyle}" Height="auto" Margin="0"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Popup>
+            
             <Button IsEnabled="{Binding UndoRedoStack.UndoStackAvailable}" Margin="10,0,0,0" Style="{StaticResource ToolbarButton}" Content="&#xe7a7;" Click="Undo_Click" ToolTip="Undo"/>
+            <Button IsEnabled="{Binding UndoRedoStack.UndoStackAvailable}" Name="undoDropdown" Style="{StaticResource ToolbarButton}" Content="&#xe96e;" FontSize="6" Width="12" Margin="0,2,2,2" Click="OpenUndoHistoryPopup"/>
             <Button IsEnabled="{Binding UndoRedoStack.RedoStackAvailable}" Style="{StaticResource ToolbarButton}" Content="&#xe7a6;" Click="Redo_Click" ToolTip="Redo"/>
             <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
             <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe8a5;" Click="NewFile_Click" ToolTip="New map template"/>
@@ -212,9 +250,11 @@
             <!-- Overlays -->
             <overlays:OverlayContainer Grid.ColumnSpan="3" />
         </Grid>
-        <Grid Name="statusBar" Grid.Row="3" Height="28">
+        <Grid Name="statusBar" Grid.Row="3" Height="32">
             <Border Background="{StaticResource WaterBlueBrush}" BorderBrush="{StaticResource DarkBackgroundBrush}" BorderThickness="0,4,0,0" RenderOptions.EdgeMode="Aliased"/>
             <StackPanel Orientation="Horizontal">
+                <TextBlock Name="versionStatusText" VerticalAlignment="Center" Margin="10,0" Style="{StaticResource DefaultLabelStyle}" />
+                <Border BorderBrush="{StaticResource DisabledBrush}" Width="1" BorderThickness="1" Margin="0,8,0,4"/>
                 <TextBlock VerticalAlignment="Center" Margin="10,0" Style="{StaticResource DefaultLabelStyle}" Text="{Binding Status}"/>
                 <controls:StatusIndicator 
                     Visibility="Visible"

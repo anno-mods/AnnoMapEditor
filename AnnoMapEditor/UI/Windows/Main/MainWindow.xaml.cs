@@ -42,6 +42,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 catch { }
             }
             title = $"{App.Title} {productVersion}";
+            versionStatusText.Text = $"Version: {productVersion}";
             Title = title;
             titleText.Text = App.Title;
 
@@ -157,6 +158,11 @@ namespace AnnoMapEditor.UI.Windows.Main
         private void Undo_Click(object? sender, RoutedEventArgs e)
         {
             _viewModel.Undo();
+        }
+
+        public void OpenUndoHistoryPopup(object? sender, RoutedEventArgs e)
+        {
+            undoHistoryPopup.IsOpen = !undoHistoryPopup.IsOpen;
         }
     }
 }

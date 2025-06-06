@@ -24,5 +24,7 @@
     <Brush x:Key="MouseoverBackgroundBrush">#23ffffff</Brush>
     <Brush x:Key="PressedBackgroundBrush">#1dffffff</Brush>
     <Brush x:Key="ForegroundBrush">#f0f0f0</Brush>
+    <Brush x:Key="MediumForegroundBrush">#BABABA</Brush>
+    <Brush x:Key="DarkForegroundBrush">#898989</Brush>
     <Brush x:Key="BrightBorderBrush">#2F363F</Brush>
 </ResourceDictionary>
