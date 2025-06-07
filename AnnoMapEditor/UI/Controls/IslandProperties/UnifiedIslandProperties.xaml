@@ -41,7 +41,7 @@
             <!-- Label -->
             <TextBlock Text="Label"
                        Style="{StaticResource SubHeaderLabelStyle}"/>
-            <TextBox Margin="5"
+            <TextBox Margin="0,5"
                      Text="{Binding SelectedIsland.Label, Mode=OneWay}"/>
             
             <!-- Position -->
@@ -58,9 +58,9 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="X" Style="{StaticResource DefaultLabelStyle}" />
-                <TextBox   VerticalAlignment="Center" Grid.Column="1" Margin="5,0" Text="{Binding SelectedIsland.Position.X, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
+                <TextBox   VerticalAlignment="Center" Grid.Column="1" Margin="0" Text="{Binding SelectedIsland.Position.X, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
                 <TextBlock VerticalAlignment="Center" Grid.Column="3" Text="Y" Style="{StaticResource DefaultLabelStyle}" />
-                <TextBox   VerticalAlignment="Center" Grid.Column="4" Margin="5,0" Text="{Binding SelectedIsland.Position.Y, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
+                <TextBox   VerticalAlignment="Center" Grid.Column="4" Margin="0" Text="{Binding SelectedIsland.Position.Y, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
             </Grid>
             <!-- Rotation -->
             <Grid Visibility="{Binding IslandRotationPropertiesVisible, Converter={StaticResource VisibleOnTrue}}"
@@ -79,25 +79,27 @@
                           Name="RotationCheckbox"
                           Content="Random Rotation"/>
                 <Button Grid.Column="2" Style="{StaticResource ToolbarButton}" 
+                        VerticalAlignment="Center"
                         IsEnabled="{Binding SelectedIsland.RandomizeRotation, Converter={StaticResource TrueOnFalse}}"
                         Click="OnRotateCounterClockwise"
-                        FontWeight="Black" FontSize="25" Content="&#xe80c;"/>
+                        FontWeight="Black" FontSize="25" Content="&#xe80c;" Height="25"/>
                 <TextBox Grid.Column="3" 
                          VerticalAlignment="Center"
                          IsEnabled="False" 
                          TextAlignment="Center"
                          Text="{Binding SelectedIsland.Rotation, Converter={StaticResource IntToAngle}}"/>
                 <Button Grid.Column="4" Style="{StaticResource ToolbarButton}" 
+                        VerticalAlignment="Center"
                         IsEnabled="{Binding SelectedIsland.RandomizeRotation, Converter={StaticResource TrueOnFalse}}"
                         Click="OnRotateClockwise"
-                        FontWeight="Black" FontSize="25" Content="&#xe80d;"/>
+                        FontWeight="Black" FontSize="25" Content="&#xe80d;" Height="25"/>
             </Grid>
             
             <!-- IslandType -->
             <StackPanel Visibility="{Binding IslandTypeItemsVisible, Converter={StaticResource VisibleOnTrue}}">
                 <TextBlock Text="Island Type"
                            Style="{StaticResource SubHeaderLabelStyle}"/>
-                <ComboBox Margin="2"
+                <ComboBox Margin="0,5"
                           Name="IslandTypeComboBox"
                           DropDownClosed="IslandTypeComboBox_OnDropDownClosed"
                           ItemsSource="{Binding IslandTypeItems}"
@@ -109,7 +111,7 @@
                 <TextBlock Text="Island Size"
                            Style="{StaticResource SubHeaderLabelStyle}"
                            Visibility="{Binding ShowIslandSizeItems, Converter={StaticResource VisibleOnTrue}}"/>
-                <ComboBox Margin="2"
+                <ComboBox Margin="0,5"
                           Name="IslandSizeComboBox"
                           DropDownClosed="IslandSizeComboBox_OnDropDownClosed"
                           ItemsSource="{Binding IslandSizeItems}"

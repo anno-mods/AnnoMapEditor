@@ -7,7 +7,8 @@
     <Brush x:Key="HighlightLightBrush">#1C97EA</Brush>
     <Brush x:Key="BackgroundBrush">#1E2328</Brush>
     <Brush x:Key="MediumBackgroundBrush">#1A1E23</Brush>
-    <Brush x:Key="DarkBackgroundBrush">#111416</Brush>
+    <Brush x:Key="OldDarkBackgroundBrush">#111416</Brush>
+    <Brush x:Key="DarkBackgroundBrush">#121619</Brush>
     <Brush x:Key="TransparentBackgroundBrush">#7f000000</Brush>
     <Brush x:Key="ControlBrush">#8024415F</Brush>
     <Brush x:Key="DisabledBrush">#708090</Brush>
@@ -18,13 +19,23 @@
     <Brush x:Key="InactiveWindowBorderBrush">#39434C</Brush>
     <Brush x:Key="WaterBlueBrush">#0D1F2E</Brush>
     <Brush x:Key="SelectedBorderBrush">#731C97EA</Brush>
-    <Brush x:Key="SelectedBackgroundBrush">#231C97EA</Brush>
+    <Brush x:Key="SelectedBackgroundBrush">#531C97EA</Brush>
     <Brush x:Key="SelectedForegroundBrush">#1C97EA</Brush>
     <Brush x:Key="MouseoverBorderBrush">#73ffffff</Brush>
+    <Brush x:Key="MouseoverFixedBorderBrush">#394856</Brush>
     <Brush x:Key="MouseoverBackgroundBrush">#23ffffff</Brush>
     <Brush x:Key="PressedBackgroundBrush">#1dffffff</Brush>
     <Brush x:Key="ForegroundBrush">#f0f0f0</Brush>
     <Brush x:Key="MediumForegroundBrush">#BABABA</Brush>
     <Brush x:Key="DarkForegroundBrush">#898989</Brush>
     <Brush x:Key="BrightBorderBrush">#2F363F</Brush>
+    <RadialGradientBrush x:Key="GradientBrush" Center="-0.2, 2" RadiusX="1.27" RadiusY="9">
+        <GradientStop Color="#121619" Offset="0.0" />
+        <GradientStop Color="#121619" Offset="0.3" />
+        <GradientStop Color="#743745" Offset="0.48" />
+        <GradientStop Color="#8d863a" Offset="0.65" />
+        <GradientStop Color="#6ac549" Offset="0.77" />
+        <GradientStop Color="#4d67ce" Offset="0.88" />
+        <GradientStop Color="#a77dc7" Offset="0.99" />
+    </RadialGradientBrush>
 </ResourceDictionary>

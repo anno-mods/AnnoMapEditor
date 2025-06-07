@@ -13,19 +13,27 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="20" />
             </Grid.ColumnDefinitions>
-            <Border Grid.ColumnSpan="2" Background="{TemplateBinding Background}" />
-            <Border x:Name="Border" 
+            <Border x:Name="BaseBackground" Grid.ColumnSpan="2" Background="{TemplateBinding Background}" CornerRadius="5" />
+            <Border x:Name="LeftBorder" 
                     BorderThickness="1,1,0,1" 
-                    Grid.ColumnSpan="1"
                     BorderBrush="{TemplateBinding BorderBrush}"
-                    Background="Transparent" />
-            <Border Grid.Column="1"
-                    Background="{TemplateBinding BorderBrush}"/>
+                    Background="Transparent" 
+                    CornerRadius="5,0,0, 5"/>
+            <Border x:Name="RightBorder" Grid.Column="1"
+                    Background="{TemplateBinding BorderBrush}"
+                    CornerRadius="0,5,5, 0"/>
             <Path x:Name="Arrow" Grid.Column="1" 
                   VerticalAlignment="Center" HorizontalAlignment="Center"
                   Width="6" Fill="#f0f0f0" Stretch="Uniform" 
                   Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z "/>
         </Grid>
+        <!--<ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="BaseBackground" Property="CornerRadius" Value="5, 5, 0, 0"/>
+                <Setter TargetName="LeftBorder" Property="CornerRadius" Value="5, 0, 0, 0"/>
+                <Setter TargetName="RightBorder" Property="CornerRadius" Value="0, 5, 0, 0"/>
+            </Trigger>
+        </ControlTemplate.Triggers>-->
     </ControlTemplate>
 
     <!--<ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
@@ -57,8 +65,10 @@
                             <ControlTemplate TargetType="{x:Type ComboBoxItem}">
                                 <Border Background="{TemplateBinding Background}" 
                                         BorderBrush="{TemplateBinding BorderBrush}" 
-                                        BorderThickness="1" 
-                                        Padding="5">
+                                        BorderThickness="0" 
+                                        CornerRadius="5"
+                                        Margin="0,1"
+                                        Padding="10,5">
                                     <ContentPresenter TextBlock.Foreground="{StaticResource ForegroundBrush}"/>
                                 </Border>
                             </ControlTemplate>
@@ -105,13 +115,14 @@
                                IsOpen="{TemplateBinding IsDropDownOpen}"
                                Focusable="False">
                             <Grid MinWidth="{TemplateBinding ActualWidth}"
-                                  MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                  MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                  Background="{StaticResource MediumBackgroundBrush}"
+                                  Margin="0,2,0,0">
                                 <Border x:Name="DropDown"
                                         SnapsToDevicePixels="True"
                                         VerticalAlignment="Stretch"
                                         BorderThickness="1"
-                                        BorderBrush="{StaticResource DarkBackgroundBrush}"
-                                        Background="{StaticResource MediumBackgroundBrush}"/>
+                                        BorderBrush="{StaticResource BrightBorderBrush}"/>
                                 <ScrollViewer Margin="4,4,4,4">
                                     <StackPanel IsItemsHost="True" />
                                 </ScrollViewer>
@@ -125,17 +136,11 @@
                         <Trigger Property="IsGrouping" Value="true">
                             <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
                         </Trigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsEnabled" Value="True" />
-                                <Condition Property="IsFocused" Value="True" />
-                            </MultiTrigger.Conditions>
-                            <MultiTrigger.Setters>
-                                <Setter Property="BorderBrush" TargetName="ToggleButton" Value="{StaticResource SelectedBorderBrush}" />
-                            </MultiTrigger.Setters>
-                        </MultiTrigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="BorderBrush" TargetName="ToggleButton" Value="{StaticResource MouseoverBackgroundBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsDropDownOpen" Value="True" >
+                            <Setter Property="BorderBrush" TargetName="ToggleButton" Value="{StaticResource SelectedForegroundBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

@@ -4,17 +4,17 @@
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Opacity" Value="1"/>
         <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
-        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontSize" Value="17" />
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
         <Setter Property="BorderBrush" Value="Transparent" />
-        <Setter Property="Width" Value="28" />
-        <Setter Property="Height" Value="28" />
+        <Setter Property="Width" Value="30" />
+        <Setter Property="Height" Value="30" />
         <Setter Property="Margin" Value="2" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}" >
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0.5">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0" CornerRadius="6" >
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                 </ControlTemplate>

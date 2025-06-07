@@ -169,6 +169,7 @@ namespace AnnoMapEditor.UI.Windows.Main
         private void MainWindow_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
             mainWindowGrid.Focus();
+            Keyboard.ClearFocus();
         }
     }
 }
