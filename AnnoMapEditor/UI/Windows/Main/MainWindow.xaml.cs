@@ -7,6 +7,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Shell;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
@@ -163,6 +164,11 @@ namespace AnnoMapEditor.UI.Windows.Main
         public void OpenUndoHistoryPopup(object? sender, RoutedEventArgs e)
         {
             undoHistoryPopup.IsOpen = !undoHistoryPopup.IsOpen;
+        }
+
+        private void MainWindow_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            mainWindowGrid.Focus();
         }
     }
 }

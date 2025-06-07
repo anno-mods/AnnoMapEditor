@@ -1,4 +1,6 @@
-﻿using Anno.FileDBModels.Anno1800.MapTemplate;
+﻿using System;
+using System.Collections.Specialized;
+using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
@@ -74,39 +76,29 @@ namespace AnnoMapEditor.UI.Windows.Main
             set
             {
                 SetProperty(ref _selectedIsland, value);
-
-                if (value == null)
-                {
-                    SelectedRandomIslandPropertiesViewModel = null;
-                    SelectedFixedIslandPropertiesViewModel = null;
-                }
-                else if (value is RandomIslandElement randomIsland)
-                {
-                    SelectedRandomIslandPropertiesViewModel = new(randomIsland);
-                    SelectedFixedIslandPropertiesViewModel = null;
-                }
-                else if (value is FixedIslandElement fixedIsland)
-                {
-                    SelectedRandomIslandPropertiesViewModel = null;
-                    SelectedFixedIslandPropertiesViewModel = new(fixedIsland, MapTemplate!.Session.Region);
-                }
+                SelectedUnifiedIslandPropertiesViewModel.SetIsland(value, MapTemplate);
             }
         }
         private IslandElement? _selectedIsland;
 
-        public RandomIslandPropertiesViewModel? SelectedRandomIslandPropertiesViewModel
+        /**
+         * Make sute to notice if an element has been remove from the canvas. If it was selected, deselct it.
+         */
+        private void MapTemplate_ElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            get => _selectedRandomIslandPropertiesViewModel;
-            set => SetProperty(ref _selectedRandomIslandPropertiesViewModel, value);
+            if (SelectedIsland != null && !_mapTemplate.Elements.Contains(SelectedIsland))
+            {
+                SelectedIsland = null;
+            }
         }
-        private RandomIslandPropertiesViewModel? _selectedRandomIslandPropertiesViewModel;
+        
+        public UnifiedIslandPropertiesViewModel SelectedUnifiedIslandPropertiesViewModel
+        {
+            get => _selectedUnifiedIslandPropertiesViewModel;
+            set => SetProperty(ref _selectedUnifiedIslandPropertiesViewModel, value);
+        }
 
-        public FixedIslandPropertiesViewModel? SelectedFixedIslandPropertiesViewModel
-        {
-            get => _selectedFixedIslandPropertiesViewModel;
-            set => SetProperty(ref _selectedFixedIslandPropertiesViewModel, value);
-        }
-        private FixedIslandPropertiesViewModel? _selectedFixedIslandPropertiesViewModel;
+        private UnifiedIslandPropertiesViewModel _selectedUnifiedIslandPropertiesViewModel = new();
 
         public SelectIslandViewModel? SelectIslandViewModel
         {
@@ -133,6 +125,8 @@ namespace AnnoMapEditor.UI.Windows.Main
             MapTemplate = mapTemplate;
             if (Settings.Instance.DataPath != null)
                 Status = $"Game Path: {Settings.Instance.GamePath}";
+            
+            MapTemplate.Elements.CollectionChanged += MapTemplate_ElementsChanged;
         }
 
         public MainWindowViewModel()
@@ -140,6 +134,8 @@ namespace AnnoMapEditor.UI.Windows.Main
             CreateNewMap();
             if (Settings.Instance.DataPath != null)
                 Status = $"Game Path: {Settings.Instance.GamePath}" ;
+            
+            MapTemplate.Elements.CollectionChanged += MapTemplate_ElementsChanged;
         }
 
         public async Task OpenMap(string a7tinfoPath, bool fromArchive = false)

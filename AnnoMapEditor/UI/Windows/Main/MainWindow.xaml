@@ -18,6 +18,7 @@
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         Name="mainWindow"
+        MouseDown="MainWindow_OnMouseDown"
         Title="MainWindow" Height="900" Width="1440"
         WindowStyle="SingleBorderWindow"
         Background="{StaticResource BackgroundBrush}" 
@@ -50,7 +51,7 @@
             ResizeBorderThickness="5"/>
     </WindowChrome.WindowChrome>
 
-    <Grid Name="mainWindowGrid" ClipToBounds="True">
+    <Grid Name="mainWindowGrid" ClipToBounds="True" Focusable="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -78,8 +79,8 @@
             <Button Name="closeButton" Grid.Column="5" Content="&#xe8bb;" Style="{StaticResource WindowControlRed}" Click="CloseBtn_Click"/>
         </Grid>
 
-        <Border Grid.Row="1" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased"/>
-        <StackPanel Grid.Row="1" HorizontalAlignment="Left" Name="toolbarStackPanel" Orientation="Horizontal" Background="{StaticResource DarkBackgroundBrush}">
+        <Border Grid.Row="1" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased" BorderThickness="0,0,0,1" BorderBrush="{StaticResource BrightBorderBrush}"/>
+        <StackPanel Grid.Row="1" Background="{StaticResource DarkBackgroundBrush}" HorizontalAlignment="Left" Name="toolbarStackPanel" Orientation="Horizontal" Margin="0,0,0,2">
 
             <Popup Name="undoHistoryPopup" 
                    PlacementTarget="{Binding ElementName=undoDropdown}" 
@@ -201,7 +202,7 @@
                 DataContext="{Binding MapTemplate, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
 
             <!-- MapTemplate properties -->
-            <Border Grid.Column="0" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased"></Border>
+            <Border Grid.Column="0" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased" BorderBrush="{StaticResource BrightBorderBrush}" BorderThickness="0,0,1,0"></Border>
             <StackPanel Grid.Column="0">
                 <TextBlock
                     Margin="16,16,16,0"
@@ -238,10 +239,13 @@
             </StackPanel>
 
             <!-- island properties -->
-            <Border Grid.Column="2" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased"></Border>
+            <Border Grid.Column="2" Background="{StaticResource DarkBackgroundBrush}" RenderOptions.EdgeMode="Aliased" BorderBrush="{StaticResource BrightBorderBrush}" BorderThickness="1,0,0,0"></Border>
             <StackPanel Grid.Column="2">
+                <!--
                 <islandProperties:RandomIslandProperties DataContext="{Binding SelectedRandomIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
                 <islandProperties:FixedIslandProperties DataContext="{Binding SelectedFixedIslandPropertiesViewModel, UpdateSourceTrigger=PropertyChanged}" />
+                -->
+                <islandProperties:UnifiedIslandProperties DataContext="{Binding SelectedUnifiedIslandPropertiesViewModel}" />
             </StackPanel>
             
             <controls:Imprint Grid.Column="2"

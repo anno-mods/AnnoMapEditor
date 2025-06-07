@@ -74,7 +74,7 @@ namespace AnnoMapEditor.MapTemplates.Enums
                 case "colony01_3rdparty04_01":
                     return PirateIsland;
                 default:
-                    if (fileName.Contains("_d_")) return Decoration;
+                    if (fileName.Contains("_d_") || fileName.Contains("_dst_") || fileName.Contains("_battlesite_")|| fileName.Contains("_encounter_")) return Decoration;
                     return Normal;
             }
         }

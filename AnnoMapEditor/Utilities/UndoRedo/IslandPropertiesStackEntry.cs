@@ -11,7 +11,9 @@ namespace AnnoMapEditor.Utilities.UndoRedo
             bool? randomizeFertilities = null,
             bool? randomizeRotation = null,
             IslandType? oldIslandType = null,
-            IslandType? newIslandType = null
+            IslandType? newIslandType = null,
+            IslandSize? oldIslandSize = null,
+            IslandSize? newIslandSize = null
         ) {
             _element = element;
             _randomizeSlots = randomizeSlots;
@@ -19,6 +21,8 @@ namespace AnnoMapEditor.Utilities.UndoRedo
             _randomizeRotation = randomizeRotation;
             _oldIslandType = oldIslandType;
             _newIslandType = newIslandType;
+            _oldIslandSize = oldIslandSize;
+            _newIslandSize = newIslandSize;
         }
         
         private readonly IslandElement _element;
@@ -27,6 +31,8 @@ namespace AnnoMapEditor.Utilities.UndoRedo
         private readonly bool? _randomizeRotation;
         private readonly IslandType? _oldIslandType;
         private readonly IslandType? _newIslandType;
+        private readonly IslandSize? _oldIslandSize;
+        private readonly IslandSize? _newIslandSize;
 
         public ActionType ActionType => ActionType.IslandProperties;
 
@@ -34,30 +40,30 @@ namespace AnnoMapEditor.Utilities.UndoRedo
         {
             if (_element is FixedIslandElement fixedIsland)
             {
-                if (_randomizeSlots != null) fixedIsland.RestoreRandomizeSlots(!_randomizeSlots.Value);
-                if (_randomizeFertilities != null) fixedIsland.RestoreRandomizeFertilities(!_randomizeFertilities.Value);
-                if (_randomizeRotation != null) fixedIsland.RestoreRandomizeRotation(!_randomizeRotation.Value);
-            }
-
-            if (_element is IslandElement island)
+                if (_randomizeSlots != null) fixedIsland.RandomizeSlots = !_randomizeSlots.Value;
+                if (_randomizeFertilities != null) fixedIsland.RandomizeFertilities = !_randomizeFertilities.Value;
+                if (_randomizeRotation != null) fixedIsland.RandomizeRotation = !_randomizeRotation.Value;
+            } 
+            else if (_element is RandomIslandElement randomIsland)
             {
-                if (_oldIslandType != null) island.RestoreIslandType(_oldIslandType);
+                if (_oldIslandSize != null) randomIsland.IslandSize = _oldIslandSize;    
             }
+            if (_oldIslandType != null) _element.IslandType = _oldIslandType;
         }
 
         public void Redo()
         {
             if (_element is FixedIslandElement fixedIsland)
             {
-                if (_randomizeSlots != null) fixedIsland.RestoreRandomizeSlots(_randomizeSlots.Value);
-                if (_randomizeFertilities != null) fixedIsland.RestoreRandomizeFertilities(_randomizeFertilities.Value);
-                if (_randomizeRotation != null) fixedIsland.RestoreRandomizeRotation(_randomizeRotation.Value);
+                if (_randomizeSlots != null) fixedIsland.RandomizeSlots = _randomizeSlots.Value;
+                if (_randomizeFertilities != null) fixedIsland.RandomizeFertilities = _randomizeFertilities.Value;
+                if (_randomizeRotation != null) fixedIsland.RandomizeRotation = _randomizeRotation.Value;
             }
-            
-            if (_element is IslandElement island)
+            else if (_element is RandomIslandElement randomIsland)
             {
-                if (_newIslandType != null) island.RestoreIslandType(_newIslandType);
+                if (_newIslandSize != null) randomIsland.IslandSize = _newIslandSize;    
             }
+            if (_newIslandType != null) _element.IslandType = _newIslandType;
         }
     }
 }

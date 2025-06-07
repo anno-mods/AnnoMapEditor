@@ -1,0 +1,133 @@
+﻿<UserControl x:Class="AnnoMapEditor.UI.Controls.IslandProperties.UnifiedIslandProperties"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls.IslandProperties"
+             xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
+             xmlns:maptemplates="clr-namespace:AnnoMapEditor.UI.Controls.MapTemplates"
+             xmlns:controls="clr-namespace:AnnoMapEditor.UI.Controls"
+             xmlns:fertilities="clr-namespace:AnnoMapEditor.UI.Controls.Fertilities"
+             xmlns:slots="clr-namespace:AnnoMapEditor.UI.Controls.Slots"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="350">
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Resources/Styles.xaml" />
+                <ResourceDictionary>
+                    <converters:ObjectToVisibility x:Key="CollapsedOnNull" />
+                    <converters:BoolToVisibility x:Key="VisibleOnTrue" OnTrue="Visible" OnFalse="Collapsed" />
+                    <converters:BoolToVisibility x:Key="VisibleOnFalse" OnTrue="Collapsed" OnFalse="Visible" />
+                    <converters:BooleaNotConverter x:Key="TrueOnFalse" />
+                    <converters:RotationIndexToAngleText x:Key="IntToAngle"/>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <StackPanel Background="{StaticResource DarkBackgroundBrush}"
+                Margin="16">
+        <!-- Header -->
+        <TextBlock Text="{Binding IslandCategoryLabel, FallbackValue=Properties Title}"
+                   Style="{StaticResource HeaderLabelStyle}"
+                   Margin="2"/>
+        <Separator Background="{StaticResource BrightBorderBrush}" />
+        <!--<TextBlock Text="{Binding IslandCategoryLabel}"
+                   Style="{StaticResource SubHeaderLabelStyle}"
+                   Margin="20, 0"/>-->
+        <StackPanel Visibility="{Binding SelectedIsland, Converter={StaticResource CollapsedOnNull}, FallbackValue=Visible}">
+            <!-- Label -->
+            <TextBlock Text="Label"
+                       Style="{StaticResource SubHeaderLabelStyle}"/>
+            <TextBox Margin="5"
+                     Text="{Binding SelectedIsland.Label, Mode=OneWay}"/>
+            
+            <!-- Position -->
+            <TextBlock Text="Position"
+                       Style="{StaticResource SubHeaderLabelStyle}"/>
+            <Grid HorizontalAlignment="Stretch"
+                  Height="30"
+                  Margin="0,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="X" Style="{StaticResource DefaultLabelStyle}" />
+                <TextBox   VerticalAlignment="Center" Grid.Column="1" Margin="5,0" Text="{Binding SelectedIsland.Position.X, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
+                <TextBlock VerticalAlignment="Center" Grid.Column="3" Text="Y" Style="{StaticResource DefaultLabelStyle}" />
+                <TextBox   VerticalAlignment="Center" Grid.Column="4" Margin="5,0" Text="{Binding SelectedIsland.Position.Y, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
+            </Grid>
+            <!-- Rotation -->
+            <Grid Visibility="{Binding IslandRotationPropertiesVisible, Converter={StaticResource VisibleOnTrue}}"
+                  Height="30"
+                  Margin="0,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox IsChecked="{Binding SelectedIsland.RandomizeRotation, Mode=OneWay}"
+                          HorizontalAlignment="Right" VerticalAlignment="Center"
+                          Click="ButtonBase_OnClick"
+                          Name="RotationCheckbox"
+                          Content="Random Rotation"/>
+                <Button Grid.Column="2" Style="{StaticResource ToolbarButton}" 
+                        IsEnabled="{Binding SelectedIsland.RandomizeRotation, Converter={StaticResource TrueOnFalse}}"
+                        Click="OnRotateCounterClockwise"
+                        FontWeight="Black" FontSize="25" Content="&#xe80c;"/>
+                <TextBox Grid.Column="3" 
+                         VerticalAlignment="Center"
+                         IsEnabled="False" 
+                         TextAlignment="Center"
+                         Text="{Binding SelectedIsland.Rotation, Converter={StaticResource IntToAngle}}"/>
+                <Button Grid.Column="4" Style="{StaticResource ToolbarButton}" 
+                        IsEnabled="{Binding SelectedIsland.RandomizeRotation, Converter={StaticResource TrueOnFalse}}"
+                        Click="OnRotateClockwise"
+                        FontWeight="Black" FontSize="25" Content="&#xe80d;"/>
+            </Grid>
+            
+            <!-- IslandType -->
+            <StackPanel Visibility="{Binding IslandTypeItemsVisible, Converter={StaticResource VisibleOnTrue}}">
+                <TextBlock Text="Island Type"
+                           Style="{StaticResource SubHeaderLabelStyle}"/>
+                <ComboBox Margin="2"
+                          Name="IslandTypeComboBox"
+                          DropDownClosed="IslandTypeComboBox_OnDropDownClosed"
+                          ItemsSource="{Binding IslandTypeItems}"
+                          SelectedItem="{Binding SelectedIsland.IslandType, Mode=OneWay}"/>
+            </StackPanel>
+            
+            <!-- IslandSize -->
+            <StackPanel Visibility="{Binding IslandSizeItemsVisible, Converter={StaticResource VisibleOnTrue}}">
+                <TextBlock Text="Island Size"
+                           Style="{StaticResource SubHeaderLabelStyle}"
+                           Visibility="{Binding ShowIslandSizeItems, Converter={StaticResource VisibleOnTrue}}"/>
+                <ComboBox Margin="2"
+                          Name="IslandSizeComboBox"
+                          DropDownClosed="IslandSizeComboBox_OnDropDownClosed"
+                          ItemsSource="{Binding IslandSizeItems}"
+                          SelectedItem="{Binding SelectedIsland.IslandSize, Mode=OneWay}"
+                          Visibility="{Binding ShowIslandSizeItems, Converter={StaticResource VisibleOnTrue}}"/>
+            </StackPanel>
+            
+            <!-- Slots and Fertilities -->
+            <StackPanel Visibility="{Binding SlotsAndFertilitiesVisible, Converter={StaticResource VisibleOnTrue}}">
+                <!-- Fertilities -->
+                <fertilities:FertilityControl DataContext="{Binding FertilitiesViewModel}" />
+        
+                <!-- Slots -->
+                <slots:SlotsControl DataContext="{Binding SlotsViewModel}" />
+            </StackPanel>
+            
+        </StackPanel>
+        
+    </StackPanel>
+    
+</UserControl>

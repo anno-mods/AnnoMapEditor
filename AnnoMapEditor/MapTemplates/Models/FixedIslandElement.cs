@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using AnnoMapEditor.Utilities.UndoRedo;
 using IslandType = AnnoMapEditor.MapTemplates.Enums.IslandType;
 
 namespace AnnoMapEditor.MapTemplates.Models
@@ -40,16 +39,9 @@ namespace AnnoMapEditor.MapTemplates.Models
         {
             get => _randomizeRotation;
             set {
-                UndoRedoStack.Instance.Do(new IslandPropertiesStackEntry(this, randomizeRotation:  value));
                 SetProperty(ref _randomizeRotation, value);
                 if (!value && Rotation == null) Rotation = 0;
             }
-        }
-
-        public void RestoreRandomizeRotation(bool randomizeRotation)
-        {
-            SetProperty(ref _randomizeRotation, randomizeRotation, propertyName: nameof(RandomizeRotation));
-            if (!randomizeRotation && Rotation == null) Rotation = 0;
         }
         private bool _randomizeRotation = true;
 
@@ -67,15 +59,7 @@ namespace AnnoMapEditor.MapTemplates.Models
         public bool RandomizeFertilities
         {
             get => _randomizeFertilities;
-            set
-            {
-                UndoRedoStack.Instance.Do(new IslandPropertiesStackEntry(this, randomizeFertilities: value));
-                SetProperty(ref _randomizeFertilities, value);
-            }
-        }
-        public void RestoreRandomizeFertilities(bool randomizeFertilities)
-        {
-            SetProperty(ref _randomizeFertilities, randomizeFertilities, propertyName: nameof(RandomizeFertilities));
+            set => SetProperty(ref _randomizeFertilities, value);
         }
         private bool _randomizeFertilities = true;
 
@@ -84,14 +68,7 @@ namespace AnnoMapEditor.MapTemplates.Models
         public bool RandomizeSlots
         {
             get => _randomizeSlots;
-            set {
-                UndoRedoStack.Instance.Do(new IslandPropertiesStackEntry(this, randomizeSlots: value));
-                SetProperty( ref _randomizeSlots, value);
-            }
-        }
-        public void RestoreRandomizeSlots(bool randomizeSlots)
-        {
-            SetProperty(ref _randomizeSlots, randomizeSlots, propertyName: nameof(RandomizeSlots));
+            set => SetProperty( ref _randomizeSlots, value);
         }
         private bool _randomizeSlots = true;
 
