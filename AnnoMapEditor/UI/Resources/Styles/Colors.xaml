@@ -15,6 +15,9 @@
     <Brush x:Key="DialogBrush">#ef182B3F</Brush>
     <Brush x:Key="ErrorBrush">#ee0000</Brush>
     <Brush x:Key="OkBrush">#00aa00</Brush>
+    <Brush x:Key="ErrorBackgroundBrush">#DB5C5C</Brush>
+    <Brush x:Key="WarningBackgroundBrush">#F2C55C</Brush>
+    <Brush x:Key="OkBackgroundBrush">#5FAD65</Brush>
     <Brush x:Key="ActiveWindowBorderBrush">#2C6593</Brush>
     <Brush x:Key="InactiveWindowBorderBrush">#39434C</Brush>
     <Brush x:Key="WaterBlueBrush">#0D1F2E</Brush>
@@ -29,7 +32,7 @@
     <Brush x:Key="MediumForegroundBrush">#BABABA</Brush>
     <Brush x:Key="DarkForegroundBrush">#898989</Brush>
     <Brush x:Key="BrightBorderBrush">#2F363F</Brush>
-    <RadialGradientBrush x:Key="GradientBrush" Center="-0.2, 2" RadiusX="1.27" RadiusY="9">
+    <RadialGradientBrush x:Key="GradientBrushBright" Center="-0.2, 2" RadiusX="1.27" RadiusY="9">
         <GradientStop Color="#121619" Offset="0.0" />
         <GradientStop Color="#121619" Offset="0.3" />
         <GradientStop Color="#743745" Offset="0.48" />
@@ -37,5 +40,14 @@
         <GradientStop Color="#6ac549" Offset="0.77" />
         <GradientStop Color="#4d67ce" Offset="0.88" />
         <GradientStop Color="#a77dc7" Offset="0.99" />
+    </RadialGradientBrush>
+    <RadialGradientBrush x:Key="GradientBrush" Center="-0.2, 2" RadiusX="1.27" RadiusY="9">
+        <GradientStop Color="#121619" Offset="0.0" />
+        <GradientStop Color="#121619" Offset="0.3" />
+        <GradientStop Color="#201B1F" Offset="0.48" />
+        <GradientStop Color="#23221F" Offset="0.65" />
+        <GradientStop Color="#212D1F" Offset="0.77" />
+        <GradientStop Color="#1C272D" Offset="0.88" />
+        <GradientStop Color="#202334" Offset="0.99" />
     </RadialGradientBrush>
 </ResourceDictionary>

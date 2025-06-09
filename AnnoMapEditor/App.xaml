@@ -7,6 +7,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="UI/Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/FontFamilies.xaml" />
                 <ResourceDictionary Source="UI/Resources/Styles/Button.xaml" />
                 <ResourceDictionary Source="UI/Resources/Styles/ToggleButton.xaml" />
                 <ResourceDictionary Source="UI/Resources/Styles/TextBox.xaml" />
@@ -19,7 +20,7 @@
                 <ResourceDictionary Source="UI/Resources/Styles/ToolbarButton.xaml" />
                 <ResourceDictionary Source="UI/Resources/Styles/ContextMenu.xaml" />
                 <ResourceDictionary Source="UI/Resources/Styles/ToolTip.xaml" />
-                <ResourceDictionary Source="/UI/Resources/Styles/Scrollbar.xaml" />
+                <ResourceDictionary Source="UI/Resources/Styles/Scrollbar.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

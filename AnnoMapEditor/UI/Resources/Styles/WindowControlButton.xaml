@@ -3,7 +3,7 @@
     <Style TargetType="{x:Type Button}" x:Key="WindowControlDefault">
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Opacity" Value="1"/>
-        <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+        <Setter Property="FontFamily" Value="{StaticResource SymbolFont}" />
         <Setter Property="FontSize" Value="10" />
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="#f0f0f0" />

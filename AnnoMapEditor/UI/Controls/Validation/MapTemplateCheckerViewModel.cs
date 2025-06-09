@@ -36,6 +36,13 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             private set => SetProperty(ref _hasErrors, value);
         }
         private bool _hasErrors;
+        
+        public bool HasErrorsOrWarnings
+        {
+            get => _hasErrorsOrWarnings;
+            private set => SetProperty(ref _hasErrorsOrWarnings, value);
+        }
+        private bool _hasErrorsOrWarnings;
 
 
         public MapTemplateCheckerViewModel(MapTemplate mapTemplate)
@@ -82,6 +89,7 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
             HasErrors = hasErrors;
             HasWarnings = hasWarnings;
+            HasErrorsOrWarnings = hasErrors || hasWarnings;
         }
     }
 }

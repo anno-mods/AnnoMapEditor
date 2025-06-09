@@ -1,6 +1,8 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/UI/Resources/Styles/Colors.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/FontFamilies.xaml" />
         <ResourceDictionary Source="/UI/Resources/Styles/Button.xaml" />
         <ResourceDictionary Source="/UI/Resources/Styles/ToggleButton.xaml" />
         <ResourceDictionary Source="/UI/Resources/Styles/TextBox.xaml" />
@@ -15,5 +17,6 @@
         <ResourceDictionary Source="/UI/Resources/Styles/ContextMenu.xaml" />
         <ResourceDictionary Source="/UI/Resources/Styles/ToolTip.xaml" />
         <ResourceDictionary Source="/UI/Resources/Styles/Scrollbar.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/FancyToggleButton.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

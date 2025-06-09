@@ -3,7 +3,7 @@
     <Style TargetType="{x:Type Button}" x:Key="ToolbarButton">
         <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="Opacity" Value="1"/>
-        <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+        <Setter Property="FontFamily" Value="{StaticResource SymbolFont}" />
         <Setter Property="FontSize" Value="17" />
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />

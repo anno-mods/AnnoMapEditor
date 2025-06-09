@@ -31,7 +31,7 @@
     <SolidColorBrush x:Key="Menu.Static.Separator" Color="{Binding Color, Source={StaticResource BrightBorderBrush}}"/>
     <SolidColorBrush x:Key="Menu.Disabled.Foreground" Color="{Binding Color, Source={StaticResource DisabledBrush}}"/>
     <SolidColorBrush x:Key="MenuItem.Selected.Background" Color="{Binding Color, Source={StaticResource SelectedBackgroundBrush}}"/>
-    <SolidColorBrush x:Key="MenuItem.Selected.Foreground" Color="{Binding Color, Source={StaticResource SelectedForegroundBrush}}"/>
+    <SolidColorBrush x:Key="MenuItem.Selected.Foreground" Color="{Binding Color, Source={StaticResource ForegroundBrush}}"/>
     <SolidColorBrush x:Key="MenuItem.Selected.Border" Color="{Binding Color, Source={StaticResource SelectedBorderBrush}}"/>
     <SolidColorBrush x:Key="MenuItem.Highlight.Background" Color="{Binding Color, Source={StaticResource MouseoverBackgroundBrush}}"/>
     <SolidColorBrush x:Key="MenuItem.Highlight.Border" Color="{Binding Color, Source={StaticResource MouseoverBorderBrush}}"/>
@@ -106,7 +106,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <ContentPresenter x:Name="Icon" ContentSource="Icon" HorizontalAlignment="Center" Height="16" Margin="3" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center" Width="16"/>
+                <ContentPresenter x:Name="Icon" ContentSource="Icon" HorizontalAlignment="Center" Width="auto" Height="16" Margin="3" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>
                 <Path x:Name="GlyphPanel" Data="{StaticResource Checkmark}" FlowDirection="LeftToRight" Fill="{StaticResource Menu.Static.Foreground}" Margin="3" VerticalAlignment="Center" Visibility="Collapsed"/>
                 <ContentPresenter ContentSource="Header" Grid.Column="1" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
             </Grid>
@@ -144,7 +144,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <ContentPresenter x:Name="Icon" ContentSource="Icon" HorizontalAlignment="Center" Height="16" Margin="3" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center" Width="16"/>
+                <ContentPresenter x:Name="Icon" ContentSource="Icon" HorizontalAlignment="Center" Width="auto" Height="16" Margin="3" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>
                 <Path x:Name="GlyphPanel" Data="{StaticResource Checkmark}" FlowDirection="LeftToRight" Fill="{StaticResource Menu.Static.Foreground}" Margin="3" VerticalAlignment="Center" Visibility="Collapsed"/>
                 <ContentPresenter ContentSource="Header" Grid.Column="1" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                 <Popup x:Name="PART_Popup" 
@@ -206,7 +206,7 @@
                     <ColumnDefinition Width="20"/>
                 </Grid.ColumnDefinitions>
                 <ContentPresenter x:Name="Icon" ContentSource="Icon" HorizontalAlignment="Center" Height="16" Margin="3" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center" Width="16"/>
-                <Border x:Name="GlyphPanel" Background="{StaticResource MenuItem.Selected.Background}" BorderBrush="{StaticResource MenuItem.Selected.Border}" BorderThickness="1" ClipToBounds="False" HorizontalAlignment="Center" Height="22" Margin="-1,0,0,0" VerticalAlignment="Center" Visibility="Hidden" Width="22">
+                <Border x:Name="GlyphPanel" Background="{StaticResource MenuItem.Selected.Background}" ClipToBounds="False" HorizontalAlignment="Center" Height="22" Width="22" Margin="2,0,0,0" VerticalAlignment="Center" Visibility="Hidden" CornerRadius="3">
                     <Path x:Name="Glyph" Data="{StaticResource Checkmark}" FlowDirection="LeftToRight" Fill="{StaticResource MenuItem.Selected.Foreground}" Height="11" Width="10"/>
                 </Border>
                 <ContentPresenter x:Name="menuHeaderContainer" ContentSource="Header" Grid.Column="2" HorizontalAlignment="Left" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>

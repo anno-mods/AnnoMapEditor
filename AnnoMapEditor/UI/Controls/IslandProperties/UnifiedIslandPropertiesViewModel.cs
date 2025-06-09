@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
+using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
-using AnnoMapEditor.UI.Controls.Fertilities;
 using AnnoMapEditor.UI.Controls.Slots;
+using AnnoMapEditor.UI.Overlays.SelectFertilities;
 using AnnoMapEditor.Utilities;
 using AnnoMapEditor.Utilities.UndoRedo;
 
@@ -33,45 +36,90 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
             [MapElementType.FixedIsland] = new() { IslandType.Normal, IslandType.Starter},
             [MapElementType.PoolIsland]  = new() { IslandType.Normal, IslandType.Starter, IslandType.ThirdParty, IslandType.PirateIsland },
         };
-
-        public MapTemplate? MapTemplate
-        {
-            get => _mapTemplate;
-            private set =>  SetProperty(ref _mapTemplate, value);
-        }
-        private MapTemplate? _mapTemplate;
         
-        public IslandElement? SelectedIsland { get; private set; }
+        /**
+         * Properties used for UI representation:
+         */
         public string IslandCategoryLabel => GetIslandCategoryLabel();
-        public ObservableCollection<IslandType> IslandTypeItems { get; } = new();
-        public bool IslandTypeItemsVisible => IslandTypeItems.Count > 1;
         public ObservableCollection<IslandSize> IslandSizeItems { get; } = new();
         public bool IslandSizeItemsVisible => IslandSizeItems.Count > 1;
+        public ObservableCollection<IslandType> IslandTypeItems { get; } = new();
+        public bool IslandTypeItemsVisible => IslandTypeItems.Count > 1;
+        public bool RandomizeRotation
+        {
+            get => (SelectedIsland as FixedIslandElement)?.RandomizeRotation ?? true;
+            set
+            {
+                SetRandomIslandRotation(value);
+                OnPropertyChanged();
+            }
+        }
+        public byte? IslandRotation => (SelectedIsland as FixedIslandElement)?.Rotation;
         public bool IslandRotationPropertiesVisible => (SelectedIsland is FixedIslandElement && 
                                                         (SelectedIsland as FixedIslandElement)?.IslandAsset.IslandSize.FirstOrDefault() != IslandSize.Continental);
+        public bool RandomizeFertilities
+        {
+            get => (SelectedIsland as FixedIslandElement)?.RandomizeFertilities ?? true;
+            set
+            {
+                if (SelectedIsland is FixedIslandElement fixedIsland)
+                {
+                    fixedIsland.RandomizeFertilities = value;
+                    UndoRedoStack.Instance.Do(new IslandPropertiesStackEntry(fixedIsland, randomizeFertilities: value));
+                }
+                OnPropertyChanged();;
+            }
+        }
+        public ObservableCollection<SelectFertilityItem> FertilityItems { get; private set; } = new();
         public bool SlotsAndFertilitiesVisible => (SelectedIsland is FixedIslandElement &&
                                                    (SelectedIsland.IslandType == IslandType.Normal ||
                                                     SelectedIsland.IslandType == IslandType.Starter));
-        public FertilitiesViewModel? FertilitiesViewModel { get; private set; }
+        public bool AllowedFertilitiesWarning => FertilityItems.Any(f => !f.IsAllowed && f.IsSelected)
+                                                 && !RandomizeFertilities;
         public SlotsViewModel? SlotsViewModel { get; private set; }
+
+        public IslandSize? IslandSize => (SelectedIsland as RandomIslandElement)?.IslandSize;
+        
+        
+        /**
+         * Properties only set inside viewmodel
+         */
+        public MapTemplate? MapTemplate { get; private set; }
+        public IslandElement? SelectedIsland { get; private set; }
+        
         
         /**
          * Set the Island to be used by the Island Properties.
          */
         public void SetIsland(IslandElement? island, MapTemplate? mapTemplate)
         {
+            // Making sure to remove callbacks when changing Island or MapTemplate
+            if (SelectedIsland != null)
+                SelectedIsland.PropertyChanged -= SelectedIsland_PropertyChanged;
+            if (MapTemplate != null)
+                MapTemplate.PropertyChanged -= SelectedIsland_PropertyChanged;
+            if (SelectedIsland is FixedIslandElement oldFixedIsland)
+                oldFixedIsland.Fertilities.CollectionChanged -= Fertilities_CollectionChanged;
+            
+            // Assign new Island and MapTemplate
             SelectedIsland = island;
             MapTemplate = mapTemplate;
             
-            UpdatePropertyChanges();
-            MapTemplateChanged();
+            // Add Callbacks again to new Island MapTemplate
+            if (SelectedIsland != null)
+                SelectedIsland.PropertyChanged += SelectedIsland_PropertyChanged;
+            if (MapTemplate != null)
+                MapTemplate.PropertyChanged += SelectedIsland_PropertyChanged;
+            if (SelectedIsland is FixedIslandElement fixedIsland)
+                fixedIsland.Fertilities.CollectionChanged += Fertilities_CollectionChanged;
             
-            OnPropertyChanged(nameof(SlotsAndFertilitiesVisible));
+            UpdatePropertyChanges();
+            UpdateSelectedFertilities();
+            
+            OnPropertyChanged(nameof(MapTemplate));
             OnPropertyChanged(nameof(IslandCategoryLabel));
             OnPropertyChanged(nameof(IslandRotationPropertiesVisible));
-
-            if (MapTemplate != null)
-                MapTemplate.PropertyChanged += (sender, args) => { MapTemplateChanged(); };
+            OnPropertyChanged(nameof(SlotsAndFertilitiesVisible));
         }
 
         /**
@@ -138,7 +186,7 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         /**
          * Enable or disable random island rotation and put it on the Undo/Redo Stack.
          */
-        public void SetRandomIslandRotation(bool randomRotation)
+        private void SetRandomIslandRotation(bool randomRotation)
         {
             if (SelectedIsland is not FixedIslandElement fixedIsland) return;
             
@@ -174,6 +222,15 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         }
 
         /**
+         * Callback for island property changes
+         */
+        private void SelectedIsland_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            UpdatePropertyChanges();
+            UpdateSelectedFertilities();
+        }
+
+        /**
          * Notify property changes and update lists of viable sizes and types.
          */
         private void UpdatePropertyChanges()
@@ -183,33 +240,51 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
             if (SelectedIsland is FixedIslandElement fixedIsland)
             {
                 if (fixedIsland.IslandType == IslandType.Normal || fixedIsland.IslandType == IslandType.Starter)
-                    IslandTypeItems.AddRange(AllowedTypesPerElementType[MapElementType.FixedIsland]);
+                    IslandTypeItems.AddRange(fixedIsland.IslandAsset.IslandType);
             }
             else if (SelectedIsland is RandomIslandElement randomIsland)
             {
                 IslandTypeItems.AddRange(AllowedTypesPerElementType[MapElementType.PoolIsland]);
                 IslandSizeItems.AddRange(AllowedSizesPerType[randomIsland.IslandType]);
             }
+            OnPropertyChanged(nameof(SelectedIsland));
             OnPropertyChanged(nameof(IslandTypeItemsVisible));
             OnPropertyChanged(nameof(IslandSizeItemsVisible));
-            OnPropertyChanged(nameof(SelectedIsland));
+            OnPropertyChanged(nameof(RandomizeFertilities));
+            OnPropertyChanged(nameof(AllowedFertilitiesWarning));
+            OnPropertyChanged(nameof(RandomizeRotation));
+            OnPropertyChanged(nameof(IslandSize));
+            OnPropertyChanged(nameof(IslandRotation));
         }
 
         /**
-         * When the map template changes, update te relevant components to reflect the overall map properties within
-         * the island properties.
+         * Set a specific fertility to a new state.
          */
-        private void MapTemplateChanged()
+        private void SetFertility(FertilityAsset fertility, bool isSelected)
         {
-            OnPropertyChanged(nameof(MapTemplate));
-            if (SelectedIsland is FixedIslandElement fixedIsland && MapTemplate != null)
+            if (SelectedIsland is not FixedIslandElement fixedIsland) return;
+
+            if (fixedIsland.Fertilities.Contains(fertility) && !isSelected)
             {
-                FertilitiesViewModel = new(fixedIsland, MapTemplate.Session.Region);
-                SlotsViewModel = new(fixedIsland, MapTemplate.Session.Region);
-                OnPropertyChanged(nameof(FertilitiesViewModel));
-                OnPropertyChanged(nameof(SlotsViewModel));
-                System.Diagnostics.Debug.WriteLine("MapTemplate config changed");
+                // removing a fertility:
+                fixedIsland.Fertilities.Remove(fertility);
+                UndoRedoStack.Instance.Do(new IslandFertilitiesStackEntry(fixedIsland, false, fertility));
             }
+            else if (!fixedIsland.Fertilities.Contains(fertility) && isSelected)
+            {
+                // adding a fertility:
+                fixedIsland.Fertilities.Add(fertility);
+                UndoRedoStack.Instance.Do(new IslandFertilitiesStackEntry(fixedIsland, true, fertility));
+            }
+        }
+
+        /**
+         * Callback for changed fertilities.
+         */
+        private void Fertilities_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (SelectedIsland is not FixedIslandElement) return;
+            UpdateSelectedFertilities();
         }
         
         /**
@@ -224,6 +299,53 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
                 RandomIslandElement => "Random Island Properties",
                 _ => "Unknown Map Element"
             };
+        }
+
+        /**
+         * Update the List of selectable fertilities depending on the map templates region.
+         */
+        private void UpdateSelectedFertilities()
+        {
+            if (SelectedIsland is FixedIslandElement fixedIsland && MapTemplate != null)
+            {
+                var allowedFertilities = MapTemplate.Session.Region.AllowedFertilities
+                    .Distinct()
+                    .ToList();
+                
+                // Update selection and allowance of each selector.
+                // also remove fertility selector if it is not allowed or not selected. Keep unallowed if it has been 
+                // selected before. It will be marked with a warning.
+                foreach (var fertilityItem in FertilityItems.ToList())
+                {
+                    fertilityItem.IsSelected = fixedIsland.Fertilities.Contains(fertilityItem.FertilityAsset);
+                    fertilityItem.IsAllowed = allowedFertilities.Contains(fertilityItem.FertilityAsset);
+                    if (fertilityItem is { IsAllowed: false, IsSelected: false })
+                        FertilityItems.Remove(fertilityItem);
+                }
+                
+                // Merge allowed and selected fertilities to determine what selectors should be shown.
+                var mergedAllowedFertilities = new List<FertilityAsset>(allowedFertilities);
+                mergedAllowedFertilities.AddRange(fixedIsland.Fertilities);
+                
+                // If a fertility is not contained in the items list yet, add it. 
+                foreach (var allowedFertility in mergedAllowedFertilities)
+                    if (FertilityItems.All(f => f.FertilityAsset != allowedFertility))
+                    {
+                        SelectFertilityItem newItem = new(SetFertility)
+                        {
+                            FertilityAsset = allowedFertility,
+                            IsSelected = fixedIsland.Fertilities.Contains(allowedFertility),
+                            IsAllowed = allowedFertilities.Contains(allowedFertility)
+                        };
+                        FertilityItems.Add(newItem);
+                    }
+                
+                // Update the warning property to show hint
+                OnPropertyChanged(nameof(AllowedFertilitiesWarning));
+                
+                SlotsViewModel = new SlotsViewModel(fixedIsland, MapTemplate.Session.Region);
+                OnPropertyChanged(nameof(SlotsViewModel));
+            }
         }
     }
 }

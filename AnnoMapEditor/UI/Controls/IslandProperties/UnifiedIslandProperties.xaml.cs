@@ -33,25 +33,5 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         {
             ViewModel.RotateIsland(true);
         }
-
-        private void RandomizeRotationToggle_OnValueChanged(object sender, RoutedEventArgs e)
-        {
-            ViewModel.SetRandomIslandRotation((sender as FancyToggle).IsChecked);
-        }
-
-        private void ToggleButton_OnChecked(object sender, RoutedEventArgs e)
-        {
-            ViewModel.SetRandomIslandRotation(true);
-        }
-
-        private void ToggleButton_OnUnchecked(object sender, RoutedEventArgs e)
-        {
-            ViewModel.SetRandomIslandRotation(false);
-        }
-
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            ViewModel.SetRandomIslandRotation(RotationCheckbox?.IsChecked ?? false);
-        }
     }
 }

@@ -12,5 +12,6 @@ namespace AnnoMapEditor.Utilities.UndoRedo
         IslandAdd,
         IslandRemove,
         IslandProperties,
+        IslandFertilities,
     }
 }

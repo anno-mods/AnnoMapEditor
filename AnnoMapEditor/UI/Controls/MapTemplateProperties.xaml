@@ -20,78 +20,96 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <StackPanel Visibility="{Binding Converter={StaticResource CollapsedOnNull}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch">
-        <TextBlock
-            Style="{StaticResource DefaultLabelStyle}"
-            HorizontalAlignment="Left"
-            Text="{Binding MapSizeText}"/>
-        <ComboBox
-            Margin="0"
-            HorizontalAlignment="Stretch"
-            ItemsSource="{Binding SupportedSessions}"
-            SelectedItem="{Binding SelectedSession}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="{Binding Icon}" 
-                               MaxHeight="20" />
-                        <TextBlock Text="{Binding DisplayName}"
-                                   VerticalAlignment="Center"
-                                   Margin="8 0 0 0" />
-                    </StackPanel>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Grid>
+            <TextBlock Text="Session properties"
+                       Style="{StaticResource HeaderLabelStyle}"
+                       Margin="16,4"/>
+            <Border BorderBrush="{StaticResource BrightBorderBrush}" BorderThickness="0,0,0,1" SnapsToDevicePixels="True" />
+        </Grid>
+        <StackPanel Grid.Row="1" 
+                    HorizontalAlignment="Stretch"
+                    Margin="16,0">
+            <TextBlock
+                Style="{StaticResource DefaultLabelStyle}"
+                HorizontalAlignment="Left"
+                Text="{Binding MapSizeText}"/>
+            <ComboBox
+                Margin="0"
+                HorizontalAlignment="Stretch"
+                ItemsSource="{Binding SupportedSessions}"
+                SelectedItem="{Binding SelectedSession}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Icon}" 
+                                   MaxHeight="20" />
+                            <TextBlock Text="{Binding DisplayName}"
+                                       VerticalAlignment="Center"
+                                       Margin="8 0 0 0" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
 
-        <Expander>
-            <Expander.Header>
-                <TextBlock Style="{StaticResource DefaultLabelStyle}" Text="Custom Size Configuration" />
-            </Expander.Header>
-            <Grid HorizontalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <!-- Map Size -->
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-
-                </Grid.RowDefinitions>
-
-                <!-- Map Size -->
-                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Map Area:" />
-                <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultLabelStyle}">
-                            <Run Text="{Binding MapSize, Mode=OneWay}"/>
-                            <Run Text="x"/>
-                            <Run Text="{Binding MapSize, Mode=OneWay}"/>
-                </TextBlock>
-                <Grid Grid.Row="1" Grid.ColumnSpan="2">
+            <Expander>
+                <Expander.Header>
+                    <TextBlock Style="{StaticResource DefaultLabelStyle}" Text="Custom Size Configuration" />
+                </Expander.Header>
+                <Grid HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="{Binding MinMapSize, Mode=OneTime}"/>
-                    <Slider Grid.Column="1" VerticalAlignment="Center" 
-                                    Minimum="{Binding MinMapSize, Mode=OneTime}" 
-                                    Maximum="{Binding MaxMapSize, Mode=OneTime}" 
-                                    Value="{Binding MapSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                    TickFrequency="64" IsSnapToTickEnabled="True"
-                                    Thumb.DragCompleted="Slider_DragCompleted"
-                                    Thumb.DragStarted="Slider_DragStarted"/>
-                    <TextBlock Grid.Column="2" Style="{StaticResource DefaultLabelStyle}" Text="{Binding MaxMapSize, Mode=OneTime}"/>
+                    <Grid.RowDefinitions>
+                        <!-- Map Size -->
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+
+                    </Grid.RowDefinitions>
+
+                    <!-- Map Size -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="Map Area:" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource DefaultLabelStyle}">
+                                <Run Text="{Binding MapSize, Mode=OneWay}"/>
+                                <Run Text="x"/>
+                                <Run Text="{Binding MapSize, Mode=OneWay}"/>
+                    </TextBlock>
+                    <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Style="{StaticResource DefaultLabelStyle}" Text="{Binding MinMapSize, Mode=OneTime}"/>
+                        <Slider Grid.Column="1" VerticalAlignment="Center" 
+                                        Minimum="{Binding MinMapSize, Mode=OneTime}" 
+                                        Maximum="{Binding MaxMapSize, Mode=OneTime}" 
+                                        Value="{Binding MapSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                        TickFrequency="64" IsSnapToTickEnabled="True"
+                                        Thumb.DragCompleted="Slider_DragCompleted"
+                                        Thumb.DragStarted="Slider_DragStarted"/>
+                        <TextBlock Grid.Column="2" Style="{StaticResource DefaultLabelStyle}" Text="{Binding MaxMapSize, Mode=OneTime}"/>
+                    </Grid>
+
+                    <local:FancyToggle Grid.Row="2" Label="Modify Playable Area" OffText="Off" OnText="On" 
+                                           IsChecked="{Binding EditPlayableArea, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <local:FancyToggle Grid.Row="3" Label="Show Playable Area Margins" OffText="Off" OnText="On" 
+                                           IsChecked="{Binding ShowPlayableAreaMargins, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
                 </Grid>
-
-                <local:FancyToggle Grid.Row="2" Label="Modify Playable Area" OffText="Off" OnText="On" 
-                                       IsChecked="{Binding EditPlayableArea, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                <local:FancyToggle Grid.Row="3" Label="Show Playable Area Margins" OffText="Off" OnText="On" 
-                                       IsChecked="{Binding ShowPlayableAreaMargins, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-            </Grid>
-        </Expander>
-    </StackPanel>
+            </Expander>
+        </StackPanel>
+    </Grid>
+    
 </UserControl>

@@ -56,7 +56,7 @@ namespace AnnoMapEditor.Utilities.UndoRedo
                 var stackEntry = _undoStack.Pop();
                 stackEntry.Undo();
                 _redoStack.Push(stackEntry);
-                UndoHistory.Remove(UndoHistory.Last());
+                UndoHistory.Remove(UndoHistory.First());
             }
             UpdateAvailabilities();
         }

@@ -9,75 +9,70 @@
              d:DesignHeight="450"
              d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=local:MapTemplateCheckerViewModel}">
-    <ListBox ItemsSource="{Binding Results}"
-             HorizontalAlignment="Left"
-             BorderThickness="0"
+    <ItemsControl ItemsSource="{Binding Results}"
              Background="Transparent">
 
-        <ListBox.Resources>
+        <ItemsControl.Resources>
             <converters:BoolToVisibility x:Key="VisibleOnTrue" OnTrue="Visible" OnFalse="Collapsed" />
-        </ListBox.Resources>
+        </ItemsControl.Resources>
         
-        <ListBox.ItemTemplate>
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel HorizontalAlignment="Stretch"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        
+        <ItemsControl.ItemTemplate>
             <DataTemplate>
 
-                <Grid x:Name="Item"
-                      Width="260"
-                      Margin="0,0,0,4">
+                <Grid x:Name="Item">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="30" />
-                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Visibility="{Binding IsWarning, Converter={StaticResource VisibleOnTrue}}"
-                               Grid.Column="0"
-                               Grid.Row="0" 
-                               Grid.RowSpan="2"
+                    
+                    <TextBlock x:Name="Icon"
+                               Grid.Column="0" Grid.Row="0"  Grid.RowSpan="2"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
-                               FontSize="16"
-                               Foreground="White"
-                               Text="⚠"
-                               ToolTip="Warning" 
-                                           FontWeight="Bold" />
-                    <TextBlock Visibility="{Binding IsError, Converter={StaticResource VisibleOnTrue}}"
-                               Grid.Column="0"
-                               Grid.Row="0" 
-                               Grid.RowSpan="2"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               FontSize="30"
-                               Foreground="White"
-                               Text="⨯"
-                               ToolTip="Error" />
-                    <TextBlock Grid.Column="1"
-                                           Grid.Row="0"
-                                           Text="{Binding Title}"
-                                           Margin="2"
-                                           Foreground="White"
-                                           FontWeight="Bold" />
-                    <TextBlock Grid.Column="1"
-                                           Grid.Row="1"
-                                           Text="{Binding Message}"
-                                           Margin="2"
-                                           Foreground="White"
-                                           TextWrapping="Wrap"/>
+                               FontSize="20"
+                               Margin="10"
+                               FontFamily="{StaticResource SymbolFont}"/>
+                    <TextBlock x:Name="TitleText"
+                               Grid.Column="1" Grid.Row="0"
+                               Text="{Binding Title}"
+                               Margin="5"
+                               FontWeight="Bold" />
+                    <TextBlock x:Name="MessageText"
+                               Grid.Column="1" Grid.Row="1"
+                               Text="{Binding Message}"
+                               Margin="5,0,5,5"
+                               TextWrapping="Wrap"/>
                 </Grid>
 
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding IsError}" Value="True">
-                        <Setter Property="Background" TargetName="Item" Value="Crimson" />
+                        <Setter Property="Background" TargetName="Item" Value="{StaticResource ErrorBackgroundBrush}" />
+                        <Setter Property="Foreground" TargetName="TitleText" Value="{StaticResource ForegroundBrush}" />
+                        <Setter Property="Foreground" TargetName="MessageText" Value="{StaticResource ForegroundBrush}" />
+                        <Setter Property="Foreground" TargetName="Icon" Value="{StaticResource ForegroundBrush}" />
+                        <Setter Property="Text" TargetName="Icon" Value="&#xea39;" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsWarning}" Value="True">
-                        <Setter Property="Background" TargetName="Item" Value="Orange" />
+                        <Setter Property="Background" TargetName="Item" Value="{StaticResource WarningBackgroundBrush}" />
+                        <Setter Property="Foreground" TargetName="TitleText" Value="{StaticResource MediumBackgroundBrush}" />
+                        <Setter Property="Foreground" TargetName="MessageText" Value="{StaticResource MediumBackgroundBrush}" />
+                        <Setter Property="Foreground" TargetName="Icon" Value="{StaticResource MediumBackgroundBrush}" />
+                        <Setter Property="Text" TargetName="Icon" Value="&#xe7ba;" />
                     </DataTrigger>
                 </DataTemplate.Triggers>
 
             </DataTemplate>
-        </ListBox.ItemTemplate>
-    </ListBox>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
 </UserControl>

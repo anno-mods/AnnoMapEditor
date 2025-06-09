@@ -61,7 +61,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectFertilities
                 .SelectMany(r => r.AllowedFertilities)
                 .Distinct()
                 .Select(f => {
-                    SelectFertilityItem item = new()
+                    SelectFertilityItem item = new((FertilityAsset _, bool _)=>{})
                     {
                         FertilityAsset = f,
                         IsSelected = fixedIsland.Fertilities.Contains(f)
