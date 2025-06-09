@@ -222,14 +222,16 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         }
 
         /**
-         * Callback for island property changes
+         * Callback for island and map template property changes
          */
         private void SelectedIsland_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
+            if (e.PropertyName == nameof(MapTemplate.Session))
+                FertilityItems.Clear(); // Clear the items to have a clean sorting order when making changes to the session
             UpdatePropertyChanges();
             UpdateSelectedFertilities();
         }
-
+        
         /**
          * Notify property changes and update lists of viable sizes and types.
          */
@@ -323,28 +325,35 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
                         FertilityItems.Remove(fertilityItem);
                 }
                 
-                // Merge allowed and selected fertilities to determine what selectors should be shown.
-                var mergedAllowedFertilities = new List<FertilityAsset>(allowedFertilities);
-                mergedAllowedFertilities.AddRange(fixedIsland.Fertilities);
-                
                 // If a fertility is not contained in the items list yet, add it. 
-                foreach (var allowedFertility in mergedAllowedFertilities)
-                    if (FertilityItems.All(f => f.FertilityAsset != allowedFertility))
-                    {
-                        SelectFertilityItem newItem = new(SetFertility)
-                        {
-                            FertilityAsset = allowedFertility,
-                            IsSelected = fixedIsland.Fertilities.Contains(allowedFertility),
-                            IsAllowed = allowedFertilities.Contains(allowedFertility)
-                        };
-                        FertilityItems.Add(newItem);
-                    }
+                foreach (var fertility in allowedFertilities)
+                    AddFertilitySelectors(fertility, fixedIsland, allowedFertilities);
+                
+                foreach (var fertility in fixedIsland.Fertilities)
+                    AddFertilitySelectors(fertility, fixedIsland, allowedFertilities);
                 
                 // Update the warning property to show hint
                 OnPropertyChanged(nameof(AllowedFertilitiesWarning));
                 
                 SlotsViewModel = new SlotsViewModel(fixedIsland, MapTemplate.Session.Region);
                 OnPropertyChanged(nameof(SlotsViewModel));
+            }
+        }
+
+        /**
+         * Check if a valid fertility selector is already in the list, if not, add it.
+         */
+        private void AddFertilitySelectors(FertilityAsset allowedFertility, FixedIslandElement fixedIsland, List<FertilityAsset> allowedFertilities)
+        {
+            if (FertilityItems.All(f => f.FertilityAsset != allowedFertility))
+            {
+                SelectFertilityItem newItem = new(SetFertility)
+                {
+                    FertilityAsset = allowedFertility,
+                    IsSelected = fixedIsland.Fertilities.Contains(allowedFertility),
+                    IsAllowed = allowedFertilities.Contains(allowedFertility)
+                };
+                FertilityItems.Add(newItem);
             }
         }
     }
