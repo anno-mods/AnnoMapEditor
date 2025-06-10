@@ -76,7 +76,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             set
             {
                 SetProperty(ref _selectedIsland, value);
-                SelectedUnifiedIslandPropertiesViewModel.SetIsland(value, MapTemplate);
+                SelectedUnifiedIslandPropertiesViewModel = value == null ? null : new UnifiedIslandPropertiesViewModel(value, MapTemplate);
             }
         }
         private IslandElement? _selectedIsland;
@@ -92,13 +92,13 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
         }
         
-        public UnifiedIslandPropertiesViewModel SelectedUnifiedIslandPropertiesViewModel
+        public UnifiedIslandPropertiesViewModel? SelectedUnifiedIslandPropertiesViewModel
         {
             get => _selectedUnifiedIslandPropertiesViewModel;
             set => SetProperty(ref _selectedUnifiedIslandPropertiesViewModel, value);
         }
 
-        private UnifiedIslandPropertiesViewModel _selectedUnifiedIslandPropertiesViewModel = new();
+        private UnifiedIslandPropertiesViewModel? _selectedUnifiedIslandPropertiesViewModel;
 
         public SelectIslandViewModel? SelectIslandViewModel
         {

@@ -40,19 +40,10 @@
             <Border BorderBrush="{StaticResource BrightBorderBrush}" BorderThickness="0,0,0,1" SnapsToDevicePixels="True" />
         </Grid>
         
-        <!-- Hint when no Island is selected -->
-        <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"
-                   Visibility="{Binding SelectedIsland, Converter={StaticResource VisibleOnNull}, FallbackValue=Visible}"
-                   Foreground="{StaticResource DisabledBrush}"
-                   FontSize="15"
-                   Margin="20"
-                   Text="Select an island to edit its properties."/>
-        
         <!-- Content when an Island is selected -->
         <ScrollViewer Grid.Row="1" VerticalAlignment="Stretch" 
                       VerticalScrollBarVisibility="Auto"
-                      Focusable="False"
-                      Visibility="{Binding SelectedIsland, Converter={StaticResource CollapsedOnNull}, FallbackValue=Hidden}">
+                      Focusable="False">
             <StackPanel Margin="16,0">
                 <!-- Label -->
                 <TextBlock Text="Label"
@@ -177,23 +168,28 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="auto" />
                                             <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="auto" />
                                         </Grid.ColumnDefinitions>
                                         <Image Height="22" Width="22" 
                                                Source="{Binding FertilityAsset.Icon}"/>
+                                        <Grid Grid.Column="0" 
+                                              Visibility="{Binding IsAllowed, Converter={StaticResource VisibleOnFalse}}"
+                                              VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                                              Margin="0,0,-5,0">
+                                            <TextBlock Text="&#xf139;" 
+                                                       FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="13"
+                                                       Foreground="{StaticResource MediumBackgroundBrush}"/>
+                                            <TextBlock Text="&#xf13a;" 
+                                                       FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="13"
+                                                       Foreground="{StaticResource WarningBackgroundBrush}"/>
+                                            <TextBlock Text="&#xf13b;" 
+                                                       FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="13"
+                                                       Foreground="{StaticResource MediumBackgroundBrush}"/>
+                                        </Grid>
                                         <TextBlock Grid.Column="1" 
                                                    Text="{Binding ShortenedDisplayName}"
                                                    Style="{StaticResource DefaultLabelStyle}"
                                                    VerticalAlignment="Center"
                                                    Margin="5,0,0,0"/>
-                                        <TextBlock Grid.Column="2" 
-                                                   Text="&#xe7ba;" 
-                                                   Visibility="{Binding IsAllowed, Converter={StaticResource VisibleOnFalse}}"
-                                                   VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                   Margin="5,0,0,0"
-                                                   FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="15"
-                                                   Foreground="{StaticResource WarningBackgroundBrush}"/>
-                                        
                                     </Grid>
                                 </ToggleButton>
                             </DataTemplate>

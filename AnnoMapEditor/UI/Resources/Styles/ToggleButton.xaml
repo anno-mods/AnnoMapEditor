@@ -84,13 +84,17 @@
                     </StackPanel>
 
                     <ControlTemplate.Triggers>
+                        <EventTrigger RoutedEvent="CheckBox.Loaded" SourceName="stackPanel">
+                            <SkipStoryboardToFill BeginStoryboardName="OnCheck" />
+                            <SkipStoryboardToFill BeginStoryboardName="OnUncheck" />
+                        </EventTrigger>
                         <Trigger Property="IsChecked"
                                  Value="True">
                             <Trigger.ExitActions>
-                                <BeginStoryboard Storyboard="{StaticResource OnUncheck}" />
+                                <BeginStoryboard x:Name="OnUncheck" Storyboard="{StaticResource OnUncheck}" />
                             </Trigger.ExitActions>
                             <Trigger.EnterActions>
-                                <BeginStoryboard Storyboard="{StaticResource OnCheck}" />
+                                <BeginStoryboard x:Name="OnCheck" Storyboard="{StaticResource OnCheck}" />
                             </Trigger.EnterActions>
                         </Trigger>
                         <Trigger Property="IsEnabled"

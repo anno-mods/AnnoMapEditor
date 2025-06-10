@@ -38,6 +38,7 @@
                     <converters:BoolToStyle x:Key="isActiveToToolbarButtonStyle" OnFalse="{StaticResource ToolbarButton}" OnTrue="{StaticResource ToolbarButtonActive}"/>
                     <converters:BoolToStyle x:Key="isActiveToWindowFrameStyle" OnFalse="{StaticResource InactiveWindowBorder}" OnTrue="{StaticResource ActiveWindowBorder}"/>
                     <converters:ObjectToBool x:Key="objectToBool" />
+                    <converters:ObjectToVisibilityInverse x:Key="VisibleOnNull"/>
                     <converters:BoolToVisibility x:Key="VisibleIfFalse" OnFalse="Visible" OnTrue="Collapsed" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
@@ -298,9 +299,24 @@
                         BorderThickness="1,0,0,0"/>
                 
                 <!-- island properties -->
-            
-                <islandProperties:UnifiedIslandProperties DataContext="{Binding SelectedUnifiedIslandPropertiesViewModel}"
-                                                          Margin="0,0,0,50"/>
+                
+                <Grid Name="PropertiesContainer" Margin="0,0,0,50">
+                    <!--<islandProperties:UnifiedIslandProperties DataContext="{Binding SelectedUnifiedIslandPropertiesViewModel}"/>-->
+                    <ContentControl Content="{Binding SelectedUnifiedIslandPropertiesViewModel}">
+                        <ContentControl.Resources>
+                            <DataTemplate DataType="{x:Type islandProperties:UnifiedIslandPropertiesViewModel}">
+                                <islandProperties:UnifiedIslandProperties/>
+                            </DataTemplate>
+                        </ContentControl.Resources>
+                    </ContentControl>
+                    
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center"
+                               Visibility="{Binding SelectedIsland, Converter={StaticResource VisibleOnNull}, FallbackValue=Visible}"
+                               Foreground="{StaticResource DisabledBrush}"
+                               FontSize="15"
+                               Margin="20"
+                               Text="Select an island to edit its properties."/>
+                </Grid>
                 
                 <!-- Imprint Area -->
                 <Border VerticalAlignment="Bottom"
