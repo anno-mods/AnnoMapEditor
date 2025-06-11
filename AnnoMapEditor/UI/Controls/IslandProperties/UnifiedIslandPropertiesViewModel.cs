@@ -97,6 +97,17 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         public SlotsViewModel? SlotsViewModel { get; private set; }
 
         public IslandSize? IslandSize => (SelectedIsland as RandomIslandElement)?.IslandSize;
+
+        public string Label
+        {
+            get => SelectedIsland.Label ?? "";
+            set
+            {
+                System.Diagnostics.Debug.WriteLine($"Label: {value}");
+                UndoRedoStack.Instance.Do(new IslandLabelStackEntry(SelectedIsland, SelectedIsland.Label, value));
+                SelectedIsland.Label = value;
+            }
+        }
         
         
         /**
@@ -207,6 +218,9 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
                 FertilityItems.Clear(); 
             UpdatePropertyChanges();
             UpdateSelectedFertilities();
+            
+            if (e.PropertyName == nameof(SelectedIsland.Label))
+                OnPropertyChanged(nameof(Label));
         }
         
         /**

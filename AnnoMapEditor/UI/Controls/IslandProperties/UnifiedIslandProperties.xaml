@@ -49,7 +49,9 @@
                 <TextBlock Text="Label"
                            Style="{StaticResource SubHeaderLabelStyle}"/>
                 <TextBox Margin="0,5"
-                         Text="{Binding SelectedIsland.Label, Mode=OneWay}"/>
+                         IsUndoEnabled="False"
+                         Text="{Binding Label, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         KeyDown="LabelTextBox_KeyDown"/>
                 
                 <!-- Position -->
                 <TextBlock Text="Position"
