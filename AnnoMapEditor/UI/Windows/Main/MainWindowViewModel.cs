@@ -82,7 +82,7 @@ namespace AnnoMapEditor.UI.Windows.Main
         private IslandElement? _selectedIsland;
 
         /**
-         * Make sute to notice if an element has been remove from the canvas. If it was selected, deselct it.
+         * Make sure to notice if an element has been remove from the canvas. If it was selected, deselect it.
          */
         private void MapTemplate_ElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -248,5 +248,11 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         public ICommand UndoCommand => new ActionCommand(Undo);
         public ICommand RedoCommand => new ActionCommand(Redo);
+        public ICommand RemoveCommand => new ActionCommand(() =>
+        {
+            if (SelectedIsland == null) return;
+            UndoRedoStack.Instance.Do(new IslandRemoveStackEntry(SelectedIsland, MapTemplate));
+            MapTemplate.Elements.Remove(SelectedIsland);
+        });
     }
 }

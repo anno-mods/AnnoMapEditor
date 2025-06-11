@@ -28,6 +28,7 @@
     <Window.InputBindings>
         <KeyBinding Modifiers="Ctrl" Key="Z" Command="{Binding UndoCommand}" />
         <KeyBinding Modifiers="Ctrl" Key="Y" Command="{Binding RedoCommand}" />
+        <KeyBinding Key="Delete" Command="{Binding RemoveCommand}"></KeyBinding>
     </Window.InputBindings>
     
     <Window.Resources>
@@ -142,7 +143,7 @@
                 <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe898;" Click="ExportMod_Click" ToolTip="Export as Mod"/>
                 <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
                 <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe710;"/>
-                <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe74d;"/>
+                <Button IsEnabled="{Binding SelectedIsland, Converter={StaticResource objectToBool}}" Style="{StaticResource ToolbarButton}" Content="&#xe74d;" Command="{Binding RemoveCommand}"/>
                 <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe8c8;"/>
                 <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe77f;"/>
                 <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe8c6;"/>
