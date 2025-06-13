@@ -18,6 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using AnnoMapEditor.UI.Controls.Toolbar;
 
 namespace AnnoMapEditor.UI.Controls
 {
@@ -150,6 +151,25 @@ namespace AnnoMapEditor.UI.Controls
             DataContextChanged += MapView_DataContextChanged;
 
             Settings.Instance.PropertyChanged += Settings_PropertyChanged;
+            ToolbarService.Instance.ButtonClicked += Toolbar_ButtonClicked;
+        }
+
+        private void Toolbar_ButtonClicked(object? sender, ToolbarButtonEventArgs e)
+        {
+            switch (e.ButtonType)
+            {
+                case ToolbarButtonType.ZoomOut:
+                    ApplyScaling(1/1.1);
+                    break;
+                case ToolbarButtonType.ZoomIn:
+                    ApplyScaling(1.1);
+                    break;
+                case ToolbarButtonType.ZoomReset:
+                    ResetZoom();
+                    break;
+                default:
+                    break;
+            }
         }
 
 
@@ -611,7 +631,9 @@ namespace AnnoMapEditor.UI.Controls
             matrix.M22 = matrix.M11;
             matrix.OffsetX = Math.Min(0, Math.Max(matrix.OffsetX, -1 * (zoomCanvas.ActualWidth * (matrix.M11 - 1))));
             matrix.OffsetY = Math.Min(0, Math.Max(matrix.OffsetY, -1 * (zoomCanvas.ActualHeight * (matrix.M11 - 1))));
+            ToolbarService.Instance.ZoomOutButtonEnabled = matrix.M11 > 1;
             matrixTransform.Matrix = matrix;
+            
         }
 
         private void LinkMapTemplateEventHandlers(MapTemplate mapTemplate)
@@ -619,26 +641,12 @@ namespace AnnoMapEditor.UI.Controls
             mapTemplate.MapSizeConfigChanged += MapElement_MapSizeConfigChanged;
             mapTemplate.MapSizeConfigCommitted += MapElement_MapSizeConfigCommitted;
             mapTemplate.Elements.CollectionChanged += MapElement_ElementsChanged;
-            mapTemplate.MapZoomConfigChanged += MapElement_MapZoomConfigChanged;
         }
         private void UnlinkMapTemplateEventHandlers(MapTemplate mapTemplate)
         {
             mapTemplate.MapSizeConfigCommitted -= MapElement_MapSizeConfigCommitted;
             mapTemplate.MapSizeConfigChanged -= MapElement_MapSizeConfigChanged;
             mapTemplate.Elements.CollectionChanged -= MapElement_ElementsChanged;
-            mapTemplate.MapZoomConfigChanged -= MapElement_MapZoomConfigChanged;
-        }
-
-        private void MapElement_MapZoomConfigChanged(object? sender, MapTemplate.MapZoomConfigEventArgs args)
-        {
-            Matrix matrix = matrixTransform.Matrix;
-            matrix.M11 = Math.Max(1, args.ZoomFactor);
-            matrix.M22 = matrix.M11;
-            matrix.OffsetX = Math.Min(0, Math.Max(matrix.OffsetX, -1 * (zoomCanvas.ActualWidth * (matrix.M11 - 1))));
-            matrix.OffsetY = Math.Min(0, Math.Max(matrix.OffsetY, -1 * (zoomCanvas.ActualHeight * (matrix.M11 - 1))));
-            matrixTransform.Matrix = matrix;
-
-            UpdateSize();
         }
 
         private void MapElement_ElementsChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -829,30 +837,34 @@ namespace AnnoMapEditor.UI.Controls
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
-            Matrix matrix = matrixTransform.Matrix;
             double scale = e.Delta > 0 ? 1.1 : 1 / 1.1;
             Point pos = e.GetPosition(this);
 
-            matrix.ScaleAt(scale, scale, pos.X, pos.Y);
+            ApplyScaling(scale, pos);
+            
+            e.Handled = true;
+            base.OnMouseWheel(e);
+        }
+
+        private void ApplyScaling(double scale, Point? pos = null)
+        {
+            var matrix = matrixTransform.Matrix;
+            if (pos is { } point)
+                matrix.ScaleAt(scale, scale, point.X, point.Y);
+            else
+                matrix.ScaleAt(scale, scale, zoomCanvas.ActualWidth / 2, zoomCanvas.ActualHeight / 2);
             matrix.M11 = Math.Max(1, matrix.M11);
             matrix.M22 = matrix.M11;
             matrix.OffsetX = Math.Min(0, Math.Max(matrix.OffsetX, -1 * (zoomCanvas.ActualWidth * (matrix.M11 - 1))));
             matrix.OffsetY = Math.Min(0, Math.Max(matrix.OffsetY, -1 * (zoomCanvas.ActualHeight * (matrix.M11 - 1))));
+            ToolbarService.Instance.ZoomOutButtonEnabled = matrix.M11 > 1;
             matrixTransform.Matrix = matrix;
-
-            e.Handled = true;
-            base.OnMouseWheel(e);
         }
 
         private void ResetZoom()
         {
             matrixTransform.Matrix = new Matrix(1,0,0,1,0,0);
             UpdateSize();
-        }
-
-        public void ResetZoomBtn_Click(Object sender, EventArgs e)
-        {
-            ResetZoom();
         }
     }
 }

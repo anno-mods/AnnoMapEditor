@@ -14,6 +14,9 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AnnoMapEditor.UI.Controls.Toolbar;
+using AnnoMapEditor.UI.Overlays;
+using AnnoMapEditor.UI.Overlays.ExportAsMod;
 using MapTemplate = AnnoMapEditor.MapTemplates.Models.MapTemplate;
 
 namespace AnnoMapEditor.UI.Windows.Main
@@ -33,6 +36,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 {
                     SetProperty(ref _mapTemplate, value);
                     SelectedIsland = null;
+                    value.Elements.CollectionChanged += MapTemplate_ElementsChanged;
 
                     MapTemplateProperties = new(value);
                     MapTemplateChecker = new(value);
@@ -43,6 +47,8 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
         }
         private MapTemplate _mapTemplate;
+        
+        public ToolbarViewModel ToolbarViewModel => new ToolbarViewModel();
 
         public MapTemplatePropertiesViewModel MapTemplateProperties 
         { 
@@ -74,6 +80,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             set
             {
                 SetProperty(ref _selectedIsland, value);
+                ToolbarService.Instance.SelectedIslandActionsEnabled = value != null;
                 SelectedUnifiedIslandPropertiesViewModel = value == null ? null : new UnifiedIslandPropertiesViewModel(value, MapTemplate);
             }
         }
@@ -82,13 +89,15 @@ namespace AnnoMapEditor.UI.Windows.Main
         /**
          * Make sure to notice if an element has been remove from the canvas. If it was selected, deselect it.
          */
-        private void MapTemplate_ElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void MapTemplate_ElementsChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine("Elements list changed!");
             if (SelectedIsland == null && SelectedUnifiedIslandPropertiesViewModel != null)
                 SelectedUnifiedIslandPropertiesViewModel = null;
             
             if (SelectedIsland != null && !_mapTemplate.Elements.Contains(SelectedIsland))
             {
+                System.Diagnostics.Debug.WriteLine("Selected Island is not contained in the map elements list!");
                 SelectedIsland = null;
             }
         }
@@ -124,19 +133,51 @@ namespace AnnoMapEditor.UI.Windows.Main
         public MainWindowViewModel(MapTemplate mapTemplate)
         {
             MapTemplate = mapTemplate;
-            if (Settings.Instance.DataPath != null)
-                Status = $"Game Path: {Settings.Instance.GamePath}";
-            
-            MapTemplate.Elements.CollectionChanged += MapTemplate_ElementsChanged;
+            CommonConstructor();
         }
 
         public MainWindowViewModel()
         {
             CreateNewMap();
+            CommonConstructor();
+        }
+
+        private void CommonConstructor()
+        {
             if (Settings.Instance.DataPath != null)
-                Status = $"Game Path: {Settings.Instance.GamePath}" ;
+                Status = $"Game Path: {Settings.Instance.GamePath}";
             
-            MapTemplate.Elements.CollectionChanged += MapTemplate_ElementsChanged;
+            MapTemplate.ShowLabels = true;
+            
+            ToolbarService.Instance.ButtonClicked += (sender, e) =>
+            {
+                switch (e.ButtonType)
+                {
+                    case ToolbarButtonType.ShowLabels:
+                        _mapTemplate.ShowLabels = !_mapTemplate.ShowLabels;
+                        break;
+                    case ToolbarButtonType.DeleteIsland:
+                        DeleteSelectedIsland();
+                        break;
+                    case ToolbarButtonType.NewMap:
+                        CreateNewMap();
+                        break;
+                    case ToolbarButtonType.ExportMap:
+                        OverlayService.Instance.Show(new ExportAsModViewModel(MapTemplate));
+                        break;
+                    case ToolbarButtonType.LoadMap:
+                        OpenMapFileDialog();
+                        break;
+                    case ToolbarButtonType.ImportMap:
+                        if (sender is Button { ContextMenu: not null } button) PopulateOpenMapMenu(button.ContextMenu, true);
+                        break;
+                    case ToolbarButtonType.SaveMap:
+                        SaveMapFileDialog();
+                        break;
+                    default: break;
+                        
+                }
+            };
         }
 
         public async Task OpenMap(string a7tinfoPath, bool fromArchive = false)
@@ -150,7 +191,8 @@ namespace AnnoMapEditor.UI.Windows.Main
             else
                 MapTemplate = await mapTemplateReader.FromFileAsync(a7tinfoPath);
 
-            MapTemplate.UpdateMapZoomConfig(1f, 0f, 0f);
+            // TODO: Find a better solution for this "Hack"
+            ToolbarService.Instance.ButtonClick(ToolbarButtonType.ZoomReset);
         }
 
         public void CreateNewMap()
@@ -160,7 +202,8 @@ namespace AnnoMapEditor.UI.Windows.Main
 
             MapTemplateFilePath = null;
             MapTemplate = new MapTemplate(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, SessionAsset.OldWorld); 
-            MapTemplate.UpdateMapZoomConfig(1f, 0f, 0f);
+            // TODO: Find a better solution for this "Hack"
+            ToolbarService.Instance.ButtonClick(ToolbarButtonType.ZoomReset);
         }
 
         public async Task SaveMap(string filePath)
@@ -237,6 +280,23 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
         }
 
+        public async void SaveMapFileDialog()
+        {
+            var picker = new SaveFileDialog
+            {
+                DefaultExt = ".a7tinfo",
+                Filter = "Map template (*.a7tinfo)|*.a7tinfo|XML map template (*.xml)|*.xml",
+                FilterIndex = Path.GetExtension(MapTemplateFilePath)?.ToLower() == ".xml" ? 2 : 1,
+                FileName = Path.GetFileName(MapTemplateFilePath),
+                OverwritePrompt = true
+            };
+
+            if (true == picker.ShowDialog() && picker.FileName is not null)
+            {
+                await SaveMap(picker.FileName);
+            }
+        }
+
         public void Undo()
         {
             UndoRedoStack.Instance.Undo();
@@ -247,13 +307,20 @@ namespace AnnoMapEditor.UI.Windows.Main
             UndoRedoStack.Instance.Redo();
         }
 
-        public ICommand UndoCommand => new ActionCommand((_) => Undo());
-        public ICommand RedoCommand => new ActionCommand((_) => Redo());
-        public ICommand RemoveCommand => new ActionCommand((_) =>
+        private void DeleteSelectedIsland()
         {
             if (SelectedIsland == null) return;
             UndoRedoStack.Instance.Do(new IslandRemoveStackEntry(SelectedIsland, MapTemplate));
             MapTemplate.Elements.Remove(SelectedIsland);
+            // SelectedIsland = null;
+            // SelectedUnifiedIslandPropertiesViewModel = null;
+        }
+
+        public ICommand UndoCommand => new ActionCommand((_) => Undo());
+        public ICommand RedoCommand => new ActionCommand((_) => Redo());
+        public ICommand RemoveCommand => new ActionCommand((_) =>
+        {
+            DeleteSelectedIsland();
         });
     }
 }

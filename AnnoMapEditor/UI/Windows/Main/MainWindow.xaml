@@ -15,6 +15,7 @@
         lex:ResxLocalizationProvider.DefaultDictionary="Texts"
         xmlns:local="clr-namespace:AnnoMapEditor.UI.Windows.Main"
         xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+        xmlns:toolbar="clr-namespace:AnnoMapEditor.UI.Controls.Toolbar"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
         mc:Ignorable="d"
         Name="mainWindow"
@@ -94,103 +95,7 @@
             </Grid>
 
             <!-- Toolbar -->
-            <StackPanel Grid.Row="1" HorizontalAlignment="Left" Name="toolbarStackPanel" Orientation="Horizontal" Margin="0,0,0,2">
-
-                <Popup Name="undoHistoryPopup" 
-                       PlacementTarget="{Binding ElementName=undoDropdown}" 
-                       StaysOpen="False"
-                       AllowsTransparency="True">
-                    <Grid Background="{StaticResource MediumBackgroundBrush}" Width="300" MaxHeight="400" MinHeight="100">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <Border BorderBrush="{StaticResource BrightBorderBrush}"
-                                BorderThickness="1"
-                                Grid.RowSpan="2"/>
-                        <TextBlock Style="{StaticResource DefaultLabelStyle}" Text="Action History:" Margin="10,0"/>
-                        <Border BorderBrush="{StaticResource BrightBorderBrush}" BorderThickness="0,0,0,1" />
-                        <ScrollViewer Grid.Row="1" Margin="1">
-                            <ItemsControl ItemsSource="{Binding UndoRedoStack.UndoHistory}" Margin="10,0">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel IsItemsHost="True"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Label}" Style="{StaticResource DefaultLabelStyle}" Height="auto" Margin="0"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </Grid>
-                </Popup>
-                
-                <Button IsEnabled="{Binding UndoRedoStack.UndoStackAvailable}" Margin="10,0,0,0" Style="{StaticResource ToolbarButton}" Content="&#xe7a7;" Click="Undo_Click" ToolTip="Undo"/>
-                <Button IsEnabled="{Binding UndoRedoStack.UndoStackAvailable}" Name="undoDropdown" Style="{StaticResource ToolbarButton}" Content="&#xe96e;" FontSize="6" Width="12" Margin="0,2,2,2" Click="OpenUndoHistoryPopup"/>
-                <Button IsEnabled="{Binding UndoRedoStack.RedoStackAvailable}" Style="{StaticResource ToolbarButton}" Content="&#xe7a6;" Click="Redo_Click" ToolTip="Redo"/>
-                <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
-                <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe8a5;" Click="NewFile_Click" ToolTip="New map template"/>
-                <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe838;" Click="OpenFile_Click" ToolTip="Load map template file"/>
-                <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe896;" Click="ImportMap_Click" ToolTip="Import map template from game">
-                    <Button.ContextMenu>
-                        <ContextMenu Name="toolbarImportContextMenu"/>
-                    </Button.ContextMenu>
-                </Button>
-                <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe74e;"/>
-                <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe792;" Click="ExportMap_Click" ToolTip="Save as"/>
-                <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe898;" Click="ExportMod_Click" ToolTip="Export as Mod"/>
-                <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
-                <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe710;"/>
-                <Button IsEnabled="{Binding SelectedIsland, Converter={StaticResource objectToBool}}" Style="{StaticResource ToolbarButton}" Content="&#xe74d;" Command="{Binding RemoveCommand}"/>
-                <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe8c8;"/>
-                <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe77f;"/>
-                <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe8c6;"/>
-                <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
-                <Button IsEnabled="True" Style="{StaticResource ToolbarButton}" Content="&#xe73f;" Click="ResetZoom_Click" ToolTip="Reset map zoom">
-                    <!-- Context Menu for testing layout style -->
-                    <Button.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Label Nr. 1" IsChecked="True"/>
-                            <MenuItem Header="Label Nr. 2" IsEnabled="False"/>
-                            <MenuItem Header="Label Nr. 3" IsCheckable="True"/>
-                            <MenuItem Header="Label Nr. 4" InputGestureText="Bla">
-                                <MenuItem.Icon>
-                                    <TextBlock FontFamily="Segoe MDL2 Assets" 
-                                               Text="&#xe713;"
-                                               FontSize="14"
-                                               VerticalAlignment="Center" 
-                                               HorizontalAlignment="Center"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="Label Nr. 5"/>
-                            <Separator/>
-                            <MenuItem Header="Label Nr. 1"/>
-                            <MenuItem Header="Label Nr. 2">
-                                <MenuItem Header="Label Nr. 1"/>
-                                <MenuItem Header="Label Nr. 2"/>
-                                <Separator />
-                                <MenuItem Header="Label Nr. 3">
-                                    <MenuItem Header="Label Nr. 1"/>
-                                    <MenuItem Header="Label Nr. 2"/>
-                                    <Separator />
-                                    <MenuItem Header="Label Nr. 3"/>
-                                </MenuItem>
-                                <MenuItem Header="Label Nr. 4"/>
-                            </MenuItem>
-                            <MenuItem Header="Label Nr. 3"/>
-                            <MenuItem Header="Label Nr. 4"/>
-                        </ContextMenu>
-                    </Button.ContextMenu>
-                </Button>
-                <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe8a3;"/>
-                <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe71f;"/>
-                <Button IsEnabled="True" Style="{Binding MapTemplate.ShowLabels, Converter={StaticResource isActiveToToolbarButtonStyle}}" Content="&#xe8ec;" Click="ShowLabels_Click" ToolTip="Show island labels"/>
-                <Border Width="8" Margin="0,4,7,4" BorderThickness =" 0,0,1,0" BorderBrush="#505050"/>
-                <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe897;"/>
-                <Button IsEnabled="False" Style="{StaticResource ToolbarButton}" Content="&#xe713;"/>
-            </StackPanel>
+            <toolbar:Toolbar x:Name="ToolbarControl" Grid.Row="1" DataContext="{Binding ToolbarViewModel}" />
         
         </Grid>
 

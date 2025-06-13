@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using AnnoMapEditor.UI.Controls.Toolbar;
 
 namespace AnnoMapEditor.MapTemplates.Models
 {
@@ -47,14 +48,16 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public event EventHandler? MapSizeConfigCommitted;
 
-        public event EventHandler<MapZoomConfigEventArgs>? MapZoomConfigChanged;
-
         public string MapSizeText => $"Size: {Size.X}, Playable: {PlayableArea.Width}";
 
         public bool ShowLabels
         {
             get => _showLabels;
-            set => SetProperty(ref _showLabels, value);
+            set
+            {
+                SetProperty(ref _showLabels, value);
+                ToolbarService.Instance.ShowLabelsButtonState = value;
+            }
         }
         private bool _showLabels = true;
 
@@ -157,13 +160,6 @@ namespace AnnoMapEditor.MapTemplates.Models
             MapSizeConfigChanged?.Invoke(this, new MapTemplateResizeEventArgs(oldMapSize, oldPlayableSize));
         }
 
-        // public float mapZoomFactor = 1.0f;
-
-        public void UpdateMapZoomConfig(float zoomFactor, float xTransFactor, float yTransFactor)
-        {
-            MapZoomConfigChanged?.Invoke(this, new MapZoomConfigEventArgs(zoomFactor, xTransFactor, yTransFactor));
-        }
-
         public void RestoreMapSizeConfig(int mapSize, Rect2 playableArea)
         {
             // TODO: Implement Map Size Config restoring
@@ -210,8 +206,7 @@ namespace AnnoMapEditor.MapTemplates.Models
 
             return _templateDocument;
         }
-
-
+        
         public class MapTemplateResizeEventArgs : EventArgs
         {
             public MapTemplateResizeEventArgs(Vector2 oldMapSize, Vector2 oldPlayableSize)
@@ -222,20 +217,6 @@ namespace AnnoMapEditor.MapTemplates.Models
 
             public Vector2 OldMapSize { get; }
             public Vector2 OldPlayableSize { get; }
-        }
-
-        public class MapZoomConfigEventArgs : EventArgs
-        {
-            public MapZoomConfigEventArgs(float zoomFactor, float xTransFactor, float yTransFactor)
-            {
-                ZoomFactor = zoomFactor;
-                XTransFactor = xTransFactor;
-                YTransFactor = yTransFactor;
-            }
-
-            public float ZoomFactor { get; }
-            public float XTransFactor { get; }
-            public float YTransFactor { get; }
         }
     }
 }

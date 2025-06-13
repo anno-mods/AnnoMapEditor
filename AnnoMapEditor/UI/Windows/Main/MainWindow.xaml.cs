@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Shell;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AnnoMapEditor.UI.Controls.Toolbar;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
@@ -30,7 +31,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             WindowChrome.SetIsHitTestVisibleInChrome(closeButton, true);
             WindowChrome.SetIsHitTestVisibleInChrome(minimizeButton, true);
             WindowChrome.SetIsHitTestVisibleInChrome(maximizeButton, true);
-            WindowChrome.SetIsHitTestVisibleInChrome(toolbarStackPanel, true);
+            WindowChrome.SetIsHitTestVisibleInChrome(ToolbarControl, true);
 
             var exePath = Path.Join(AppContext.BaseDirectory, "AnnoMapEditor.exe");
             var productVersion = "";
@@ -49,7 +50,7 @@ namespace AnnoMapEditor.UI.Windows.Main
 
             _viewModel.PropertyChanged += ViewModel_PropertyChanged;
             // _viewModel.PopulateOpenMapMenu(openMapMenu);
-            _viewModel.PopulateOpenMapMenu(toolbarImportContextMenu, true);
+            // _viewModel.PopulateOpenMapMenu(toolbarImportContextMenu, true);
 
             StateChanged += new EventHandler(Window_StateChanged);
         }
@@ -67,65 +68,10 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
         }
 
-        private async void ExportMap_Click(object sender, RoutedEventArgs e)
-        {
-            var picker = new SaveFileDialog
-            {
-                DefaultExt = ".a7tinfo",
-                Filter = "Map template (*.a7tinfo)|*.a7tinfo|XML map template (*.xml)|*.xml",
-                FilterIndex = Path.GetExtension(_viewModel.MapTemplateFilePath)?.ToLower() == ".xml" ? 2 : 1,
-                FileName = Path.GetFileName(_viewModel.MapTemplateFilePath),
-                OverwritePrompt = true
-            };
-
-            if (true == picker.ShowDialog() && picker.FileName is not null)
-            {
-                await _viewModel.SaveMap(picker.FileName);
-            }
-        }
-
-        private void ExportMod_Click(object sender, RoutedEventArgs e)
-        {
-            if (_viewModel.MapTemplate is null)
-                return;
-
-            OverlayService.Instance.Show(new ExportAsModViewModel(_viewModel.MapTemplate));
-        }
-
-        private void ImportMap_Click(object sender, RoutedEventArgs e)
-        {
-            // toolbarImportContextMenu.PlacementTarget = sender as Panel;
-            toolbarImportContextMenu.IsOpen = true;
-        }
-
-        private void OpenFile_Click(object sender, RoutedEventArgs e)
-        {
-            _viewModel.OpenMapFileDialog();
-        }
-
-        private void NewFile_Click(object sender, RoutedEventArgs e)
-        {
-            _viewModel.CreateNewMap();
-        }
-        private void ShowLabels_Click(object sender, RoutedEventArgs e)
-        {
-            _viewModel.MapTemplate.ShowLabels = !_viewModel.MapTemplate.ShowLabels;
-        }
-
-        private void ResetZoom_Click(object sender, RoutedEventArgs e)
-        {
-            _viewModel.MapTemplate.UpdateMapZoomConfig(1f, 0f, 0f);
-        }
-
-        private void OverlayContainer_Loaded(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
             Close();
-            App.Current.Shutdown();
+            Application.Current.Shutdown();
         }
 
         private void maximizeBtn_Click(object sender, RoutedEventArgs e)
@@ -149,21 +95,6 @@ namespace AnnoMapEditor.UI.Windows.Main
                 mainWindowGrid.Margin = new(5);
                 maximizeButton.Content = (char)0xe923;
             }
-        }
-
-        private void Redo_Click(object?  sender, RoutedEventArgs e)
-        {
-            _viewModel.Redo();
-        }
-
-        private void Undo_Click(object? sender, RoutedEventArgs e)
-        {
-            _viewModel.Undo();
-        }
-
-        public void OpenUndoHistoryPopup(object? sender, RoutedEventArgs e)
-        {
-            undoHistoryPopup.IsOpen = !undoHistoryPopup.IsOpen;
         }
 
         private void MainWindow_OnMouseDown(object sender, MouseButtonEventArgs e)
