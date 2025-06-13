@@ -3,11 +3,11 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Input;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.UI.Controls.Slots;
-using AnnoMapEditor.UI.Overlays.SelectFertilities;
 using AnnoMapEditor.Utilities;
 using AnnoMapEditor.Utilities.UndoRedo;
 
@@ -28,15 +28,22 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
             MapTemplate = mapTemplate;
             
             SelectedIsland.PropertyChanged += SelectedIsland_PropertyChanged;
-            MapTemplate.PropertyChanged += SelectedIsland_PropertyChanged;
-            if (SelectedIsland is FixedIslandElement fixedIsland)
-            {
-                fixedIsland.Fertilities.CollectionChanged += Fertilities_CollectionChanged;
-                SlotsViewModel = new SlotsViewModel(fixedIsland, MapTemplate.Session.Region);
-            }
+            MapTemplate.PropertyChanged += MapTemplate_PropertyChanged;
             
-            UpdatePropertyChanges();
-            UpdateSelectedFertilities();
+            switch (SelectedIsland)
+            {
+                case FixedIslandElement fixedIsland:
+                    fixedIsland.Fertilities.CollectionChanged += Fertilities_CollectionChanged;
+                    SlotsViewModel = new SlotsViewModel(fixedIsland, MapTemplate.Session.Region);
+                    IslandTypeItems.AddRange(fixedIsland.IslandAsset.IslandType);
+                    UpdateSelectedFertilities();
+                    break;
+                case RandomIslandElement randomIsland:
+                    IslandTypeItems.AddRange(AllowedTypesPerElementType[MapElementType.PoolIsland]);
+                    IslandSizeItems.AddRange(AllowedSizesPerType[randomIsland.IslandType]);
+                    UpdateAvailableSizes();
+                    break;
+            }
         }
         
         /** Valid island sizes depending on the island type */
@@ -82,8 +89,8 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
             {
                 if (SelectedIsland is FixedIslandElement fixedIsland)
                 {
-                    fixedIsland.RandomizeFertilities = value;
                     UndoRedoStack.Instance.Do(new IslandPropertiesStackEntry(fixedIsland, randomizeFertilities: value));
+                    fixedIsland.RandomizeFertilities = value;
                 }
                 OnPropertyChanged();
             }
@@ -96,14 +103,23 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
                                                  && !RandomizeFertilities;
         public SlotsViewModel? SlotsViewModel { get; private set; }
 
-        public IslandSize? IslandSize => (SelectedIsland as RandomIslandElement)?.IslandSize;
+        public IslandSize? IslandSize
+        {
+            get => (SelectedIsland as RandomIslandElement)?.IslandSize;
+            set => ChangeIslandSize(value);
+        }
+
+        public IslandType? IslandType
+        {
+            get => SelectedIsland.IslandType;
+            set => ChangeIslandType(value);
+        }
 
         public string Label
         {
             get => SelectedIsland.Label ?? "";
             set
             {
-                System.Diagnostics.Debug.WriteLine($"Label: {value}");
                 UndoRedoStack.Instance.Do(new IslandLabelStackEntry(SelectedIsland, SelectedIsland.Label, value));
                 SelectedIsland.Label = value;
             }
@@ -120,29 +136,33 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
          * Change Island Type. Checks for allowed size and type combinations. Puts the change on the
          * Undo/Redo Stack.
          */
-        public void ChangeIslandType(IslandType newIslandType)
+        private void ChangeIslandType(IslandType? newIslandType)
         {
+            if (newIslandType == null) return;
+            if (newIslandType == IslandType) return;
+            
             var oldIslandSize = (SelectedIsland as RandomIslandElement)?.IslandSize ?? null;
-            var oldIslandType = SelectedIsland.IslandType;
+            var oldIslandType = IslandType;
             
             SelectedIsland.IslandType = newIslandType;
+            
+            IslandSize? newIslandSize = null;
 
             if (SelectedIsland is RandomIslandElement randomIsland)
             {
+                newIslandSize = randomIsland.IslandSize;
                 if (randomIsland.IslandType == IslandType.PirateIsland || randomIsland.IslandType == IslandType.ThirdParty)
-                    randomIsland.IslandSize = IslandSize.Small;
-                if (randomIsland.IslandType == IslandType.Starter && (randomIsland.IslandSize != IslandSize.Large && randomIsland.IslandSize != IslandSize.Medium)) 
-                    randomIsland.IslandSize = IslandSize.Medium;
+                    newIslandSize = IslandSize.Small;
+                else if (randomIsland.IslandType == IslandType.Starter && (randomIsland.IslandSize != IslandSize.Large && randomIsland.IslandSize != IslandSize.Medium)) 
+                    newIslandSize = IslandSize.Medium;
+                
+                randomIsland.IslandSize = newIslandSize;
             }
-            
-            UpdatePropertyChanges();
-            
-            var newIslandSize = (SelectedIsland as RandomIslandElement)?.IslandSize ?? null;
             
             UndoRedoStack.Instance.Do(new IslandPropertiesStackEntry(
                 element:  SelectedIsland,
                 oldIslandType: oldIslandType,
-                newIslandType: SelectedIsland.IslandType,
+                newIslandType: newIslandType,
                 oldIslandSize: oldIslandSize,
                 newIslandSize: newIslandSize
             ));
@@ -152,17 +172,18 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
          * Change Island Size. Checks for allowed size and type combinations. Puts the change on the
          * Undo/Redo Stack.
          */
-        public void ChangeIslandSize(IslandSize newIslandSize)
+        private void ChangeIslandSize(IslandSize? newIslandSize)
         {
-            var oldIslandSize = (SelectedIsland as RandomIslandElement)?.IslandSize ?? null;
-            var oldIslandType = SelectedIsland.IslandType;
+            if (newIslandSize == null) return;
+            if (SelectedIsland is not RandomIslandElement randomIsland) return;
+            if (randomIsland.IslandSize == newIslandSize) return;
             
-            if (SelectedIsland is RandomIslandElement randomIsland)
-                randomIsland.IslandSize = newIslandSize;
+            var oldIslandSize = randomIsland.IslandSize;
+            var oldIslandType = randomIsland.IslandType;
             
-            UpdatePropertyChanges();
+            randomIsland.IslandSize = newIslandSize;
             
-            var realNewIslandSize = (SelectedIsland as RandomIslandElement)?.IslandSize ?? null;
+            var realNewIslandSize = randomIsland.IslandSize;
             
             UndoRedoStack.Instance.Do(new IslandPropertiesStackEntry(
                 element:  SelectedIsland,
@@ -194,12 +215,13 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         /**
          * Rotate the Island and put it on the Undo/Redo Stack.
          */
-        public void RotateIsland(bool clockwise)
+        private void RotateIsland(bool? clockwise)
         {
+            if (clockwise == null) return;
             if (SelectedIsland is not FixedIslandElement fixedIsland) return;
             
             var islandRotation = fixedIsland.Rotation ?? 0;
-            fixedIsland.Rotation = clockwise ? (byte)((islandRotation - 1) % 4) : (byte)((islandRotation + 1) % 4);
+            fixedIsland.Rotation = (bool)clockwise ? (byte)((islandRotation - 1) % 4) : (byte)((islandRotation + 1) % 4);
             
             UndoRedoStack.Instance.Do(new MapElementTransformStackEntry(
                 fixedIsland, 
@@ -209,47 +231,61 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         }
 
         /**
-         * Callback for island and map template property changes
+         * Callback for island property changes
          */
         private void SelectedIsland_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            // Clear the items to have a clean sorting order when making changes to the session
-            if (e.PropertyName == nameof(MapTemplate.Session))
-                FertilityItems.Clear(); 
-            UpdatePropertyChanges();
-            UpdateSelectedFertilities();
-            
-            if (e.PropertyName == nameof(SelectedIsland.Label))
-                OnPropertyChanged(nameof(Label));
-        }
-        
-        /**
-         * Notify property changes and update lists of viable sizes and types.
-         */
-        private void UpdatePropertyChanges()
-        {
-            IslandTypeItems.Clear();
-            IslandSizeItems.Clear();
-            switch (SelectedIsland)
+            switch (e.PropertyName)
             {
-                case FixedIslandElement fixedIsland:
-                {
-                    if (fixedIsland.IslandType == IslandType.Normal || fixedIsland.IslandType == IslandType.Starter)
-                        IslandTypeItems.AddRange(fixedIsland.IslandAsset.IslandType);
+                case nameof(FixedIslandElement.RandomizeFertilities):
+                    OnPropertyChanged(nameof(RandomizeFertilities));
                     break;
-                }
-                case RandomIslandElement randomIsland:
-                    IslandTypeItems.AddRange(AllowedTypesPerElementType[MapElementType.PoolIsland]);
-                    IslandSizeItems.AddRange(AllowedSizesPerType[randomIsland.IslandType]);
+                case nameof(FixedIslandElement.RandomizeRotation):
+                    OnPropertyChanged(nameof(RandomizeRotation));
+                    break;
+                case nameof(FixedIslandElement.Rotation):
+                    OnPropertyChanged(nameof(IslandRotation));
+                    break;
+                case nameof(RandomIslandElement.IslandSize):
+                    OnPropertyChanged(nameof(IslandSize));
+                    break;
+                case nameof(IslandElement.Label):
+                    OnPropertyChanged(nameof(Label));
+                    break;
+                case nameof(IslandElement.IslandType):
+                    OnPropertyChanged(nameof(IslandType));
+                    UpdateAvailableSizes();
                     break;
             }
-            OnPropertyChanged(nameof(SelectedIsland));
-            OnPropertyChanged(nameof(IslandTypeItemsVisible));
+        }
+
+        /**
+         * Callback for map template property changes
+         */
+        private void MapTemplate_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            // Clear the items to have a clean sorting order when making changes to the session
+            if (e.PropertyName == nameof(MapTemplate.Session))
+            {
+                FertilityItems.Clear();
+                UpdateSelectedFertilities(); 
+            }
+        }
+
+        /**
+         * Update the list of available pool island sizes depending on island type
+         */
+        private void UpdateAvailableSizes()
+        {
+            if (SelectedIsland is not RandomIslandElement randomIsland) return;
+
+            foreach (var sizeItem in IslandSizeItems.ToList().Where(sizeItem => !AllowedSizesPerType[randomIsland.IslandType].Contains(sizeItem)))
+                IslandSizeItems.Remove(sizeItem);
+
+            foreach (var allowedItem in AllowedSizesPerType[randomIsland.IslandType].Where(allowedItem => !IslandSizeItems.Contains(allowedItem)))
+                IslandSizeItems.Add(allowedItem);
+            
             OnPropertyChanged(nameof(IslandSizeItemsVisible));
-            OnPropertyChanged(nameof(RandomizeFertilities));
-            OnPropertyChanged(nameof(RandomizeRotation));
-            OnPropertyChanged(nameof(IslandSize));
-            OnPropertyChanged(nameof(IslandRotation));
         }
 
         /**
@@ -319,7 +355,7 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
             foreach (var fertility in allowedFertilities)
                 AddFertilitySelectors(fertility, fixedIsland, allowedFertilities);
                 
-            foreach (var fertility in fixedIsland.Fertilities)
+            foreach (var fertility in fixedIsland.Fertilities.OrderBy(FertilityComparer.Instance))
                 AddFertilitySelectors(fertility, fixedIsland, allowedFertilities);
                 
             // Update the warning property to show hint
@@ -332,13 +368,17 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         private void AddFertilitySelectors(FertilityAsset allowedFertility, FixedIslandElement fixedIsland, List<FertilityAsset> allowedFertilities)
         {
             if (FertilityItems.Any(f => f.FertilityAsset == allowedFertility)) return;
-            SelectFertilityItem newItem = new(SetFertility)
+            SelectFertilityItem newItem = new(SetFertility, allowedFertility)
             {
-                FertilityAsset = allowedFertility,
                 IsSelected = fixedIsland.Fertilities.Contains(allowedFertility),
                 IsAllowed = allowedFertilities.Contains(allowedFertility)
             };
             FertilityItems.Add(newItem);
         }
+
+        /**
+         * Commands to rotate 
+         */
+        public ICommand RotateIslandCommand => new ActionCommand((dir) => RotateIsland((bool?)dir));
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Specialized;
-using Anno.FileDBModels.Anno1800.MapTemplate;
+﻿using System.Collections.Specialized;
 using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Models;
@@ -86,6 +84,9 @@ namespace AnnoMapEditor.UI.Windows.Main
          */
         private void MapTemplate_ElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (SelectedIsland == null && SelectedUnifiedIslandPropertiesViewModel != null)
+                SelectedUnifiedIslandPropertiesViewModel = null;
+            
             if (SelectedIsland != null && !_mapTemplate.Elements.Contains(SelectedIsland))
             {
                 SelectedIsland = null;
@@ -246,9 +247,9 @@ namespace AnnoMapEditor.UI.Windows.Main
             UndoRedoStack.Instance.Redo();
         }
 
-        public ICommand UndoCommand => new ActionCommand(Undo);
-        public ICommand RedoCommand => new ActionCommand(Redo);
-        public ICommand RemoveCommand => new ActionCommand(() =>
+        public ICommand UndoCommand => new ActionCommand((_) => Undo());
+        public ICommand RedoCommand => new ActionCommand((_) => Redo());
+        public ICommand RemoveCommand => new ActionCommand((_) =>
         {
             if (SelectedIsland == null) return;
             UndoRedoStack.Instance.Do(new IslandRemoveStackEntry(SelectedIsland, MapTemplate));

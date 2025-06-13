@@ -89,10 +89,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="UI\Controls\IslandProperties\FixedIslandProperties.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Update="UI\Controls\MapTemplateProperties.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>

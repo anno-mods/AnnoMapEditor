@@ -38,32 +38,46 @@ namespace AnnoMapEditor.Utilities.UndoRedo
 
         public void Undo()
         {
-            if (_element is FixedIslandElement fixedIsland)
+            // Needs to be set first to prevent unwanted UI states. Don't really know why ...
+            if (_oldIslandType != null) _element.IslandType = _oldIslandType; 
+            
+            switch (_element)
             {
-                if (_randomizeSlots != null) fixedIsland.RandomizeSlots = !_randomizeSlots.Value;
-                if (_randomizeFertilities != null) fixedIsland.RandomizeFertilities = !_randomizeFertilities.Value;
-                if (_randomizeRotation != null) fixedIsland.RandomizeRotation = !_randomizeRotation.Value;
-            } 
-            else if (_element is RandomIslandElement randomIsland)
-            {
-                if (_oldIslandSize != null) randomIsland.IslandSize = _oldIslandSize;    
+                case FixedIslandElement fixedIsland:
+                {
+                    if (_randomizeSlots != null) fixedIsland.RandomizeSlots = !_randomizeSlots.Value;
+                    if (_randomizeFertilities != null) fixedIsland.RandomizeFertilities = !_randomizeFertilities.Value;
+                    if (_randomizeRotation != null) fixedIsland.RandomizeRotation = !_randomizeRotation.Value;
+                    break;
+                }
+                case RandomIslandElement randomIsland:
+                {
+                    if (_oldIslandSize != null) randomIsland.IslandSize = _oldIslandSize;
+                    break;
+                }
             }
-            if (_oldIslandType != null) _element.IslandType = _oldIslandType;
         }
 
         public void Redo()
         {
-            if (_element is FixedIslandElement fixedIsland)
-            {
-                if (_randomizeSlots != null) fixedIsland.RandomizeSlots = _randomizeSlots.Value;
-                if (_randomizeFertilities != null) fixedIsland.RandomizeFertilities = _randomizeFertilities.Value;
-                if (_randomizeRotation != null) fixedIsland.RandomizeRotation = _randomizeRotation.Value;
-            }
-            else if (_element is RandomIslandElement randomIsland)
-            {
-                if (_newIslandSize != null) randomIsland.IslandSize = _newIslandSize;    
-            }
+            // Needs to be set first to prevent unwanted UI states. Don't really know why ...
             if (_newIslandType != null) _element.IslandType = _newIslandType;
+            
+            switch (_element)
+            {
+                case FixedIslandElement fixedIsland:
+                {
+                    if (_randomizeSlots != null) fixedIsland.RandomizeSlots = _randomizeSlots.Value;
+                    if (_randomizeFertilities != null) fixedIsland.RandomizeFertilities = _randomizeFertilities.Value;
+                    if (_randomizeRotation != null) fixedIsland.RandomizeRotation = _randomizeRotation.Value;
+                    break;
+                }
+                case RandomIslandElement randomIsland:
+                {
+                    if (_newIslandSize != null) randomIsland.IslandSize = _newIslandSize;
+                    break;
+                }
+            }
         }
     }
 }

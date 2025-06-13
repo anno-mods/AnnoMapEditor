@@ -24,7 +24,11 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         private void RandomIsland_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(IslandElement.IslandType) || e.PropertyName == nameof(IslandElement.Label))
+            if (e.PropertyName 
+                is nameof(IslandElement.IslandType) 
+                or nameof(IslandElement.Label) 
+                or nameof(RandomIslandElement.IslandSize)
+            )
                 UpdateLabel();
         }
 

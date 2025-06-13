@@ -9,16 +9,16 @@ namespace AnnoMapEditor.Utilities
 {
     public class ActionCommand : ICommand
     {
-        private readonly Action _action;
+        private readonly Action<object?> _action;
 
-        public ActionCommand(Action action)
+        public ActionCommand(Action<object?> action)
         {
             _action = action;
         }
 
         public void Execute(object? parameter)
         {
-            _action();
+            _action(parameter);
         }
 
         public bool CanExecute(object? parameter)

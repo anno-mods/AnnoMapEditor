@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AnnoMapEditor.UI.Controls.Fertilities
+namespace AnnoMapEditor.UI.Controls.IslandProperties
 {
     /// <summary>
     /// Sorts the island's fertilities the same way as on the minimap in game.

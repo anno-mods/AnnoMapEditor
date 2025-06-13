@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls.IslandProperties"
              xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
              xmlns:slots="clr-namespace:AnnoMapEditor.UI.Controls.Slots"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=local:UnifiedIslandPropertiesViewModel}"
              d:DesignHeight="600" d:DesignWidth="350">
@@ -21,6 +22,8 @@
                     <converters:BoolToVisibility x:Key="VisibleOnFalse" OnTrue="Collapsed" OnFalse="Visible" />
                     <converters:BooleaNotConverter x:Key="TrueOnFalse" />
                     <converters:RotationIndexToAngleText x:Key="IntToAngle"/>
+                    <system:Boolean x:Key="False">False</system:Boolean>
+                    <system:Boolean x:Key="True">True</system:Boolean>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -91,7 +94,8 @@
                     <Button Grid.Column="2" Style="{StaticResource ToolbarButton}" 
                             VerticalAlignment="Center"
                             IsEnabled="{Binding RandomizeRotation, Converter={StaticResource TrueOnFalse}}"
-                            Click="OnRotateCounterClockwise"
+                            Command="{Binding RotateIslandCommand}"
+                            CommandParameter="{StaticResource False}"
                             FontWeight="Black" FontSize="25" Content="&#xe80c;" Height="25"/>
                     <TextBox Grid.Column="3" 
                              VerticalAlignment="Center"
@@ -101,7 +105,8 @@
                     <Button Grid.Column="4" Style="{StaticResource ToolbarButton}" 
                             VerticalAlignment="Center"
                             IsEnabled="{Binding RandomizeRotation, Converter={StaticResource TrueOnFalse}}"
-                            Click="OnRotateClockwise"
+                            Command="{Binding RotateIslandCommand}"
+                            CommandParameter="{StaticResource True}"
                             FontWeight="Black" FontSize="25" Content="&#xe80d;" Height="25"/>
                 </Grid>
                 
@@ -110,10 +115,8 @@
                     <TextBlock Text="Island Type"
                                Style="{StaticResource SubHeaderLabelStyle}"/>
                     <ComboBox Margin="0,5"
-                              Name="IslandTypeComboBox"
-                              DropDownClosed="IslandTypeComboBox_OnDropDownClosed"
                               ItemsSource="{Binding IslandTypeItems}"
-                              SelectedItem="{Binding SelectedIsland.IslandType, Mode=OneWay}"/>
+                              SelectedItem="{Binding IslandType}"/>
                 </StackPanel>
                 
                 <!-- IslandSize -->
@@ -122,10 +125,8 @@
                                Style="{StaticResource SubHeaderLabelStyle}"
                                Visibility="{Binding IslandSizeItemsVisible, Converter={StaticResource VisibleOnTrue}}"/>
                     <ComboBox Margin="0,5"
-                              Name="IslandSizeComboBox"
-                              DropDownClosed="IslandSizeComboBox_OnDropDownClosed"
                               ItemsSource="{Binding IslandSizeItems}"
-                              SelectedItem="{Binding IslandSize, Mode=OneWay}"/>
+                              SelectedItem="{Binding IslandSize}"/>
                 </StackPanel>
                 
                 <!-- Slots and Fertilities -->
@@ -164,7 +165,6 @@
                             <DataTemplate>
                                 <ToggleButton Style="{StaticResource FancyToggleButton}"
                                               IsChecked="{Binding IsSelected}"
-                                              Command="{Binding ToggleCommand}"
                                               Margin="8,4">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
