@@ -3,6 +3,8 @@ using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using AnnoMapEditor.Utilities.UndoRedo;
 
 namespace AnnoMapEditor.UI.Controls
 {
@@ -22,18 +24,14 @@ namespace AnnoMapEditor.UI.Controls
 
         public SessionAsset SelectedSession
         {
-            get => _selectedSession;
+            get => _mapTemplate.Session;
             set
             {
-                if (value != _selectedSession)
-                {
-                    _selectedSession = value;
-                    _mapTemplate.Session = value;
-                    OnSelectedRegionChanged();
-                }
+                UndoRedoStack.Instance.Do(new MapPropertiesStackEntry(_mapTemplate, oldSession: SelectedSession, newSession: value));
+                _mapTemplate.Session = value;
+                OnSelectedRegionChanged();
             }
         }
-        private SessionAsset _selectedSession;
 
         public event EventHandler? SelectedRegionChanged;
 
@@ -118,8 +116,7 @@ namespace AnnoMapEditor.UI.Controls
         {
             _mapTemplate = mapTemplate;
             _mapTemplate.MapSizeConfigCommitted += HandleMapTemplateSizeCommitted;
-
-            _selectedSession = _mapTemplate.Session;
+            _mapTemplate.PropertyChanged += HandleMapTemplatePropertyChanged;
 
             MapSize = mapTemplate.Size.X;
 
@@ -139,6 +136,12 @@ namespace AnnoMapEditor.UI.Controls
         private void HandleMapTemplateSizeCommitted(object? sender, EventArgs _)
         {
             UpdateMapSizeText();
+        }
+
+        private void HandleMapTemplatePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(MapTemplate.Session))
+                OnPropertyChanged(nameof(SelectedSession));
         }
     }
 }

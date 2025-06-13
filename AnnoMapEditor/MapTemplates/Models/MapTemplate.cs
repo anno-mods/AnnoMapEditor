@@ -22,10 +22,10 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public Rect2 PlayableArea
         {
-            get => _playableAea;
-            private set => SetProperty(ref _playableAea, value, dependendProperties: new[] { nameof(MapSizeText) });
+            get => _playableArea;
+            private set => SetProperty(ref _playableArea, value, dependendProperties: new[] { nameof(MapSizeText) });
         }
-        private Rect2 _playableAea = new();
+        private Rect2 _playableArea = new();
 
         public SessionAsset Session 
         { 
@@ -68,7 +68,7 @@ namespace AnnoMapEditor.MapTemplates.Models
         {
             _session = session;
             _size = new Vector2(document.MapTemplate?.Size);
-            _playableAea = new Rect2(document.MapTemplate?.PlayableArea);
+            _playableArea = new Rect2(document.MapTemplate?.PlayableArea);
             _templateDocument = document;
 
             // TODO: Allow empty templates?
@@ -104,7 +104,7 @@ namespace AnnoMapEditor.MapTemplates.Models
 
             _session = session;
             _size = new Vector2(_templateDocument.MapTemplate.Size);
-            _playableAea = new Rect2(_templateDocument.MapTemplate.PlayableArea);
+            _playableArea = new Rect2(_templateDocument.MapTemplate.PlayableArea);
 
             // create starting spots in the default location
             Elements.AddRange(CreateNewStartingSpots(mapSize));
@@ -162,6 +162,11 @@ namespace AnnoMapEditor.MapTemplates.Models
         public void UpdateMapZoomConfig(float zoomFactor, float xTransFactor, float yTransFactor)
         {
             MapZoomConfigChanged?.Invoke(this, new MapZoomConfigEventArgs(zoomFactor, xTransFactor, yTransFactor));
+        }
+
+        public void RestoreMapSizeConfig(int mapSize, Rect2 playableArea)
+        {
+            // TODO: Implement Map Size Config restoring
         }
 
         public void ResizeAndCommitMapTemplate(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
