@@ -61,13 +61,22 @@ namespace AnnoMapEditor.MapTemplates.Models
         }
         private bool _showLabels = true;
 
-        public MapTemplate(SessionAsset session)
+        private MapTemplate()
+        {
+            ToolbarService.Instance.ButtonClicked += (sender, e) =>
+            {
+                if (e.ButtonType == ToolbarButtonType.ShowLabels) 
+                    ShowLabels = !ShowLabels;
+            };
+        }
+
+        public MapTemplate(SessionAsset session) : this()
         {
             _session = session;
             _templateDocument = new MapTemplateDocument();
         }
 
-        public MapTemplate(MapTemplateDocument document, SessionAsset session)
+        public MapTemplate(MapTemplateDocument document, SessionAsset session) : this()
         {
             _session = session;
             _size = new Vector2(document.MapTemplate?.Size);
@@ -91,7 +100,7 @@ namespace AnnoMapEditor.MapTemplates.Models
                 _templateDocument.MapTemplate.TemplateElement = null;
         }
 
-        public MapTemplate(int mapSize, int playableSize, SessionAsset session)
+        public MapTemplate(int mapSize, int playableSize, SessionAsset session) : this()
         {
             int margin = (mapSize - playableSize) / 2;
 

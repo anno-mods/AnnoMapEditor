@@ -149,13 +149,11 @@ namespace AnnoMapEditor.UI.Windows.Main
             
             MapTemplate.ShowLabels = true;
             
+            // Toolbar button events to listen for
             ToolbarService.Instance.ButtonClicked += (sender, e) =>
             {
                 switch (e.ButtonType)
                 {
-                    case ToolbarButtonType.ShowLabels:
-                        _mapTemplate.ShowLabels = !_mapTemplate.ShowLabels;
-                        break;
                     case ToolbarButtonType.DeleteIsland:
                         DeleteSelectedIsland();
                         break;
@@ -163,6 +161,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                         CreateNewMap();
                         break;
                     case ToolbarButtonType.ExportMap:
+                        // TODO: To be replaced by a proper window.
                         OverlayService.Instance.Show(new ExportAsModViewModel(MapTemplate));
                         break;
                     case ToolbarButtonType.LoadMap:
@@ -175,7 +174,6 @@ namespace AnnoMapEditor.UI.Windows.Main
                         SaveMapFileDialog();
                         break;
                     default: break;
-                        
                 }
             };
         }
@@ -316,11 +314,8 @@ namespace AnnoMapEditor.UI.Windows.Main
             // SelectedUnifiedIslandPropertiesViewModel = null;
         }
 
-        public ICommand UndoCommand => new ActionCommand((_) => Undo());
-        public ICommand RedoCommand => new ActionCommand((_) => Redo());
-        public ICommand RemoveCommand => new ActionCommand((_) =>
-        {
-            DeleteSelectedIsland();
-        });
+        public ICommand UndoCommand => new ActionCommand(_ => Undo());
+        public ICommand RedoCommand => new ActionCommand(_ => Redo());
+        public ICommand RemoveCommand => new ActionCommand(_ => DeleteSelectedIsland());
     }
 }

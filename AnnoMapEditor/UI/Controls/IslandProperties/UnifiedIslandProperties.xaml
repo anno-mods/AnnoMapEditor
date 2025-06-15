@@ -51,7 +51,7 @@
                 <!-- Label -->
                 <TextBlock Text="Label"
                            Style="{StaticResource SubHeaderLabelStyle}"/>
-                <TextBox Margin="0,5"
+                <TextBox Margin="0,4"
                          IsUndoEnabled="False"
                          Text="{Binding Label, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          KeyDown="LabelTextBox_KeyDown"/>
@@ -61,7 +61,7 @@
                            Style="{StaticResource SubHeaderLabelStyle}"/>
                 <Grid HorizontalAlignment="Stretch"
                       Height="30"
-                      Margin="0,2">
+                      Margin="0,4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="*"/>
@@ -78,7 +78,7 @@
                 <!-- Rotation -->
                 <Grid Visibility="{Binding IslandRotationPropertiesVisible, Converter={StaticResource VisibleOnTrue}}"
                       Height="30"
-                      Margin="0,2">
+                      Margin="0,4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -114,7 +114,7 @@
                 <StackPanel Visibility="{Binding IslandTypeItemsVisible, Converter={StaticResource VisibleOnTrue}}">
                     <TextBlock Text="Island Type"
                                Style="{StaticResource SubHeaderLabelStyle}"/>
-                    <ComboBox Margin="0,5"
+                    <ComboBox Margin="0,4"
                               ItemsSource="{Binding IslandTypeItems}"
                               SelectedItem="{Binding IslandType}"/>
                 </StackPanel>
@@ -124,7 +124,7 @@
                     <TextBlock Text="Island Size"
                                Style="{StaticResource SubHeaderLabelStyle}"
                                Visibility="{Binding IslandSizeItemsVisible, Converter={StaticResource VisibleOnTrue}}"/>
-                    <ComboBox Margin="0,5"
+                    <ComboBox Margin="0,4"
                               ItemsSource="{Binding IslandSizeItems}"
                               SelectedItem="{Binding IslandSize}"/>
                 </StackPanel>

@@ -75,17 +75,14 @@ namespace AnnoMapEditor.UI.Controls
 
         public bool EditPlayableArea
         {
-            get { return (bool)GetValue(EditPlayableAreaProperty); }
+            get => (bool)GetValue(EditPlayableAreaProperty);
             set
             {
-                if ((bool)GetValue(EditPlayableAreaProperty) != value)
-                {
-                    SetValue(EditPlayableAreaProperty, value);
-                    if (_playableRect is not null)
-                    {
-                        _playableRect.IsEnabled = value;
-                    }
-                }
+                if ((bool)GetValue(EditPlayableAreaProperty) == value) return;
+                
+                SetValue(EditPlayableAreaProperty, value);
+                if (_playableRect is not null)
+                    _playableRect.IsEnabled = value;
             }
         }
 
@@ -418,6 +415,9 @@ namespace AnnoMapEditor.UI.Controls
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
+            // Do not use group selection when editing playable area
+            if (EditPlayableArea) return;
+            
             // TODO:    base.OnMouseLeftButtonDown(e);      Handle clicking on other elements
             if (_selectionBox != null)
                 RemoveSelectionBox();
@@ -437,6 +437,9 @@ namespace AnnoMapEditor.UI.Controls
 
         private void SelectionBoxViewModel_DragEnded(object? sender, DragEndedEventArgs e)
         {
+            // Do not use group selection when editing playable area
+            if (EditPlayableArea) return;
+            
             SelectionBoxViewModel selectionBoxViewModel = sender as SelectionBoxViewModel
                 ?? throw new ArgumentException();
 
@@ -528,6 +531,8 @@ namespace AnnoMapEditor.UI.Controls
                 else if (item is MapElementControl mapElement)
                     mapElement.IsEnabled = enable;
             }
+            if (!enable)
+                DeselectAllMapElements();
         }
 
         private void SelectIsland_IslandSelected(object? sender, IslandSelectedEventArgs e, Vector2 position)

@@ -11,6 +11,7 @@
     <Brush x:Key="DarkBackgroundBrush">#121619</Brush>
     <Brush x:Key="TransparentBackgroundBrush">#7f000000</Brush>
     <Brush x:Key="ControlBrush">#8024415F</Brush>
+    <Brush x:Key="FixedControlBrush">#1B2C3C</Brush>
     <Brush x:Key="DisabledBrush">#708090</Brush>
     <Brush x:Key="DialogBrush">#ef182B3F</Brush>
     <Brush x:Key="ErrorBrush">#ee0000</Brush>
@@ -25,7 +26,7 @@
     <Brush x:Key="SelectedBackgroundBrush">#531C97EA</Brush>
     <Brush x:Key="SelectedForegroundBrush">#1C97EA</Brush>
     <Brush x:Key="MouseoverBorderBrush">#73ffffff</Brush>
-    <Brush x:Key="MouseoverFixedBorderBrush">#394856</Brush>
+    <Brush x:Key="MouseoverFixedBorderBrush">#828B94</Brush>
     <Brush x:Key="MouseoverBackgroundBrush">#23ffffff</Brush>
     <Brush x:Key="PressedBackgroundBrush">#1dffffff</Brush>
     <Brush x:Key="ForegroundBrush">#f0f0f0</Brush>

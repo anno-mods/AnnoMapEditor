@@ -18,5 +18,6 @@
         <ResourceDictionary Source="/UI/Resources/Styles/ToolTip.xaml" />
         <ResourceDictionary Source="/UI/Resources/Styles/Scrollbar.xaml" />
         <ResourceDictionary Source="/UI/Resources/Styles/FancyToggleButton.xaml" />
+        <ResourceDictionary Source="/UI/Resources/Styles/Slider.xaml"></ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

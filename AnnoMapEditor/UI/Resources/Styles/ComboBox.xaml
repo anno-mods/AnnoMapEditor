@@ -24,7 +24,7 @@
                     CornerRadius="0,5,5, 0"/>
             <Path x:Name="Arrow" Grid.Column="1" 
                   VerticalAlignment="Center" HorizontalAlignment="Center"
-                  Width="6" Fill="#f0f0f0" Stretch="Uniform" 
+                  Width="6" Fill="{StaticResource ForegroundBrush}" Stretch="Uniform" 
                   Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z "/>
         </Grid>
         <!--<ControlTemplate.Triggers>
@@ -137,7 +137,7 @@
                             <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" TargetName="ToggleButton" Value="{StaticResource MouseoverBackgroundBrush}" />
+                            <Setter Property="BorderBrush" TargetName="ToggleButton" Value="{StaticResource MouseoverBorderBrush}" />
                         </Trigger>
                         <Trigger Property="IsDropDownOpen" Value="True" >
                             <Setter Property="BorderBrush" TargetName="ToggleButton" Value="{StaticResource SelectedForegroundBrush}" />
