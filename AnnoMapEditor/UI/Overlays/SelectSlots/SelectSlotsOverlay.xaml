@@ -12,7 +12,8 @@
         d:DesignHeight="450"
         d:DesignWidth="800"
         HorizontalAlignment="Stretch"
-        VerticalAlignment="Stretch">
+        VerticalAlignment="Stretch"
+        Background="{StaticResource MediumBackgroundBrush}">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -23,19 +24,21 @@
                         <ComboBox ItemsSource="{Binding SlotItems}"
                                   SelectedItem="{Binding AssignedSlot}"
                                   Height="38"
-                                  Width="150"
+                                  Margin="2"
+                                  MinWidth="150"
                                   GotFocus="{e:EventBinding OnGotFocus}"
                                   LostFocus="{e:EventBinding OnLostFocus}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Height="40"
-                                    Orientation="Horizontal">
+                                    <StackPanel Height="30"
+                                                VerticalAlignment="Center"
+                                                Orientation="Horizontal">
                                         <Image Source="{Binding Icon}"
-                                               Width="32"
-                                               Height="32"
+                                               Width="30"
+                                               Height="30"
                                                Margin="4"/>
                                         <TextBlock Text="{Binding DisplayName}"
-                                                   Foreground="Black"
+                                                   Foreground="{StaticResource ForegroundBrush}"
                                                    VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </DataTemplate>
@@ -47,14 +50,14 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource DialogBrush}">
+    <Grid>
         <Grid.Resources>
             <converters:BoolToVisibility x:Key="boolToVisibility" OnTrue="Visible" OnFalse="Collapsed" />
         </Grid.Resources>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="32"/>
-            <RowDefinition Height="32"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition>
                 <RowDefinition.Style>
                     <Style TargetType="{x:Type RowDefinition}">
@@ -95,21 +98,24 @@
                               Label="Mines" 
                               OnText="Show" OffText="Hide" 
                               IsChecked="{Binding ShowMines, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              HorizontalAlignment="Center"/>
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
         <controls:FancyToggle x:Name="ClayFilter"
                               Grid.Row="1"
                               Grid.Column="2"
                               Label="Clay" 
                               OnText="Show" OffText="Hide" 
                               IsChecked="{Binding ShowClay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              HorizontalAlignment="Center"/>
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
         <controls:FancyToggle x:Name="OilFilter"
                               Grid.Row="1"
                               Grid.Column="3"
                               Label="Oil" 
                               OnText="Show" OffText="Hide" 
                               IsChecked="{Binding ShowOil, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              HorizontalAlignment="Center"/>
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
 
         <!-- region warning -->
         <DockPanel Grid.Row="2"
@@ -126,6 +132,7 @@
         <ListBox x:Name="Map"
                  Grid.Row="3"
                  Grid.ColumnSpan="4"
+                 Background="Transparent"
                  ItemsSource="{Binding SlotAssignmentViewModels}"
                  Width="{Binding FixedIsland.IslandAsset.SizeInTiles}"
                  Height="{Binding FixedIsland.IslandAsset.SizeInTiles}"
@@ -183,25 +190,25 @@
         </Canvas>
 
         <!-- selectors -->
-        <ListView x:Name="SlotSelectionsLeft"
+        <ItemsControl x:Name="SlotSelectionsLeft"
                   Grid.Row="3"
                   Grid.Column="0"
                   HorizontalAlignment="Left"
                   VerticalAlignment="Center"
-                  Background="Transparent"
+                  Background="{StaticResource MediumBackgroundBrush}"
                   BorderThickness="0"
                   ItemsSource="{Binding SlotAssignmentViewModelsLeft}"
                   ItemTemplate="{StaticResource SelectorTemplate}">
-        </ListView>
-        <ListView x:Name="SlotSelectionsRight"
+        </ItemsControl>
+        <ItemsControl x:Name="SlotSelectionsRight"
                   Grid.Row="3"
                   Grid.Column="3"
                   HorizontalAlignment="Right"
                   VerticalAlignment="Center"
-                  Background="Transparent"
+                  Background="{StaticResource MediumBackgroundBrush}"
                   BorderThickness="0"
                   ItemsSource="{Binding SlotAssignmentViewModelsRight}"
                   ItemTemplate="{StaticResource SelectorTemplate}">
-        </ListView>
+        </ItemsControl>
     </Grid>
 </UserControl>

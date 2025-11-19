@@ -2,10 +2,10 @@
 
 This project is not affiliated in any way with Ubisoft.
 
-Anno 1800 is a trademark of Ubisoft Entertainment in the US and/or other countries.
+Anno 1800 and Anno 117 - Pax Romana are trademarks of Ubisoft Entertainment in the US and/or other countries.
 Anno is a trademark of Ubisoft GmbH in the US and/or other countries.
 
-![](./doc/editor-v0.5.gif)
+![](./doc/editor-v0.6.gif)
 
 ## Setup
 
@@ -13,21 +13,21 @@ You need to install [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/
 If you don't have it yet it will prompt you to download it.
 Select "Run desktop apps, Download x64".
 
-Once started, the editor will detect your game path automatically.
-If it didn't find it, you'll need to set the path manually to your game or a folder with all RDA `data/` extracted.
+Once started, the Editor will ask for your Anno installation path. Continue to the editor and you are presented with an empty map template.
 
 ## Features
 
 - open map templates from the game, or extracted files (`.a7tinfo` and [FileDBReader](https://github.com/anno-mods/FileDBReader) `.xml`)
-- rearrange islands, change island pool type
-- save as ready-to-play mod (Old World in Sandbox mode only)
+- create entirely new map templates
+- rearrange, delete and add islands, change island pool type
+- modify mining slots and fertilities
+- undo and redo changes (currently not working with map size changes and group transform)
+- save as ready-to-play mod.
 - save as map template for manual modding
 
 ## How to Use
 
-Open an existing map, change it to your liking and safe it as a mod.
-Only Old World maps can currently be saved as mod.
-All other maps are only useful for modders.
+Open an existing map or create a new one, change it to your liking and safe it as a mod.
 
 Have a look at the [Modding Guide](https://github.com/anno-mods/modding-guide) if you need help how to create more complex map mods or even new sessions.
 
@@ -35,21 +35,29 @@ Sometimes you will see some warnings on the left side:
 
 - Too many small/medium/large pool islands: The game uses every island variation only once.
   If you have too many pool islands, the game will just omit the remaining ones.
+- Too many continental islands. More than 1 continental island may result in visual glitches.
 
-  Keep in mind, third party and pirate slots may turn into small islands depending on game settings.
+You can export the map anyways, but you might encounter unwanted behavior while playing on it.
+
+Keep in mind, third party and pirate slots may turn into small islands depending on game settings.
 
 ## Roadmap
 
-- change fixed islands type
-- resize session
-- fertilities, mine slots
-- save Cap Trelawney, Arctic, Enbesa as mod
-- save New World as mod mod after DLC12
-
-There won't be a save as new region.
-It's not reliable to do so without manual editing.
+- Compatibility with Anno 117 - Pax Romana (currently underway)
+- Quality of life enhancements
+- Optimized export-as-mod methods
 
 ## Changelog
+
+### 0.6
+
+- Complete UI overhaul:
+  - New startup window with optimized asset loading
+  - Undo and Redo features
+  - Zooming (mousewheel) and panning (right click and drag)
+  - Visible slots on the map
+  - Streamlined fertility selection
+- General fixes and optimizations 
 
 ### 0.5
 

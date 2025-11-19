@@ -7,6 +7,7 @@ using AnnoMapEditor.UI.Controls.Selection;
 using AnnoMapEditor.UI.Overlays;
 using AnnoMapEditor.UI.Overlays.SelectIsland;
 using AnnoMapEditor.Utilities;
+using AnnoMapEditor.Utilities.UndoRedo;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -17,6 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using AnnoMapEditor.UI.Controls.Toolbar;
 
 namespace AnnoMapEditor.UI.Controls
 {
@@ -73,17 +75,14 @@ namespace AnnoMapEditor.UI.Controls
 
         public bool EditPlayableArea
         {
-            get { return (bool)GetValue(EditPlayableAreaProperty); }
+            get => (bool)GetValue(EditPlayableAreaProperty);
             set
             {
-                if ((bool)GetValue(EditPlayableAreaProperty) != value)
-                {
-                    SetValue(EditPlayableAreaProperty, value);
-                    if (_playableRect is not null)
-                    {
-                        _playableRect.IsEnabled = value;
-                    }
-                }
+                if ((bool)GetValue(EditPlayableAreaProperty) == value) return;
+                
+                SetValue(EditPlayableAreaProperty, value);
+                if (_playableRect is not null)
+                    _playableRect.IsEnabled = value;
             }
         }
 
@@ -140,6 +139,7 @@ namespace AnnoMapEditor.UI.Controls
         #endregion playable area
 
 
+
         public MapView()
         {
             InitializeComponent();
@@ -148,6 +148,25 @@ namespace AnnoMapEditor.UI.Controls
             DataContextChanged += MapView_DataContextChanged;
 
             Settings.Instance.PropertyChanged += Settings_PropertyChanged;
+            ToolbarService.Instance.ButtonClicked += Toolbar_ButtonClicked;
+        }
+
+        private void Toolbar_ButtonClicked(object? sender, ToolbarButtonEventArgs e)
+        {
+            switch (e.ButtonType)
+            {
+                case ToolbarButtonType.ZoomOut:
+                    ApplyScaling(1/1.1);
+                    break;
+                case ToolbarButtonType.ZoomIn:
+                    ApplyScaling(1.1);
+                    break;
+                case ToolbarButtonType.ZoomReset:
+                    ResetZoom();
+                    break;
+                default:
+                    break;
+            }
         }
 
 
@@ -171,6 +190,8 @@ namespace AnnoMapEditor.UI.Controls
 
         private void UpdateIslands(MapTemplate? mapTemplate)
         {
+            // ResetZoom();
+
             //Unlink event handlers from old MapTemplate
             if (mapTemplate != _mapTemplate)
             {
@@ -190,6 +211,8 @@ namespace AnnoMapEditor.UI.Controls
 
                 if (mapTemplate is not null)
                 {
+                    // ShowLabelSwitch.IsChecked = _mapTemplate.ShowLabels;
+
                     LinkMapTemplateEventHandlers(mapTemplate);
 
                     _mapRect = new Rectangle
@@ -368,6 +391,9 @@ namespace AnnoMapEditor.UI.Controls
                             Position = protoIslandViewModel.Island.Position
                         };
                         _mapTemplate!.Elements.Add(islandElement);
+
+                        // Add random island to Undo Stack
+                        UndoRedoStack.Instance.Do(new IslandAddStackEntry(islandElement, _mapTemplate));
                     }
                     else
                         throw new NotImplementedException();
@@ -389,6 +415,9 @@ namespace AnnoMapEditor.UI.Controls
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
+            // Do not use group selection when editing playable area
+            if (EditPlayableArea) return;
+            
             // TODO:    base.OnMouseLeftButtonDown(e);      Handle clicking on other elements
             if (_selectionBox != null)
                 RemoveSelectionBox();
@@ -408,6 +437,9 @@ namespace AnnoMapEditor.UI.Controls
 
         private void SelectionBoxViewModel_DragEnded(object? sender, DragEndedEventArgs e)
         {
+            // Do not use group selection when editing playable area
+            if (EditPlayableArea) return;
+            
             SelectionBoxViewModel selectionBoxViewModel = sender as SelectionBoxViewModel
                 ?? throw new ArgumentException();
 
@@ -459,14 +491,6 @@ namespace AnnoMapEditor.UI.Controls
             }
         }
 
-        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
-        {
-            DeselectAllMapElements();
-
-            e.Handled = true;
-            base.OnMouseRightButtonDown(e);
-        }
-
         #endregion selecting
 
         private void OnMapElementSelected(MapElementViewModel viewModel)
@@ -507,17 +531,28 @@ namespace AnnoMapEditor.UI.Controls
                 else if (item is MapElementControl mapElement)
                     mapElement.IsEnabled = enable;
             }
+            if (!enable)
+                DeselectAllMapElements();
         }
 
         private void SelectIsland_IslandSelected(object? sender, IslandSelectedEventArgs e, Vector2 position)
         {
             // add the new Island
-            // TODO: Select the correct IslandType.
-            FixedIslandElement fixedIslandElement = new(e.IslandAsset, IslandType.Normal)
+
+            string fileName = System.IO.Path.GetFileNameWithoutExtension(e.IslandAsset.FilePath);
+            System.Diagnostics.Debug.WriteLine("Island file name: " + fileName);
+
+            IslandType islandType = IslandType.FromIslandFileName(fileName);
+
+            FixedIslandElement fixedIslandElement = new(e.IslandAsset, islandType)
             {
+                Label = IslandType.DefaultIslandLabelFromFileName(fileName),
                 Position = position
             };
             _mapTemplate.Elements.Add(fixedIslandElement);
+
+            // Add fixed island to Undo Stack
+            UndoRedoStack.Instance.Do(new IslandAddStackEntry(fixedIslandElement, _mapTemplate));
         }
 
         private void MapElementViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -543,6 +578,8 @@ namespace AnnoMapEditor.UI.Controls
                     if (viewModel.IsOutOfBounds && !viewModel.IsDragging && !_mapTemplate.ResizingInProgress)
                     {
                         _mapTemplate.Elements.Remove(viewModel.Element);
+                        viewModel.Element.Position = viewModel.DragStartPosition;
+                        UndoRedoStack.Instance.Do(new IslandRemoveStackEntry(viewModel.Element as IslandElement, _mapTemplate));
 
                         // deselect the island if it was selected
                         if (viewModel == _selectedElement)
@@ -578,17 +615,30 @@ namespace AnnoMapEditor.UI.Controls
         {
             if (_mapTemplate is null)
                 return;
+            
+            double canvasSize = Math.Min(zoomCanvas.ActualWidth, zoomCanvas.ActualHeight);
+            double size = Math.Sqrt((canvasSize * canvasSize) / 2);
 
-            double size = Math.Min(ActualWidth, ActualHeight);
-            size = Math.Sqrt((size * size) / 2);
+            rotationCanvas.Width = size;
+            rotationCanvas.Height = size;
 
-            double requiredScaleX = size / _mapTemplate.Size.X;
-            double requiredScaleY = size / _mapTemplate.Size.Y;
-            float scale = (float)Math.Min(requiredScaleX, requiredScaleY);
+            float scale = (float)(Math.Min(size / _mapTemplate.Size.X, size / _mapTemplate.Size.Y));
 
             mapTemplateCanvas.RenderTransform = new ScaleTransform(scale, scale);
-            rotationCanvas.Width = scale * _mapTemplate.Size.X;
-            rotationCanvas.Height = scale * _mapTemplate.Size.Y;
+
+            TransformGroup mapRenderTransform = new();
+            mapRenderTransform.Children.Add(new RotateTransform(MAP_ROTATION_ANGLE));
+            mapRenderTransform.Children.Add(new TranslateTransform((zoomCanvas.ActualWidth - size) / 2, (zoomCanvas.ActualHeight - size) / 2));
+            rotationCanvas.RenderTransform = mapRenderTransform; 
+            
+            Matrix matrix = matrixTransform.Matrix;
+            matrix.M11 = Math.Max(1, matrix.M11);
+            matrix.M22 = matrix.M11;
+            matrix.OffsetX = Math.Min(0, Math.Max(matrix.OffsetX, -1 * (zoomCanvas.ActualWidth * (matrix.M11 - 1))));
+            matrix.OffsetY = Math.Min(0, Math.Max(matrix.OffsetY, -1 * (zoomCanvas.ActualHeight * (matrix.M11 - 1))));
+            ToolbarService.Instance.ZoomOutButtonEnabled = matrix.M11 > 1;
+            matrixTransform.Matrix = matrix;
+            
         }
 
         private void LinkMapTemplateEventHandlers(MapTemplate mapTemplate)
@@ -750,6 +800,76 @@ namespace AnnoMapEditor.UI.Controls
                     startViewModel.Element.Position = startViewModel.Element.Position.Clamp(_mapTemplate.PlayableArea);
                 }
             }
+        }
+
+        private bool rightclickDragging = false;
+        private Point dragPoint = new Point(0, 0);
+
+        protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
+        {
+            rightclickDragging = true;
+            dragPoint = e.GetPosition(this);
+            Mouse.Capture(this);
+
+            e.Handled = true;
+            base.OnMouseRightButtonDown(e);
+        }
+
+        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
+        {
+            rightclickDragging = false; 
+            Mouse.Capture(null);
+            ReleaseMouseCapture();
+            base.OnMouseRightButtonUp(e);
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            if (rightclickDragging)
+            {
+                Point dragOffset = e.GetPosition(this);
+
+                Matrix matrix = matrixTransform.Matrix;
+                matrix.Translate(dragOffset.X -dragPoint.X, dragOffset.Y - dragPoint.Y);
+                matrix.OffsetX = Math.Min(0, Math.Max(matrix.OffsetX, -1 * (zoomCanvas.ActualWidth * (matrix.M11 - 1))));
+                matrix.OffsetY = Math.Min(0, Math.Max(matrix.OffsetY, -1 * (zoomCanvas.ActualHeight * (matrix.M11 - 1))));
+                matrixTransform.Matrix = matrix;
+                dragPoint = dragOffset;
+            }
+            e.Handled = true;
+            base.OnMouseMove(e);
+        }
+
+        protected override void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            double scale = e.Delta > 0 ? 1.1 : 1 / 1.1;
+            Point pos = e.GetPosition(this);
+
+            ApplyScaling(scale, pos);
+            
+            e.Handled = true;
+            base.OnMouseWheel(e);
+        }
+
+        private void ApplyScaling(double scale, Point? pos = null)
+        {
+            var matrix = matrixTransform.Matrix;
+            if (pos is { } point)
+                matrix.ScaleAt(scale, scale, point.X, point.Y);
+            else
+                matrix.ScaleAt(scale, scale, zoomCanvas.ActualWidth / 2, zoomCanvas.ActualHeight / 2);
+            matrix.M11 = Math.Max(1, matrix.M11);
+            matrix.M22 = matrix.M11;
+            matrix.OffsetX = Math.Min(0, Math.Max(matrix.OffsetX, -1 * (zoomCanvas.ActualWidth * (matrix.M11 - 1))));
+            matrix.OffsetY = Math.Min(0, Math.Max(matrix.OffsetY, -1 * (zoomCanvas.ActualHeight * (matrix.M11 - 1))));
+            ToolbarService.Instance.ZoomOutButtonEnabled = matrix.M11 > 1;
+            matrixTransform.Matrix = matrix;
+        }
+
+        private void ResetZoom()
+        {
+            matrixTransform.Matrix = new Matrix(1,0,0,1,0,0);
+            UpdateSize();
         }
     }
 }

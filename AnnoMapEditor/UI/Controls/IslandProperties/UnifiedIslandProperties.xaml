@@ -1,0 +1,209 @@
+﻿<UserControl x:Class="AnnoMapEditor.UI.Controls.IslandProperties.UnifiedIslandProperties"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls.IslandProperties"
+             xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
+             xmlns:slots="clr-namespace:AnnoMapEditor.UI.Controls.Slots"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=local:UnifiedIslandPropertiesViewModel}"
+             d:DesignHeight="600" d:DesignWidth="350">
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Resources/Styles.xaml" />
+                <ResourceDictionary>
+                    <converters:ObjectToVisibility x:Key="CollapsedOnNull" />
+                    <converters:ObjectToVisibilityInverse x:Key="VisibleOnNull"/>
+                    <converters:BoolToVisibility x:Key="VisibleOnTrue" OnTrue="Visible" OnFalse="Collapsed" />
+                    <converters:BoolToVisibility x:Key="VisibleOnFalse" OnTrue="Collapsed" OnFalse="Visible" />
+                    <converters:BooleaNotConverter x:Key="TrueOnFalse" />
+                    <converters:RotationIndexToAngleText x:Key="IntToAngle"/>
+                    <system:Boolean x:Key="False">False</system:Boolean>
+                    <system:Boolean x:Key="True">True</system:Boolean>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Grid>
+            <TextBlock Text="{Binding IslandCategoryLabel, FallbackValue=Properties Title}"
+                       Style="{StaticResource HeaderLabelStyle}"
+                       Margin="16,4"/>
+            <Border BorderBrush="{StaticResource BrightBorderBrush}" BorderThickness="0,0,0,1" SnapsToDevicePixels="True" />
+        </Grid>
+        
+        <!-- Content when an Island is selected -->
+        <ScrollViewer Grid.Row="1" VerticalAlignment="Stretch" 
+                      VerticalScrollBarVisibility="Auto"
+                      Focusable="False">
+            <StackPanel Margin="16,0">
+                <!-- Label -->
+                <TextBlock Text="Label"
+                           Style="{StaticResource SubHeaderLabelStyle}"/>
+                <TextBox Margin="0,4"
+                         IsUndoEnabled="False"
+                         Text="{Binding Label, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         KeyDown="LabelTextBox_KeyDown"/>
+                
+                <!-- Position -->
+                <TextBlock Text="Position"
+                           Style="{StaticResource SubHeaderLabelStyle}"/>
+                <Grid HorizontalAlignment="Stretch"
+                      Height="30"
+                      Margin="0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="X" Style="{StaticResource DefaultLabelStyle}" />
+                    <TextBox   VerticalAlignment="Center" Grid.Column="1" Margin="5,0,0,0" Text="{Binding SelectedIsland.Position.X, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
+                    <TextBlock VerticalAlignment="Center" Grid.Column="3" Text="Y" Style="{StaticResource DefaultLabelStyle}" />
+                    <TextBox   VerticalAlignment="Center" Grid.Column="4" Margin="5,0,0,0" Text="{Binding SelectedIsland.Position.Y, UpdateSourceTrigger=PropertyChanged}" IsEnabled="false" />
+                </Grid>
+                
+                <!-- Rotation -->
+                <Grid Visibility="{Binding IslandRotationPropertiesVisible, Converter={StaticResource VisibleOnTrue}}"
+                      Height="30"
+                      Margin="0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ToggleButton
+                        Style="{StaticResource FancyToggleButton}"
+                        IsChecked="{Binding RandomizeRotation}">
+                        Randomize Rotation
+                    </ToggleButton>
+                    <Button Grid.Column="2" Style="{StaticResource ToolbarButton}" 
+                            VerticalAlignment="Center"
+                            IsEnabled="{Binding RandomizeRotation, Converter={StaticResource TrueOnFalse}}"
+                            Command="{Binding RotateIslandCommand}"
+                            CommandParameter="{StaticResource False}"
+                            FontWeight="Black" FontSize="25" Content="&#xe80c;" Height="25"/>
+                    <TextBox Grid.Column="3" 
+                             VerticalAlignment="Center"
+                             IsEnabled="False" 
+                             TextAlignment="Center"
+                             Text="{Binding IslandRotation, Converter={StaticResource IntToAngle}, Mode=OneWay}"/>
+                    <Button Grid.Column="4" Style="{StaticResource ToolbarButton}" 
+                            VerticalAlignment="Center"
+                            IsEnabled="{Binding RandomizeRotation, Converter={StaticResource TrueOnFalse}}"
+                            Command="{Binding RotateIslandCommand}"
+                            CommandParameter="{StaticResource True}"
+                            FontWeight="Black" FontSize="25" Content="&#xe80d;" Height="25"/>
+                </Grid>
+                
+                <!-- IslandType -->
+                <StackPanel Visibility="{Binding IslandTypeItemsVisible, Converter={StaticResource VisibleOnTrue}}">
+                    <TextBlock Text="Island Type"
+                               Style="{StaticResource SubHeaderLabelStyle}"/>
+                    <ComboBox Margin="0,4"
+                              ItemsSource="{Binding IslandTypeItems}"
+                              SelectedItem="{Binding IslandType}"/>
+                </StackPanel>
+                
+                <!-- IslandSize -->
+                <StackPanel Visibility="{Binding IslandSizeItemsVisible, Converter={StaticResource VisibleOnTrue}}">
+                    <TextBlock Text="Island Size"
+                               Style="{StaticResource SubHeaderLabelStyle}"
+                               Visibility="{Binding IslandSizeItemsVisible, Converter={StaticResource VisibleOnTrue}}"/>
+                    <ComboBox Margin="0,4"
+                              ItemsSource="{Binding IslandSizeItems}"
+                              SelectedItem="{Binding IslandSize}"/>
+                </StackPanel>
+                
+                <!-- Slots and Fertilities -->
+                <StackPanel Visibility="{Binding SlotsAndFertilitiesVisible, Converter={StaticResource VisibleOnTrue}}">
+                    <!-- Fertilities -->
+                    <TextBlock Text="Fertilities" Style="{StaticResource SubHeaderLabelStyle}" />
+                    
+                    <ToggleButton Style="{StaticResource FancyToggleButton}" 
+                                  Margin="0,0,0,4"
+                                  IsChecked="{Binding RandomizeFertilities}" >
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Height="22" Width="22" FontFamily="{StaticResource SymbolFont}" Text="&#xe8b1;" FontSize="20"/>
+                            <TextBlock VerticalAlignment="Center" Margin="5,0" Text="Randomize Fertilities"/>
+                        </StackPanel>
+                    </ToggleButton>
+                    
+                    <!-- Invalid fertilities warning -->
+                    <Border Visibility="{Binding AllowedFertilitiesWarning, Converter={StaticResource VisibleOnTrue}}"
+                            Margin="0,4" Padding="10,5"
+                            CornerRadius="5"
+                            Background="{StaticResource WarningBackgroundBrush}">
+                        <TextBlock
+                            Foreground="{StaticResource MediumBackgroundBrush}"
+                            TextWrapping="Wrap"
+                            Text="Some selected fertilities are not allowed by default in the currently selected region."></TextBlock>
+                    </Border>
+                    
+                    <ItemsControl ItemsSource="{Binding FertilityItems}"
+                                  Visibility="{Binding RandomizeFertilities, Converter={StaticResource VisibleOnFalse}}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="2" Margin="-8,0" HorizontalAlignment="Stretch"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ToggleButton Style="{StaticResource FancyToggleButton}"
+                                              IsChecked="{Binding IsSelected}"
+                                              Margin="8,4">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Image Height="22" Width="22" 
+                                               Source="{Binding FertilityAsset.Icon}"/>
+                                        <Grid Grid.Column="0" 
+                                              Visibility="{Binding IsAllowed, Converter={StaticResource VisibleOnFalse}}"
+                                              VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                                              Margin="0,0,-5,0">
+                                            <TextBlock Text="&#xf139;" 
+                                                       FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="13"
+                                                       Foreground="{StaticResource MediumBackgroundBrush}"/>
+                                            <TextBlock Text="&#xf13a;" 
+                                                       FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="13"
+                                                       Foreground="{StaticResource WarningBackgroundBrush}"/>
+                                            <TextBlock Text="&#xf13b;" 
+                                                       FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="13"
+                                                       Foreground="{StaticResource MediumBackgroundBrush}"/>
+                                        </Grid>
+                                        <TextBlock Grid.Column="1" 
+                                                   Text="{Binding ShortenedDisplayName}"
+                                                   Style="{StaticResource DefaultLabelStyle}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="5,0,0,0"/>
+                                    </Grid>
+                                </ToggleButton>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+            
+                    <!-- Slots -->
+                    <slots:SlotsControl DataContext="{Binding SlotsViewModel}" />
+                </StackPanel>
+                
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+    
+</UserControl>

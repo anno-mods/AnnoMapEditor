@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
@@ -59,11 +60,16 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public abstract string? Label { get; }
 
+        public bool ShowLabel => _showLabel;
+        private bool _showLabel;
+
         public virtual BitmapImage? Thumbnail { get; }
 
         public virtual int ThumbnailRotation { get; }
 
         public virtual bool RandomizeRotation => true;
+
+        public virtual ObservableCollection<SlotAssignment>? SlotAssignments { get; protected set; }
 
 
         public IslandViewModel(MapTemplate mapTemplate, IslandElement island)
@@ -73,16 +79,24 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             Island = island;
 
             UpdateBackground();
+            UpdateLabelVisibility();
 
             PropertyChanged += This_PropertyChanged;
             Island.PropertyChanged += Island_PropertyChanged;
+            _mapTemplate.PropertyChanged += MapTemplate_ConfigChanged;
         }
 
 
         private void This_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(IsSelected))
+            {
                 UpdateBackground();
+                UpdateLabelVisibility();
+            }
+
+            if (e.PropertyName == nameof(Label))
+                UpdateLabelVisibility();
         }
 
         private void Island_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -95,6 +109,15 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
             else if (e.PropertyName == nameof(MapElement.Position))
                 BoundsCheck();
+
+            else if (e.PropertyName == nameof(IslandElement.Label))
+                UpdateLabelVisibility();
+        }
+
+        private void MapTemplate_ConfigChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(MapTemplate.ShowLabels))
+                UpdateLabelVisibility();
         }
 
         private void UpdateBackground()
@@ -136,6 +159,14 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             var mapArea = new Rect2(_mapTemplate.Size - Island.SizeInTiles + Vector2.Tile);
             Vector2 position = Element.Position;
             IsOutOfBounds = !position.Within(mapArea);
+        }
+
+        private void UpdateLabelVisibility()
+        {
+            _showLabel = _mapTemplate.ShowLabels && (Label != null);
+            // if (IsSelected && Island is FixedIslandElement)
+            //     _showLabel = false;
+            OnPropertyChanged(nameof(ShowLabel));
         }
     }
 }

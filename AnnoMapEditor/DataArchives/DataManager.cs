@@ -64,22 +64,32 @@ namespace AnnoMapEditor.DataArchives
 
         public async Task TryInitializeAsync(string dataPath)
         {
+            if (dataPath.Length == 0)
+            {
+                UpdateStatus(false, false, "Empty Data String");
+                return;
+            }
+
             UpdateStatus(isInitializing: true, isInitialized: false);
             _logger.LogInformation($"Initializing DataManager at '{dataPath}'.");
 
             try
             {
+
                 DataArchiveFactory dataArchiveFactory = new();
-                _dataArchive = dataArchiveFactory.CreateDataArchive(dataPath);
+                _dataArchive = await dataArchiveFactory.CreateDataArchiveAsync(dataPath);
 
                 _assetRepository = new AssetRepository(_dataArchive);
-                _assetRepository.Register<RegionAsset>();
-                _assetRepository.Register<FertilityAsset>();
-                _assetRepository.Register<RandomIslandAsset>();
-                _assetRepository.Register<SlotAsset>();
-                _assetRepository.Register<MinimapSceneAsset>();
-                _assetRepository.Register<SessionAsset>();
-                _assetRepository.Register<MapTemplateAsset>();
+                await Task.Run(() =>
+                {
+                    _assetRepository.Register<RegionAsset>();
+                    _assetRepository.Register<FertilityAsset>();
+                    _assetRepository.Register<RandomIslandAsset>();
+                    _assetRepository.Register<SlotAsset>();
+                    _assetRepository.Register<MinimapSceneAsset>();
+                    _assetRepository.Register<SessionAsset>();
+                    _assetRepository.Register<MapTemplateAsset>();
+                });
                 await _assetRepository.InitializeAsync();
 
                 _fixedIslandRepository = new FixedIslandRepository(_dataArchive);
@@ -89,7 +99,7 @@ namespace AnnoMapEditor.DataArchives
                 await _islandRepository.InitializeAsync();
 
                 _mapGroupRepository = new MapGroupRepository(_dataArchive);
-                _mapGroupRepository.InitializeAsync();
+                await _mapGroupRepository.InitializeAsync();
             }
             catch (Exception ex)
             {

@@ -4,8 +4,8 @@
         <ResourceDictionary Source="Label.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <Style TargetType="{x:Type CheckBox}">
-        <Setter Property="Foreground"
-                Value="{DynamicResource TextBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        <Setter Property="Height" Value="25"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type CheckBox}">
@@ -38,6 +38,7 @@
                         </Storyboard>
                     </ControlTemplate.Resources>
                     <StackPanel x:Name="stackPanel"
+                                Height="{TemplateBinding Height}"
                                 Orientation="Horizontal">
                         <Grid FlowDirection="LeftToRight">
                             <Border 
@@ -70,25 +71,30 @@
                                 </Border.RenderTransform>
                             </Border>
                         </Grid>
-                        <TextBlock Style="{StaticResource DefaultLabelStyle}">
-                            <ContentPresenter
-                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                Content="{TemplateBinding Content}"
-                                ContentStringFormat="{TemplateBinding ContentStringFormat}"
-                                ContentTemplate="{TemplateBinding ContentTemplate}"
-                                RecognizesAccessKey="True"
-                                VerticalAlignment="Center" />
-                        </TextBlock>
+                        <!--<TextBlock Style="{StaticResource DefaultLabelStyle}">
+                        </TextBlock>-->
+                        <ContentPresenter
+                            Margin="5,0"
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                            Content="{TemplateBinding Content}"
+                            ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            RecognizesAccessKey="True"
+                            VerticalAlignment="Center" />
                     </StackPanel>
 
                     <ControlTemplate.Triggers>
+                        <EventTrigger RoutedEvent="CheckBox.Loaded" SourceName="stackPanel">
+                            <SkipStoryboardToFill BeginStoryboardName="OnCheck" />
+                            <SkipStoryboardToFill BeginStoryboardName="OnUncheck" />
+                        </EventTrigger>
                         <Trigger Property="IsChecked"
                                  Value="True">
                             <Trigger.ExitActions>
-                                <BeginStoryboard Storyboard="{StaticResource OnUncheck}" />
+                                <BeginStoryboard x:Name="OnUncheck" Storyboard="{StaticResource OnUncheck}" />
                             </Trigger.ExitActions>
                             <Trigger.EnterActions>
-                                <BeginStoryboard Storyboard="{StaticResource OnCheck}" />
+                                <BeginStoryboard x:Name="OnCheck" Storyboard="{StaticResource OnCheck}" />
                             </Trigger.EnterActions>
                         </Trigger>
                         <Trigger Property="IsEnabled"

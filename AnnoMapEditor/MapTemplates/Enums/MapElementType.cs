@@ -1,5 +1,6 @@
 ﻿using AnnoMapEditor.Utilities;
 using System.Linq;
+using AnnoMapEditor.MapTemplates.Models;
 
 namespace AnnoMapEditor.MapTemplates.Enums
 {
@@ -34,6 +35,17 @@ namespace AnnoMapEditor.MapTemplates.Enums
             }
 
             return mapElementType;
+        }
+
+        public static MapElementType FromElement(MapElement mapElement)
+        {
+            return mapElement switch
+            {
+                FixedIslandElement => FixedIsland,
+                RandomIslandElement => PoolIsland,
+                StartingSpotElement => StartingSpot,
+                _ => FixedIsland
+            };
         }
     }
 }

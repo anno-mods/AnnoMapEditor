@@ -1,6 +1,7 @@
 ﻿using AnnoMapEditor.DataArchives;
 using System;
 using System.Windows;
+using System.Windows.Shell;
 
 namespace AnnoMapEditor.UI.Windows.Start
 {
@@ -21,14 +22,15 @@ namespace AnnoMapEditor.UI.Windows.Start
             DataContext = viewModel;
 
             InitializeComponent();
-        }
 
+            WindowChrome.SetIsHitTestVisibleInChrome(closeButton, true);
+        }
 
         private void DataManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(DataManager.IsInitialized) && _viewModel.DataManager.IsInitialized)
             {
-                _viewModel.PopulateOpenMapMenu(openMapMenu);
+                // _viewModel.PopulateOpenMapMenu(openMapMenu);
             }
         }
 
@@ -46,7 +48,13 @@ namespace AnnoMapEditor.UI.Windows.Start
 
         public void OpenMap_Click(object? sender, RoutedEventArgs args)
         {
-            openMapMenu.IsOpen = true;
+            // openMapMenu.IsOpen = true;
+        }
+
+        public void CloseBtn_Click(object? sender, RoutedEventArgs args)
+        {
+            Close();
+            App.Current.Shutdown();
         }
     }
 }

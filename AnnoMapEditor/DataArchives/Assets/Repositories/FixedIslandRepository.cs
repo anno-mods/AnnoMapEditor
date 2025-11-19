@@ -42,9 +42,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
             var mapFilePaths = _dataArchive.Find("*.a7m");
 
-            var tasks = mapFilePaths.Select(mapFilePath => 
+            var tasks = mapFilePaths.Select(mapFilePath =>
             {
-                return Task.Run(() => LoadIslandAsset(mapFilePath));
+                return LoadIslandAssetAsync(mapFilePath);
             });
 
             var islandAssets = await Task.WhenAll(tasks);
@@ -58,15 +58,17 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             _logger.LogInformation($"Finished loading fixed islands. Loaded {_islands.Count} islands in {watch.Elapsed.TotalMilliseconds} ms.");
         }
 
-        public FixedIslandAsset LoadIslandAsset(String mapFilePath)
+        public async Task<FixedIslandAsset> LoadIslandAssetAsync(String mapFilePath)
         {
             // thumbnail
             string thumbnailPath = Path.Combine(
-                Path.GetDirectoryName(mapFilePath)!,
-                "_gamedata",
-                Path.GetFileNameWithoutExtension(mapFilePath),
-                "mapimage.png");
-            BitmapImage thumbnail = _dataArchive.TryLoadPng(thumbnailPath)
+                    Path.GetDirectoryName(mapFilePath)!,
+                    "_gamedata",
+                    Path.GetFileNameWithoutExtension(mapFilePath),
+                    "activemapimage.png"
+                );
+
+            BitmapImage thumbnail = await Task.Run(() => _dataArchive.TryLoadPng(thumbnailPath))
                 ?? throw new Exception($"Could not load island thumbnail '{thumbnailPath}'.");
 
             // open a7minfo

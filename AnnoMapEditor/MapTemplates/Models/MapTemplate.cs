@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using AnnoMapEditor.UI.Controls.Toolbar;
 
 namespace AnnoMapEditor.MapTemplates.Models
 {
@@ -22,10 +23,10 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public Rect2 PlayableArea
         {
-            get => _playableAea;
-            private set => SetProperty(ref _playableAea, value, dependendProperties: new[] { nameof(MapSizeText) });
+            get => _playableArea;
+            private set => SetProperty(ref _playableArea, value, dependendProperties: new[] { nameof(MapSizeText) });
         }
-        private Rect2 _playableAea = new();
+        private Rect2 _playableArea = new();
 
         public SessionAsset Session 
         { 
@@ -49,18 +50,37 @@ namespace AnnoMapEditor.MapTemplates.Models
 
         public string MapSizeText => $"Size: {Size.X}, Playable: {PlayableArea.Width}";
 
+        public bool ShowLabels
+        {
+            get => _showLabels;
+            set
+            {
+                SetProperty(ref _showLabels, value);
+                ToolbarService.Instance.ShowLabelsButtonState = value;
+            }
+        }
+        private bool _showLabels = true;
 
-        public MapTemplate(SessionAsset session)
+        private MapTemplate()
+        {
+            ToolbarService.Instance.ButtonClicked += (sender, e) =>
+            {
+                if (e.ButtonType == ToolbarButtonType.ShowLabels) 
+                    ShowLabels = !ShowLabels;
+            };
+        }
+
+        public MapTemplate(SessionAsset session) : this()
         {
             _session = session;
             _templateDocument = new MapTemplateDocument();
         }
 
-        public MapTemplate(MapTemplateDocument document, SessionAsset session)
+        public MapTemplate(MapTemplateDocument document, SessionAsset session) : this()
         {
             _session = session;
             _size = new Vector2(document.MapTemplate?.Size);
-            _playableAea = new Rect2(document.MapTemplate?.PlayableArea);
+            _playableArea = new Rect2(document.MapTemplate?.PlayableArea);
             _templateDocument = document;
 
             // TODO: Allow empty templates?
@@ -80,7 +100,7 @@ namespace AnnoMapEditor.MapTemplates.Models
                 _templateDocument.MapTemplate.TemplateElement = null;
         }
 
-        public MapTemplate(int mapSize, int playableSize, SessionAsset session)
+        public MapTemplate(int mapSize, int playableSize, SessionAsset session) : this()
         {
             int margin = (mapSize - playableSize) / 2;
 
@@ -96,10 +116,11 @@ namespace AnnoMapEditor.MapTemplates.Models
 
             _session = session;
             _size = new Vector2(_templateDocument.MapTemplate.Size);
-            _playableAea = new Rect2(_templateDocument.MapTemplate.PlayableArea);
+            _playableArea = new Rect2(_templateDocument.MapTemplate.PlayableArea);
 
             // create starting spots in the default location
             Elements.AddRange(CreateNewStartingSpots(mapSize));
+
         }
 
 
@@ -148,6 +169,11 @@ namespace AnnoMapEditor.MapTemplates.Models
             MapSizeConfigChanged?.Invoke(this, new MapTemplateResizeEventArgs(oldMapSize, oldPlayableSize));
         }
 
+        public void RestoreMapSizeConfig(int mapSize, Rect2 playableArea)
+        {
+            // TODO: Implement Map Size Config restoring
+        }
+
         public void ResizeAndCommitMapTemplate(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
         {
             if (_templateDocument.MapTemplate == null)
@@ -189,8 +215,7 @@ namespace AnnoMapEditor.MapTemplates.Models
 
             return _templateDocument;
         }
-
-
+        
         public class MapTemplateResizeEventArgs : EventArgs
         {
             public MapTemplateResizeEventArgs(Vector2 oldMapSize, Vector2 oldPlayableSize)

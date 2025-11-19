@@ -25,4 +25,24 @@ namespace AnnoMapEditor.UI.Converters
             throw new NotImplementedException();
         }
     }
+
+    public class ObjectToVisibilityInverse : IValueConverter
+    {
+        public Visibility OnNull { get; set; }
+
+        public ObjectToVisibilityInverse()
+        {
+            OnNull = Visibility.Visible;
+        }
+
+        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is null ? OnNull : Visibility.Collapsed;
+        }
+
+        public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

@@ -137,8 +137,8 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
         {
             bool pointerExists = _pointers.TryGetValue(slotAssignment, out Path? pointer);
 
-            ListBoxItem? selector = _selectorGeneratorLeft.ContainerFromItem(slotAssignment) as ListBoxItem
-                                 ?? _selectorGeneratorRight.ContainerFromItem(slotAssignment) as ListBoxItem;
+            ContentPresenter? selector = _selectorGeneratorLeft.ContainerFromItem(slotAssignment) as ContentPresenter
+                                 ?? _selectorGeneratorRight.ContainerFromItem(slotAssignment) as ContentPresenter;
             ListBoxItem? pin = _pinGenerator.ContainerFromItem(slotAssignment) as ListBoxItem;
 
             if (selector != null && pin != null)

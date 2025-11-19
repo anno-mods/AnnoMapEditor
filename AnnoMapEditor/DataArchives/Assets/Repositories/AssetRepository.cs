@@ -126,7 +126,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             {
                 try
                 {
-                    assetsXmlStream = File.OpenRead(CachedAssetsXml);
+                    assetsXmlStream = await Task.Run(() => File.OpenRead(CachedAssetsXml));
                 }
                 catch (Exception e)
                 {
@@ -135,7 +135,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 }
             }
 
-            var Xml = XDocument.Load(assetsXmlStream);
+            var Xml = await Task.Run(() => XDocument.Load(assetsXmlStream));
             var assets = Xml.XPathSelectElements(xpath);
 
             if (!validCache)
@@ -144,7 +144,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 UserSettings.Default.Xpath = xpath; 
                 UserSettings.Default.Save();
                 assetsXmlStream.Dispose();
-                RenewCache(assets);
+                await Task.Run(() => RenewCache(assets));
             }
 
             var convertAssetTasks = assets.Select(assetElement =>
@@ -155,13 +155,16 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             });
             var assetList = await Task.WhenAll(convertAssetTasks);
 
-            foreach (var asset in assetList)
+            await Task.Run(() =>
             {
-                if (asset is not null)
+                foreach (var asset in assetList)
                 {
-                    _assets.Add(asset.GUID, asset);
+                    if (asset is not null)
+                    {
+                        _assets.Add(asset.GUID, asset);
+                    }
                 }
-            }
+            });
 
             _logger.LogInformation($"Finished Deserialising at {watch.Elapsed.TotalMilliseconds} ms.");
             _logger.LogInformation($"Resolving asset references...");

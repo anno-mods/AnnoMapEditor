@@ -5,19 +5,32 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    d:DesignHeight="600" d:DesignWidth ="600">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-    <Grid Width="auto" Height="auto" VerticalAlignment="Center" HorizontalAlignment="Center">
-        <Canvas Name="rotationCanvas" RenderTransformOrigin="0.5, 0.5" Width="0" Height="0">
-            <Canvas.RenderTransform>
-                <RotateTransform Angle="{Binding Source={x:Static local:MapView.MAP_ROTATION_ANGLE}}"/>
-            </Canvas.RenderTransform>
-            <Canvas 
-                Name="mapTemplateCanvas"
-                Width="0"
-                Height="0" />
-            <Canvas
-                Name="addIslandCanvas" />
-        </Canvas>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
+        <Grid Margin="16" Name="canvasGrid" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <Canvas Name="zoomCanvas">
+                <Canvas.RenderTransform>
+                    <MatrixTransform x:Name="matrixTransform"/>
+                </Canvas.RenderTransform>
+                <Canvas Name="rotationCanvas" RenderTransformOrigin="0.5, 0.5" Visibility="Visible">
+                    <Canvas.RenderTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="{Binding Source={x:Static local:MapView.MAP_ROTATION_ANGLE}}"/>
+                        </TransformGroup>
+                    </Canvas.RenderTransform>
+                    <Canvas Visibility="Visible"  Name="mapTemplateCanvas" Width="0" Height="0" />
+                    <Canvas Name="addIslandCanvas" />
+                </Canvas>
+            </Canvas>
+        </Grid>
     </Grid>
 </UserControl>

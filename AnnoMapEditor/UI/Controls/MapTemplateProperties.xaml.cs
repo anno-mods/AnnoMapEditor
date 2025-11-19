@@ -16,7 +16,6 @@ namespace AnnoMapEditor.UI.Controls
         {
             
         }
-
         
         private void Slider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {

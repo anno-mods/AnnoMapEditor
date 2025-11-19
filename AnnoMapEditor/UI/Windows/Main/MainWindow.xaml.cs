@@ -1,10 +1,14 @@
 ﻿using AnnoMapEditor.UI.Overlays;
 using AnnoMapEditor.UI.Overlays.ExportAsMod;
-using Microsoft.Win32;
+using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Shell;
+using System.Windows.Controls;
+using System.Windows.Input;
+using AnnoMapEditor.UI.Controls.Toolbar;
 
 namespace AnnoMapEditor.UI.Windows.Main
 {
@@ -17,13 +21,17 @@ namespace AnnoMapEditor.UI.Windows.Main
 
         private readonly string title;
 
-
         public MainWindow(MainWindowViewModel viewModel)
         {
             _viewModel = viewModel;
             DataContext= _viewModel;
 
             InitializeComponent();
+
+            WindowChrome.SetIsHitTestVisibleInChrome(closeButton, true);
+            WindowChrome.SetIsHitTestVisibleInChrome(minimizeButton, true);
+            WindowChrome.SetIsHitTestVisibleInChrome(maximizeButton, true);
+            WindowChrome.SetIsHitTestVisibleInChrome(ToolbarControl, true);
 
             var exePath = Path.Join(AppContext.BaseDirectory, "AnnoMapEditor.exe");
             var productVersion = "";
@@ -36,10 +44,15 @@ namespace AnnoMapEditor.UI.Windows.Main
                 catch { }
             }
             title = $"{App.Title} {productVersion}";
+            versionStatusText.Text = $"Version: {productVersion}";
             Title = title;
+            titleText.Text = App.Title;
 
             _viewModel.PropertyChanged += ViewModel_PropertyChanged;
-            _viewModel.PopulateOpenMapMenu(openMapMenu);
+            // _viewModel.PopulateOpenMapMenu(openMapMenu);
+            // _viewModel.PopulateOpenMapMenu(toolbarImportContextMenu, true);
+
+            StateChanged += new EventHandler(Window_StateChanged);
         }
 
         private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -55,29 +68,39 @@ namespace AnnoMapEditor.UI.Windows.Main
             }
         }
 
-        private async void ExportMap_Click(object sender, RoutedEventArgs e)
+        private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
-            var picker = new SaveFileDialog
-            {
-                DefaultExt = ".a7tinfo",
-                Filter = "Map template (*.a7tinfo)|*.a7tinfo|XML map template (*.xml)|*.xml",
-                FilterIndex = Path.GetExtension(_viewModel.MapTemplateFilePath)?.ToLower() == ".xml" ? 2 : 1,
-                FileName = Path.GetFileName(_viewModel.MapTemplateFilePath),
-                OverwritePrompt = true
-            };
+            Close();
+            Application.Current.Shutdown();
+        }
 
-            if (true == picker.ShowDialog() && picker.FileName is not null)
+        private void maximizeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = (WindowState == WindowState.Maximized) ? WindowState.Normal : WindowState.Maximized;
+        }
+        private void minimizeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void Window_StateChanged(object? sender, EventArgs e)
+        {
+            if (WindowState != WindowState.Maximized)
             {
-                await _viewModel.SaveMap(picker.FileName);
+                mainWindowGrid.Margin = new(0);
+                maximizeButton.Content = (char)0xe922;
+            }
+            else
+            {
+                mainWindowGrid.Margin = new(5);
+                maximizeButton.Content = (char)0xe923;
             }
         }
 
-        private void ExportMod_Click(object sender, RoutedEventArgs e)
+        private void MainWindow_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (_viewModel.MapTemplate is null)
-                return;
-
-            OverlayService.Instance.Show(new ExportAsModViewModel(_viewModel.MapTemplate));
+            mainWindowGrid.Focus();
+            // Keyboard.ClearFocus();
         }
     }
 }

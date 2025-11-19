@@ -7,6 +7,19 @@ namespace AnnoMapEditor.Utilities
     {
         public static Settings Instance { get; } = new();
 
+        public bool Quickstart
+        {
+            get => UserSettings.Default.Quickstart;
+            set
+            {
+                if (value != Quickstart)
+                {
+                    UserSettings.Default.Quickstart = value;
+                    UserSettings.Default.Save();
+                    OnPropertyChanged(nameof(Quickstart));
+                }
+            }
+        }
 
         public string? GamePath 
         {

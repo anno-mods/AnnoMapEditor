@@ -40,9 +40,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             get => _randomizeRotation;
             set {
                 SetProperty(ref _randomizeRotation, value);
-
-                if (!value && Rotation == null)
-                    Rotation = 0;
+                if (!value && Rotation == null) Rotation = 0;
             }
         }
         private bool _randomizeRotation = true;
@@ -70,7 +68,7 @@ namespace AnnoMapEditor.MapTemplates.Models
         public bool RandomizeSlots
         {
             get => _randomizeSlots;
-            set => SetProperty(ref _randomizeSlots, value);
+            set => SetProperty( ref _randomizeSlots, value);
         }
         private bool _randomizeSlots = true;
 

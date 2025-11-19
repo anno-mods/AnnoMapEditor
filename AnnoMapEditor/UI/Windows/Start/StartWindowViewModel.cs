@@ -17,22 +17,37 @@ namespace AnnoMapEditor.UI.Windows.Start
 
         public Settings Settings { get; init; } = Settings.Instance;
 
+        private bool _pathConfigured = false;
 
         public StartWindowViewModel(StartWindow startWindow)
         {
             _startWindow = startWindow;
 
             Settings.PropertyChanged += Settings_PropertyChanged;
+            DataManager.PropertyChanged += DataManager_PropertyChanged;
 
-            if (Settings.DataPath != null)
-                _ = DataManager.TryInitializeAsync(Settings.DataPath);
+            if (Settings.DataPath != null && Settings.DataPath.Length > 0)
+            {
+                _pathConfigured = true;
+                Task.Run(() => DataManager.TryInitializeAsync(Settings.DataPath).ContinueWith(t => throw t.Exception, TaskContinuationOptions.OnlyOnFaulted));
+            }
         }
-
 
         private void Settings_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Settings.DataPath) && Settings.DataPath != null)
-                _ = DataManager.TryInitializeAsync(Settings.DataPath);
+            {
+                Task.Run(() => DataManager.TryInitializeAsync(Settings.DataPath).ContinueWith(t => throw t.Exception, TaskContinuationOptions.OnlyOnFaulted));
+            }
+        }
+
+        private void DataManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(DataManager.IsInitialized)) 
+            {
+                if (_pathConfigured && Settings.Quickstart)
+                    ContinueToMainWindow();
+            }
         }
 
 
@@ -49,16 +64,12 @@ namespace AnnoMapEditor.UI.Windows.Start
 
             MainWindow mainWindow = new(new MainWindowViewModel(mapTemplate));
 
-            _startWindow.Close();
-            mainWindow.Show();
+            ContinueToMainWindow();
         }
 
         public void NewMap()
         {
-            MainWindow mainWindow = new(new MainWindowViewModel());
-
-            _startWindow.Close();
-            mainWindow.Show();
+            ContinueToMainWindow();
         }
 
         public void SelectGamePath()
@@ -147,6 +158,15 @@ namespace AnnoMapEditor.UI.Windows.Start
 
                 await OpenMap(picker.FileName, false);
             }
+        }
+
+        private void ContinueToMainWindow()
+        {
+            Settings.PropertyChanged -= Settings_PropertyChanged;
+            DataManager.PropertyChanged -= DataManager_PropertyChanged;
+            MainWindow mainWindow = new(new MainWindowViewModel());
+            _startWindow.Close();
+            mainWindow.Show();
         }
     }
 }
