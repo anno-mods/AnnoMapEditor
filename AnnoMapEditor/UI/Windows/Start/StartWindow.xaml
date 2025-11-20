@@ -20,17 +20,19 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../Resources/Styles.xaml" />
                 <ResourceDictionary>
-                    <converters:BooleaNotConverter x:Key="booleanNot" />
-                    <converters:BoolToGridLengthConverter x:Key="hideRowOnFalse" />
-                    <converters:BoolToGridLengthConverter x:Key="hideRowOnTrue" OnTrue="0" OnFalse="*"/>
-                    <converters:BoolToVisibility x:Key="collapseOnFalse" />
-                    <converters:BoolToVisibility x:Key="collapseOnTrue" OnTrue="Collapsed" OnFalse="Visible" />
-                    <converters:BoolToVisibility x:Key="hideOnFalse" OnFalse="Hidden" />
-                    <converters:BoolToVisibility x:Key="hideOnTrue" OnTrue="Hidden" OnFalse="Visible" />
-                    <converters:ObjectToBool x:Key="objectToBool" />
-                    <converters:ObjectToVisibility x:Key="collapseOnNull" />
-                    <converters:ObjectToVisibility x:Key="hideOnNull" OnNull="Hidden" />
-                    <converters:BoolToStyle x:Key="isActiveToWindowFrameStyle" OnTrue="{StaticResource ActiveWindowBorder}" OnFalse="{StaticResource InactiveWindowBorder}"/>
+                    <converters:EmptyStringToVisibility x:Key="CollapsedOnEmptyString" />
+                    <converters:EmptyStringToVisibility x:Key="VisibleOnEmptyString" OnEmpty="Visible" OnNotEmpty="Collapsed"/>
+                    <converters:BooleaNotConverter x:Key="BooleanNot" />
+                    <converters:BoolToGridLengthConverter x:Key="HideRowOnFalse" />
+                    <converters:BoolToGridLengthConverter x:Key="HideRowOnTrue" OnTrue="0" OnFalse="*"/>
+                    <converters:BoolToVisibility x:Key="CollapseOnFalse" />
+                    <converters:BoolToVisibility x:Key="CollapseOnTrue" OnTrue="Collapsed" OnFalse="Visible" />
+                    <converters:BoolToVisibility x:Key="HideOnFalse" OnFalse="Hidden" />
+                    <converters:BoolToVisibility x:Key="HideOnTrue" OnTrue="Hidden" OnFalse="Visible" />
+                    <converters:ObjectToBool x:Key="ObjectToBool" />
+                    <converters:ObjectToVisibility x:Key="CollapseOnNull" />
+                    <converters:ObjectToVisibility x:Key="HideOnNull" OnNull="Hidden" />
+                    <converters:BoolToStyle x:Key="IsActiveToWindowFrameStyle" OnTrue="{StaticResource ActiveWindowBorder}" OnFalse="{StaticResource InactiveWindowBorder}"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -50,7 +52,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Border Grid.RowSpan="2" Style="{Binding ElementName=startWindow, Path=IsActive, Converter={StaticResource isActiveToWindowFrameStyle}}"/>
+        <Border Grid.RowSpan="2" Style="{Binding ElementName=startWindow, Path=IsActive, Converter={StaticResource IsActiveToWindowFrameStyle}}"/>
 
         <Button Name="closeButton" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource WindowControlRed}" Content="&#xe8bb;" Click="CloseBtn_Click"/>
 
@@ -121,21 +123,21 @@
 
             <!-- game path  -->
             <TextBlock Grid.Row="1" Grid.Column="0"
-                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
+                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource CollapseOnTrue}}"
                        Style="{StaticResource DefaultLabelStyle}"
                        Text="Anno Game Path:"  />
             <TextBox Grid.Row="1" Grid.Column="1"
-                     Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
+                     Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource CollapseOnTrue}}"
                      Text="{Binding Settings.GamePath}"
                      IsEnabled="False" />
             <Button Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2"
-                    Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
+                    Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource CollapseOnTrue}}"
                     Content="Select"
                     Click="SelectGamePath_Click"
-                    IsEnabled="{Binding DataManager.IsInitializing, Converter={StaticResource booleanNot}}" />
+                    IsEnabled="{Binding DataManager.IsInitializing, Converter={StaticResource BooleanNot}}" />
             <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
                        Margin="2,0,2,10"
-                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
+                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource CollapseOnTrue}}"
                        Style="{StaticResource MutedLabelStyle}"
                        TextWrapping="Wrap">
                 The Anno Map Editor requires the game's files to function. Select the game's installation directory.
@@ -144,7 +146,16 @@
                        VerticalAlignment="Center"
                        Style="{StaticResource DefaultLabelStyle}"
                        Text="Detected Game:" />
-            <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3">
+            <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
+                       Text="No game path selected!"
+                       Style="{StaticResource DefaultLabelStyle}"
+                       FontSize="15"
+                       FontWeight="Light"
+                       VerticalAlignment="Center" 
+                       Margin="24,0,0,0"
+                       Visibility="{Binding Settings.DataPath, Converter={StaticResource VisibleOnEmptyString}}"/>
+            <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
+                  Visibility="{Binding Settings.DataPath, Converter={StaticResource CollapsedOnEmptyString}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -166,7 +177,7 @@
                                           VerticalAlignment="Center" HorizontalAlignment="Right"
                                           IsOk="{Binding DataManager.IsInitialized}"
                                           IsLoading="{Binding DataManager.IsInitializing}"
-                                          IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource objectToBool}}"/>
+                                          IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource ObjectToBool}}"/>
 
             </Grid>
             <StackPanel Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="4"
