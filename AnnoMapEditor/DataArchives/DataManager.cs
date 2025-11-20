@@ -39,7 +39,13 @@ namespace AnnoMapEditor.DataArchives
 
         public bool HasError => _errorMessage != null;
 
-
+        public Game? Game
+        {
+            get => _game; 
+            private set => SetProperty(ref _game, value);
+        }
+        private Game? _game;
+        
         public IDataArchive DataArchive => _isInitialized && _dataArchive != null ? _dataArchive : throw new Exception(NOT_INITIALIZED_MESSAGE);
         private IDataArchive? _dataArchive;
 
@@ -72,6 +78,14 @@ namespace AnnoMapEditor.DataArchives
 
             UpdateStatus(isInitializing: true, isInitialized: false);
             _logger.LogInformation($"Initializing DataManager at '{dataPath}'.");
+
+            Game = null;
+            foreach (var supportedGame in Game.SupportedGames)
+            {
+                if (!dataPath.Contains(supportedGame.Path)) continue;
+                Game = supportedGame;
+                break;
+            }
 
             try
             {

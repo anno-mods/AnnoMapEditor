@@ -11,6 +11,8 @@ namespace AnnoMapEditor.UI.Windows.Start
 {
     public class StartWindowViewModel : ObservableBase
     {
+        private const string UnsupportedGameString = "No supported game detected";
+        
         private readonly StartWindow _startWindow;
 
         public DataManager DataManager { get; init; } = DataManager.Instance;
@@ -18,6 +20,13 @@ namespace AnnoMapEditor.UI.Windows.Start
         public Settings Settings { get; init; } = Settings.Instance;
 
         private bool _pathConfigured = false;
+
+        public Game SelectedGame
+        {
+            get => _selectedGame ?? Game.UnsupportedGame; 
+            private set => SetProperty(ref _selectedGame, value);
+        }
+        private Game? _selectedGame;
 
         public StartWindowViewModel(StartWindow startWindow)
         {
@@ -43,10 +52,17 @@ namespace AnnoMapEditor.UI.Windows.Start
 
         private void DataManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(DataManager.IsInitialized)) 
+            switch (e.PropertyName)
             {
-                if (_pathConfigured && Settings.Quickstart)
-                    ContinueToMainWindow();
+                case nameof(DataManager.IsInitialized):
+                {
+                    if (_pathConfigured && Settings.Quickstart)
+                        ContinueToMainWindow();
+                    break;
+                }
+                case nameof(DataManager.Game):
+                    SelectedGame = DataManager.Game ?? Game.UnsupportedGame;
+                    break;
             }
         }
 
