@@ -9,7 +9,8 @@ namespace AnnoMapEditor
     public partial class App : Application
     {
         public readonly static string TitleShort = "Community Map Editor";
-        public readonly static string Title = $"{TitleShort} for Anno 1800";
+        public readonly static string SubTitle = "for Anno 1800 and 117";
+        public readonly static string Title = $"{TitleShort} {SubTitle}";
 
         public App() {
             ResxLocalizationProvider provider = ResxLocalizationProvider.Instance;

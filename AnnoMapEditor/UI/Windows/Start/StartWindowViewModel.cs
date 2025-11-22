@@ -1,4 +1,7 @@
-﻿using AnnoMapEditor.DataArchives;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.UI.Windows.Main;
@@ -11,7 +14,10 @@ namespace AnnoMapEditor.UI.Windows.Start
 {
     public class StartWindowViewModel : ObservableBase
     {
-        private const string UnsupportedGameString = "No supported game detected";
+        public static string AppTitle => App.TitleShort;
+        public static string AppSubTitle => App.SubTitle;
+        public static string AppVersion => FileVersionInfo
+            .GetVersionInfo(Path.Join(AppContext.BaseDirectory, "AnnoMapEditor.exe")).ProductVersion ?? "";
         
         private readonly StartWindow _startWindow;
 
