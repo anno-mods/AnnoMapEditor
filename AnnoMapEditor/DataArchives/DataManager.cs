@@ -2,6 +2,7 @@
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.Utilities;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -39,12 +40,12 @@ namespace AnnoMapEditor.DataArchives
 
         public bool HasError => _errorMessage != null;
 
-        public Game? Game
+        public Game? DetectedGame
         {
-            get => _game; 
-            private set => SetProperty(ref _game, value);
+            get => _detectedGame; 
+            private set => SetProperty(ref _detectedGame, value);
         }
-        private Game? _game;
+        private Game? _detectedGame;
         
         public IDataArchive DataArchive => _isInitialized && _dataArchive != null ? _dataArchive : throw new Exception(NOT_INITIALIZED_MESSAGE);
         private IDataArchive? _dataArchive;
@@ -79,30 +80,32 @@ namespace AnnoMapEditor.DataArchives
             UpdateStatus(isInitializing: true, isInitialized: false);
             _logger.LogInformation($"Initializing DataManager at '{dataPath}'.");
 
-            Game = null;
+            DetectedGame = null;
             foreach (var supportedGame in Game.SupportedGames)
             {
                 if (!dataPath.Contains(supportedGame.Path)) continue;
-                Game = supportedGame;
+                DetectedGame = supportedGame;
                 break;
             }
 
             try
             {
+                if (DetectedGame == null || DetectedGame == Game.UnsupportedGame)
+                    throw new Exception("Selected game is not supported.");
 
                 DataArchiveFactory dataArchiveFactory = new();
                 _dataArchive = await dataArchiveFactory.CreateDataArchiveAsync(dataPath);
 
-                _assetRepository = new AssetRepository(_dataArchive);
+                _assetRepository = new AssetRepository(_dataArchive, DetectedGame);
                 await Task.Run(() =>
                 {
-                    _assetRepository.Register<RegionAsset>();
-                    _assetRepository.Register<FertilityAsset>();
-                    _assetRepository.Register<RandomIslandAsset>();
-                    _assetRepository.Register<SlotAsset>();
-                    _assetRepository.Register<MinimapSceneAsset>();
-                    _assetRepository.Register<SessionAsset>();
-                    _assetRepository.Register<MapTemplateAsset>();
+                    _assetRepository.RegisterWithGameCheck<RegionAsset>();
+                    _assetRepository.RegisterWithGameCheck<FertilityAsset>();
+                    _assetRepository.RegisterWithGameCheck<RandomIslandAsset>();
+                    _assetRepository.RegisterWithGameCheck<SlotAsset>();
+                    _assetRepository.RegisterWithGameCheck<MinimapSceneAsset>();
+                    _assetRepository.RegisterWithGameCheck<SessionAsset>();
+                    _assetRepository.RegisterWithGameCheck<MapTemplateAsset>();
                 });
                 await _assetRepository.InitializeAsync();
 
@@ -117,6 +120,7 @@ namespace AnnoMapEditor.DataArchives
             }
             catch (Exception ex)
             {
+                _logger.LogError($"{ex.Message}\n{ex.StackTrace}");
                 UpdateStatus(isInitializing: false, isInitialized: false, errorMessage: ex.Message);
                 _logger.LogInformation($"Could not initialize DataManager at '{dataPath}'.");
                 return;

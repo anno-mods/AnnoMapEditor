@@ -18,12 +18,14 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
     public class AssetRepository : Repository
     {
-        private const string ASSETS_XML_PATH = "data/config/export/main/asset/assets.xml";
+        // private const string ASSETS_XML_PATH = "data/config/export/main/asset/assets.xml";
 
 
         private static readonly Logger<AssetRepository> _logger = new();
 
         private const string CachedAssetsXml = "assets.cached.xml";
+        
+        private readonly Game _detectedGame;
 
         private readonly IDataArchive _dataArchive;
 
@@ -40,9 +42,10 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         private readonly List<Type> _assetTypes = new();
 
 
-        public AssetRepository(IDataArchive dataArchive)
+        public AssetRepository(IDataArchive dataArchive, Game detectedGame)
         {
             _dataArchive = dataArchive;
+            _detectedGame = detectedGame;
             _guidReferenceResolverFactory = new(this);
             _regionIdReferenceResolverFactory = new(this);
         }
@@ -110,7 +113,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             // load assets.xml
             Stopwatch watch = Stopwatch.StartNew();
 
-            Stream assetsXmlStream = _dataArchive.OpenRead(ASSETS_XML_PATH)
+            Stream assetsXmlStream = _dataArchive.OpenRead(_detectedGame.AssetsXmlPath)
                 ?? throw new Exception($"Could not locate assets.xml.");
 
             var xpath = GetXpath();
@@ -176,9 +179,11 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     foreach (Action<object> resolver in resolvers)
                         resolver(asset);
             }
-
+            
+            // TODO: Complete Game-Aware static asset init and remove old way of loading static assets.
+            InitializeStaticGameAssets(_detectedGame.StaticAssets);
             InitializeStaticAssets();
-
+            
             watch.Stop();
             _logger.LogInformation($"Finished loading {_assets.Count} assets at {watch.Elapsed.TotalMilliseconds} ms.");
             assetsXmlStream.Dispose(); 
@@ -232,6 +237,13 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 if (asset is TAsset castAsset)
                     yield return castAsset;
             }
+        }
+
+        public void RegisterWithGameCheck<TAsset>()
+            where TAsset : StandardAsset
+        {
+            if (_detectedGame.StaticAssets.SupportedAssetTypes.Contains(typeof(TAsset)))
+                Register<TAsset>();
         }
 
         public void Register<TAsset>()
@@ -302,10 +314,31 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                             throw new Exception($"Could not resolve StaticAsset {assetType.FullName}.{staticProperty.Name}. The asset's type {asset.GetType().FullName} does not match the property's type {staticProperty.PropertyType.FullName}.");
 
                         staticProperty.SetValue(null, asset);
+                        
+                        _logger.LogInformation($"Resolved StaticAsset {assetType.FullName}.{staticProperty.Name}.");
                     }
                     else
                         throw new Exception($"Could not resolve StaticAsset {assetType.FullName}.{staticProperty.Name}. There exists no asset with GUID {staticAssetAttribute.GUID}.");
                 }
+            }
+        }
+
+        private void InitializeStaticGameAssets(StaticGameAssets staticGameAssets)
+        {
+            foreach (PropertyInfo staticProperty in staticGameAssets.GetType().GetProperties(BindingFlags.Static | BindingFlags.Public))
+            {
+                StaticAssetAttribute? staticAssetAttribute = staticProperty.GetCustomAttribute<StaticAssetAttribute>();
+                if (staticAssetAttribute == null)
+                    continue;
+
+                if (TryGet(staticAssetAttribute.GUID, out StandardAsset? asset))
+                {
+                    staticProperty.SetValue(null, asset);
+                        
+                    _logger.LogInformation($"Resolved {asset.GetType().Name} {staticProperty.Name}.");
+                }
+                else
+                    throw new Exception($"Could not resolve StaticAsset {staticProperty.Name}. There exists no asset with GUID {staticAssetAttribute.GUID}.");
             }
         }
     }

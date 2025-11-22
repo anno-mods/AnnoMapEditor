@@ -18,7 +18,7 @@ namespace AnnoMapEditor.Utilities
 
         public void LogInformation(string message)
         {
-            Log.PrintLine(string.Format(_logTemplate,
+            Console.WriteLine(string.Format(_logTemplate,
                 GetTimestamp(), 
                 "Information", 
                 message));
@@ -26,7 +26,7 @@ namespace AnnoMapEditor.Utilities
 
         public void LogWarning(string message)
         {
-            Log.PrintLine(string.Format(_logTemplate,
+            Console.WriteLine(string.Format(_logTemplate,
                 GetTimestamp(),
                 "Warning",
                 message));
@@ -34,13 +34,13 @@ namespace AnnoMapEditor.Utilities
 
         public void LogError(string message, Exception? ex = null)
         {
-            Log.PrintLine(string.Format(_logTemplate,
+            Console.WriteLine(string.Format(_logTemplate,
                 GetTimestamp(),
                 "Error",
                 message));
 
             if (ex != null)
-                Log.PrintLine(ex.Message);
+                Console.WriteLine(ex.Message);
         }
     }
 }

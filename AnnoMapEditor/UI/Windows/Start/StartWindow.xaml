@@ -57,13 +57,21 @@
         <Button Name="closeButton" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource WindowControlRed}" Content="&#xe8bb;" Click="CloseBtn_Click"/>
 
         <StackPanel Margin="32" Grid.Row="0" Orientation="Horizontal" Height="auto">
-            <Image Source="/Assets/app.ico" Height="50"/>
-            <TextBlock Margin="20,0,0,0" 
-                       VerticalAlignment="Center" 
-                       Text="Anno Community Map Editor" 
-                       Foreground="{StaticResource TextBrush}" 
-                       FontSize="23" 
-                       FontWeight="Light"/>
+            <Image Source="/Assets/app.ico" Height="50" VerticalAlignment="Center"/>
+            <StackPanel Orientation="Vertical"
+                        Margin="20,0,0,0" >
+                <TextBlock VerticalAlignment="Center" 
+                           Text="Community Map Editor" 
+                           Foreground="{StaticResource TextBrush}" 
+                           FontSize="25" 
+                           FontWeight="Light"/>
+                <TextBlock VerticalAlignment="Center"
+                           Text="for Anno 1800 and 117"
+                           Foreground="{StaticResource TextBrush}" 
+                           FontSize="16" 
+                           FontWeight="Light" />
+            </StackPanel>
+            
         </StackPanel>
 
         <Grid Grid.Row="1" Margin="100,0"

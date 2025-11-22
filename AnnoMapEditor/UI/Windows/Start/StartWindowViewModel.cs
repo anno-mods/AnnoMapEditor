@@ -60,8 +60,8 @@ namespace AnnoMapEditor.UI.Windows.Start
                         ContinueToMainWindow();
                     break;
                 }
-                case nameof(DataManager.Game):
-                    SelectedGame = DataManager.Game ?? Game.UnsupportedGame;
+                case nameof(DataManager.DetectedGame):
+                    SelectedGame = DataManager.DetectedGame ?? Game.UnsupportedGame;
                     break;
             }
         }
