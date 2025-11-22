@@ -9,6 +9,7 @@ using AnnoMapEditor.Utilities;
 using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using AnnoMapEditor.DataArchives.Games;
 
 namespace AnnoMapEditor.UI.Windows.Start
 {
@@ -29,7 +30,7 @@ namespace AnnoMapEditor.UI.Windows.Start
 
         public Game SelectedGame
         {
-            get => _selectedGame ?? Game.UnsupportedGame; 
+            get => _selectedGame ?? Game.UnsupportedAnno; 
             private set => SetProperty(ref _selectedGame, value);
         }
         private Game? _selectedGame;
@@ -67,7 +68,7 @@ namespace AnnoMapEditor.UI.Windows.Start
                     break;
                 }
                 case nameof(DataManager.DetectedGame):
-                    SelectedGame = DataManager.DetectedGame ?? Game.UnsupportedGame;
+                    SelectedGame = DataManager.DetectedGame ?? Game.UnsupportedAnno;
                     break;
             }
         }

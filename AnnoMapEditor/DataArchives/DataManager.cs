@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using AnnoMapEditor.DataArchives.Games;
 
 namespace AnnoMapEditor.DataArchives
 {
@@ -85,12 +86,13 @@ namespace AnnoMapEditor.DataArchives
             {
                 if (!dataPath.Contains(supportedGame.Path)) continue;
                 DetectedGame = supportedGame;
+                _logger.LogInformation($"Found Game '{supportedGame.Title}'.");
                 break;
             }
 
             try
             {
-                if (DetectedGame == null || DetectedGame == Game.UnsupportedGame)
+                if (DetectedGame == null || DetectedGame == Game.UnsupportedAnno)
                     throw new Exception("Selected game is not supported.");
 
                 DataArchiveFactory dataArchiveFactory = new();
