@@ -79,9 +79,15 @@ namespace AnnoMapEditor.DataArchives
         }
     }
 
+    // TODO: For more flexibility and possible future modded data support, using static assets could be a problem.
+    // Ideally, all assets should be loaded dynamically. But this would probably require quite a lot of work.
+    // This might be an idea for a future version after compatibility with 117 is archived. 
+    
     public abstract class StaticGameAssets
     {
         public abstract IEnumerable<RegionAsset?> SupportedRegions { get; }
+        public abstract IEnumerable<SessionAsset?> SupportedSessions { get; }
+        public abstract IEnumerable<SlotAsset?> SupportedSlots { get; }
         public abstract IEnumerable<Type> SupportedAssetTypes { get; }
     }
     
@@ -89,25 +95,76 @@ namespace AnnoMapEditor.DataArchives
 
     public class Anno1800StaticAssets : StaticGameAssets
     {
+        // Region GUIDs
         public const long RegionModerateGuid = 5000000;
         public const long RegionSouthAmericaGuid = 5000001;
         public const long RegionArcticGuid = 160001;
         public const long RegionAfricaGuid = 114327;
         
+        // Session GUIDs
+        public const long SessionOldWorldGuid = 180023;
+        public const long SessionNewWorldGuid = 180025;
+        public const long SessionSunkenTreasuresGuid = 110934;
+        public const long SessionArcticGuid = 180045;
+        public const long SessionEnbesaGuid = 112132;
+        
+        // Slot GUIDs
+        public const long RandomMineOldWorldGuid = 1000029;
+        public const long RandomMineNewWorldGuid = 614;
+        public const long RandomMineArcticGuid = 116037;
+        public const long RandomClayGuid = 100417;
+        public const long RandomOilGuid = 100849;
+        
+        // Static Region Assets
         [StaticAsset(RegionModerateGuid)]
-        public static RegionAsset? Moderate { get; private set; }
+        public static RegionAsset? ModerateRegion { get; private set; }
 
         [StaticAsset(RegionSouthAmericaGuid)]
-        public static RegionAsset? SouthAmerica { get; private set; }
+        public static RegionAsset? SouthAmericaRegion { get; private set; }
 
         [StaticAsset(RegionArcticGuid)]
-        public static RegionAsset? Arctic { get; private set; }
+        public static RegionAsset? ArcticRegion { get; private set; }
 
         [StaticAsset(RegionAfricaGuid)]
-        public static RegionAsset? Africa { get; private set; }
+        public static RegionAsset? AfricaRegion { get; private set; }
+        
+        // Static Session Assets
+        [StaticAsset(SessionOldWorldGuid)]
+        public static SessionAsset? OldWorldSession { get; private set; }
+
+        [StaticAsset(SessionNewWorldGuid)]
+        public static SessionAsset? NewWorldSession { get; private set; }
+
+        [StaticAsset(SessionSunkenTreasuresGuid)]
+        public static SessionAsset? CapeTrelawneySession { get; private set; }
+
+        [StaticAsset(SessionArcticGuid)]
+        public static SessionAsset? ArcticSession { get; private set; }
+
+        [StaticAsset(SessionEnbesaGuid)]
+        public static SessionAsset? EnbesaSession { get; private set; }
+        
+        // Static slot assets
+        [StaticAsset(RandomMineOldWorldGuid)]
+        public static SlotAsset? RandomMineOldWorld { get; private set; }
+
+        [StaticAsset(RandomMineNewWorldGuid)]
+        public static SlotAsset? RandomMineNewWorld { get; private set; }
+
+        [StaticAsset(RandomMineArcticGuid)]
+        public static SlotAsset? RandomMineArctic { get; private set; }
+
+        [StaticAsset(RandomClayGuid)]
+        public static SlotAsset? RandomClay { get; private set; }
+
+        [StaticAsset(RandomOilGuid)]
+        public static SlotAsset? RandomOil { get; private set; }
 
 
-        public override IEnumerable<RegionAsset?> SupportedRegions => new[] { Moderate, SouthAmerica, Arctic, Africa };
+        public override IEnumerable<RegionAsset?> SupportedRegions => new[] { ModerateRegion, SouthAmericaRegion, ArcticRegion, AfricaRegion };
+        public override IEnumerable<SessionAsset?> SupportedSessions => new [] { OldWorldSession, NewWorldSession, CapeTrelawneySession, ArcticSession, EnbesaSession };
+        public override IEnumerable<SlotAsset?> SupportedSlots => new [] { RandomMineOldWorld, RandomMineNewWorld, RandomMineArctic, RandomClay, RandomOil };
+
         public override IEnumerable<Type> SupportedAssetTypes => new[]
         {
             typeof(RegionAsset),
@@ -123,16 +180,31 @@ namespace AnnoMapEditor.DataArchives
 
     public class Anno117StaticAssets : StaticGameAssets
     {
+        // Region GUIDs
         public const long RegionRomanGuid = 3225;
         public const long RegionCelticGuid = 6626;
         
+        // Session GUIDs
+        public const long SessionLatiumGuid = 3245;
+        public const long SessionAlbionGuid = 6627;
+        
+        // Region Assets
         [StaticAsset(RegionRomanGuid)]
         public static RegionAsset? Roman { get; private set; }
 
         [StaticAsset(RegionCelticGuid)]
         public static RegionAsset? Celtic { get; private set; }
         
+        // Session Assets
+        [StaticAsset(SessionLatiumGuid)]
+        public static SessionAsset? Latium { get; private set; }
+        
+        [StaticAsset(SessionAlbionGuid)]
+        public static SessionAsset? Albion { get; private set; }
+        
         public override IEnumerable<RegionAsset?> SupportedRegions => new [] { Roman, Celtic };
+        public override IEnumerable<SessionAsset?> SupportedSessions => new[] { Latium, Albion };
+        public override IEnumerable<SlotAsset?> SupportedSlots => Enumerable.Empty<SlotAsset>(); // Anno 117 does not use slots.
         public override IEnumerable<Type> SupportedAssetTypes => new[]
         {
             typeof(RegionAsset),
