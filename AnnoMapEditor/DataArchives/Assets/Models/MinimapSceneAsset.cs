@@ -3,6 +3,7 @@ using AnnoMapEditor.DataArchives.Assets.Repositories;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
@@ -24,8 +25,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
 
         // deserialization constructor
-        public MinimapSceneAsset(XElement valuesXml)
-            : base(valuesXml)
+        public MinimapSceneAsset(XElement valuesXml, GameDefaults gameDefaults)
+            : base(valuesXml, gameDefaults)
         {
             FertilityOrderGuids = valuesXml.Element("MinimapScene")?
                 .Element("FertilityOrder")?

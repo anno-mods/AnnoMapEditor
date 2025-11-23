@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
@@ -16,8 +17,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public const long REGION_SOUTHAMERICA_GUID = 5000001;
         public const long REGION_ARCTIC_GUID = 160001;
         public const long REGION_AFRICA_GUID = 114327;
-
-        public const string REGION_MODERATE_REGIONID = "Moderate";
 
 
         [StaticAsset(REGION_MODERATE_GUID)]
@@ -33,30 +32,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public static RegionAsset Africa { get; private set; }
 
         public static IEnumerable<RegionAsset> SupportedRegions => new[] { Moderate, SouthAmerica, Arctic, Africa };
-
-
-        /// <summary>
-        /// Each region has its own AmbientName, which is needed when creating the .a7t. These
-        /// values are missing in assets.xml. The values seen here were reverse engineered from
-        /// existing a7t files within the game.
-        /// 
-        /// Note: Region assets do contain an attribute "Ambiente". However its value is always
-        /// "Region_map_global" and does not match the expected value for a7ts.
-        /// </summary>
-        private static readonly Dictionary<long, string> REGION_AMBIENTE_HARDCODED = new Dictionary<long, string>()
-        {
-            [REGION_MODERATE_GUID] = "Moderate_01_day_night",
-            [REGION_SOUTHAMERICA_GUID] = "south_america_caribic_01",
-            [REGION_ARCTIC_GUID] = "DLC03_01",
-            [REGION_AFRICA_GUID] = "Colony_02"
-        };
-
-
+        
         public string DisplayName { get; init; }
 
         public string? Ambiente { get; init; }
 
-        public string RegionID { get; init; }
+        public string RegionID { get; set; }
 
         public IEnumerable<long> AllowedFertilityGuids { get; init; }
 
@@ -64,8 +45,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public ICollection<FertilityAsset> AllowedFertilities { get; init; }
 
 
-        public RegionAsset(XElement valuesXml)
-            : base(valuesXml)
+        public RegionAsset(XElement valuesXml, GameDefaults gameDefaults)
+            : base(valuesXml, gameDefaults)
         {
             DisplayName = valuesXml.Element("Text")!
                 .Element("LocaText")?
@@ -77,12 +58,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
             XElement regionElement = valuesXml.Element(TEMPLATE_NAME)!;
 
-            if (REGION_AMBIENTE_HARDCODED.ContainsKey(GUID))
-                Ambiente = REGION_AMBIENTE_HARDCODED[GUID];
+            if (gameDefaults.RegionAmbienteDictionary.TryGetValue(GUID, out var regionAmbiente))
+                Ambiente = regionAmbiente;
 
             // The region Moderate does not have a RegionID specified in assets.xml. All other
             // regions have them.
-            RegionID = regionElement.Element("RegionID")?.Value ?? REGION_MODERATE_REGIONID;
+            RegionID = regionElement.Element("RegionID")?.Value ?? gameDefaults.DefaultRegionId;
 
             AllowedFertilityGuids = regionElement.Element("AllowedFertilities")?
                 .Elements("Item")?
@@ -91,20 +72,11 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 ?? Array.Empty<long>();
         }
 
-
-        public static RegionAsset DetectFromPath(string filePath)
+        public static RegionAsset DetectFromPath(string filePath, GameDefaults gameDefaults)
         {
-            if (filePath.Contains("colony01") || filePath.Contains("ggj") || filePath.Contains("scenario03"))
-                return SouthAmerica;
-            else if (filePath.Contains("dlc03") || filePath.Contains("colony_03"))
-                return Arctic;
-            else if (filePath.Contains("dlc06") || filePath.Contains("colony02") || filePath.Contains("scenario02"))
-                return Africa;
-            else
-                return Moderate;
+            return gameDefaults.GetRegionAssetFromFilePath(filePath);
         }
-
-
+        
         public override string ToString() => DisplayName;
     }
 }

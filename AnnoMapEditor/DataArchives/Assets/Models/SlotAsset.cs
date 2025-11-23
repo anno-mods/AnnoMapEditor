@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
@@ -11,29 +12,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
     public class SlotAsset : StandardAsset
     {
         public const string TEMPLATE_NAME = "Slot";
-
-        public const long RANDOM_MINE_OLD_WORLD_GUID = 1000029;
-        public const long RANDOM_MINE_NEW_WORLD_GUID = 614;
-        public const long RANDOM_MINE_ARCTIC_GUID = 116037;
-        public const long RANDOM_CLAY_GUID = 100417;
-        public const long RANDOM_OIL_GUID = 100849;
-
-
-        [StaticAsset(RANDOM_MINE_OLD_WORLD_GUID)]
-        public static SlotAsset RandomMineOldWorld { get; private set; }
-
-        [StaticAsset(RANDOM_MINE_NEW_WORLD_GUID)]
-        public static SlotAsset RandomMineNewWorld { get; private set; }
-
-        [StaticAsset(RANDOM_MINE_ARCTIC_GUID)]
-        public static SlotAsset RandomMineArctic { get; private set; }
-
-        [StaticAsset(RANDOM_CLAY_GUID)]
-        public static SlotAsset RandomClay { get; private set; }
-
-        [StaticAsset(RANDOM_OIL_GUID)]
-        public static SlotAsset RandomOil { get; private set; }
-
 
         public string DisplayName { get; init; }
 
@@ -62,8 +40,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
 
         // deserialization constructor
-        public SlotAsset(XElement valuesXml) 
-            : base(valuesXml)
+        public SlotAsset(XElement valuesXml, GameDefaults gameDefaults)
+            : base(valuesXml, gameDefaults)
         {
             DisplayName = valuesXml.Element("Text")!
                 .Element("LocaText")?

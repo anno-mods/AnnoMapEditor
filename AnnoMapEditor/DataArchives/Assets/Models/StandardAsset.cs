@@ -2,6 +2,7 @@
 using System;
 using System.Windows.Media;
 using System.Xml.Linq;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
@@ -29,7 +30,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         }
 
-        public StandardAsset(XElement valuesXml)
+        public StandardAsset(XElement valuesXml, GameDefaults gameDefaults)
         {
             XElement standardValues = valuesXml.Element(TemplateName)
                 ?? throw new Exception($"XML is not a valid {nameof(StandardAsset)}. Required section '{TemplateName}' not found.");

@@ -2,6 +2,7 @@
 using AnnoMapEditor.Mods.Enums;
 using System;
 using System.Xml.Linq;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
@@ -23,8 +24,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public MapType? TemplateMapType { get; init; }
 
 
-        public MapTemplateAsset(XElement valuesXml)
-            : base(valuesXml)
+        public MapTemplateAsset(XElement valuesXml, GameDefaults gameDefaults)
+            : base(valuesXml, gameDefaults)
         {
             XElement mapTemplateValues = valuesXml.Element(TEMPLATE_NAME)
                 ?? throw new Exception($"XML is not a valid {nameof(MapTemplateAsset)}. It does not have '{TEMPLATE_NAME}' section in its values.");
@@ -36,7 +37,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
             // TemplateRegion defaults to Moderate. If the MapTemplate belongs to another region,
             // it must have TemplateRegion set explicitly within assets.xml.
-            TemplateRegionId = mapTemplateValues.Element(nameof(TemplateRegion))?.Value ?? RegionAsset.REGION_MODERATE_REGIONID;
+            TemplateRegionId = mapTemplateValues.Element(nameof(TemplateRegion))?.Value ?? gameDefaults.DefaultRegionId;
 
             string? templateMapTypeStr = mapTemplateValues.Element(nameof(TemplateMapType))?.Value;
             if (templateMapTypeStr != null)

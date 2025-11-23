@@ -5,6 +5,8 @@ using System;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.Windows.Media;
+using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.UI.Overlays.SelectSlots
 {
@@ -94,12 +96,13 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
                 throw new ArgumentException();
 
             // Warning: Hardcoding
+            // TODO: Get rid of hardcoding if possible
             // SouthAmerica uses both random mine slots 614 and 1000029. However, none of the
             // replacements for 1000029 contain the New World as an AssociatedRegion. Despite of
             // this, it is possible to have both 1010502 Iron Deposit and 1010507 Gold Deposit in
             // the New World.
             if (_selectedRegion == RegionAsset.SouthAmerica
-                && SlotAssignment.Slot.ObjectGuid == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID
+                && SlotAssignment.Slot.ObjectGuid == Anno1800StaticAssets.RandomMineOldWorldGuid
                 && (slotAsset.GUID == 1010501 || slotAsset.GUID == 1010507))
                 return true;
 
@@ -140,20 +143,9 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             {
                 long randomSlotGuid = SlotAssignment.Slot.ObjectGuid;
 
-                /* TODO: Re-implement for game-aware assets...
-                 * Idea: Implement a UI Color Property within the slot asset to get rid of this hardcoded part.
-                 */
-                if (randomSlotGuid == SlotAsset.RandomMineOldWorld.GUID
-                    || randomSlotGuid == SlotAsset.RandomMineNewWorld.GUID
-                    || randomSlotGuid == SlotAsset.RandomMineArctic.GUID)
-                    PinBrush = Brushes.Gray;
-                else if (randomSlotGuid == SlotAsset.RandomClay.GUID)
-                    PinBrush = Brushes.SandyBrown;
-                else if (randomSlotGuid == SlotAsset.RandomOil.GUID)
-                    PinBrush = Brushes.DarkSlateGray;
-                else
-                    PinBrush = Brushes.Red;
-
+                PinBrush = DataManager.Instance.DetectedGame?.GameDefaults?
+                               .PinBrushFromSlot(randomSlotGuid) 
+                           ?? Brushes.Red;
                 BackgroundBrush = PinBrush;
             }
         }

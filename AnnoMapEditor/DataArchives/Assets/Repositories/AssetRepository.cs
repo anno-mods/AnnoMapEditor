@@ -31,7 +31,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         private readonly RegionIdReferenceResolverFactory _regionIdReferenceResolverFactory;
 
-        private readonly Dictionary<string, Func<XElement, StandardAsset>> _deserializers = new();
+        private readonly Dictionary<string, Func<XElement, GameDefaults, StandardAsset>> _deserializers = new();
 
         private readonly Dictionary<Type, List<Action<object>>> _referenceResolvers = new();
 
@@ -61,7 +61,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
                 try
                 {
-                    asset = deserializer(valuesElement);
+                    asset = deserializer(valuesElement, _detectedGame.GameDefaults!);
                 }
                 catch (Exception ex)
                 {
@@ -170,7 +170,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     if (asset is not null)
                     {
                         _assets.Add(asset.GUID, asset);
-                        _logger.LogInformation($"Added asset {asset.Name}.");
+                        _logger.LogInformation($"Added {asset.GetType().Name} {asset.Name}.");
                     }
                 }
             });
@@ -191,7 +191,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             
             // TODO: Complete Game-Aware static asset init and remove old way of loading static assets.
             InitializeStaticGameAssets(_detectedGame.StaticAssets);
-            InitializeStaticAssets();
+            // InitializeStaticAssets();
             
             watch.Stop();
             _logger.LogInformation($"Finished loading {_assets.Count} assets at {watch.Elapsed.TotalMilliseconds} ms.");
@@ -264,9 +264,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 ?? throw new Exception($"Cannot register type '{typeof(TAsset).FullName}' as an asset model, because it lacks the {nameof(AssetTemplateAttribute)}.");
             
             // get the deserializer
-            ConstructorInfo deserializerConstructor = typeof(TAsset).GetConstructor(new[] { typeof(XElement) })
+            ConstructorInfo deserializerConstructor = typeof(TAsset).GetConstructor(new[] { typeof(XElement), typeof(GameDefaults) })
                 ?? throw new Exception($"Type {typeof(TAsset).FullName} is not a valid asset model. Asset models must have a deserialization constructor.");
-            Func<XElement, TAsset> deserializer = (x) => (TAsset)deserializerConstructor.Invoke(new object?[] { x });
+            Func<XElement, GameDefaults, TAsset> deserializer = (x, y) => (TAsset)deserializerConstructor.Invoke(new object?[] { x, y });
 
             foreach (string templateName in assetTemplateAttribute.TemplateNames)
                 _deserializers.Add(templateName, deserializer);

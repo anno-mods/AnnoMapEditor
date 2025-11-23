@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
@@ -39,12 +40,15 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         private readonly FixedIslandRepository _fixedIslandRepository;
 
         private readonly AssetRepository _assetRepository;
+        
+        private readonly Game _detectGame;
 
 
-        public IslandRepository(FixedIslandRepository fixedIslandRepository, AssetRepository assetRepository)
+        public IslandRepository(FixedIslandRepository fixedIslandRepository, AssetRepository assetRepository,  Game detectGame)
         {
             _fixedIslandRepository = fixedIslandRepository;
             _assetRepository = assetRepository;
+            _detectGame = detectGame;
         }
 
 
@@ -68,6 +72,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         public override Task InitializeAsync()
         {
             _logger.LogInformation($"Begin loading islands.");
+            
+            if (_detectGame.GameDefaults == null)
+                throw new NullReferenceException("GameDefaults not initialized.");
 
             Dictionary<string, RandomIslandAsset> randomByFilePath = _assetRepository
                 .GetAll<RandomIslandAsset>()
@@ -95,7 +102,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     FilePath = filePath,
                     DisplayName = randomIsland?.Name ?? Path.GetFileNameWithoutExtension(filePath),
                     Thumbnail = fixedIsland.Thumbnail,
-                    Region = randomIsland?.IslandRegion ?? RegionAsset.DetectFromPath(filePath),
+                    Region = randomIsland?.IslandRegion ?? RegionAsset.DetectFromPath(filePath, _detectGame.GameDefaults),
                     IslandDifficulty = randomIsland?.IslandDifficulty ?? new[] { IslandDifficulty.Normal },
                     IslandType = randomIsland?.IslandType ?? new[] { DetectIslandTypeFromPath(filePath) },
                     IslandSize = new[] { islandSize },

@@ -13,6 +13,7 @@ namespace AnnoMapEditor.Games
         public override string Title => "Anno 117 - Pax Romana";
         public override string IconGeometry => "M6,5H18A1,1 0 0,1 19,6A1,1 0 0,1 18,7H6A1,1 0 0,1 5,6A1,1 0 0,1 6,5M21,2V4H3V2H21M15,8H17V22H15V8M7,8H9V22H7V8M11,8H13V22H11V8Z";
         public override string AssetsXmlPath => "data/base/config/export/assets.xml";
+        public override GameDefaults GameDefaults => new Anno117GameDefaults();
         public override StaticGameAssets StaticAssets => new Anno117StaticAssets();
 
         public override IEnumerable<Pool> IslandPools => new List<Pool>()
@@ -66,5 +67,32 @@ namespace AnnoMapEditor.Games
             typeof(SessionAsset),
             typeof(MapTemplateAsset)
         };
+    }
+
+    internal class Anno117GameDefaults : GameDefaults
+    {
+        public override string DefaultRegionId => "Roman";
+        public override long DefaultRegionGuid => Anno117StaticAssets.RegionRomanGuid;
+
+        public override Dictionary<long, long> SessionToRegionGuidDictionary => new()
+        {
+            [Anno117StaticAssets.SessionLatiumGuid] = Anno117StaticAssets.RegionRomanGuid,
+            [Anno117StaticAssets.SessionAlbionGuid] = Anno117StaticAssets.RegionCelticGuid,
+        };
+        
+        public override Dictionary<long, string> RegionAmbienteDictionary => new() { };
+        public override RegionAsset GetRegionAssetFromFilePath(string path)
+        {
+            try
+            {
+                if (path.Contains("celtic"))
+                    return Anno117StaticAssets.CelticRegion!;
+                return Anno117StaticAssets.RomanRegion!;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Static Region Assets have not been initialized!", e);
+            }
+        }
     }
 }

@@ -114,7 +114,7 @@ namespace AnnoMapEditor.DataArchives
                 _fixedIslandRepository = new FixedIslandRepository(_dataArchive);
                 await _fixedIslandRepository.InitializeAsync();
 
-                _islandRepository = new IslandRepository(_fixedIslandRepository, _assetRepository);
+                _islandRepository = new IslandRepository(_fixedIslandRepository, _assetRepository, DetectedGame);
                 await _islandRepository.InitializeAsync();
 
                 _mapGroupRepository = new MapGroupRepository(_dataArchive);

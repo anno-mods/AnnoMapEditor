@@ -202,6 +202,11 @@ namespace AnnoMapEditor.MapTemplates.Models
         [MemberNotNull(nameof(_islandAsset))]
         private void SetDummyAsset(Element sourceElement)
         {
+            var gameDefaults = DataManager.Instance.DetectedGame?.GameDefaults;
+            
+            if (gameDefaults ==  null)
+                throw new NullReferenceException("GameDefaults have not been initialized!.");
+            
             string islandFilePath = sourceElement.MapFilePath
                 ?? throw new ArgumentException($"Missing property '{nameof(Element.MapFilePath)}'.");
 
@@ -214,7 +219,7 @@ namespace AnnoMapEditor.MapTemplates.Models
                 FilePath = islandFilePath,
                 DisplayName = System.IO.Path.GetFileNameWithoutExtension(islandFilePath),
                 Thumbnail = null,
-                Region = RegionAsset.DetectFromPath(islandFilePath),
+                Region = RegionAsset.DetectFromPath(islandFilePath, gameDefaults),
                 IslandDifficulty =  new[] { islandDifficulty },
                 IslandType = new[] { IslandRepository.DetectIslandTypeFromPath(islandFilePath) },
                 IslandSize = new[] { islandSize },

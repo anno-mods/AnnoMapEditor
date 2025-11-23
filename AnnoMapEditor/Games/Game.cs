@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Media;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates;
 
@@ -38,6 +39,7 @@ namespace AnnoMapEditor.Games
          */
         public abstract string IconGeometry { get; }
         public virtual string? AssetsXmlPath => null;
+        public virtual GameDefaults? GameDefaults => null;
         public virtual StaticGameAssets? StaticAssets => null;
         public virtual IEnumerable<Pool> IslandPools => new List<Pool>();
 
@@ -62,5 +64,35 @@ namespace AnnoMapEditor.Games
         public abstract IEnumerable<SessionAsset?> SupportedSessions { get; }
         public abstract IEnumerable<SlotAsset?> SupportedSlots { get; }
         public abstract IEnumerable<Type> SupportedAssetTypes { get; }
+    }
+
+    public abstract class GameDefaults
+    {
+        public abstract string DefaultRegionId { get;}
+        public abstract long DefaultRegionGuid { get; }
+        
+        /*
+         * Anno 1800:
+         *     The session assets for The Old World and The New World to not properly reference their
+         *     respective regions in assets.xml.
+         */
+        public abstract Dictionary<long, long> SessionToRegionGuidDictionary { get; }
+        
+        /*
+         * Anno 1800: 
+         *     Each region has its own AmbientName, which is needed when creating the .a7t. These values are missing in
+         *     assets.xml. The values seen here were reverse engineered from existing a7t files within the game.
+         *
+         *     Note: Region assets do contain an attribute "Ambiente". However its value is always "Region_map_global"
+         *     and does not match the expected value for a7ts.
+         */
+        public abstract Dictionary<long, string> RegionAmbienteDictionary { get; }
+
+        public abstract RegionAsset GetRegionAssetFromFilePath(string path);
+
+        public virtual Brush PinBrushFromSlot(long slotGuid)
+        {
+            return Brushes.LightGray;
+        }
     }
 }

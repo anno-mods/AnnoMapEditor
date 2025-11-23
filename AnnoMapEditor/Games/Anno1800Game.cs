@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Media;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates;
@@ -12,6 +13,7 @@ namespace AnnoMapEditor.Games
         public override string Title => "Anno 1800";
         public override string IconGeometry => "M4,18V20H8V18H4M4,14V16H14V14H4M10,18V20H14V18H10M16,14V16H20V14H16M16,18V20H20V18H16M2,22V8L7,12V8L12,12V8L17,12L18,2H21L22,12V22H2Z";
         public override string AssetsXmlPath => "data/config/export/main/asset/assets.xml";
+        public override GameDefaults GameDefaults => new Anno1800GameDefaults();
         public override StaticGameAssets StaticAssets => new Anno1800StaticAssets();
 
         public override IEnumerable<Pool> IslandPools => new List<Pool>()
@@ -146,5 +148,56 @@ namespace AnnoMapEditor.Games
             typeof(SessionAsset),
             typeof(MapTemplateAsset)
         };
+    }
+
+    internal class Anno1800GameDefaults : GameDefaults
+    {
+        public override string DefaultRegionId => "Moderate";
+        public override long DefaultRegionGuid => Anno1800StaticAssets.RegionModerateGuid;
+
+        public override Dictionary<long, long> SessionToRegionGuidDictionary => new()
+        {
+            [Anno1800StaticAssets.SessionOldWorldGuid] = Anno1800StaticAssets.RegionModerateGuid,
+            [Anno1800StaticAssets.SessionNewWorldGuid] = Anno1800StaticAssets.RegionSouthAmericaGuid
+        };
+
+        public override Dictionary<long, string> RegionAmbienteDictionary => new()
+        {
+            [Anno1800StaticAssets.RegionModerateGuid] = "Moderate_01_day_night",
+            [Anno1800StaticAssets.RegionSouthAmericaGuid] = "south_america_caribic_01",
+            [Anno1800StaticAssets.RegionArcticGuid] = "DLC03_01",
+            [Anno1800StaticAssets.RegionAfricaGuid] = "Colony_02"
+        };
+
+        public override RegionAsset GetRegionAssetFromFilePath(string filePath)
+        {
+            try
+            {
+                if (filePath.Contains("colony01") || filePath.Contains("ggj") || filePath.Contains("scenario03"))
+                    return Anno1800StaticAssets.SouthAmericaRegion!;
+                if (filePath.Contains("dlc03") || filePath.Contains("colony_03"))
+                    return Anno1800StaticAssets.ArcticRegion!;
+                if (filePath.Contains("dlc06") || filePath.Contains("colony02") || filePath.Contains("scenario02"))
+                    return Anno1800StaticAssets.AfricaRegion!;
+                return Anno1800StaticAssets.ModerateRegion!;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Static Region Assets have not been initialized!", e);
+            }
+        }
+
+        public override Brush PinBrushFromSlot(long slotGuid)
+        {
+            return slotGuid switch
+            {
+                Anno1800StaticAssets.RandomMineOldWorldGuid 
+                    or Anno1800StaticAssets.RandomMineNewWorldGuid
+                    or Anno1800StaticAssets.RandomMineArcticGuid => Brushes.Gray,
+                Anno1800StaticAssets.RandomClayGuid => Brushes.SandyBrown,
+                Anno1800StaticAssets.RandomOilGuid => Brushes.DarkSlateGray,
+                _ => Brushes.Red
+            };
+        }
     }
 }

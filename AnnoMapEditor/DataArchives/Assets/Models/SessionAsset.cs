@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
@@ -40,17 +41,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public static IEnumerable<SessionAsset> SupportedSessions => new[] { OldWorld, NewWorld, CapeTrelawney, Arctic, Enbesa };
 
 
-        /// <summary>
-        /// The session assets for The Old World and The New World to not properly reference their
-        /// respective regions in assets.xml.
-        /// </summary>
-        private static readonly Dictionary<long, long> REGIONID_HARDCODED = new()
-        {
-            [SESSION_OLDWORLD_GUID] = RegionAsset.REGION_MODERATE_GUID, // The Old World => Moderate
-            [SESSION_NEWWORLD_GUID] = RegionAsset.REGION_SOUTHAMERICA_GUID  // The New World => Colony01
-        };
-
-
         public string DisplayName { get; init; }
 
         public long? MapTemplateGuid { get; init; }
@@ -69,8 +59,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public RegionAsset Region { get; set; }
 
 
-        public SessionAsset(XElement valuesXml)
-            : base(valuesXml)
+        public SessionAsset(XElement valuesXml, GameDefaults gameDefaults)
+            : base(valuesXml, gameDefaults)
         {
             DisplayName = valuesXml.Element("Text")!
                 .Element("LocaText")?
@@ -109,12 +99,15 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 else
                     throw new Exception($"XML is not a valid {nameof(SessionAsset)}. Invalid value '{regionGuidStr}' for attribute '{nameof(Region)}'.");
             }
-            // special handling for The Old World and The New World
-            else if (REGIONID_HARDCODED.ContainsKey(GUID))
-                RegionGuid = REGIONID_HARDCODED[GUID];
-            // default to Moderate
+            
+            /* 
+             * The session assets for The Old World and The New World to not properly reference their
+             * respective regions in assets.xml.
+             */
+            else if (gameDefaults.SessionToRegionGuidDictionary.TryGetValue(GUID, out var regionGuid))
+                RegionGuid = regionGuid;
             else
-                RegionGuid = RegionAsset.REGION_MODERATE_GUID;
+                RegionGuid = gameDefaults.DefaultRegionGuid;
         }
 
 
