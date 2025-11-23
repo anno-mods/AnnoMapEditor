@@ -1,7 +1,6 @@
 ﻿using Anno.FileDBModels.Anno1800.MapTemplate;
 using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
-using AnnoMapEditor.Utilities;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -13,8 +12,9 @@ namespace AnnoMapEditor.MapTemplates.Serializing
     {
         public async Task<MapTemplate> FromDataArchiveAsync(string a7tinfoPath)
         {
-            SessionAsset session = SessionAsset.DetectFromPath(a7tinfoPath);
-            Stream a7tinfoStream = DataManager.Instance.DataArchive.OpenRead(a7tinfoPath)
+            var dataManager = DataManager.Instance;
+            SessionAsset session = SessionAsset.DetectFromPath(a7tinfoPath, dataManager.DetectedGame!.GameDefaults!);
+            Stream a7tinfoStream = dataManager.DataArchive.OpenRead(a7tinfoPath)
                 ?? throw new FileNotFoundException($"Could not find file \"{a7tinfoPath}\" in DataArchive.");
 
             return await FromBinaryStreamAsync(session, a7tinfoStream);
@@ -33,14 +33,14 @@ namespace AnnoMapEditor.MapTemplates.Serializing
 
         public async Task<MapTemplate> FromXmlFileAsync(string filePath)
         {
-            SessionAsset session = SessionAsset.DetectFromPath(filePath);
+            SessionAsset session = SessionAsset.DetectFromPath(filePath, DataManager.Instance.DetectedGame!.GameDefaults!);
             Stream a7tinfoXmlStream = File.OpenRead(filePath);
             return await FromXmlStreamAsync(session, a7tinfoXmlStream);
         }
 
         public async Task<MapTemplate> FromBinaryFileAsync(string filePath)
         {
-            SessionAsset session = SessionAsset.DetectFromPath(filePath);
+            SessionAsset session = SessionAsset.DetectFromPath(filePath, DataManager.Instance.DetectedGame!.GameDefaults!);
             Stream a7tinfoStream = File.OpenRead(filePath);
             return await FromBinaryStreamAsync(session, a7tinfoStream);
         }

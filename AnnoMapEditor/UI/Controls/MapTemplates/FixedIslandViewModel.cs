@@ -1,5 +1,4 @@
-﻿using AnnoMapEditor.MapTemplates.Enums;
-using AnnoMapEditor.MapTemplates.Models;
+﻿using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.Utilities;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,7 +31,8 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
             : base(mapTemplate, fixedIsland)
         {
             _fixedIsland = fixedIsland;
-            _isContinentalIsland = _fixedIsland.IslandAsset.IslandSize.FirstOrDefault() == IslandSize.Continental;
+            // TODO: Temporary fix until island sizes are adjusted for 117.
+            _isContinentalIsland = false; // _fixedIsland.IslandAsset.IslandSize.FirstOrDefault() == IslandSize.Continental;
 
             SlotAssignments = new(_fixedIsland.SlotAssignments.Values.Where(s => s.Slot.SlotAsset != null));
 

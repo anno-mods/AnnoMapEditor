@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AnnoMapEditor.DataArchives;
 
 namespace AnnoMapEditor.UI.Controls.Slots
 {
@@ -17,9 +18,10 @@ namespace AnnoMapEditor.UI.Controls.Slots
         private static readonly Dictionary<string, int> _orderLookup;
         static SlotComparer()
         {
-            int index = 0;
-            _orderLookup = MinimapSceneAsset.Instance.LodesOrderSlotTypes
-                .ToDictionary(f => f, f => index++);
+            var index = 0;
+            var lodesOrderSlotTypes = DataManager.Instance.DetectedGame?.GameDefaults?.MinimapSceneInstance
+                ?.LodesOrderSlotTypes;
+            _orderLookup = lodesOrderSlotTypes != null ? lodesOrderSlotTypes.ToDictionary(f => f, f => index++) : new Dictionary<string, int>();
         }
 
 

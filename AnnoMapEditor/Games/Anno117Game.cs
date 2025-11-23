@@ -73,6 +73,7 @@ namespace AnnoMapEditor.Games
     {
         public override string DefaultRegionId => "Roman";
         public override long DefaultRegionGuid => Anno117StaticAssets.RegionRomanGuid;
+        public override SessionAsset? DefaultSessionAsset => Anno117StaticAssets.LatiumSession;
 
         public override Dictionary<long, long> SessionToRegionGuidDictionary => new()
         {
@@ -92,6 +93,36 @@ namespace AnnoMapEditor.Games
             catch (Exception e)
             {
                 throw new Exception("Static Region Assets have not been initialized!", e);
+            }
+        }
+
+        public override SessionAsset GetSessionAssetFromFilePath(string path)
+        {
+            try
+            {
+                if (path.Contains("celtic"))
+                    return Anno117StaticAssets.AlbionSession!;
+                return Anno117StaticAssets.LatiumSession!;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Static Region Assets have not been initialized!", e);
+            }
+        }
+
+        public override SessionAsset GetSessionAssetFromGuid(long guid)
+        {
+            try
+            {
+                return guid switch
+                {
+                    Anno117StaticAssets.SessionAlbionGuid => Anno117StaticAssets.AlbionSession!,
+                    _ => Anno117StaticAssets.LatiumSession!
+                };
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Static Session Assets have not been initialized!", e);
             }
         }
     }

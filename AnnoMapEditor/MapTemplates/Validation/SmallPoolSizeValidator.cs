@@ -27,13 +27,14 @@ namespace AnnoMapEditor.MapTemplates.Validation
                 }
             }
 
+            // TODO: Re-implement this without hardcoding.
             // subtract Archibald / Nate / Isabel from the counter
-            if ((mapTemplate.Session == SessionAsset.OldWorld || mapTemplate.Session == SessionAsset.NewWorld || mapTemplate.Session == SessionAsset.CapeTrelawney) && thirdPartyCount > 0)
-                --smallIslandCount;
+            // if ((mapTemplate.Session == SessionAsset.OldWorld || mapTemplate.Session == SessionAsset.NewWorld || mapTemplate.Session == SessionAsset.CapeTrelawney) && thirdPartyCount > 0)
+            //     --smallIslandCount;
 
             // subtract all but one pirate island from the counter
-            if (pirateCount > 0)
-                smallIslandCount -= pirateCount - 1;
+            // if (pirateCount > 0)
+            //    smallIslandCount -= pirateCount - 1;
 
             int maxPoolSize = Pool.GetPool(mapTemplate.Session.Region, IslandSize.Small).Size;
             if (smallIslandCount <= maxPoolSize)

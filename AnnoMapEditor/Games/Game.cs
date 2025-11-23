@@ -70,6 +70,8 @@ namespace AnnoMapEditor.Games
     {
         public abstract string DefaultRegionId { get;}
         public abstract long DefaultRegionGuid { get; }
+        public abstract SessionAsset? DefaultSessionAsset { get; }
+        public virtual MinimapSceneAsset? MinimapSceneInstance => null;
         
         /*
          * Anno 1800:
@@ -89,6 +91,8 @@ namespace AnnoMapEditor.Games
         public abstract Dictionary<long, string> RegionAmbienteDictionary { get; }
 
         public abstract RegionAsset GetRegionAssetFromFilePath(string path);
+        public abstract SessionAsset GetSessionAssetFromFilePath(string path);
+        public abstract SessionAsset GetSessionAssetFromGuid(long guid);
 
         public virtual Brush PinBrushFromSlot(long slotGuid)
         {

@@ -12,8 +12,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
     public class RandomIslandAsset : StandardAsset
     {
         public const string TEMPLATE_NAME = "RandomIsland";
-
-
+        
         public string FilePath { get; init; }
 
         public string IslandRegionId { get; init; }

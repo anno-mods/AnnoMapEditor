@@ -1,4 +1,5 @@
-﻿using FileDBReader;
+﻿using System;
+using FileDBReader;
 using FileDBReader.src.XmlRepresentation;
 using FileDBSerializing;
 using FileDBSerializing.ObjectSerializer;
@@ -6,11 +7,14 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
+using AnnoMapEditor.Utilities;
 
 namespace AnnoMapEditor.MapTemplates.Serializing
 {
     internal class FileDBSerializer
     {
+        private static readonly Logger<FileDBSerializer> _logger = new();
+        
         public static async Task<T?> ReadAsync<T>(Stream stream) where T : class, new()
         {
             return await Task.Run(() =>
@@ -21,10 +25,15 @@ namespace AnnoMapEditor.MapTemplates.Serializing
                     var version = VersionDetector.GetCompressionVersion(stream);
                     stream.Seek(0, SeekOrigin.Begin);
                     return FileDBConvert.DeserializeObject<T>(stream,
-                        new FileDBSerializerOptions() { Version = version });
+                        new FileDBSerializerOptions
+                        {
+                            Version = version,
+                            IgnoreMissingProperties = true // TODO: Implement new FileDBModels.
+                        });
                 }
-                catch
+                catch (Exception e)
                 {
+                    _logger.LogError($"{e.Message} \n {e.StackTrace}");
                     return null;
                 }
             });
@@ -54,8 +63,9 @@ namespace AnnoMapEditor.MapTemplates.Serializing
                     FileDBDocumentDeserializer<T> deserializer = new(new FileDBSerializerOptions() { IgnoreMissingProperties = true });
                     return deserializer.GetObjectStructureFromFileDBDocument(doc);
                 }
-                catch
+                catch (Exception e)
                 {
+                    _logger.LogError($"{e.Message} \n {e.StackTrace}");
                     return null;
                 }
             });
@@ -69,8 +79,9 @@ namespace AnnoMapEditor.MapTemplates.Serializing
                 {
                     FileDBConvert.SerializeObject(data, new() { Version = FileDBDocumentVersion.Version1 }, stream);
                 }
-                catch
+                catch (Exception e)
                 {
+                    _logger.LogError($"{e.Message} \n {e.StackTrace}");
                 }
             });
         }
@@ -96,8 +107,9 @@ namespace AnnoMapEditor.MapTemplates.Serializing
 
                     xmlDocument.Save(stream);
                 }
-                catch
+                catch (Exception e)
                 {
+                    _logger.LogError($"{e.Message} \n {e.StackTrace}");
                 }
             });
         }

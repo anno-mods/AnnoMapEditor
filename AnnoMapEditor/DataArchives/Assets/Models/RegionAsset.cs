@@ -12,26 +12,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
     public class RegionAsset : StandardAsset
     {
         public const string TEMPLATE_NAME = "Region";
-
-        public const long REGION_MODERATE_GUID = 5000000;
-        public const long REGION_SOUTHAMERICA_GUID = 5000001;
-        public const long REGION_ARCTIC_GUID = 160001;
-        public const long REGION_AFRICA_GUID = 114327;
-
-
-        [StaticAsset(REGION_MODERATE_GUID)]
-        public static RegionAsset Moderate { get; private set; }
-
-        [StaticAsset(REGION_SOUTHAMERICA_GUID)]
-        public static RegionAsset SouthAmerica { get; private set; }
-
-        [StaticAsset(REGION_ARCTIC_GUID)]
-        public static RegionAsset Arctic { get; private set; }
-
-        [StaticAsset(REGION_AFRICA_GUID)]
-        public static RegionAsset Africa { get; private set; }
-
-        public static IEnumerable<RegionAsset> SupportedRegions => new[] { Moderate, SouthAmerica, Arctic, Africa };
         
         public string DisplayName { get; init; }
 
@@ -61,7 +41,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
             if (gameDefaults.RegionAmbienteDictionary.TryGetValue(GUID, out var regionAmbiente))
                 Ambiente = regionAmbiente;
 
-            // The region Moderate does not have a RegionID specified in assets.xml. All other
+            // The default region does not have a RegionID specified in assets.xml. All other
             // regions have them.
             RegionID = regionElement.Element("RegionID")?.Value ?? gameDefaults.DefaultRegionId;
 

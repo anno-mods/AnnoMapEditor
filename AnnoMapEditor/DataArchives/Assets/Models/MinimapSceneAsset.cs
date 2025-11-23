@@ -11,14 +11,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
     public class MinimapSceneAsset : StandardAsset
     {
         public const string TEMPLATE_NAME = "MinimapScene";
-
-        public const long INSTANCE_GUID = 500204;
-
-
-        [StaticAsset(INSTANCE_GUID)]
-        public static MinimapSceneAsset Instance { get; set; }
-
-
+        
         public List<long> FertilityOrderGuids { get; init; }
 
         public List<string> LodesOrderSlotTypes { get; init; }

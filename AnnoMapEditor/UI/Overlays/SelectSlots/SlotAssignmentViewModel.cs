@@ -101,7 +101,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             // replacements for 1000029 contain the New World as an AssociatedRegion. Despite of
             // this, it is possible to have both 1010502 Iron Deposit and 1010507 Gold Deposit in
             // the New World.
-            if (_selectedRegion == RegionAsset.SouthAmerica
+            if (_selectedRegion == Anno1800StaticAssets.SouthAmericaRegion
                 && SlotAssignment.Slot.ObjectGuid == Anno1800StaticAssets.RandomMineOldWorldGuid
                 && (slotAsset.GUID == 1010501 || slotAsset.GUID == 1010507))
                 return true;

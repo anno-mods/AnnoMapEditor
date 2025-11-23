@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using AnnoMapEditor.Games;
 using AnnoMapEditor.UI.Controls.Toolbar;
 
 namespace AnnoMapEditor.MapTemplates.Models
@@ -208,7 +209,8 @@ namespace AnnoMapEditor.MapTemplates.Models
             _templateDocument.MapTemplate.TemplateElement = new List<TemplateElement>(Elements.Select(x => x.ToTemplate()).Where(x => x is not null)!);
             _templateDocument.MapTemplate.ElementCount = _templateDocument.MapTemplate.TemplateElement.Count;
 
-            if (Session == SessionAsset.NewWorld)
+            // TODO: Redo this without hardcoding.
+            if (Session == Anno1800StaticAssets.NewWorldSession ) // SessionAsset.NewWorld)
                 _templateDocument.MapTemplate.InitialPlayableArea = _templateDocument.MapTemplate.PlayableArea;
             else
                 _templateDocument.MapTemplate.InitialPlayableArea = null;

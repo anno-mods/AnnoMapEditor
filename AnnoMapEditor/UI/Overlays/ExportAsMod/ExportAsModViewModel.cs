@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.UI.Overlays.ExportAsMod
 {
@@ -77,7 +78,8 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
         {
             MapTemplate = mapTemplate;
 
-            ShowMapTypeSelection = mapTemplate.Session == SessionAsset.OldWorld;
+            // TODO: Redo this without hardcoding.
+            ShowMapTypeSelection = mapTemplate.Session == Anno1800StaticAssets.OldWorldSession; // SessionAsset.OldWorld;
             if (ShowMapTypeSelection)
                 SelectedMapType = AllowedMapTypes.First();
 
@@ -113,6 +115,7 @@ namespace AnnoMapEditor.UI.Overlays.ExportAsMod
 
         public async Task<bool> Save()
         {
+            // TODO: Allow for alternative save locations of mods.
             string modsFolderPath = Settings.Instance.ModsPath
                 ?? throw new Exception($"ModsPath is not set.");
 

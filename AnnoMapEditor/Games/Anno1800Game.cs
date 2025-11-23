@@ -87,6 +87,9 @@ namespace AnnoMapEditor.Games
         public const long RandomClayGuid = 100417;
         public const long RandomOilGuid = 100849;
         
+        // Minimap GUID
+        public const long MinimapGuid = 500204;
+        
         // Static Region Assets
         [StaticAsset(RegionModerateGuid)]
         public static RegionAsset? ModerateRegion { get; private set; }
@@ -131,6 +134,11 @@ namespace AnnoMapEditor.Games
 
         [StaticAsset(RandomOilGuid)]
         public static SlotAsset? RandomOil { get; private set; }
+        
+        // Static Minimap Asset
+        
+        [StaticAsset(MinimapGuid)]
+        public static MinimapSceneAsset? MinimapScene { get; private set; }
 
 
         public override IEnumerable<RegionAsset?> SupportedRegions => new[] { ModerateRegion, SouthAmericaRegion, ArcticRegion, AfricaRegion };
@@ -154,6 +162,8 @@ namespace AnnoMapEditor.Games
     {
         public override string DefaultRegionId => "Moderate";
         public override long DefaultRegionGuid => Anno1800StaticAssets.RegionModerateGuid;
+        public override SessionAsset? DefaultSessionAsset => Anno1800StaticAssets.OldWorldSession;
+        public override MinimapSceneAsset? MinimapSceneInstance => Anno1800StaticAssets.MinimapScene;
 
         public override Dictionary<long, long> SessionToRegionGuidDictionary => new()
         {
@@ -184,6 +194,45 @@ namespace AnnoMapEditor.Games
             catch (Exception e)
             {
                 throw new Exception("Static Region Assets have not been initialized!", e);
+            }
+        }
+
+        public override SessionAsset GetSessionAssetFromFilePath(string filePath)
+        {
+            try
+            {
+                if (filePath.Contains("colony01") || filePath.Contains("ggj") || filePath.Contains("scenario03"))
+                    return Anno1800StaticAssets.NewWorldSession!;
+                if (filePath.Contains("dlc03") || filePath.Contains("colony_03"))
+                    return Anno1800StaticAssets.ArcticSession!;
+                if (filePath.Contains("dlc06") || filePath.Contains("colony02") || filePath.Contains("scenario02"))
+                    return Anno1800StaticAssets.EnbesaSession!;
+                if (filePath.Contains("sunken_treasures"))
+                    return Anno1800StaticAssets.CapeTrelawneySession!;
+                return Anno1800StaticAssets.OldWorldSession!;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Static Session Assets have not been initialized!", e);
+            }
+        }
+
+        public override SessionAsset GetSessionAssetFromGuid(long guid)
+        {
+            try
+            {
+                return guid switch
+                {
+                    Anno1800StaticAssets.SessionSunkenTreasuresGuid => Anno1800StaticAssets.CapeTrelawneySession!,
+                    Anno1800StaticAssets.SessionArcticGuid => Anno1800StaticAssets.ArcticSession!,
+                    Anno1800StaticAssets.SessionNewWorldGuid => Anno1800StaticAssets.NewWorldSession!,
+                    Anno1800StaticAssets.SessionEnbesaGuid => Anno1800StaticAssets.EnbesaSession!,
+                    _ => Anno1800StaticAssets.OldWorldSession!
+                };
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Static Session Assets have not been initialized!", e);
             }
         }
 

@@ -5,6 +5,7 @@
     <Convert Path="//MapTemplate/Size" Type="Int32" Structure="List"/>
     <!-- The playable area of the map indicated in "x y x1 y1" format. Note that the north would be in the "y" direction. -->
     <Convert Path="//MapTemplate/PlayableArea" Type="Int32" Structure="List"/>
+    <Convert Path="//MapTemplate/InitialPlayableArea" Type="Int32" Structure="List"/>
     <!-- The amount of TemplateElements -->
     <Convert Path="//MapTemplate/ElementCount" Type="Int32"/>
     <!-- Some maps also include a RandomlyPlacedThirdParties property, but I found them empty -->

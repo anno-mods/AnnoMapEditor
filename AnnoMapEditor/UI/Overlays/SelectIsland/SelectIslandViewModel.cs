@@ -28,7 +28,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectIsland
         }
         private string? _pathFilter;
 
-        public IEnumerable<RegionAsset?> Regions { get; init; } = RegionAsset.SupportedRegions;
+        // public IEnumerable<RegionAsset?> Regions { get; init; } = RegionAsset.SupportedRegions;
 
         private readonly RegionAsset _initialRegion;
 

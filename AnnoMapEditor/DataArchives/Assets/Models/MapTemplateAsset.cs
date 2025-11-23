@@ -35,7 +35,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
             EnlargedTemplateFilename = mapTemplateValues.Element(nameof(EnlargedTemplateFilename))?.Value;
 
-            // TemplateRegion defaults to Moderate. If the MapTemplate belongs to another region,
+            // TemplateRegion defaults to Game default region. If the MapTemplate belongs to another region,
             // it must have TemplateRegion set explicitly within assets.xml.
             TemplateRegionId = mapTemplateValues.Element(nameof(TemplateRegion))?.Value ?? gameDefaults.DefaultRegionId;
 
