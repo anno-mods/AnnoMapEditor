@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using AnnoMapEditor.DataArchives.Games;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
@@ -65,7 +65,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"{ex.Message} - {ex.StackTrace}");
+                    // _logger.LogError($"{ex.Message} - {ex.StackTrace}");
                     return null;
                 }
 
@@ -170,6 +170,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     if (asset is not null)
                     {
                         _assets.Add(asset.GUID, asset);
+                        _logger.LogInformation($"Added asset {asset.Name}.");
                     }
                 }
             });

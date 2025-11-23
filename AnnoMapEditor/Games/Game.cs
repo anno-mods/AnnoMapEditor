@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.MapTemplates;
 
-namespace AnnoMapEditor.DataArchives.Games
+namespace AnnoMapEditor.Games
 {
     /*
      * Symbols taken from https://pictogrammers.com/library/mdi/
@@ -38,6 +39,7 @@ namespace AnnoMapEditor.DataArchives.Games
         public abstract string IconGeometry { get; }
         public virtual string? AssetsXmlPath => null;
         public virtual StaticGameAssets? StaticAssets => null;
+        public virtual IEnumerable<Pool> IslandPools => new List<Pool>();
 
         private class UnsupportedGame : Game
         {

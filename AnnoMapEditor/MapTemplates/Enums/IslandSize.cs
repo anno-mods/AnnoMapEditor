@@ -12,7 +12,9 @@ namespace AnnoMapEditor.MapTemplates.Enums
         public static readonly IslandSize Small       = new("Small",       0,    192);
         public static readonly IslandSize Medium      = new("Medium",      1,    320);
         public static readonly IslandSize Large       = new("Large",       2,    384);
-        public static readonly IslandSize Continental = new("Continental", 2,    int.MaxValue);
+        // TODO: Placeholder for ExtraLarge. Need to figure out the details for 117.
+        public static readonly IslandSize ExtraLarge  = new("ExtraLarge",  3,    400);
+        public static readonly IslandSize Continental = new("Continental", 3,    int.MaxValue);
 
         public static readonly IEnumerable<IslandSize> All = new[] { Small, Medium, Large, Continental };
 

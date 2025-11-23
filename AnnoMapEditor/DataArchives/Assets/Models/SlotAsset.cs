@@ -66,10 +66,12 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
             : base(valuesXml)
         {
             DisplayName = valuesXml.Element("Text")!
-                .Element("LocaText")!
+                .Element("LocaText")?
                 .Element("English")!
                 .Element("Text")!
-                .Value!;
+                .Value ?? valuesXml.Element("Standard")?
+                .Element("Name")?
+                .Value ?? "Unknown Slot Name";
 
             SlotType = valuesXml.Element(TEMPLATE_NAME)?
                 .Element("SlotType")?

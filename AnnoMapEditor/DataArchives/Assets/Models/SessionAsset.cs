@@ -76,8 +76,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 .Element("LocaText")?
                 .Element("English")!
                 .Element("Text")!
-                .Value!
-                ?? "Meta";
+                .Value ?? valuesXml.Element("Standard")?
+                .Element("Name")?
+                .Value ?? "Unknown Session Name";
 
             XElement sessionValues = valuesXml.Element(TEMPLATE_NAME)
                 ?? throw new Exception($"XML is not a valid {nameof(SessionAsset)}. It does not have '{TEMPLATE_NAME}' section in its values.");

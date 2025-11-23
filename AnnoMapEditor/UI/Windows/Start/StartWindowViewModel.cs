@@ -9,7 +9,7 @@ using AnnoMapEditor.Utilities;
 using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using AnnoMapEditor.DataArchives.Games;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.UI.Windows.Start
 {

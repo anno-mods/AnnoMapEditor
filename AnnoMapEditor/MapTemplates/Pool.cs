@@ -7,6 +7,7 @@ namespace AnnoMapEditor.MapTemplates
 {
     public class Pool
     {
+        // TODO: Re-implement game-aware pools and move pool definitions to game classes.
         public static readonly IEnumerable<Pool> All = new List<Pool>()
         {
             // Moderate
@@ -63,8 +64,7 @@ namespace AnnoMapEditor.MapTemplates
                 _poolsMap[(pool.Region, pool.IslandSize)] = pool;
             }
         }
-
-
+        
         public readonly RegionAsset Region;
 
         public readonly IslandSize IslandSize;

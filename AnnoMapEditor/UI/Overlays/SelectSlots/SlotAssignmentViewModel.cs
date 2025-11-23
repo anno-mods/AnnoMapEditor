@@ -140,6 +140,9 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
             {
                 long randomSlotGuid = SlotAssignment.Slot.ObjectGuid;
 
+                /* TODO: Re-implement for game-aware assets...
+                 * Idea: Implement a UI Color Property within the slot asset to get rid of this hardcoded part.
+                 */
                 if (randomSlotGuid == SlotAsset.RandomMineOldWorld.GUID
                     || randomSlotGuid == SlotAsset.RandomMineNewWorld.GUID
                     || randomSlotGuid == SlotAsset.RandomMineArctic.GUID)

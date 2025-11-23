@@ -71,8 +71,9 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
                 .Element("LocaText")?
                 .Element("English")!
                 .Element("Text")!
-                .Value!
-                ?? "Meta";
+                .Value ?? valuesXml.Element("Standard")?
+                .Element("Name")?
+                .Value ?? "Unknown Region Name";
 
             XElement regionElement = valuesXml.Element(TEMPLATE_NAME)!;
 
