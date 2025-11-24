@@ -1,4 +1,5 @@
 ﻿using System;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.Utilities;
 
@@ -34,8 +35,6 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         }
         private bool _isAllowed = true;
 
-        public string ShortenedDisplayName => FertilityAsset.DisplayName
-            .Replace(" Fertility", "")
-            .Replace(" Abundance", "s");
+        public string ShortenedDisplayName =>  DataManager.Instance.DetectedGame!.GameDefaults!.ShortenAssetDisplayName<FertilityAsset>(FertilityAsset.DisplayName);
     }
 }

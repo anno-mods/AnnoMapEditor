@@ -344,6 +344,10 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
                 if (TryGet(staticAssetAttribute.GUID, out StandardAsset? asset))
                 {
+                    // This allows to run Game-specific code after assets have been loaded.
+                    if (asset != null)
+                        _detectedGame.GameDefaults?.PostProcess(asset);
+                    
                     staticProperty.SetValue(null, asset);
                         
                     _logger.LogInformation($"Resolved {asset?.GetType().Name} {staticProperty.Name}.");

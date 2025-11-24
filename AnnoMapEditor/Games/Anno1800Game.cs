@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Media;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates;
@@ -164,7 +166,8 @@ namespace AnnoMapEditor.Games
         public override long DefaultRegionGuid => Anno1800StaticAssets.RegionModerateGuid;
         public override SessionAsset? DefaultSessionAsset => Anno1800StaticAssets.OldWorldSession;
         public override MinimapSceneAsset? MinimapSceneInstance => Anno1800StaticAssets.MinimapScene;
-
+        public override bool UsesSlots => true;
+        public override bool UsesFertilities => true;
         public override Dictionary<long, long> SessionToRegionGuidDictionary => new()
         {
             [Anno1800StaticAssets.SessionOldWorldGuid] = Anno1800StaticAssets.RegionModerateGuid,
@@ -236,6 +239,28 @@ namespace AnnoMapEditor.Games
             }
         }
 
+        public override void PostProcess(StandardAsset asset)
+        {
+            switch (asset)
+            {
+                case RegionAsset regionAsset:
+                    AssignAllowedFertilities(regionAsset);
+                    break;
+            }
+        }
+
+        private static void AssignAllowedFertilities(RegionAsset regionAsset)
+        {
+            var allowedFertilityGuids = regionAsset.Xml?.Element("Region")?
+                                            .Element("AllowedFertilities")?
+                                            .Elements("Item")?
+                                            .Select(x => long.Parse(x.Value))
+                                            .ToArray()
+                                        ?? Array.Empty<long>();
+            
+            regionAsset.AllowedFertilities = allowedFertilityGuids.Select(allowedFertilityGuid => DataManager.Instance.AssetRepositoryUnsafe.Get<FertilityAsset>(allowedFertilityGuid)).ToList();
+        }
+
         public override Brush PinBrushFromSlot(long slotGuid)
         {
             return slotGuid switch
@@ -247,6 +272,18 @@ namespace AnnoMapEditor.Games
                 Anno1800StaticAssets.RandomOilGuid => Brushes.DarkSlateGray,
                 _ => Brushes.Red
             };
+        }
+        
+        public override string ShortenAssetDisplayName<TAsset>(string displayName)
+        {
+            displayName = base.ShortenAssetDisplayName<TAsset>(displayName);
+
+            if (typeof(TAsset) == typeof(FertilityAsset)) 
+                displayName = displayName
+                    .Replace(" Abundance", "s ")
+                    .Trim();
+            
+            return displayName;
         }
     }
 }

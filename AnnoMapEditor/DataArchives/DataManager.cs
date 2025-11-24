@@ -52,6 +52,7 @@ namespace AnnoMapEditor.DataArchives
         private IDataArchive? _dataArchive;
 
         public AssetRepository AssetRepository => _isInitialized && _assetRepository != null ? _assetRepository : throw new Exception(NOT_INITIALIZED_MESSAGE);
+        public AssetRepository AssetRepositoryUnsafe => _assetRepository!;
         private AssetRepository? _assetRepository;
 
         public FixedIslandRepository FixedIslandRepository => _isInitialized && _fixedIslandRepository != null ? _fixedIslandRepository : throw new Exception(NOT_INITIALIZED_MESSAGE);

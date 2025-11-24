@@ -16,6 +16,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public string? Name { get; init; }
 
         public string? IconFilename { get; init; }
+        
+        public XElement? Xml { get; }
 
         public ImageSource? Icon
         {
@@ -32,6 +34,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
 
         public StandardAsset(XElement valuesXml, GameDefaults gameDefaults)
         {
+            Xml = valuesXml;
             XElement standardValues = valuesXml.Element(TemplateName)
                 ?? throw new Exception($"XML is not a valid {nameof(StandardAsset)}. Required section '{TemplateName}' not found.");
 

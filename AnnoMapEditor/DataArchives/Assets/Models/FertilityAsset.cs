@@ -13,7 +13,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public string DisplayName { get; init; }
 
 
-        public FertilityAsset(XElement valuesXml,  GameDefaults gameDefaults)
+        public FertilityAsset(XElement valuesXml, GameDefaults gameDefaults)
             : base(valuesXml, gameDefaults)
         {
             DisplayName = valuesXml.Element("Text")!

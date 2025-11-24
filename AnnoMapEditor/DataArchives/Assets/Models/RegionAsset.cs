@@ -1,8 +1,5 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Deserialization;
-using AnnoMapEditor.DataArchives.Assets.Repositories;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Linq;
 using AnnoMapEditor.Games;
 
@@ -13,16 +10,13 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
     {
         public const string TEMPLATE_NAME = "Region";
         
-        public string DisplayName { get; init; }
+        public string DisplayName { get; }
 
-        public string? Ambiente { get; init; }
+        public string? Ambiente { get; }
 
-        public string RegionID { get; set; }
-
-        public IEnumerable<long> AllowedFertilityGuids { get; init; }
-
-        [GuidReference(nameof(AllowedFertilityGuids))]
-        public ICollection<FertilityAsset> AllowedFertilities { get; init; }
+        public string RegionID { get; }
+        
+        public List<FertilityAsset> AllowedFertilities { get; set; } = new List<FertilityAsset>();
 
 
         public RegionAsset(XElement valuesXml, GameDefaults gameDefaults)
@@ -45,11 +39,6 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
             // regions have them.
             RegionID = regionElement.Element("RegionID")?.Value ?? gameDefaults.DefaultRegionId;
 
-            AllowedFertilityGuids = regionElement.Element("AllowedFertilities")?
-                .Elements("Item")?
-                .Select(x => long.Parse(x.Value))
-                .ToArray()
-                ?? Array.Empty<long>();
         }
 
         public static RegionAsset DetectFromPath(string filePath, GameDefaults gameDefaults)

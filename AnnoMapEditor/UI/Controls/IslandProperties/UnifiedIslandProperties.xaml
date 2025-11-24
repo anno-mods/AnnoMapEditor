@@ -132,74 +132,80 @@
                 <!-- Slots and Fertilities -->
                 <StackPanel Visibility="{Binding SlotsAndFertilitiesVisible, Converter={StaticResource VisibleOnTrue}}">
                     <!-- Fertilities -->
-                    <TextBlock Text="Fertilities" Style="{StaticResource SubHeaderLabelStyle}" />
+                    <StackPanel Visibility="{Binding UsesFertilities, Converter={StaticResource VisibleOnTrue}}"
+                                Orientation="Vertical">
+                        <TextBlock Text="Fertilities" Style="{StaticResource SubHeaderLabelStyle}" />
                     
-                    <ToggleButton Style="{StaticResource FancyToggleButton}" 
-                                  Margin="0,0,0,4"
-                                  IsChecked="{Binding RandomizeFertilities}" >
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Height="22" Width="22" FontFamily="{StaticResource SymbolFont}" Text="&#xe8b1;" FontSize="20"/>
-                            <TextBlock VerticalAlignment="Center" Margin="5,0" Text="Randomize Fertilities"/>
-                        </StackPanel>
-                    </ToggleButton>
-                    
-                    <!-- Invalid fertilities warning -->
-                    <Border Visibility="{Binding AllowedFertilitiesWarning, Converter={StaticResource VisibleOnTrue}}"
-                            Margin="0,4" Padding="10,5"
-                            CornerRadius="5"
-                            Background="{StaticResource WarningBackgroundBrush}">
-                        <TextBlock
-                            Foreground="{StaticResource MediumBackgroundBrush}"
-                            TextWrapping="Wrap"
-                            Text="Some selected fertilities are not allowed by default in the currently selected region."></TextBlock>
-                    </Border>
-                    
-                    <ItemsControl ItemsSource="{Binding FertilityItems}"
-                                  Visibility="{Binding RandomizeFertilities, Converter={StaticResource VisibleOnFalse}}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="2" Margin="-8,0" HorizontalAlignment="Stretch"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <ToggleButton Style="{StaticResource FancyToggleButton}"
-                                              IsChecked="{Binding IsSelected}"
-                                              Margin="8,4">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="auto" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Image Height="22" Width="22" 
-                                               Source="{Binding FertilityAsset.Icon}"/>
-                                        <Grid Grid.Column="0" 
-                                              Visibility="{Binding IsAllowed, Converter={StaticResource VisibleOnFalse}}"
-                                              VerticalAlignment="Bottom" HorizontalAlignment="Right"
-                                              Margin="0,0,-5,0">
-                                            <TextBlock Text="&#xf139;" 
-                                                       FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="13"
-                                                       Foreground="{StaticResource MediumBackgroundBrush}"/>
-                                            <TextBlock Text="&#xf13a;" 
-                                                       FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="13"
-                                                       Foreground="{StaticResource WarningBackgroundBrush}"/>
-                                            <TextBlock Text="&#xf13b;" 
-                                                       FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="13"
-                                                       Foreground="{StaticResource MediumBackgroundBrush}"/>
+                        <ToggleButton Style="{StaticResource FancyToggleButton}" 
+                                      Margin="0,0,0,4"
+                                      IsChecked="{Binding RandomizeFertilities}" >
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center" Height="22" Width="22" FontFamily="{StaticResource SymbolFont}" Text="&#xe8b1;" FontSize="20"/>
+                                <TextBlock VerticalAlignment="Center" Margin="5,0" Text="Randomize Fertilities"/>
+                            </StackPanel>
+                        </ToggleButton>
+                        
+                        <!-- Invalid fertilities warning -->
+                        <Border Visibility="{Binding AllowedFertilitiesWarning, Converter={StaticResource VisibleOnTrue}}"
+                                Margin="0,4" Padding="10,5"
+                                CornerRadius="5"
+                                Background="{StaticResource WarningBackgroundBrush}">
+                            <TextBlock
+                                Foreground="{StaticResource MediumBackgroundBrush}"
+                                TextWrapping="Wrap"
+                                Text="Some selected fertilities are not allowed by default in the currently selected region."></TextBlock>
+                        </Border>
+                        
+                        <ItemsControl ItemsSource="{Binding FertilityItems}"
+                                      Visibility="{Binding RandomizeFertilities, Converter={StaticResource VisibleOnFalse}}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="2" Margin="-8,0" HorizontalAlignment="Stretch"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <ToggleButton Style="{StaticResource FancyToggleButton}"
+                                                  IsChecked="{Binding IsSelected}"
+                                                  Margin="8,4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Image Height="22" Width="22" 
+                                                   Source="{Binding FertilityAsset.Icon}"/>
+                                            <Grid Grid.Column="0" 
+                                                  Visibility="{Binding IsAllowed, Converter={StaticResource VisibleOnFalse}}"
+                                                  VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                                                  Margin="0,0,-5,0">
+                                                <TextBlock Text="&#xf139;" 
+                                                           FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="13"
+                                                           Foreground="{StaticResource MediumBackgroundBrush}"/>
+                                                <TextBlock Text="&#xf13a;" 
+                                                           FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="13"
+                                                           Foreground="{StaticResource WarningBackgroundBrush}"/>
+                                                <TextBlock Text="&#xf13b;" 
+                                                           FontWeight="Bold" FontFamily="{StaticResource SymbolFont}" FontSize="13"
+                                                           Foreground="{StaticResource MediumBackgroundBrush}"/>
+                                            </Grid>
+                                            <TextBlock Grid.Column="1" 
+                                                       Text="{Binding ShortenedDisplayName}"
+                                                       Style="{StaticResource DefaultLabelStyle}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="5,0,0,0"/>
                                         </Grid>
-                                        <TextBlock Grid.Column="1" 
-                                                   Text="{Binding ShortenedDisplayName}"
-                                                   Style="{StaticResource DefaultLabelStyle}"
-                                                   VerticalAlignment="Center"
-                                                   Margin="5,0,0,0"/>
-                                    </Grid>
-                                </ToggleButton>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-            
+                                    </ToggleButton>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                    
                     <!-- Slots -->
-                    <slots:SlotsControl DataContext="{Binding SlotsViewModel}" />
+                    <StackPanel Visibility="{Binding UsesSlots, Converter={StaticResource VisibleOnTrue}}"
+                                Orientation="Vertical">
+                        <slots:SlotsControl DataContext="{Binding SlotsViewModel}"/>
+                    </StackPanel>
                 </StackPanel>
                 
             </StackPanel>

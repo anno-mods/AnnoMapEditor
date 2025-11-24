@@ -68,20 +68,22 @@ namespace AnnoMapEditor.Games
 
     public abstract class GameDefaults
     {
-        public abstract string DefaultRegionId { get;}
+        public abstract string DefaultRegionId { get; }
         public abstract long DefaultRegionGuid { get; }
         public abstract SessionAsset? DefaultSessionAsset { get; }
         public virtual MinimapSceneAsset? MinimapSceneInstance => null;
-        
+        public virtual bool UsesSlots => false;
+        public virtual bool UsesFertilities => false;
+
         /*
          * Anno 1800:
          *     The session assets for The Old World and The New World to not properly reference their
          *     respective regions in assets.xml.
          */
         public abstract Dictionary<long, long> SessionToRegionGuidDictionary { get; }
-        
+
         /*
-         * Anno 1800: 
+         * Anno 1800:
          *     Each region has its own AmbientName, which is needed when creating the .a7t. These values are missing in
          *     assets.xml. The values seen here were reverse engineered from existing a7t files within the game.
          *
@@ -93,10 +95,24 @@ namespace AnnoMapEditor.Games
         public abstract RegionAsset GetRegionAssetFromFilePath(string path);
         public abstract SessionAsset GetSessionAssetFromFilePath(string path);
         public abstract SessionAsset GetSessionAssetFromGuid(long guid);
+        public virtual void PostProcess(StandardAsset asset) { }
 
         public virtual Brush PinBrushFromSlot(long slotGuid)
         {
             return Brushes.LightGray;
         }
+        
+        public virtual string ShortenAssetDisplayName<TAsset>(string displayName) where TAsset : StandardAsset
+        {
+            if (typeof(TAsset) == typeof(FertilityAsset))
+            {
+                displayName = displayName
+                    .Replace("Fertility", "")
+                    .Trim();
+            }
+            return displayName;
+        }
     }
+    
+    
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.MapTemplates;
@@ -74,6 +75,11 @@ namespace AnnoMapEditor.Games
         public override string DefaultRegionId => "Roman";
         public override long DefaultRegionGuid => Anno117StaticAssets.RegionRomanGuid;
         public override SessionAsset? DefaultSessionAsset => Anno117StaticAssets.LatiumSession;
+        public override bool UsesSlots => false;
+        public override bool UsesFertilities => true;
+        
+        private static readonly List<string> RegionIds = new() {"Roman", "Celtic"};
+        private static readonly List<string> FertilityBlackList = new() {"Coal", "Wheat", "Oats", "Sardines", "Clay"};
 
         public override Dictionary<long, long> SessionToRegionGuidDictionary => new()
         {
@@ -100,9 +106,7 @@ namespace AnnoMapEditor.Games
         {
             try
             {
-                if (path.Contains("celtic"))
-                    return Anno117StaticAssets.AlbionSession!;
-                return Anno117StaticAssets.LatiumSession!;
+                return path.Contains("celtic") ? Anno117StaticAssets.AlbionSession! : Anno117StaticAssets.LatiumSession!;
             }
             catch (Exception e)
             {
@@ -124,6 +128,44 @@ namespace AnnoMapEditor.Games
             {
                 throw new Exception("Static Session Assets have not been initialized!", e);
             }
+        }
+
+        public override void PostProcess(StandardAsset asset)
+        {
+            switch (asset)
+            {
+                case RegionAsset regionAsset:
+                    AssignAllowedFertilities(regionAsset);
+                    break;
+            }
+        }
+
+        private static void AssignAllowedFertilities(RegionAsset regionAsset)
+        {
+            // TODO: Workaround for Base game. Should use FertilitySets at some point, but will require new asset type.
+            var assetRepository = DataManager.Instance.AssetRepositoryUnsafe;
+            var allowedFertilities = assetRepository.GetAll<FertilityAsset>().Where(fertilityAsset =>
+            {
+                return (fertilityAsset.DisplayName.Contains(regionAsset.RegionID) 
+                       || !RegionIds.Any(fertilityAsset.DisplayName.Contains))
+                       && !FertilityBlackList.Any(fertilityAsset.DisplayName.Contains);
+            }).ToList();
+
+            allowedFertilities = allowedFertilities.OrderBy(fertilityAsset => fertilityAsset.DisplayName).ToList();
+            
+            regionAsset.AllowedFertilities = allowedFertilities;
+        }
+
+        public override string ShortenAssetDisplayName<TAsset>(string displayName)
+        {
+            displayName = base.ShortenAssetDisplayName<TAsset>(displayName);
+
+            if (typeof(TAsset) == typeof(FertilityAsset)) 
+                displayName = RegionIds.Aggregate(displayName, (current, regionId) => current.Replace(regionId, ""))
+                    .Replace("Deposit", "")
+                    .Trim();
+            
+            return displayName;
         }
     }
 }
