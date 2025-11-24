@@ -6,7 +6,7 @@
              xmlns:converters="clr-namespace:AnnoMapEditor.UI.Converters"
              xmlns:local="clr-namespace:AnnoMapEditor.UI.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="20" d:DesignWidth="20"
+             d:DesignHeight="20" d:DesignWidth="30"
              x:Name="ThisControl">
 
     <UserControl.Resources>
@@ -20,6 +20,7 @@
         <Viewbox>
             <TextBlock VerticalAlignment="Center"
                        TextWrapping="Wrap"
+                       Margin="0,-3,0, 2"
                        Text="✔" Foreground="{StaticResource OkBrush}"
                        Visibility="{Binding Path=IsOk, ElementName=ThisControl, Converter={StaticResource collapseOnFalse}}"/>
         </Viewbox>
@@ -28,7 +29,8 @@
                    Visibility="{Binding Path=IsLoading, ElementName=ThisControl, Converter={StaticResource collapseOnFalse}}"/>
         <Viewbox>
             <TextBlock VerticalAlignment="Center"
-                       HorizontalAlignment="Stretch"
+                       TextWrapping="Wrap"
+                       Margin="0,-2,0, 2"
                        Text="⚠" Foreground="{StaticResource ErrorBrush}"
                        Visibility="{Binding Path=IsError, ElementName=ThisControl, Converter={StaticResource collapseOnFalse}}"/>
         </Viewbox>
