@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AnnoMapEditor.DataArchives;
 
 namespace AnnoMapEditor.UI.Controls.IslandProperties
 {
@@ -17,9 +18,10 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         private static readonly Dictionary<long, int> _orderLookup;
         static FertilityComparer()
         {
-            int index = 0;
-            _orderLookup = MinimapSceneAsset.Instance.FertilityOrderGuids
-                .ToDictionary(f => f, f => index++);
+            var index = 0;
+            var fertilityOrderGuids = DataManager.Instance.DetectedGame?.GameDefaults?.MinimapSceneInstance?.FertilityOrderGuids;
+            
+            _orderLookup = fertilityOrderGuids != null ? fertilityOrderGuids.ToDictionary(f => f, f => index++) : new Dictionary<long, int>();
         }
 
 

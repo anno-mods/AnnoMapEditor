@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Data;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.UI.Overlays.SelectSlots
 {
@@ -75,7 +76,7 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
     public class SelectSlotsViewModel : ObservableBase, IOverlayViewModel
     {
         public event EventHandler<FilteredItemsChangedEventArgs<SlotAssignmentViewModel>>? FilterModified;
-        public IEnumerable<RegionAsset?> Regions { get; init; } = RegionAsset.SupportedRegions;
+        // public IEnumerable<RegionAsset?> Regions { get; init; } = RegionAsset.SupportedRegions;
 
         private readonly RegionAsset _initialRegion;
 
@@ -198,16 +199,17 @@ namespace AnnoMapEditor.UI.Overlays.SelectSlots
 
             long slotGroupId = slotAssignment.SlotAssignment.Slot.ObjectGuid;
 
+            // TODO: Get rid of this hardcoding if possible.
             if (!ShowMines && (
-                  slotGroupId == SlotAsset.RANDOM_MINE_OLD_WORLD_GUID
-               || slotGroupId == SlotAsset.RANDOM_MINE_NEW_WORLD_GUID
-               || slotGroupId == SlotAsset.RANDOM_MINE_ARCTIC_GUID))
+                  slotGroupId == Anno1800StaticAssets.RandomMineOldWorldGuid
+               || slotGroupId == Anno1800StaticAssets.RandomMineNewWorldGuid
+               || slotGroupId == Anno1800StaticAssets.RandomMineArcticGuid))
                 return false;
 
-            if (!ShowClay && slotGroupId == SlotAsset.RANDOM_CLAY_GUID)
+            if (!ShowClay && slotGroupId == Anno1800StaticAssets.RandomClayGuid)
                 return false;
 
-            if (!ShowOil && slotGroupId == SlotAsset.RANDOM_OIL_GUID)
+            if (!ShowOil && slotGroupId == Anno1800StaticAssets.RandomOilGuid)
                 return false;
 
             return true;

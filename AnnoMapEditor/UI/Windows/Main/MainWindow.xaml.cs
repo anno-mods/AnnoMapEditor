@@ -46,7 +46,7 @@ namespace AnnoMapEditor.UI.Windows.Main
             title = $"{App.Title} {productVersion}";
             versionStatusText.Text = $"Version: {productVersion}";
             Title = title;
-            titleText.Text = App.Title;
+            titleText.Text = App.TitleShort;
 
             _viewModel.PropertyChanged += ViewModel_PropertyChanged;
             // _viewModel.PopulateOpenMapMenu(openMapMenu);

@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.DataArchives.Assets.Models;
 using AnnoMapEditor.MapTemplates.Enums;
 using AnnoMapEditor.MapTemplates.Models;
@@ -99,6 +100,9 @@ namespace AnnoMapEditor.UI.Controls.IslandProperties
         public bool SlotsAndFertilitiesVisible => (SelectedIsland is FixedIslandElement &&
                                                    (SelectedIsland.IslandType == IslandType.Normal ||
                                                     SelectedIsland.IslandType == IslandType.Starter));
+
+        public static bool UsesFertilities => DataManager.Instance.DetectedGame?.GameDefaults?.UsesFertilities ?? false;
+        public static bool UsesSlots => DataManager.Instance.DetectedGame?.GameDefaults?.UsesSlots ?? false;
         public bool AllowedFertilitiesWarning => FertilityItems.Any(f => f is { IsAllowed: false, IsSelected: true })
                                                  && !RandomizeFertilities;
         public SlotsViewModel? SlotsViewModel { get; private set; }

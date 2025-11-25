@@ -13,17 +13,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.DataArchives.Assets.Repositories
 {
     public class AssetRepository : Repository
     {
-        private const string ASSETS_XML_PATH = "data/config/export/main/asset/assets.xml";
-
-
         private static readonly Logger<AssetRepository> _logger = new();
 
         private const string CachedAssetsXml = "assets.cached.xml";
+        
+        private readonly Game _detectedGame;
 
         private readonly IDataArchive _dataArchive;
 
@@ -31,7 +31,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
         private readonly RegionIdReferenceResolverFactory _regionIdReferenceResolverFactory;
 
-        private readonly Dictionary<string, Func<XElement, StandardAsset>> _deserializers = new();
+        private readonly Dictionary<string, Func<XElement, GameDefaults, StandardAsset>> _deserializers = new();
 
         private readonly Dictionary<Type, List<Action<object>>> _referenceResolvers = new();
 
@@ -40,9 +40,10 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         private readonly List<Type> _assetTypes = new();
 
 
-        public AssetRepository(IDataArchive dataArchive)
+        public AssetRepository(IDataArchive dataArchive, Game detectedGame)
         {
             _dataArchive = dataArchive;
+            _detectedGame = detectedGame;
             _guidReferenceResolverFactory = new(this);
             _regionIdReferenceResolverFactory = new(this);
         }
@@ -60,10 +61,11 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
                 try
                 {
-                    asset = deserializer(valuesElement);
+                    asset = deserializer(valuesElement, _detectedGame.GameDefaults!);
                 }
                 catch (Exception ex)
                 {
+                    // _logger.LogError($"{ex.Message} - {ex.StackTrace}");
                     return null;
                 }
 
@@ -106,11 +108,17 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
         public override async Task InitializeAsync()
         {
             _logger.LogInformation($"Loading assets...");
+            
+            if (_detectedGame == null)
+                throw new NullReferenceException("No game loaded.");
 
             // load assets.xml
             Stopwatch watch = Stopwatch.StartNew();
 
-            Stream assetsXmlStream = _dataArchive.OpenRead(ASSETS_XML_PATH)
+            if (_detectedGame.AssetsXmlPath == null)
+                throw new NullReferenceException($"{_detectedGame.Title} does not define an assets.xml path.");
+            
+            Stream assetsXmlStream = _dataArchive.OpenRead(_detectedGame.AssetsXmlPath)
                 ?? throw new Exception($"Could not locate assets.xml.");
 
             var xpath = GetXpath();
@@ -135,8 +143,8 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                 }
             }
 
-            var Xml = await Task.Run(() => XDocument.Load(assetsXmlStream));
-            var assets = Xml.XPathSelectElements(xpath);
+            var xml = await Task.Run(() => XDocument.Load(assetsXmlStream));
+            var assets = xml.XPathSelectElements(xpath);
 
             if (!validCache)
             {
@@ -162,6 +170,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     if (asset is not null)
                     {
                         _assets.Add(asset.GUID, asset);
+                        _logger.LogInformation($"Added {asset.GetType().Name} {asset.Name}.");
                     }
                 }
             });
@@ -176,9 +185,14 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
                     foreach (Action<object> resolver in resolvers)
                         resolver(asset);
             }
-
-            InitializeStaticAssets();
-
+            
+            if (_detectedGame.StaticAssets == null)
+                throw new NullReferenceException($"{_detectedGame.Title} does not define static assets.");
+            
+            // TODO: Complete Game-Aware static asset init and remove old way of loading static assets.
+            InitializeStaticGameAssets(_detectedGame.StaticAssets);
+            // InitializeStaticAssets();
+            
             watch.Stop();
             _logger.LogInformation($"Finished loading {_assets.Count} assets at {watch.Elapsed.TotalMilliseconds} ms.");
             assetsXmlStream.Dispose(); 
@@ -234,16 +248,25 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
             }
         }
 
-        public void Register<TAsset>()
+        public void RegisterWithGameCheck<TAsset>()
+            where TAsset : StandardAsset
+        {
+            if (_detectedGame.StaticAssets == null)
+                throw new NullReferenceException($"{_detectedGame.Title} does not define static assets.");
+            if (_detectedGame.StaticAssets.SupportedAssetTypes.Contains(typeof(TAsset)))
+                Register<TAsset>();
+        }
+
+        private void Register<TAsset>()
             where TAsset : StandardAsset
         {
             AssetTemplateAttribute assetTemplateAttribute = typeof(TAsset).GetCustomAttribute<AssetTemplateAttribute>()
                 ?? throw new Exception($"Cannot register type '{typeof(TAsset).FullName}' as an asset model, because it lacks the {nameof(AssetTemplateAttribute)}.");
             
             // get the deserializer
-            ConstructorInfo deserializerConstructor = typeof(TAsset).GetConstructor(new[] { typeof(XElement) })
+            ConstructorInfo deserializerConstructor = typeof(TAsset).GetConstructor(new[] { typeof(XElement), typeof(GameDefaults) })
                 ?? throw new Exception($"Type {typeof(TAsset).FullName} is not a valid asset model. Asset models must have a deserialization constructor.");
-            Func<XElement, TAsset> deserializer = (x) => (TAsset)deserializerConstructor.Invoke(new[] { x });
+            Func<XElement, GameDefaults, TAsset> deserializer = (x, y) => (TAsset)deserializerConstructor.Invoke(new object?[] { x, y });
 
             foreach (string templateName in assetTemplateAttribute.TemplateNames)
                 _deserializers.Add(templateName, deserializer);
@@ -298,14 +321,39 @@ namespace AnnoMapEditor.DataArchives.Assets.Repositories
 
                     if (TryGet(staticAssetAttribute.GUID, out StandardAsset? asset))
                     {
-                        if (!staticProperty.PropertyType.IsAssignableFrom(asset.GetType()))
-                            throw new Exception($"Could not resolve StaticAsset {assetType.FullName}.{staticProperty.Name}. The asset's type {asset.GetType().FullName} does not match the property's type {staticProperty.PropertyType.FullName}.");
+                        if (!staticProperty.PropertyType.IsInstanceOfType(asset))
+                            throw new Exception($"Could not resolve StaticAsset {assetType.FullName}.{staticProperty.Name}. The asset's type {asset?.GetType().FullName} does not match the property's type {staticProperty.PropertyType.FullName}.");
 
                         staticProperty.SetValue(null, asset);
+                        
+                        _logger.LogInformation($"Resolved StaticAsset {assetType.FullName}.{staticProperty.Name}.");
                     }
                     else
                         throw new Exception($"Could not resolve StaticAsset {assetType.FullName}.{staticProperty.Name}. There exists no asset with GUID {staticAssetAttribute.GUID}.");
                 }
+            }
+        }
+
+        private void InitializeStaticGameAssets(StaticGameAssets staticGameAssets)
+        {
+            foreach (PropertyInfo staticProperty in staticGameAssets.GetType().GetProperties(BindingFlags.Static | BindingFlags.Public))
+            {
+                StaticAssetAttribute? staticAssetAttribute = staticProperty.GetCustomAttribute<StaticAssetAttribute>();
+                if (staticAssetAttribute == null)
+                    continue;
+
+                if (TryGet(staticAssetAttribute.GUID, out StandardAsset? asset))
+                {
+                    // This allows to run Game-specific code after assets have been loaded.
+                    if (asset != null)
+                        _detectedGame.GameDefaults?.PostProcess(asset);
+                    
+                    staticProperty.SetValue(null, asset);
+                        
+                    _logger.LogInformation($"Resolved {asset?.GetType().Name} {staticProperty.Name}.");
+                }
+                else
+                    throw new Exception($"Could not resolve StaticAsset {staticProperty.Name}. There exists no asset with GUID {staticAssetAttribute.GUID}.");
             }
         }
     }

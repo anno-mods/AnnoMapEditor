@@ -4,6 +4,7 @@ using AnnoMapEditor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.Utilities.UndoRedo;
 
 namespace AnnoMapEditor.UI.Controls
@@ -53,7 +54,8 @@ namespace AnnoMapEditor.UI.Controls
                 _mapTemplate.PlayableArea.Y + _mapTemplate.PlayableArea.Height);
         }
 
-        public IEnumerable<SessionAsset> SupportedSessions { get; } = SessionAsset.SupportedSessions;
+        public IEnumerable<SessionAsset> SupportedSessions { get; } =
+            DataManager.Instance.DetectedGame!.StaticAssets!.SupportedSessions!; //  SessionAsset.SupportedSessions;
 
         public int MapSize
         {

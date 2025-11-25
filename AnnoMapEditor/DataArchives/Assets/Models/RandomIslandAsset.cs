@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
@@ -11,8 +12,7 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
     public class RandomIslandAsset : StandardAsset
     {
         public const string TEMPLATE_NAME = "RandomIsland";
-
-
+        
         public string FilePath { get; init; }
 
         public string IslandRegionId { get; init; }
@@ -25,15 +25,15 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public IEnumerable<IslandType> IslandType { get; init; }
 
 
-        public RandomIslandAsset(XElement valuesXml)
-            : base(valuesXml)
+        public RandomIslandAsset(XElement valuesXml, GameDefaults gameDefaults)
+            : base(valuesXml, gameDefaults)
         {
             XElement randomIslandValues = valuesXml.Element(TEMPLATE_NAME)
                 ?? throw new Exception($"XML is not a valid {nameof(RandomIslandAsset)}. It does not have '{TEMPLATE_NAME}' section in its values.");
 
             // IslandRegion defaults to Moderate. If the MapTemplate belongs to another region,
             // it must have TemplateRegion set explicitly within assets.xml.
-            IslandRegionId = randomIslandValues.Element(nameof(IslandRegion))?.Value ?? RegionAsset.REGION_MODERATE_REGIONID;
+            IslandRegionId = randomIslandValues.Element(nameof(IslandRegion))?.Value ?? gameDefaults.DefaultRegionId;
 
             FilePath = randomIslandValues.Element(nameof(FilePath))?.Value
                 ?? throw new Exception($"XML is not a valid {nameof(RandomIslandAsset)}. Required attribute '{nameof(FilePath)}' not found.");

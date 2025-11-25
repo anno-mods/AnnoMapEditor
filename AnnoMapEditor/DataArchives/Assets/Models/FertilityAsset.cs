@@ -1,5 +1,6 @@
 ﻿using AnnoMapEditor.DataArchives.Assets.Deserialization;
 using System.Xml.Linq;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.DataArchives.Assets.Models
 {
@@ -12,14 +13,16 @@ namespace AnnoMapEditor.DataArchives.Assets.Models
         public string DisplayName { get; init; }
 
 
-        public FertilityAsset(XElement valuesXml)
-            : base(valuesXml)
+        public FertilityAsset(XElement valuesXml, GameDefaults gameDefaults)
+            : base(valuesXml, gameDefaults)
         {
             DisplayName = valuesXml.Element("Text")!
-                .Element("LocaText")!
+                .Element("LocaText")?
                 .Element("English")!
                 .Element("Text")!
-                .Value!;
+                .Value ?? valuesXml.Element("Standard")?
+                .Element("Name")?
+                .Value ?? "Unknown Fertility Name";
         }
     }
 }

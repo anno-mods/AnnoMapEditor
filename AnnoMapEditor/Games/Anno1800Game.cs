@@ -1,0 +1,289 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Media;
+using AnnoMapEditor.DataArchives;
+using AnnoMapEditor.DataArchives.Assets.Models;
+using AnnoMapEditor.DataArchives.Assets.Repositories;
+using AnnoMapEditor.MapTemplates;
+using AnnoMapEditor.MapTemplates.Enums;
+
+namespace AnnoMapEditor.Games
+{
+    internal class Anno1800Game : Game
+    {
+        public override string Title => "Anno 1800";
+        public override string IconGeometry => "M4,18V20H8V18H4M4,14V16H14V14H4M10,18V20H14V18H10M16,14V16H20V14H16M16,18V20H20V18H16M2,22V8L7,12V8L12,12V8L17,12L18,2H21L22,12V22H2Z";
+        public override string AssetsXmlPath => "data/config/export/main/asset/assets.xml";
+        public override GameDefaults GameDefaults => new Anno1800GameDefaults();
+        public override StaticGameAssets StaticAssets => new Anno1800StaticAssets();
+
+        public override IEnumerable<Pool> IslandPools => new List<Pool>()
+        {
+            // Moderate
+            new(Anno1800StaticAssets.ModerateRegion, IslandSize.Small,
+                "data/sessions/islands/pool/moderate/moderate_s_{0}/moderate_s_{0}.a7m", 12
+                ),
+            new(Anno1800StaticAssets.ModerateRegion, IslandSize.Medium,
+                "data/sessions/islands/pool/moderate/moderate_m_{0}/moderate_m_{0}.a7m", 9
+                ),
+            new(Anno1800StaticAssets.ModerateRegion, IslandSize.Large,
+                new FilePathRange[]
+                {
+                    new("data/sessions/islands/pool/moderate/moderate_l_{0}/moderate_l_{0}.a7m", 1, 14),
+                    new("data/sessions/islands/pool/moderate/community_island/community_island.a7m", 1, 1)
+                }),
+            
+            // NewWorld
+            new(Anno1800StaticAssets.SouthAmericaRegion, IslandSize.Small,
+                new FilePathRange[]
+                {
+                    new("data/sessions/islands/pool/colony01/colony01_s_{0}/colony01_s_{0}.a7m", 1, 4),
+                    new("data/dlc12/sessions/islands/pool/colony01/colony01_s_{0}/colony01_s_{0}.a7m", 5, 3)
+                }),
+            new(Anno1800StaticAssets.SouthAmericaRegion, IslandSize.Medium,
+                new FilePathRange[]
+                {
+                    new("data/sessions/islands/pool/colony01/colony01_m_{0}/colony01_m_{0}.a7m", 1, 6),
+                    new("data/dlc12/sessions/islands/pool/colony01/colony01_m_{0}/colony01_m_{0}.a7m", 7, 3)
+                }),
+            new(Anno1800StaticAssets.SouthAmericaRegion, IslandSize.Large,
+                new FilePathRange[]
+                {
+                    new("data/sessions/islands/pool/colony01/colony01_l_{0}/colony01_l_{0}.a7m", 1, 5),
+                    new("data/dlc12/sessions/islands/pool/colony01/colony01_l_{0}/colony01_l_{0}.a7m", 6, 3),
+
+                }),
+
+            // Arctic
+            new(Anno1800StaticAssets.ArcticRegion, IslandSize.Small,  "data/dlc03/sessions/islands/pool/colony03_a01_{0}/colony03_a01_{0}.a7m", 8),
+            new(Anno1800StaticAssets.ArcticRegion, IslandSize.Medium, "data/dlc03/sessions/islands/pool/colony03_a02_{0}/colony03_a02_{0}.a7m", 4),
+            new(Anno1800StaticAssets.ArcticRegion, IslandSize.Large,  "data/dlc03/sessions/islands/pool/moderate/moderate_l_{0}/moderate_l_{0}.a7m", 14),
+
+            // Enbesa
+            new(Anno1800StaticAssets.AfricaRegion, IslandSize.Small,  "data/dlc06/sessions/islands/pool/colony02_s_{0}/colony02_s_{0}.a7m", new int[] { 1, 2, 3, 5 }),
+            new(Anno1800StaticAssets.AfricaRegion, IslandSize.Medium, "data/dlc06/sessions/islands/pool/colony02_m_{0}/colony02_m_{0}.a7m", new int[] { 2, 4, 5, 9 }),
+            new(Anno1800StaticAssets.AfricaRegion, IslandSize.Large,  "data/dlc06/sessions/islands/pool/colony02_l_{0}/colony02_l_{0}.a7m", new int[] { 1, 3, 5, 6 }),
+        };
+    }
+    
+    internal class Anno1800StaticAssets : StaticGameAssets
+    {
+        // Region GUIDs
+        public const long RegionModerateGuid = 5000000;
+        public const long RegionSouthAmericaGuid = 5000001;
+        public const long RegionArcticGuid = 160001;
+        public const long RegionAfricaGuid = 114327;
+        
+        // Session GUIDs
+        public const long SessionOldWorldGuid = 180023;
+        public const long SessionNewWorldGuid = 180025;
+        public const long SessionSunkenTreasuresGuid = 110934;
+        public const long SessionArcticGuid = 180045;
+        public const long SessionEnbesaGuid = 112132;
+        
+        // Slot GUIDs
+        public const long RandomMineOldWorldGuid = 1000029;
+        public const long RandomMineNewWorldGuid = 614;
+        public const long RandomMineArcticGuid = 116037;
+        public const long RandomClayGuid = 100417;
+        public const long RandomOilGuid = 100849;
+        
+        // Minimap GUID
+        public const long MinimapGuid = 500204;
+        
+        // Static Region Assets
+        [StaticAsset(RegionModerateGuid)]
+        public static RegionAsset? ModerateRegion { get; private set; }
+
+        [StaticAsset(RegionSouthAmericaGuid)]
+        public static RegionAsset? SouthAmericaRegion { get; private set; }
+
+        [StaticAsset(RegionArcticGuid)]
+        public static RegionAsset? ArcticRegion { get; private set; }
+
+        [StaticAsset(RegionAfricaGuid)]
+        public static RegionAsset? AfricaRegion { get; private set; }
+        
+        // Static Session Assets
+        [StaticAsset(SessionOldWorldGuid)]
+        public static SessionAsset? OldWorldSession { get; private set; }
+
+        [StaticAsset(SessionNewWorldGuid)]
+        public static SessionAsset? NewWorldSession { get; private set; }
+
+        [StaticAsset(SessionSunkenTreasuresGuid)]
+        public static SessionAsset? CapeTrelawneySession { get; private set; }
+
+        [StaticAsset(SessionArcticGuid)]
+        public static SessionAsset? ArcticSession { get; private set; }
+
+        [StaticAsset(SessionEnbesaGuid)]
+        public static SessionAsset? EnbesaSession { get; private set; }
+        
+        // Static slot assets
+        [StaticAsset(RandomMineOldWorldGuid)]
+        public static SlotAsset? RandomMineOldWorld { get; private set; }
+
+        [StaticAsset(RandomMineNewWorldGuid)]
+        public static SlotAsset? RandomMineNewWorld { get; private set; }
+
+        [StaticAsset(RandomMineArcticGuid)]
+        public static SlotAsset? RandomMineArctic { get; private set; }
+
+        [StaticAsset(RandomClayGuid)]
+        public static SlotAsset? RandomClay { get; private set; }
+
+        [StaticAsset(RandomOilGuid)]
+        public static SlotAsset? RandomOil { get; private set; }
+        
+        // Static Minimap Asset
+        
+        [StaticAsset(MinimapGuid)]
+        public static MinimapSceneAsset? MinimapScene { get; private set; }
+
+
+        public override IEnumerable<RegionAsset?> SupportedRegions => new[] { ModerateRegion, SouthAmericaRegion, ArcticRegion, AfricaRegion };
+        public override IEnumerable<SessionAsset?> SupportedSessions => new [] { OldWorldSession, NewWorldSession, CapeTrelawneySession, ArcticSession, EnbesaSession };
+        public override IEnumerable<SlotAsset?> SupportedSlots => new [] { RandomMineOldWorld, RandomMineNewWorld, RandomMineArctic, RandomClay, RandomOil };
+
+        public override IEnumerable<Type> SupportedAssetTypes => new[]
+        {
+            typeof(RegionAsset),
+            typeof(FertilityAsset),
+            typeof(RandomIslandAsset),
+            typeof(SlotAsset),
+            // TODO: What is this Asset Type used for?
+            typeof(MinimapSceneAsset),
+            typeof(SessionAsset),
+            typeof(MapTemplateAsset)
+        };
+    }
+
+    internal class Anno1800GameDefaults : GameDefaults
+    {
+        public override string DefaultRegionId => "Moderate";
+        public override long DefaultRegionGuid => Anno1800StaticAssets.RegionModerateGuid;
+        public override SessionAsset? DefaultSessionAsset => Anno1800StaticAssets.OldWorldSession;
+        public override MinimapSceneAsset? MinimapSceneInstance => Anno1800StaticAssets.MinimapScene;
+        public override bool UsesSlots => true;
+        public override bool UsesFertilities => true;
+        public override Dictionary<long, long> SessionToRegionGuidDictionary => new()
+        {
+            [Anno1800StaticAssets.SessionOldWorldGuid] = Anno1800StaticAssets.RegionModerateGuid,
+            [Anno1800StaticAssets.SessionNewWorldGuid] = Anno1800StaticAssets.RegionSouthAmericaGuid
+        };
+
+        public override Dictionary<long, string> RegionAmbienteDictionary => new()
+        {
+            [Anno1800StaticAssets.RegionModerateGuid] = "Moderate_01_day_night",
+            [Anno1800StaticAssets.RegionSouthAmericaGuid] = "south_america_caribic_01",
+            [Anno1800StaticAssets.RegionArcticGuid] = "DLC03_01",
+            [Anno1800StaticAssets.RegionAfricaGuid] = "Colony_02"
+        };
+
+        public override RegionAsset GetRegionAssetFromFilePath(string filePath)
+        {
+            try
+            {
+                if (filePath.Contains("colony01") || filePath.Contains("ggj") || filePath.Contains("scenario03"))
+                    return Anno1800StaticAssets.SouthAmericaRegion!;
+                if (filePath.Contains("dlc03") || filePath.Contains("colony_03"))
+                    return Anno1800StaticAssets.ArcticRegion!;
+                if (filePath.Contains("dlc06") || filePath.Contains("colony02") || filePath.Contains("scenario02"))
+                    return Anno1800StaticAssets.AfricaRegion!;
+                return Anno1800StaticAssets.ModerateRegion!;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Static Region Assets have not been initialized!", e);
+            }
+        }
+
+        public override SessionAsset GetSessionAssetFromFilePath(string filePath)
+        {
+            try
+            {
+                if (filePath.Contains("colony01") || filePath.Contains("ggj") || filePath.Contains("scenario03"))
+                    return Anno1800StaticAssets.NewWorldSession!;
+                if (filePath.Contains("dlc03") || filePath.Contains("colony_03"))
+                    return Anno1800StaticAssets.ArcticSession!;
+                if (filePath.Contains("dlc06") || filePath.Contains("colony02") || filePath.Contains("scenario02"))
+                    return Anno1800StaticAssets.EnbesaSession!;
+                if (filePath.Contains("sunken_treasures"))
+                    return Anno1800StaticAssets.CapeTrelawneySession!;
+                return Anno1800StaticAssets.OldWorldSession!;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Static Session Assets have not been initialized!", e);
+            }
+        }
+
+        public override SessionAsset GetSessionAssetFromGuid(long guid)
+        {
+            try
+            {
+                return guid switch
+                {
+                    Anno1800StaticAssets.SessionSunkenTreasuresGuid => Anno1800StaticAssets.CapeTrelawneySession!,
+                    Anno1800StaticAssets.SessionArcticGuid => Anno1800StaticAssets.ArcticSession!,
+                    Anno1800StaticAssets.SessionNewWorldGuid => Anno1800StaticAssets.NewWorldSession!,
+                    Anno1800StaticAssets.SessionEnbesaGuid => Anno1800StaticAssets.EnbesaSession!,
+                    _ => Anno1800StaticAssets.OldWorldSession!
+                };
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Static Session Assets have not been initialized!", e);
+            }
+        }
+
+        public override void PostProcess(StandardAsset asset)
+        {
+            switch (asset)
+            {
+                case RegionAsset regionAsset:
+                    AssignAllowedFertilities(regionAsset);
+                    break;
+            }
+        }
+
+        private static void AssignAllowedFertilities(RegionAsset regionAsset)
+        {
+            var allowedFertilityGuids = regionAsset.Xml?.Element("Region")?
+                                            .Element("AllowedFertilities")?
+                                            .Elements("Item")?
+                                            .Select(x => long.Parse(x.Value))
+                                            .ToArray()
+                                        ?? Array.Empty<long>();
+            
+            regionAsset.AllowedFertilities = allowedFertilityGuids.Select(allowedFertilityGuid => DataManager.Instance.AssetRepositoryUnsafe.Get<FertilityAsset>(allowedFertilityGuid)).ToList();
+        }
+
+        public override Brush PinBrushFromSlot(long slotGuid)
+        {
+            return slotGuid switch
+            {
+                Anno1800StaticAssets.RandomMineOldWorldGuid 
+                    or Anno1800StaticAssets.RandomMineNewWorldGuid
+                    or Anno1800StaticAssets.RandomMineArcticGuid => Brushes.Gray,
+                Anno1800StaticAssets.RandomClayGuid => Brushes.SandyBrown,
+                Anno1800StaticAssets.RandomOilGuid => Brushes.DarkSlateGray,
+                _ => Brushes.Red
+            };
+        }
+        
+        public override string ShortenAssetDisplayName<TAsset>(string displayName)
+        {
+            displayName = base.ShortenAssetDisplayName<TAsset>(displayName);
+
+            if (typeof(TAsset) == typeof(FertilityAsset)) 
+                displayName = displayName
+                    .Replace(" Abundance", "s ")
+                    .Trim();
+            
+            return displayName;
+        }
+    }
+}

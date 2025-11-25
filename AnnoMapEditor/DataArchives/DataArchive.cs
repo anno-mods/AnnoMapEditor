@@ -37,7 +37,10 @@ namespace AnnoMapEditor.DataArchives
             // Icons are referenced as .png but stored as .dds.
             if (iconPath.EndsWith(".png"))
                 iconPath = iconPath[0..^4] + "_0.dds";
-
+            
+            if (iconPath.Contains("/fhd/"))
+                iconPath = iconPath.Replace("/fhd/", "/4k/");
+            
             // open the file
             using Stream? stream = OpenRead(iconPath);
             if (stream == null)

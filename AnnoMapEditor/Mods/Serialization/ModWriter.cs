@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.Mods.Serialization
 {
@@ -38,6 +39,11 @@ namespace AnnoMapEditor.Mods.Serialization
             _assetRepository = DataManager.Instance.AssetRepository;
         }
 
+        /*
+         * TODO: The ModWrite will require some extensive work to optimize mod export for Anno 1800
+         * and to add support for Anno 117. For now, it still uses some hardcoded values from
+         * Anno1800StaticAssets.
+         */
 
         /// <summary>
         /// Determines the list of MapTemplateAssets to be replaced for a mod targeting the given 
@@ -100,7 +106,7 @@ namespace AnnoMapEditor.Mods.Serialization
                     .Where(m => m.TemplateFilename.Contains("pool"));
 
                 // For The Old World filter according to the MapType.
-                if (session == SessionAsset.OldWorld)
+                if (session == Anno1800StaticAssets.OldWorldSession)//SessionAsset.OldWorld)
                 {
                     if (mapType != null)
                         mapTemplates = mapTemplates.Where(m => m.TemplateMapType == mapType);
@@ -124,7 +130,7 @@ namespace AnnoMapEditor.Mods.Serialization
             await WriteModinfoJson(mod, modPath);
 
             //Only write Language XML for OW Maps, as only they need naming in a menu
-            if (session == SessionAsset.OldWorld)
+            if (session ==  Anno1800StaticAssets.OldWorldSession) // SessionAsset.OldWorld)
                 await WriteLanguageXml(modPath, mod.Name, mod.MapType!.Guid);
 
             // create the first copy of a7t, a7tinfo and a7te
@@ -192,7 +198,7 @@ namespace AnnoMapEditor.Mods.Serialization
         private static async Task WriteModinfoJson(Mod mod, string modPath)
         {
             string modDescription;
-            if (mod.MapTemplate.Session == SessionAsset.OldWorld)
+            if (mod.MapTemplate.Session == Anno1800StaticAssets.OldWorldSession) // SessionAsset.OldWorld)
                 modDescription = $"Select Map Type '{mod.Name}' to play this map.\n"
                                + $"World and island sizes are fixed.\n\n";
             else

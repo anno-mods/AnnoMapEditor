@@ -199,7 +199,11 @@ namespace AnnoMapEditor.UI.Windows.Main
             const int DEFAULT_PLAYABLE_SIZE = 2160;
 
             MapTemplateFilePath = null;
-            MapTemplate = new MapTemplate(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, SessionAsset.OldWorld); 
+
+            var defaultRegionAsset = DataManager.DetectedGame?.GameDefaults?.DefaultSessionAsset;
+            
+            if (defaultRegionAsset != null)
+                MapTemplate = new MapTemplate(DEFAULT_MAP_SIZE, DEFAULT_PLAYABLE_SIZE, defaultRegionAsset); 
             // TODO: Find a better solution for this "Hack"
             ToolbarService.Instance.ButtonClick(ToolbarButtonType.ZoomReset);
         }
@@ -244,7 +248,7 @@ namespace AnnoMapEditor.UI.Windows.Main
                 menu.Items.Add(new Separator());
             }
 
-            foreach (MapGroup group in DataManager.Instance.MapGroupRepository.MapGroups)
+            foreach (MapGroup group in DataManager.MapGroupRepository.MapGroups)
             {
                 MenuItem groupMenu = new() { Header = group.Name };
 

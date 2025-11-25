@@ -51,7 +51,8 @@ namespace AnnoMapEditor.DataArchives
 
             FileSystemBuilder builder = FileSystemBuilder.Create()
                 .FromPath(dataPath)
-                .OnlyArchivesMatchingWildcard("data*.rda")
+                // Anno 117 uses a different naming convention, can't use this wildcard.
+                // .OnlyArchivesMatchingWildcard("data*.rda")
                 .WithDefaultSorting()
                 .ConfigureLoadZeroByteFiles(false)
                 .AddWhitelisted(EXTENSION_WHITELIST);

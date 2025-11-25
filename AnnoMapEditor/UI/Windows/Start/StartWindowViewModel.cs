@@ -1,4 +1,7 @@
-﻿using AnnoMapEditor.DataArchives;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using AnnoMapEditor.DataArchives;
 using AnnoMapEditor.MapTemplates.Models;
 using AnnoMapEditor.MapTemplates.Serializing;
 using AnnoMapEditor.UI.Windows.Main;
@@ -6,11 +9,17 @@ using AnnoMapEditor.Utilities;
 using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.UI.Windows.Start
 {
     public class StartWindowViewModel : ObservableBase
     {
+        public static string AppTitle => App.TitleShort;
+        public static string AppSubTitle => App.SubTitle;
+        public static string AppVersion => FileVersionInfo
+            .GetVersionInfo(Path.Join(AppContext.BaseDirectory, "AnnoMapEditor.exe")).ProductVersion ?? "";
+        
         private readonly StartWindow _startWindow;
 
         public DataManager DataManager { get; init; } = DataManager.Instance;
@@ -18,6 +27,13 @@ namespace AnnoMapEditor.UI.Windows.Start
         public Settings Settings { get; init; } = Settings.Instance;
 
         private bool _pathConfigured = false;
+
+        public Game SelectedGame
+        {
+            get => _selectedGame ?? Game.UnsupportedAnno; 
+            private set => SetProperty(ref _selectedGame, value);
+        }
+        private Game? _selectedGame;
 
         public StartWindowViewModel(StartWindow startWindow)
         {
@@ -43,10 +59,17 @@ namespace AnnoMapEditor.UI.Windows.Start
 
         private void DataManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(DataManager.IsInitialized)) 
+            switch (e.PropertyName)
             {
-                if (_pathConfigured && Settings.Quickstart)
-                    ContinueToMainWindow();
+                case nameof(DataManager.IsInitialized):
+                {
+                    if (_pathConfigured && Settings.Quickstart)
+                        ContinueToMainWindow();
+                    break;
+                }
+                case nameof(DataManager.DetectedGame):
+                    SelectedGame = DataManager.DetectedGame ?? Game.UnsupportedAnno;
+                    break;
             }
         }
 

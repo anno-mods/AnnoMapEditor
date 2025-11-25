@@ -20,17 +20,19 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../Resources/Styles.xaml" />
                 <ResourceDictionary>
-                    <converters:BooleaNotConverter x:Key="booleanNot" />
-                    <converters:BoolToGridLengthConverter x:Key="hideRowOnFalse" />
-                    <converters:BoolToGridLengthConverter x:Key="hideRowOnTrue" OnTrue="0" OnFalse="*"/>
-                    <converters:BoolToVisibility x:Key="collapseOnFalse" />
-                    <converters:BoolToVisibility x:Key="collapseOnTrue" OnTrue="Collapsed" OnFalse="Visible" />
-                    <converters:BoolToVisibility x:Key="hideOnFalse" OnFalse="Hidden" />
-                    <converters:BoolToVisibility x:Key="hideOnTrue" OnTrue="Hidden" OnFalse="Visible" />
-                    <converters:ObjectToBool x:Key="objectToBool" />
-                    <converters:ObjectToVisibility x:Key="collapseOnNull" />
-                    <converters:ObjectToVisibility x:Key="hideOnNull" OnNull="Hidden" />
-                    <converters:BoolToStyle x:Key="isActiveToWindowFrameStyle" OnTrue="{StaticResource ActiveWindowBorder}" OnFalse="{StaticResource InactiveWindowBorder}"/>
+                    <converters:EmptyStringToVisibility x:Key="CollapsedOnEmptyString" />
+                    <converters:EmptyStringToVisibility x:Key="VisibleOnEmptyString" OnEmpty="Visible" OnNotEmpty="Collapsed"/>
+                    <converters:BooleaNotConverter x:Key="BooleanNot" />
+                    <converters:BoolToGridLengthConverter x:Key="HideRowOnFalse" />
+                    <converters:BoolToGridLengthConverter x:Key="HideRowOnTrue" OnTrue="0" OnFalse="*"/>
+                    <converters:BoolToVisibility x:Key="CollapseOnFalse" />
+                    <converters:BoolToVisibility x:Key="CollapseOnTrue" OnTrue="Collapsed" OnFalse="Visible" />
+                    <converters:BoolToVisibility x:Key="HideOnFalse" OnFalse="Hidden" />
+                    <converters:BoolToVisibility x:Key="HideOnTrue" OnTrue="Hidden" OnFalse="Visible" />
+                    <converters:ObjectToBool x:Key="ObjectToBool" />
+                    <converters:ObjectToVisibility x:Key="CollapseOnNull" />
+                    <converters:ObjectToVisibility x:Key="HideOnNull" OnNull="Hidden" />
+                    <converters:BoolToStyle x:Key="IsActiveToWindowFrameStyle" OnTrue="{StaticResource ActiveWindowBorder}" OnFalse="{StaticResource InactiveWindowBorder}"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -50,13 +52,33 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Border Grid.RowSpan="2" Style="{Binding ElementName=startWindow, Path=IsActive, Converter={StaticResource isActiveToWindowFrameStyle}}"/>
+        <Border Grid.RowSpan="2" Style="{Binding ElementName=startWindow, Path=IsActive, Converter={StaticResource IsActiveToWindowFrameStyle}}"/>
 
         <Button Name="closeButton" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource WindowControlRed}" Content="&#xe8bb;" Click="CloseBtn_Click"/>
 
         <StackPanel Margin="32" Grid.Row="0" Orientation="Horizontal" Height="auto">
-            <Image Source="/Assets/app.ico" Height="50"/>
-            <TextBlock Margin="20,0,0,0" VerticalAlignment="Center" Text="Community Map Editor for Anno 1800" Foreground="{StaticResource TextBrush}" FontSize="23" FontWeight="Light"/>
+            <Image Source="/Assets/app.ico" Height="50" VerticalAlignment="Center"/>
+            <StackPanel Orientation="Vertical"
+                        Margin="20,0,0,0" >
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" 
+                               Text="{Binding AppTitle, FallbackValue=AppTitle}" 
+                               Foreground="{StaticResource TextBrush}" 
+                               FontSize="25" 
+                               FontWeight="Light"/>
+                    <TextBlock VerticalAlignment="Bottom" Margin="10, 3"
+                               Text="{Binding AppVersion, FallbackValue=AppVersion}"
+                               Foreground="{StaticResource DisabledBrush}"
+                               FontSize="13"
+                               FontWeight="Light"/>
+                </StackPanel>
+                <TextBlock VerticalAlignment="Center"
+                           Text="{Binding AppSubTitle, FallbackValue=AppSubTitle}"
+                           Foreground="{StaticResource TextBrush}" 
+                           FontSize="16" 
+                           FontWeight="Light" />
+            </StackPanel>
+            
         </StackPanel>
 
         <Grid Grid.Row="1" Margin="100,0"
@@ -116,38 +138,70 @@
 
             <!-- game path  -->
             <TextBlock Grid.Row="1" Grid.Column="0"
-                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
+                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource CollapseOnTrue}}"
                        Style="{StaticResource DefaultLabelStyle}"
                        Text="Anno Game Path:"  />
             <TextBox Grid.Row="1" Grid.Column="1"
-                     Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
+                     Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource CollapseOnTrue}}"
                      Text="{Binding Settings.GamePath}"
                      IsEnabled="False" />
-            <Button Grid.Row="1" Grid.Column="2"
-                    Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
+            <Button Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2"
+                    Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource CollapseOnTrue}}"
                     Content="Select"
                     Click="SelectGamePath_Click"
-                    IsEnabled="{Binding DataManager.IsInitializing, Converter={StaticResource booleanNot}}" />
+                    IsEnabled="{Binding DataManager.IsInitializing, Converter={StaticResource BooleanNot}}" />
             <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
-                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
+                       Margin="2,0,2,10"
+                       Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource CollapseOnTrue}}"
                        Style="{StaticResource MutedLabelStyle}"
-                       TextWrapping="Wrap"
-                       Margin="0 0 0 12">
+                       TextWrapping="Wrap">
                 The Anno Map Editor requires the game's files to function. Select the game's installation directory.
             </TextBlock>
-            <controls:StatusIndicator Grid.Row="1" Grid.Column="3" HorizontalAlignment="Right"
-                                      Visibility="{Binding Settings.EnableExpertMode, Converter={StaticResource collapseOnTrue}}"
-                                      IsOk="{Binding DataManager.IsInitialized}"
-                                      IsLoading="{Binding DataManager.IsInitializing}"
-                                      IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource objectToBool}}"/>
+            <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" 
+                       VerticalAlignment="Center"
+                       Style="{StaticResource DefaultLabelStyle}"
+                       Text="Detected Game:" />
+            <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
+                       Text="No game path selected!"
+                       Style="{StaticResource DefaultLabelStyle}"
+                       FontSize="15"
+                       FontWeight="Light"
+                       VerticalAlignment="Center" 
+                       Margin="24,0,0,0"
+                       Visibility="{Binding Settings.DataPath, Converter={StaticResource VisibleOnEmptyString}}"/>
+            <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
+                  Visibility="{Binding Settings.DataPath, Converter={StaticResource CollapsedOnEmptyString}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Canvas Width="24" Height="24" Margin="24, 0,3, 0" VerticalAlignment="Center">
+                    <Path Fill="#ffffff"
+                          Data="{Binding SelectedGame.IconGeometry}" />
+                </Canvas>
+                <TextBlock Grid.Column="1" Text="{Binding SelectedGame.Title}"
+                           Style="{StaticResource DefaultLabelStyle}"
+                           FontSize="15"
+                           FontWeight="Light"
+                           VerticalAlignment="Center"/>
+                <controls:StatusIndicator Grid.Column="3" 
+                                          Width="20" Height="20" 
+                                          Margin="10,0"
+                                          VerticalAlignment="Center" HorizontalAlignment="Right"
+                                          IsOk="{Binding DataManager.IsInitialized}"
+                                          IsLoading="{Binding DataManager.IsInitializing}"
+                                          IsError="{Binding DataManager.ErrorMessage, Converter={StaticResource ObjectToBool}}"/>
 
-            <StackPanel Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2"
+            </Grid>
+            <StackPanel Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="4"
                         Orientation="Horizontal"
-                        VerticalAlignment="Bottom"
-                        Height="40"
-                        Margin="0,0,50,0"
-                        HorizontalAlignment="right">
+                        Margin="0, 20, 0,0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="left">
                 <TextBlock Text="Go to Editor directly on next startup"
+                           Style="{StaticResource DefaultLabelStyle}"
                            VerticalAlignment="Center"
                            Foreground="{StaticResource ForegroundBrush}"/>
                 <controls:FancyToggle IsChecked="{Binding Settings.Quickstart, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -156,8 +210,8 @@
                                       OnText="" 
                                       OffText=""/>
             </StackPanel>
-            <Button Grid.Row="12" Grid.Column="2" Grid.ColumnSpan="2"
-                    Margin="0,30,0,0"
+            <Button Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2"
+                    Margin="0,0,0,0"
                     Height="40"
                     Content="Continue"
                     Click="NewMap_Click"

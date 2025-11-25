@@ -2,8 +2,10 @@
 using AnnoMapEditor.DataArchives.Assets.Repositories;
 using AnnoMapEditor.Utilities;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using AnnoMapEditor.Games;
 
 namespace AnnoMapEditor.DataArchives
 {
@@ -39,11 +41,18 @@ namespace AnnoMapEditor.DataArchives
 
         public bool HasError => _errorMessage != null;
 
-
+        public Game? DetectedGame
+        {
+            get => _detectedGame; 
+            private set => SetProperty(ref _detectedGame, value);
+        }
+        private Game? _detectedGame;
+        
         public IDataArchive DataArchive => _isInitialized && _dataArchive != null ? _dataArchive : throw new Exception(NOT_INITIALIZED_MESSAGE);
         private IDataArchive? _dataArchive;
 
         public AssetRepository AssetRepository => _isInitialized && _assetRepository != null ? _assetRepository : throw new Exception(NOT_INITIALIZED_MESSAGE);
+        public AssetRepository AssetRepositoryUnsafe => _assetRepository!;
         private AssetRepository? _assetRepository;
 
         public FixedIslandRepository FixedIslandRepository => _isInitialized && _fixedIslandRepository != null ? _fixedIslandRepository : throw new Exception(NOT_INITIALIZED_MESSAGE);
@@ -73,29 +82,40 @@ namespace AnnoMapEditor.DataArchives
             UpdateStatus(isInitializing: true, isInitialized: false);
             _logger.LogInformation($"Initializing DataManager at '{dataPath}'.");
 
+            DetectedGame = null;
+            foreach (var supportedGame in Game.SupportedGames)
+            {
+                if (!dataPath.Contains(supportedGame.Path)) continue;
+                DetectedGame = supportedGame;
+                _logger.LogInformation($"Found Game '{supportedGame.Title}'.");
+                break;
+            }
+
             try
             {
+                if (DetectedGame == null || DetectedGame == Game.UnsupportedAnno)
+                    throw new Exception("Selected game is not supported.");
 
                 DataArchiveFactory dataArchiveFactory = new();
                 _dataArchive = await dataArchiveFactory.CreateDataArchiveAsync(dataPath);
 
-                _assetRepository = new AssetRepository(_dataArchive);
+                _assetRepository = new AssetRepository(_dataArchive, DetectedGame);
                 await Task.Run(() =>
                 {
-                    _assetRepository.Register<RegionAsset>();
-                    _assetRepository.Register<FertilityAsset>();
-                    _assetRepository.Register<RandomIslandAsset>();
-                    _assetRepository.Register<SlotAsset>();
-                    _assetRepository.Register<MinimapSceneAsset>();
-                    _assetRepository.Register<SessionAsset>();
-                    _assetRepository.Register<MapTemplateAsset>();
+                    _assetRepository.RegisterWithGameCheck<RegionAsset>();
+                    _assetRepository.RegisterWithGameCheck<FertilityAsset>();
+                    _assetRepository.RegisterWithGameCheck<RandomIslandAsset>();
+                    _assetRepository.RegisterWithGameCheck<SlotAsset>();
+                    _assetRepository.RegisterWithGameCheck<MinimapSceneAsset>();
+                    _assetRepository.RegisterWithGameCheck<SessionAsset>();
+                    _assetRepository.RegisterWithGameCheck<MapTemplateAsset>();
                 });
                 await _assetRepository.InitializeAsync();
 
                 _fixedIslandRepository = new FixedIslandRepository(_dataArchive);
                 await _fixedIslandRepository.InitializeAsync();
 
-                _islandRepository = new IslandRepository(_fixedIslandRepository, _assetRepository);
+                _islandRepository = new IslandRepository(_fixedIslandRepository, _assetRepository, DetectedGame);
                 await _islandRepository.InitializeAsync();
 
                 _mapGroupRepository = new MapGroupRepository(_dataArchive);
@@ -103,6 +123,7 @@ namespace AnnoMapEditor.DataArchives
             }
             catch (Exception ex)
             {
+                _logger.LogError($"{ex.Message}\n{ex.StackTrace}");
                 UpdateStatus(isInitializing: false, isInitialized: false, errorMessage: ex.Message);
                 _logger.LogInformation($"Could not initialize DataManager at '{dataPath}'.");
                 return;
