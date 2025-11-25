@@ -36,6 +36,11 @@ namespace AnnoMapEditor.UI.Controls
         private IList<AddIslandButton>? _addIslands { get; set; }
 
         private Vector2? _oldSize { get; set; }
+        private Rect2? _oldPlayableArea { get; set; }
+
+        // Group drag tracking
+        private bool _groupDragActive = false;
+        private Dictionary<MapElementViewModel, Vector2>? _groupDragStartPositions;
 
         #region selecting
 
@@ -570,11 +575,59 @@ namespace AnnoMapEditor.UI.Controls
                     DeselectMapElement(mapElementViewModel);
             }
 
-            // handle removal of islands
+            // handle removal of islands and start/end of group drag
             else if (e.PropertyName == nameof(IslandViewModel.IsOutOfBounds) || e.PropertyName == nameof(DraggingViewModel.IsDragging))
             {
                 if (sender is IslandViewModel viewModel)
                 {
+                    // Start or end of a drag
+                    if (e.PropertyName == nameof(DraggingViewModel.IsDragging))
+                    {
+                        // Group Dragging
+                        if (viewModel.IsDragging && viewModel.IsSelected && _selectedElements.Count > 1 && !_groupDragActive)
+                        {
+                            _groupDragActive = true;
+                            MapTemplates.MapElementViewModel.SuppressIndividualTransformStacking = true;
+                            _groupDragStartPositions = new Dictionary<MapElementViewModel, Vector2>();
+                            foreach (var sel in _selectedElements)
+                            {
+                                _groupDragStartPositions[sel] = sel.Element.Position;
+                            }
+                        }
+                        // If drag ends and a grouped drag was active, push a grouped stack entry
+                        else if (!viewModel.IsDragging && _groupDragActive)
+                        {
+                            try
+                            {
+                                List<IUndoRedoStackEntry> entries = new();
+                                if (_groupDragStartPositions != null)
+                                {
+                                    foreach (var kvp in _groupDragStartPositions)
+                                    {
+                                        var vm = kvp.Key;
+                                        var startPos = kvp.Value;
+                                        var endPos = vm.Element.Position;
+                                        if (!Vector2.Equals(startPos, endPos))
+                                        {
+                                            entries.Add(new MapElementTransformStackEntry(vm.Element, startPos, endPos));
+                                        }
+                                    }
+                                }
+
+                                if (entries.Count == 1)
+                                    UndoRedoStack.Instance.Do(entries[0]);
+                                else if (entries.Count > 1)
+                                    UndoRedoStack.Instance.Do(new GroupStackEntry(entries));
+                            }
+                            finally
+                            {
+                                _groupDragActive = false;
+                                MapTemplates.MapElementViewModel.SuppressIndividualTransformStacking = false;
+                                _groupDragStartPositions = null;
+                            }
+                        }
+                    }
+
                     if (viewModel.IsOutOfBounds && !viewModel.IsDragging && !_mapTemplate.ResizingInProgress)
                     {
                         _mapTemplate.Elements.Remove(viewModel.Element);
@@ -709,6 +762,8 @@ namespace AnnoMapEditor.UI.Controls
             {
                 if (_oldSize is null)
                     _oldSize = new Vector2(args.OldMapSize);
+                if (_oldPlayableArea is null)
+                    _oldPlayableArea = args.OldPlayableAreaRect;
 
                 if (_mapRect is not null)
                 {
@@ -735,7 +790,23 @@ namespace AnnoMapEditor.UI.Controls
 
         private void MapElement_MapSizeConfigCommitted(object? sender, EventArgs _)
         {
+            if (_mapTemplate is not null && _oldSize is not null && _oldPlayableArea is not null)
+            {
+                // push undo entry for map size and playable area change
+                if (!UndoRedoStack.IsProcessing)
+                {
+                    UndoRedoStack.Instance.Do(new MapPropertiesStackEntry(
+                    _mapTemplate,
+                    oldSize: _oldSize.X,
+                    newSize: _mapTemplate.Size.X,
+                    oldPlayableArea: _oldPlayableArea,
+                    newPlayableArea: _mapTemplate.PlayableArea
+                    ));
+                }
+            }
+
             _oldSize = null;
+            _oldPlayableArea = null;
             RecalculateAddIslandCoordinates();
             UpdateSize();
             KeepStartingSpotsInBounds();

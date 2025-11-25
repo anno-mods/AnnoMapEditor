@@ -13,9 +13,10 @@ namespace AnnoMapEditor.Utilities.UndoRedo
         private readonly List<IUndoRedoStackEntry> _group;
         public void Undo()
         {
-            foreach (var stackEntry in _group)
+            // Undo in reverse order to properly revert changes inside group changes
+            for (int i = _group.Count - 1; i >= 0; i--)
             {
-                stackEntry.Undo();
+                _group[i].Undo();
             }
         }
 

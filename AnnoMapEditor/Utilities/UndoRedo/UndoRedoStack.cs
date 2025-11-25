@@ -16,6 +16,9 @@ namespace AnnoMapEditor.Utilities.UndoRedo
             UndoHistory = new();
         }
 
+        // Indicates an Undo or Redo operation is currently being processed to block ui
+        public static bool IsProcessing { get; private set; } = false;
+
         public class HistoryEntry
         {
             public HistoryEntry(string label, int index)
@@ -54,7 +57,15 @@ namespace AnnoMapEditor.Utilities.UndoRedo
             if (_undoStack.Count > 0)
             {
                 var stackEntry = _undoStack.Pop();
-                stackEntry.Undo();
+                try
+                {
+                    IsProcessing = true;
+                    stackEntry.Undo();
+                }
+                finally
+                {
+                    IsProcessing = false;
+                }
                 _redoStack.Push(stackEntry);
                 UndoHistory.Remove(UndoHistory.First());
             }
@@ -66,7 +77,15 @@ namespace AnnoMapEditor.Utilities.UndoRedo
             if (_redoStack.Count > 0)
             {
                 var stackEntry = _redoStack.Pop();
-                stackEntry.Redo();
+                try
+                {
+                    IsProcessing = true;
+                    stackEntry.Redo();
+                }
+                finally
+                {
+                    IsProcessing = false;
+                }
                 _undoStack.Push(stackEntry);
                 UndoHistory.Insert(0, new HistoryEntry(stackEntry.ActionType.ToString(), _undoStack.Count - 1));
             }
