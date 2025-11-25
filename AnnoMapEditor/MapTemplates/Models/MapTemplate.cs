@@ -161,17 +161,37 @@ namespace AnnoMapEditor.MapTemplates.Models
             ResizingInProgress = true;
 
             Vector2 oldMapSize = new(Size);
+            Rect2 oldPlayableAreaRect = new(PlayableArea.Position, PlayableArea.Max);
             Size = new(mapSize, mapSize);
 
             Vector2 oldPlayableSize = new(PlayableArea.Width, PlayableArea.Height);
             PlayableArea = new(new int[] { playableAreaMargins.x1, playableAreaMargins.y1, playableAreaMargins.x2, playableAreaMargins.y2 });
 
-            MapSizeConfigChanged?.Invoke(this, new MapTemplateResizeEventArgs(oldMapSize, oldPlayableSize));
+            MapSizeConfigChanged?.Invoke(this, new MapTemplateResizeEventArgs(oldMapSize, oldPlayableAreaRect, oldPlayableSize));
         }
 
         public void RestoreMapSizeConfig(int mapSize, Rect2 playableArea)
         {
-            // TODO: Implement Map Size Config restoring
+            if (_templateDocument.MapTemplate == null)
+                throw new InvalidDataException();
+
+            // capture old values for change event
+            Vector2 oldMapSize = new(Size);
+            Rect2 oldPlayableAreaRect = new(PlayableArea.Position, PlayableArea.Max);
+            Vector2 oldPlayableSize = new(PlayableArea.Width, PlayableArea.Height);
+
+            // write to template document
+            _templateDocument.MapTemplate.Size = new int[] { mapSize, mapSize };
+            _templateDocument.MapTemplate.PlayableArea = new int[] { playableArea.X, playableArea.Y, playableArea.X + playableArea.Width, playableArea.Y + playableArea.Height };
+
+            // apply to model
+            Size = new(_templateDocument.MapTemplate.Size);
+            PlayableArea = new(_templateDocument.MapTemplate.PlayableArea);
+
+            ResizingInProgress = false;
+            
+            MapSizeConfigChanged?.Invoke(this, new MapTemplateResizeEventArgs(oldMapSize, oldPlayableAreaRect, oldPlayableSize));
+            MapSizeConfigCommitted?.Invoke(this, new EventArgs());
         }
 
         public void ResizeAndCommitMapTemplate(int mapSize, (int x1, int y1, int x2, int y2) playableAreaMargins)
@@ -189,6 +209,7 @@ namespace AnnoMapEditor.MapTemplates.Models
             };
 
             Vector2 oldMapSize = new(Size);
+            Rect2 oldPlayableAreaRect = new(PlayableArea.Position, PlayableArea.Max);
             Size = new(_templateDocument.MapTemplate.Size);
 
             Vector2 oldPlayableSize = new(PlayableArea.Width, PlayableArea.Height);
@@ -196,7 +217,7 @@ namespace AnnoMapEditor.MapTemplates.Models
 
             ResizingInProgress = false;
 
-            MapSizeConfigChanged?.Invoke(this, new MapTemplateResizeEventArgs(oldMapSize, oldPlayableSize));
+            MapSizeConfigChanged?.Invoke(this, new MapTemplateResizeEventArgs(oldMapSize, oldPlayableAreaRect, oldPlayableSize));
             MapSizeConfigCommitted?.Invoke(this, new EventArgs());
         }
 
@@ -218,13 +239,15 @@ namespace AnnoMapEditor.MapTemplates.Models
         
         public class MapTemplateResizeEventArgs : EventArgs
         {
-            public MapTemplateResizeEventArgs(Vector2 oldMapSize, Vector2 oldPlayableSize)
+            public MapTemplateResizeEventArgs(Vector2 oldMapSize, Rect2 oldPlayableAreaRect, Vector2 oldPlayableSize)
             {
                 OldMapSize = new Vector2(oldMapSize);
+                OldPlayableAreaRect = oldPlayableAreaRect;
                 OldPlayableSize = new Vector2(oldPlayableSize);
             }
 
             public Vector2 OldMapSize { get; }
+            public Rect2 OldPlayableAreaRect { get; }
             public Vector2 OldPlayableSize { get; }
         }
     }

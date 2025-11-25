@@ -34,6 +34,9 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
 
         public Vector2? DragStartPosition;
 
+        // When true, MapElementViewModel will not push individual transform entries to the Undo/Redo stack.
+        public static bool SuppressIndividualTransformStacking { get; set; }
+
         private void Element_TransformationUndo(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(IsDragging))
@@ -50,7 +53,10 @@ namespace AnnoMapEditor.UI.Controls.MapTemplates
                         && (Element is RandomIslandElement || Element is FixedIslandElement || Element is StartingSpotElement)
                         && !((this as IslandViewModel)?.IsOutOfBounds ?? false)
                     ) {
-                        UndoRedoStack.Instance.Do(new MapElementTransformStackEntry(Element, DragStartPosition, currentPosition));
+                        if (!SuppressIndividualTransformStacking)
+                        {
+                            UndoRedoStack.Instance.Do(new MapElementTransformStackEntry(Element, DragStartPosition, currentPosition));
+                        }
                     }
                 }
             }
